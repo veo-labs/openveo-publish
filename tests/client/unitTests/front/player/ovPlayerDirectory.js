@@ -1,0 +1,1 @@
+ovPlayerDirectory = "public/publish/lib/openveo-player";

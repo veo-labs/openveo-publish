@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{{=[[ ]]=}}
+<html ng-app="ov.publish.player" ng-controller="PlayerController" ng-strict-di>
+  <head>
+
+    <title ng-bind="'OpenVeo - Video ' + title"></title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    [[#css]]
+      <link rel="stylesheet" type="text/css" href="[[.]]">
+    [[/css]]
+
+    <!--[if lt IE 9]>
+      <script src="/publish/lib/html5shiv/dist/html5shiv.min.js"></script>
+    <![endif]-->
+    <script>
+      var ovPlayerDirectory = "/publish/lib/openveo-player";
+    </script>
+    
+  </head>
+
+  <body>
+
+    <ov-player ov-fullscreen-icon="true" ov-fullscreen="fullscreen" ov-time-icon="true" ov-volume-icon="true" ov-mode-icon="true" ov-data="data" ng-show="ready"></ov-player>
+
+    [[#scripts]]
+      <script type="text/javascript" src="[[.]]"></script>
+    [[/scripts]]
+
+  </body>
+
+</html>

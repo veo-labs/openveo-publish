@@ -1,0 +1,6 @@
+{
+  "videoTmpDir" : "path to video packages temporary file (e.g. /var/www/videos/tmp)",
+  "maxConcurrentPublish" : 3,
+  "timecodeFileName" : "synchro.xml",
+  "metadataFileName" : ".session"
+}

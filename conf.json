@@ -1,0 +1,53 @@
+{
+  "routes" : {
+    "public" : {
+      "get /video/:id" : "app/server/controllers/videoController.displayVideoAction",
+      "get /getVideo/:id" : "app/server/controllers/videoController.getVideoAction"
+    },
+    "admin" : {
+      "get /videos" : "app/server/controllers/videoController.getVideosAction",
+      "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
+      "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
+      "get /startWatcher" : "app/server/controllers/watcherController.startAction"
+    }
+  },
+  "backOffice": {
+    "menu" : [
+      {
+        "label" : "Publish", 
+        "path" : "/admin/publish"
+      }
+    ],
+    "scriptFiles" : [
+      "/publish/admin/js/PublishApp.js",
+      "/publish/admin/js/PublishController.js",
+      "/publish/admin/js/PublishService.js"
+    ],
+    "cssFiles" : []
+  },
+  "custom" : {
+    "scriptFiles" : [
+      "/publish/lib/angular/angular.js",
+      "/publish/lib/openveo-player/PlayerApp.js",
+      "/publish/lib/openveo-player/PlayerDirective.js",
+      "/publish/lib/openveo-player/TabsDirective.js",
+      "/publish/lib/openveo-player/ViewDirective.js",
+      "/publish/lib/openveo-player/PlayerInterface.js",
+      "/publish/lib/openveo-player/IndexDirective.js",
+      "/publish/lib/openveo-player/TimeFilter.js",
+      "/publish/lib/openveo-player/OrderTimeCodesFilter.js",
+      "/publish/lib/openveo-player/players/VimeoPlayer.js",    
+      "/publish/front/js/PublishPlayerApp.js",
+      "/publish/front/js/VideoService.js",
+      "/publish/front/js/PlayerController.js"
+    ],
+    "cssFiles" : [
+      "/publish/lib/openveo-player/css/font.css",
+      "/publish/lib/openveo-player/css/reset.css",
+      "/publish/lib/openveo-player/css/style.css"
+    ]
+  },  
+  "viewsFolders" : [
+    "app/server/views"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "watcher": {
+    "fileName" : "path to log file (e.g. /tmp/openveo-watcher.log)",
+    "level" : "info",
+    "maxFileSize" : 1048576,
+    "maxFiles" : 2
+  },
+  "publish" : {
+    "fileName" : "path to log file (e.g. /tmp/openveo-publish.log)",
+    "level" : "info",
+    "maxFileSize" : 1048576,
+    "maxFiles" : 2
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "vimeo" : {
+    "clientId" : "vimeo client id (available on vimeo application page https://developer.vimeo.com/apps)",
+    "clientSecret" : "vimeo client secret (available on vimeo application page https://developer.vimeo.com/apps)",
+    "accessToken" : "vimeo access token (available on vimeo application page https://developer.vimeo.com/apps)"
+  }
+}

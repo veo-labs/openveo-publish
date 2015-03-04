@@ -1,0 +1,32 @@
+# Linux
+.directory
+*~
+.*.swp
+
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Windows XP
+ehthumbs.db
+
+# Logs
+logs
+*.log
+
+# Project npm dependencies
+node_modules/*
+
+# Published video packages
+public/publish/videos/*
+
+# Bower libraries
+public/publish/lib/*
+
+# Temporary directory for video packages
+tmp
