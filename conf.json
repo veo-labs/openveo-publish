@@ -1,7 +1,7 @@
 {
   "routes" : {
     "public" : {
-      "get /video/:id" : "app/server/controllers/videoController.displayVideoAction",
+      "get /video/*" : "app/server/controllers/videoController.displayVideoAction",
       "get /getVideo/:id" : "app/server/controllers/videoController.getVideoAction"
     },
     "admin" : {

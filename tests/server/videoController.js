@@ -42,13 +42,12 @@ describe("videoController", function(){
         assert.ok(false);
       });
     });
-    
+
   });
   
   describe("displayVideoAction", function(){
 
     it("should display the video page", function(done){
-      request.params.id = "1";
       response.render = function(templateName, variables){
         assert.equal(templateName, "player");
         assert.isDefined(variables.scripts);
@@ -58,18 +57,6 @@ describe("videoController", function(){
 
       videoController.displayVideoAction(request, response, function(){
         assert.ok(false);
-      });
-
-    }); 
-    
-    it("should not display the video page while video is unknown", function(done){
-      request.params.id = "0";
-      response.render = function(templateName, variables){
-        assert.ok(false);  
-      };
-
-      videoController.displayVideoAction(request, response, function(){
-        done();
       });
 
     });

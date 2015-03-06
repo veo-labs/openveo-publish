@@ -32,41 +32,28 @@ module.exports.getVideosAction = function(request, response, next){
  * Checks first if the video id is valid before returning the template.
  */
 module.exports.displayVideoAction = function(request, response, next){
-  if(request.params.id){
-    
-    videoProvider.getVideo(request.params.id, function(error, video){
-      if(error)
-        next();
-      else if(video && video.status === "success"){
-        response.locals.scripts = [];
-        response.locals.css = [];
-        
-        // Retrieve openveo sub plugins
-        var plugins = applicationStorage.getPlugins();
+  response.locals.scripts = [];
+  response.locals.css = [];
 
-        // Got sub plugins
-        if(plugins){
+  // Retrieve openveo sub plugins
+  var plugins = applicationStorage.getPlugins();
 
-          var player = false;
-          plugins.forEach(function(subPlugin){
-            if(subPlugin.name === "publish"){
-              if(subPlugin.custom){
-                response.locals.scripts = response.locals.scripts.concat(subPlugin.custom.scriptFiles || []);
-                response.locals.css = response.locals.css.concat(subPlugin.custom.cssFiles || []);
-              }
-            }
-          });
-
-          response.render("player", response.locals);
+  // Got sub plugins
+  if(plugins){
+    var player = false;
+    plugins.forEach(function(subPlugin){
+      if(subPlugin.name === "publish"){
+        if(subPlugin.custom){
+          response.locals.scripts = response.locals.scripts.concat(subPlugin.custom.scriptFiles || []);
+          response.locals.css = response.locals.css.concat(subPlugin.custom.cssFiles || []);
         }
-
       }
-      else
-        next();
-
     });
- 
+
+    response.render("player", response.locals);
   }
+  
+  // No sub plugins
   else
     next();
 };
