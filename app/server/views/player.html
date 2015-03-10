@@ -3,7 +3,6 @@
 <html ng-app="ov.publish.player" ng-controller="PlayerController" ng-strict-di>
   <head>
 
-    <title ng-bind="'OpenVeo - Video ' + title"></title>
     <base href="/publish/video/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -22,7 +21,12 @@
 
   <body>
 
-    <ov-player ov-fullscreen-icon="true" ov-fullscreen="fullscreen" ov-time-icon="true" ov-volume-icon="true" ov-mode-icon="true" ov-data="data" ng-show="ready"></ov-player>
+    <ov-player 
+      ov-mode-icon="displayModeIcon"
+      ov-full-viewport="fullViewport"
+      ov-data="data"
+      ng-show="ready"
+    ></ov-player>
 
     [[#scripts]]
       <script type="text/javascript" src="[[.]]"></script>

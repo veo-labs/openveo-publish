@@ -9,7 +9,6 @@
    * Defines the player controller.
    */
   function PlayerController($scope, $window, $location, videoService){
-    $scope.fullscreen = false;
     $scope.ready = false;
     
     var urlChunks = /.*\/([^\/]*)\/?/.exec($location.path());
@@ -24,13 +23,14 @@
           // Retrieve url parameters 
           var urlParams = $location.search();
 
-          $scope.fullscreen = urlParams["fullscreen"] || false;
+          $scope.fullViewport = urlParams["fullscreen"] || false;
+          $scope.displayModeIcon = true;
           $scope.data = video;
           $scope.ready = true;
         }
         else
           $window.location.href = "/notFound";
-          
+
       });
     }
   }
