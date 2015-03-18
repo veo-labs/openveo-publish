@@ -2,17 +2,16 @@
 
 window.assert = chai.assert;
 
-describe("PublishController", function(){
+describe("WatcherController", function(){
 
   beforeEach(module("ov.publish"));
 
-  var $rootScope, $controller, $httpBackend, $location;
+  var $rootScope, $controller, $httpBackend;
 
-  beforeEach(inject(function(_$rootScope_, _$controller_, _$httpBackend_, _$location_){
+  beforeEach(inject(function(_$rootScope_, _$controller_, _$httpBackend_){
     $rootScope = _$rootScope_;
     $httpBackend = _$httpBackend_;
     $controller = _$controller_;
-    $location = _$location_;
   }));
 
   describe("startWatcher", function(){
@@ -21,7 +20,7 @@ describe("PublishController", function(){
     beforeEach(function(){
       $scope = $rootScope.$new();
 
-      $controller("PublishController", {
+      $controller("WatcherController", {
         $scope: $scope,
         watcherStatus : { data : { status : 0 }},
         videos : { data : { videos : [] }}

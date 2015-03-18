@@ -1,0 +1,24 @@
+{
+  "MENU" : {
+    "VIDEOS" : "Vidéos",
+    "WATCHER" : "Watcher"
+  },
+  "VIDEOS" : {
+    "PAGE_TITLE" : "Publish - Vidéos",
+    "TITLE" : "Vidéos",
+    "VIDEO_ID_COLUMN" : "Vidéo id",
+    "VIDEO_LINK_COLUMN" : "Lien",
+    "VIDEO_STATUS_COLUMN" : "Statut",
+    "NO_VIDEO" : "Pas de vidéo pour le moment"
+  },
+  "WATCHER" : {  
+    "PAGE_TITLE" : "Publish - Watcher",
+    "TITLE" : "Watcher",
+    "STARTING" : "Le Watcher démarre... Veuillez patienter",
+    "STARTED" : "Le Watcher est actif et à l'écoute des répertoires",
+    "STOPPING" : "Le Watcher est en cours d'arrêt... Veuillez patienter",
+    "STOPPED" : "Le Watcher est inactif",
+    "STOP_BUTTON" : "Arrêter le Watcher",
+    "START_BUTTON" : "Démarrer le Watcher"
+  }
+}

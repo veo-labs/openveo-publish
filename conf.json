@@ -14,13 +14,18 @@
   "backOffice": {
     "menu" : [
       {
-        "label" : "Publish", 
-        "path" : "/admin/publish"
+        "label" : "MENU.VIDEOS",
+        "path" : "/admin/publish/be/videos"
+      },
+      {
+        "label" : "MENU.WATCHER",
+        "path" : "/admin/publish/be/watcher"
       }
     ],
     "scriptFiles" : [
       "/publish/admin/js/PublishApp.js",
-      "/publish/admin/js/PublishController.js",
+      "/publish/admin/js/VideoController.js",
+      "/publish/admin/js/WatcherController.js",
       "/publish/admin/js/PublishService.js"
     ],
     "cssFiles" : []

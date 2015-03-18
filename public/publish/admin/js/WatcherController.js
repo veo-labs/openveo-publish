@@ -2,33 +2,15 @@
   
   "use strict"
 
-  app.controller("PublishController", PublishController);
-  PublishController.$inject = ["$scope", "$interval", "publishService", "watcherStatus", "videos"];
+  app.controller("WatcherController", WatcherController);
+  WatcherController.$inject = ["$scope", "$interval", "publishService", "watcherStatus"];
 
   /**
-   * Defines the publish controller for the publish page.
+   * Defines the watcher controller for the watcher page.
    */
-  function PublishController($scope, $interval, publishService, watcherStatus, videos){
-
-    $scope.videos = videos.data.videos;
+  function WatcherController($scope, $interval, publishService, watcherStatus){
+    
     updateWatcherStatus(watcherStatus.data.status);
-
-    // Iterate through the list of videos, if at least one video
-    // is pending, poll each 10 seconds to be informed of 
-    // its status
-    var pollVideosPromise = $interval(function(){
-      publishService.getVideos().success(function(data, status, headers, config){
-        $scope.videos = data.videos;
-      }).error(function(data, status, headers, config){
-        if(status === 401)
-          $scope.$parent.logout();
-      });
-    }, 20000);
-
-    // Listen to destroy event on the view to update
-    $scope.$on("$destroy", function(event){
-      $interval.cancel(pollVideosPromise);
-    });
     
     /**
      * Starts the watcher.
@@ -57,7 +39,7 @@
     };
     
     /**
-     * Enables or disables actions on the watcher is status is not
+     * Enables or disables actions on the watcher if status is not
      * stable (starting or stopping).
      */
     function enableDisableWatcher(){
@@ -67,7 +49,7 @@
     /**
      * Updates watcher status, if the status is in transition 
      * state (starting or stopping) poll the server until the status
-     * is stable or 10 polls have been reached.
+     * is stable.
      * @param Number status The watcher status to set
      */
     function updateWatcherStatus(status){

@@ -1,0 +1,24 @@
+{
+  "MENU" : {
+    "VIDEOS" : "Videos",
+    "WATCHER" : "Watcher"
+  },
+  "VIDEOS" : {
+    "PAGE_TITLE" : "Publish - Videos",
+    "TITLE" : "Videos",
+    "VIDEO_ID_COLUMN" : "Video id",
+    "VIDEO_LINK_COLUMN" : "Link",
+    "VIDEO_STATUS_COLUMN" : "Status",
+    "NO_VIDEO" : "No video yet"
+  },
+  "WATCHER" : {  
+    "PAGE_TITLE" : "Publish - Watcher",
+    "TITLE" : "Watcher",
+    "STARTING" : "The Watcher is starting... Please wait",
+    "STARTED" : "The Watcher is currently listening to hot folder(s)",
+    "STOPPING" : "The Watcher is stopping... Please wait",
+    "STOPPED" : "The Watcher is actually not started",
+    "STOP_BUTTON" : "Stop watcher",
+    "START_BUTTON" : "Start watcher"
+  }
+}

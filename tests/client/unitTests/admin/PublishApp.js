@@ -16,18 +16,27 @@ describe("PublishApp", function(){
     $httpBackend.when("GET", /.*/).respond(200, "");
   }));
   
-  it("Should register /publish route", function(){
-    assert.isDefined($route.routes["/publish"]);
+  it("Should register routes to pages videos and watcher", function(){
+    assert.isDefined($route.routes["/publish/be/videos"]);
+    assert.isDefined($route.routes["/publish/be/watcher"]);
   });
   
-  it("Should be able to route to /publish after retrieving the watcher status and the list of videos", function(){
-    $httpBackend.expectGET("/admin/publish/watcherStatus");
+  it("Should be able to route to videos page after retrieving the list of videos", function(){
     $httpBackend.expectGET("/admin/publish/videos");
-    $httpBackend.expectGET("publish/admin/views/publish.html");
-    
-    $location.path("/publish");
+    $httpBackend.expectGET("publish/admin/views/videos.html");
+
+    $location.path("/publish/be/videos");
     $httpBackend.flush();
-    assert.equal($location.path(), "/publish");
+    assert.equal($location.path(), "/publish/be/videos");
+  });
+
+  it("Should be able to route to watcher page after retrieving the watcher status", function(){
+    $httpBackend.expectGET("/admin/publish/watcherStatus");
+    $httpBackend.expectGET("publish/admin/views/watcher.html");
+
+    $location.path("/publish/be/watcher");
+    $httpBackend.flush();
+    assert.equal($location.path(), "/publish/be/watcher");
   });
   
 });

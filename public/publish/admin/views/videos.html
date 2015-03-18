@@ -1,0 +1,22 @@
+<div>
+
+  <h2 ng-bind="'VIDEOS.TITLE' | translate"></h2>
+  <p class="ng-hide" ng-show="!videos.length" ng-bind="'VIDEOS.NO_VIDEO' | translate"></p>
+  <table class="table ng-hide" ng-show="videos.length">
+    <thead>
+      <tr>
+        <th ng-bind="'VIDEOS.VIDEO_ID_COLUMN' | translate"></th>
+        <th ng-bind="'VIDEOS.VIDEO_LINK_COLUMN' | translate"></th>
+        <th ng-bind="'VIDEOS.VIDEO_STATUS_COLUMN' | translate"></th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr ng-repeat="video in videos" ng-class="{'success': (video.status === 'success'), 'info' : (video.status === 'pending'), 'danger' : (video.status === 'error')}">
+        <td>[[video.id]]</td>
+        <td><a ng-href="[[video.link]]" target="_self">[[video.link]]</a></td>
+        <td>[[video.state]]</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
