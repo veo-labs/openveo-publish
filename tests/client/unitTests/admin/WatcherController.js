@@ -22,8 +22,7 @@ describe("WatcherController", function(){
 
       $controller("WatcherController", {
         $scope: $scope,
-        watcherStatus : { data : { status : 0 }},
-        videos : { data : { videos : [] }}
+        watcherStatus : { data : { status : 0 }}
       });
     });
     

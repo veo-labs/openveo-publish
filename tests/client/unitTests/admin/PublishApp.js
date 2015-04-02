@@ -38,5 +38,14 @@ describe("PublishApp", function(){
     $httpBackend.flush();
     assert.equal($location.path(), "/publish/be/watcher");
   });
+
+  it("Should be able to route to properties page after retrieving the list of properties", function(){
+    $httpBackend.expectGET("/admin/publish/properties");
+    $httpBackend.expectGET("publish/admin/views/properties.html");
+
+    $location.path("/publish/be/properties");
+    $httpBackend.flush();
+    assert.equal($location.path(), "/publish/be/properties");
+  });
   
 });

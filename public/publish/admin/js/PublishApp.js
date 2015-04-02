@@ -2,7 +2,7 @@
 
   "use strict"
 
-  var app = angular.module("ov.publish", ["ov.route", "ov.i18n"]);
+  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.edit"]);
 
   /**
    * Configures the ov.publish application by adding new routes.
@@ -40,6 +40,22 @@
       resolve: {
         watcherStatus : ["$q", "publishService", function($q, publishService){
           return publishService.getWatcherStatus();
+        }]
+      }
+    });
+
+    // Add route /publish/be/properties with authentication
+    // (will be automatically mapped
+    // to /admin/publish/be/properties instead
+    // of /publish/be/properties).
+    // Also retrieve the list of properties
+    ovRouteProvider.when("/publish/be/properties", {
+      templateUrl: "publish/admin/views/properties.html",
+      controller: "PropertiesController",
+      title: "PROPERTIES.PAGE_TITLE",
+      resolve: {
+        properties : ["$q", "publishService", function($q, publishService){
+          return publishService.getProperties();
         }]
       }
     });

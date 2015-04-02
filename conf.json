@@ -8,7 +8,15 @@
       "get /videos" : "app/server/controllers/videoController.getVideosAction",
       "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
       "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
-      "get /startWatcher" : "app/server/controllers/watcherController.startAction"
+      "get /startWatcher" : "app/server/controllers/watcherController.startAction",
+      "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
+      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
+      "get /removeVideo/:id" : "app/server/controllers/videoController.removeVideoAction",
+      "post /updateVideo/:id" : "app/server/controllers/videoController.updateVideoAction",
+      "get /properties" : "app/server/controllers/propertyController.getPropertiesAction",
+      "post /addProperty" : "app/server/controllers/propertyController.addPropertyAction",
+      "post /updateProperty/:id" : "app/server/controllers/propertyController.updatePropertyAction",
+      "get /removeProperty/:id" : "app/server/controllers/propertyController.removePropertyAction"
     }
   },
   "backOffice": {
@@ -20,15 +28,22 @@
       {
         "label" : "MENU.WATCHER",
         "path" : "/admin/publish/be/watcher"
+      },
+      {
+        "label" : "MENU.PROPERTIES",
+        "path" : "/admin/publish/be/properties"
       }
     ],
     "scriptFiles" : [
       "/publish/admin/js/PublishApp.js",
       "/publish/admin/js/VideoController.js",
       "/publish/admin/js/WatcherController.js",
+      "/publish/admin/js/PropertiesController.js",
       "/publish/admin/js/PublishService.js"
     ],
-    "cssFiles" : []
+    "cssFiles" : [
+      "/publish/admin/css/publish.css"
+    ]
   },
   "custom" : {
     "scriptFiles" : [

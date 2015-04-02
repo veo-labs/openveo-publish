@@ -1,24 +1,69 @@
 {
   "MENU" : {
     "VIDEOS" : "Vidéos",
-    "WATCHER" : "Watcher"
+    "WATCHER" : "Watcher",
+    "PROPERTIES" : "Propriétés personnalisées"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
     "TITLE" : "Vidéos",
-    "VIDEO_ID_COLUMN" : "Vidéo id",
-    "VIDEO_LINK_COLUMN" : "Lien",
-    "VIDEO_STATUS_COLUMN" : "Statut",
-    "NO_VIDEO" : "Pas de vidéo pour le moment"
+    "NAME_COLUMN" : "Vidéo",
+    "STATUS_COLUMN" : "Statut",
+    "ACTIONS_COLUMN" : "Actions",
+    "DATE_COLUMN" : "Date",
+    "NO_VIDEO" : "Pas de vidéo pour le moment",
+    "FORM_EDIT" : "Editer",
+    "FORM_CANCEL" : "Annuler",
+    "FORM_SAVE" : "Enregistrer",
+    "PUBLISH" : "Publier",
+    "UNPUBLISH" : "Dépublier",
+    "REMOVE" : "Supprimer",
+    "ATTR_TITLE" : "Titre",
+    "ATTR_DESCRIPTION" : "Description",
+    "STATE_0" : "En attente",
+    "STATE_1" : "Copie",
+    "STATE_2" : "Extraction",
+    "STATE_3" : "Validation",
+    "STATE_4" : "Préparation",
+    "STATE_5" : "Envoi",
+    "STATE_6" : "Envoyé",
+    "STATE_7" : "Publié",
+    "STATE_8" : "Erreur"
   },
-  "WATCHER" : {  
+  "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
     "TITLE" : "Watcher",
+    "INFO" : "Le watcher écoute un ou plusieurs répertoires (en fonction de la configuration). Lorsqu'un paquet vidéo est ajouté à l'un des répertoires écouté, la vidéo est envoyée sur la plateforme vidéo.",
     "STARTING" : "Le Watcher démarre... Veuillez patienter",
     "STARTED" : "Le Watcher est actif et à l'écoute des répertoires",
     "STOPPING" : "Le Watcher est en cours d'arrêt... Veuillez patienter",
     "STOPPED" : "Le Watcher est inactif",
     "STOP_BUTTON" : "Arrêter le Watcher",
     "START_BUTTON" : "Démarrer le Watcher"
+  },
+  "PROPERTIES" : {
+    "PAGE_TITLE" : "Publish - Propriétés personnalisées",
+    "TITLE" : "Propriétés personnalisées",
+    "INFO" : "Les propriétés personnalisées permettent de rajouter des propriétés aux vidéos. Par défaut une vidéo posséde deux propriétés, titre et description. Toutes les propriétés présentes sur cette page seront disponibles lors de l'édition d'une vidéo.",    
+    "NO_PROPERTIES" : "Pas de propriétés personnalisées pour le moment",
+    "NAME_COLUMN" : "Nom",
+    "TYPE_COLUMN" : "Type",
+    "ACTIONS_COLUMN" : "Actions",
+    "REMOVE" : "Supprimer",
+    "FORM_EDIT" : "Editer",
+    "FORM_CANCEL" : "Annuler",
+    "FORM_SAVE" : "Enregistrer",
+    "ATTR_NAME" : "Nom",
+    "ATTR_DESCRIPTION" : "Description",
+    "ATTR_TYPE" : "Type",
+    "ADD_PROPERTY" : "Ajouter une propriété personnalisée",
+    "FORM_ADD_NAME" : "Nom",
+    "FORM_ADD_DESCRIPTION" : "Description",
+    "FORM_ADD_TYPE" : "Type",
+    "FORM_ADD_TEXT_TYPE" : "Texte",
+    "FORM_ADD_BUTTON" : "Ajouter",
+    "FORM_ADD_NAME_DESC" : "Le nom de la propriété tel qu'il apparaîtra lors de l'édition d'une vidéo",
+    "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
+    "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété"
   }
 }
