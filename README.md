@@ -4,8 +4,16 @@ OpenVeo Publish is a plugin, for OpenVeo application, to help publish video pack
 
 ## Features
 
+TODO
+
 ## Installation
+
+TODO
 
 ### Requirements
 
+TODO
+
 ## License
+
+TODO
