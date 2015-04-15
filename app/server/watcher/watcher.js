@@ -92,6 +92,55 @@ var db = openVeoAPI.Database.getDatabase(databaseConf);
 // Establish connection to the database
 db.connect(function(error){
   
+  /**
+   * Publishes a package by its name after making sure the
+   * file is completely copied to the hot folder.
+   * Recursively check file every 10 seconds to know if it has changed
+   * or not to be sure file is complete before starting to publish
+   * it.
+   * TODO Find a better way to know if the file is complete
+   * @param String filePath The file of the path to publish
+   * @param fs.Stats lastStat Information about the file
+   */
+  function publishPackage(filePath, lastStat){
+    fs.stat(filePath, function(error, stat){
+
+      if(error)
+        logger.error(error && error.message, {code : error.code});
+      else{
+
+        // Files modification date hasn't change in 10 seconds
+        // File is considered complete
+        if(lastStat && stat.mtime.getTime() === lastStat.mtime.getTime()){
+
+          // Only files with tar extension are accepted
+          if(path.extname(filePath) === ".tar"){
+            logger.info("File " + filePath + " has been added to hot folder");
+            var dirName = path.dirname(filePath);
+            var packageInfo = null;
+
+            // Find the hot folder corresponding in which the file
+            // was added
+            watcherConf.hotFolders.forEach(function(hotFolder){
+              if(path.normalize(hotFolder.path).indexOf(dirName) === 0){
+                packageInfo = JSON.parse(JSON.stringify(hotFolder));
+                return;
+              }
+            });
+
+            packageInfo["originalPackagePath"] = filePath;
+            publishManager.publish(packageInfo);
+          }
+
+        }
+
+        // File modification date has changed, file is not complete yet
+        else
+          setTimeout(publishPackage, 10000, filePath, stat);
+      }
+    });
+  }
+
   // Connection to database failed
   if(error){
     logger.error(error && error.message);
@@ -127,7 +176,7 @@ db.connect(function(error){
     
     async.filter(hotFoldersPaths, fs.exists, function(results){
       hotFoldersPaths = results;
-      
+
       // Start watching the hot folders
       var watcher = chokidar.watch(hotFoldersPaths, {
         persistent: true,
@@ -136,25 +185,7 @@ db.connect(function(error){
 
       // Listen to files added to the hot folder
       watcher.on("add", function(filePath){
-
-        // Only files with tar extension are accepted
-        if(path.extname(filePath) === ".tar"){
-          logger.info("File " + filePath + " has been added to hot folder");
-          var dirName = path.dirname(filePath);
-          var packageInfo = null;
-
-          // Find the hot folder corresponding in which the file
-          // was added
-          watcherConf.hotFolders.forEach(function(hotFolder){
-            if(path.normalize(hotFolder.path).indexOf(dirName) === 0){
-              packageInfo = JSON.parse(JSON.stringify(hotFolder));
-              return;
-            }
-          });
-
-          packageInfo["originalPackagePath"] = filePath;
-          publishManager.publish(packageInfo);
-        }
+        publishPackage(filePath);
       });
 
       watcher.on("ready", function(){
