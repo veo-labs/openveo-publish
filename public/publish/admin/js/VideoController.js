@@ -117,7 +117,6 @@
       pendingEdition = false;
       form.edition = false;
       form.cancelEdition();
-      updateVideos();
     };
 
     /**
@@ -144,7 +143,6 @@
           video.saving = form.saving = false;
           form.edition = false;
           pendingEdition = false;
-          updateVideos();
           form.closeEdition();
           $scope.toggleVideoDetails(video);
         }).error(function(data, status, headers, config){
