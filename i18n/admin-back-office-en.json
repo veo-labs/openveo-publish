@@ -1,5 +1,6 @@
 {
   "MENU" : {
+    "PUBLISH" : "Publish",
     "VIDEOS" : "Videos",
     "WATCHER" : "Watcher",
     "PROPERTIES" : "Custom properties"
@@ -30,7 +31,7 @@
     "STATE_7" : "Published",
     "STATE_8" : "Error"
   },
-  "WATCHER" : {  
+  "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
     "TITLE" : "Watcher",
     "INFO" : "The watcher listens to one or several directories (depending on configuration). When a video package is added to one of the listened directory, the video is sent to the video platform.",

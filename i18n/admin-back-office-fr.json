@@ -1,5 +1,6 @@
 {
   "MENU" : {
+    "PUBLISH" : "Publish",
     "VIDEOS" : "Vidéos",
     "WATCHER" : "Watcher",
     "PROPERTIES" : "Propriétés personnalisées"
