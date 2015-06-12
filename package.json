@@ -40,7 +40,7 @@
     "node": "^0.10.0"
   },
   "scripts": {
-    "postinstall": "bower install",
+    "postinstall": "bower install --allow-root",
     "test-client": "karma start tests/client/karmaConf.js",
     "test-server": "mocha -R spec tests/server/*.js"
   }
