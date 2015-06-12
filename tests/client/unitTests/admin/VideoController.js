@@ -182,8 +182,8 @@ describe("VideoController", function(){
   describe("removeVideo", function(){
 
     it("Should be able to remove a video if not saving", function(){
-      $httpBackend.when("GET", "/admin/publish/removeVideo/1").respond(200);
-      $httpBackend.expectGET("/admin/publish/removeVideo/1");
+      $httpBackend.when("DELETE", "/admin/publish/video/1").respond(200);
+      $httpBackend.expectDELETE("/admin/publish/video/1");
 
       $controller("VideoController", {
         $scope: $scope,
@@ -206,8 +206,8 @@ describe("VideoController", function(){
     });
 
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("GET", "/admin/publish/removeVideo/1").respond(401);
-      $httpBackend.expectGET("/admin/publish/removeVideo/1");
+      $httpBackend.when("DELETE", "/admin/publish/video/1").respond(401);
+      $httpBackend.expectDELETE("/admin/publish/video/1");
 
       $rootScope.logout = function(){
         done();

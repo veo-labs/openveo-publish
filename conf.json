@@ -11,12 +11,12 @@
       "get /startWatcher" : "app/server/controllers/watcherController.startAction",
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
       "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
-      "get /removeVideo/:id" : "app/server/controllers/videoController.removeVideoAction",
+      "delete /video/:id" : "app/server/controllers/videoController.removeVideoAction",
       "post /updateVideo/:id" : "app/server/controllers/videoController.updateVideoAction",
       "get /properties" : "app/server/controllers/propertyController.getPropertiesAction",
-      "post /addProperty" : "app/server/controllers/propertyController.addPropertyAction",
+      "put /property" : "app/server/controllers/propertyController.addPropertyAction",
       "post /updateProperty/:id" : "app/server/controllers/propertyController.updatePropertyAction",
-      "get /removeProperty/:id" : "app/server/controllers/propertyController.removePropertyAction"
+      "delete /property/:id" : "app/server/controllers/propertyController.removePropertyAction"
     }
   },
   "backOffice": {
@@ -46,9 +46,7 @@
       "/publish/admin/js/PropertiesController.js",
       "/publish/admin/js/PublishService.js"
     ],
-    "cssFiles" : [
-      "/publish/admin/css/publish.css"
-    ]
+    "cssFiles" : []
   },
   "custom" : {
     "scriptFiles" : [
@@ -71,7 +69,7 @@
       "/publish/lib/openveo-player/css/reset.css",
       "/publish/lib/openveo-player/css/style.css"
     ]
-  },  
+  },
   "viewsFolders" : [
     "app/server/views"
   ]

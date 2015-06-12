@@ -35,7 +35,7 @@
      * @return HttpPromise The HTTP promise
      */
     var removeVideo = function(id){
-      return $http.get(basePath + "removeVideo/" + id);
+      return $http.delete(basePath + "video/" + id);
     };
 
     /**
@@ -112,7 +112,7 @@
      * @param String type The type of the property
      */
     var addProperty = function(name, description, type){
-      return $http.post(basePath + "addProperty", {
+      return $http.put(basePath + "property", {
         name : name,
         description : description,
         type : type
@@ -140,7 +140,7 @@
      * @return HttpPromise The HTTP promise
      */
     var removeProperty = function(id){
-      return $http.get(basePath + "removeProperty/" + id);
+      return $http.delete(basePath + "property/" + id);
     };    
 
     return{

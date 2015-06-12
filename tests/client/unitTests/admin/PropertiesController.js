@@ -62,8 +62,8 @@ describe("PropertiesController", function(){
   describe("removeProperty", function(){
     
     it("Should be able to remove a property if not saving", function(){
-      $httpBackend.when("GET", "/admin/publish/removeProperty/1").respond(200);
-      $httpBackend.expectGET("/admin/publish/removeProperty/1");
+      $httpBackend.when("DELETE", "/admin/publish/property/1").respond(200);
+      $httpBackend.expectDELETE("/admin/publish/property/1");
       
       $controller("PropertiesController", {
         $scope: $scope,
@@ -86,8 +86,8 @@ describe("PropertiesController", function(){
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("GET", "/admin/publish/removeProperty/1").respond(401);
-      $httpBackend.expectGET("/admin/publish/removeProperty/1");
+      $httpBackend.when("DELETE", "/admin/publish/property/1").respond(401);
+      $httpBackend.expectDELETE("/admin/publish/property/1");
       
       $rootScope.logout = function(){
         done();
@@ -224,8 +224,8 @@ describe("PropertiesController", function(){
   describe("addProperty", function(){
     
     it("Should be able to add a new property", function(){
-      $httpBackend.when("POST", "/admin/publish/addProperty").respond(200, { property : {}});
-      $httpBackend.expectPOST("/admin/publish/addProperty");
+      $httpBackend.when("PUT", "/admin/publish/property").respond(200, { property : {}});
+      $httpBackend.expectPUT("/admin/publish/property");
       
       $controller("PropertiesController", {
         $scope: $scope,
@@ -246,8 +246,8 @@ describe("PropertiesController", function(){
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("POST", "/admin/publish/addProperty").respond(401);
-      $httpBackend.expectPOST("/admin/publish/addProperty");
+      $httpBackend.when("PUT", "/admin/publish/property").respond(401);
+      $httpBackend.expectPUT("/admin/publish/property");
       
       $rootScope.logout = function(){
         done();
