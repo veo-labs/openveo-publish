@@ -17,7 +17,7 @@
     ];
     $scope.propertyType = $scope.supportedTypes[0].value;
     $scope.properties = properties.data.properties;
-    
+
     /**
      * Toggles the property detail.
      * Can't open / close detail of the property if its saving.
@@ -107,6 +107,7 @@
       
       publishService.addProperty($scope.propertyName, $scope.propertyDescription, $scope.propertyType).success(function(data, status, headers, config){
         form.saving = false;
+        resetAddForm(form);
         $scope.properties.push(data.property);
       }).error(function(data, status, headers, config){
         form.saving = false;
@@ -114,6 +115,17 @@
           $scope.$parent.logout();
       });
     };
+
+    /**
+     * Resets add's form values.
+     * @param Object form The formular to reset
+     */
+    function resetAddForm(form){
+      $scope.propertyName = null;
+      $scope.propertyDescription = null;
+      $scope.propertyType = $scope.supportedTypes[0].value;
+      form.$submitted = false;
+    }
 
   }
 
