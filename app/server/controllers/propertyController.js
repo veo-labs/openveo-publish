@@ -73,7 +73,7 @@ module.exports.addPropertyAction = function(request, response, next){
     });
   }
   else
-    response.status(400);
+    response.status(400).send();
 };
 
 /**
