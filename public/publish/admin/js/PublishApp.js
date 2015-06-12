@@ -18,13 +18,8 @@
       controller: "VideoController",
       title: "VIDEOS.PAGE_TITLE",
       resolve: {
-        videos : ["$q", "publishService", function($q, publishService){
-          var videosPromise = publishService.getVideos();
-          
-          if(videosPromise)
-            return $q.when(videosPromise);
-          else
-            return $q.reject({ authenticated: false });
+        videos : ["publishService", function(publishService){
+          return publishService.loadVideos();
         }]
       }
     });
@@ -38,7 +33,7 @@
       controller: "WatcherController",
       title: "WATCHER.PAGE_TITLE",
       resolve: {
-        watcherStatus : ["$q", "publishService", function($q, publishService){
+        watcherStatus : ["publishService", function(publishService){
           return publishService.getWatcherStatus();
         }]
       }
@@ -54,8 +49,8 @@
       controller: "PropertiesController",
       title: "PROPERTIES.PAGE_TITLE",
       resolve: {
-        properties : ["$q", "publishService", function($q, publishService){
-          return publishService.getProperties();
+        properties : ["publishService", function(publishService){
+          return publishService.loadProperties();
         }]
       }
     });

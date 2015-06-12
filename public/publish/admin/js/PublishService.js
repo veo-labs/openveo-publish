@@ -3,13 +3,33 @@
   "use strict"
 
   app.factory("publishService", PublishService);
-  PublishService.$inject = ["$http"];
+  PublishService.$inject = ["$http", "$q"];
 
   /**
    * Defines a publish service to get publish information.
    */
-  function PublishService($http){
+  function PublishService($http, $q){
     var basePath = "/admin/publish/";
+    var properties, videos;
+
+    /**
+     * Loads the list of videos from server.
+     * @return Promise The promise used to retrieve properties
+     * from server
+     * @param Boolean force true to force reloading the list of videos
+     */
+    var loadVideos = function(force){
+      if(!videos || force){
+
+        // Get videos from server
+        return $http.get(basePath + "videos").success(function(videosObj){
+          videos = videosObj;
+        });
+
+      }
+
+      return $q.when({data : videos});
+    };
 
     /**
      * Publishes the given video.
@@ -43,7 +63,7 @@
      * @return HttpPromise The HTTP promise
      */
     var getVideos = function(){
-      return $http.get(basePath + "videos");
+      return videos;
     };
 
     /**
@@ -98,11 +118,29 @@
     };
 
     /**
+     * Loads the list of properties from server.
+     * @return Promise The promise used to retrieve properties
+     * from server
+     */
+    var loadProperties = function(){
+      if(!properties){
+
+        // Get properties from server
+        return $http.get(basePath + "properties").success(function(propertiesObj){
+          properties = propertiesObj;
+        });
+
+      }
+
+      return $q.when({data : properties});
+    };
+
+    /**
      * Gets list of properties.
      * @return HttpPromise The HTTP promise
      */
     var getProperties = function(){
-      return $http.get(basePath + "properties");
+      return properties;
     };
 
     /**
@@ -144,6 +182,7 @@
     };    
 
     return{
+      loadVideos : loadVideos,
       getVideos : getVideos,
       getWatcherStatus : getWatcherStatus,
       startWatcher : startWatcher,
@@ -155,7 +194,8 @@
       getProperties : getProperties,
       addProperty : addProperty,
       updateProperty : updateProperty,
-      removeProperty : removeProperty
+      removeProperty : removeProperty,
+      loadProperties : loadProperties
     };
 
   }

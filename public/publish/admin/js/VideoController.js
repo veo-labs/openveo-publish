@@ -14,11 +14,11 @@
     $scope.videos = videos.data.videos;
 
     // Iterate through the list of videos, if at least one video
-    // is pending, poll each 10 seconds to be informed of 
+    // is pending, poll each 30 seconds to be informed of
     // its status
     var pollVideosPromise = $interval(function(){
-      publishService.getVideos().success(function(data, status, headers, config){
-        pendingVideos = data.videos;
+      publishService.loadVideos(true).success(function(data, status, headers, config){
+        pendingVideos = publishService.getVideos().videos;
 
         // Do not update videos if edition of a video is in progress by
         // the user
