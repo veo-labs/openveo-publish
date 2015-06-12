@@ -6,16 +6,14 @@
   <div class="ng-hide" ng-show="properties.length">
   
     <div class="row header">
-      <div class="col-xs-12 col-sm-8"><strong ng-bind="'PROPERTIES.NAME_COLUMN' | translate"></strong></div>
-      <div class="col-xs-2 hidden-xs"><strong ng-bind="'PROPERTIES.TYPE_COLUMN' | translate"></strong></div>     
+      <div class="col-xs-12 col-sm-10"><strong ng-bind="'PROPERTIES.NAME_COLUMN' | translate"></strong></div>
       <div class="col-xs-2 hidden-xs"><strong ng-bind="'PROPERTIES.ACTIONS_COLUMN' | translate"></strong></div>
     </div>
     
-    <div class="row pu-line bg-success" ng-repeat="property in properties">
-      <div class="col-xs-12 col-sm-8" ng-click="togglePropertyDetails(property)">
+    <div class="row line bg-success" ng-repeat="property in properties">
+      <div class="col-xs-12 col-sm-10" ng-click="togglePropertyDetails(property)">
         <span class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !property.opened, 'glyphicon-chevron-down' : property.opened}"></span> <strong>[[property.name]]</strong>
       </div>
-      <div class="col-xs-2 hidden-xs">[[property.type]]</div>
       <div class="col-xs-2 hidden-xs">
         <div class="actions dropdown" ng-click="toggleSubMenu($event)">
           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -25,15 +23,14 @@
         </div>
       </div>
       <div class="row" ng-if="property.opened">
-        <div class="col-xs-12 pu-detail">
+        <div class="col-xs-12 detail">
           <form ov-form name="propertyForm" ng-submit="propertyForm.$valid && saveProperty(propertyForm, property)" novalidate>
             <ul>
               
               <li class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_NAME' | translate"></label>
-                  <ov-editable ov-value="property.name" ov-type="text" ng-class="{'has-error': propertyForm.name.$invalid && propertyForm.$submitted}">
-                    <input type="text" ng-model="property.name" name="name" class="form-control" required ng-disabled="propertyForm.saving" />
+                  <ov-editable ov-name="name" ov-value="property.name" ov-type="text" ov-required="true" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.name.$invalid && propertyForm.$submitted}">
                   </ov-editable>
                 </div>
               </li>
@@ -41,8 +38,7 @@
               <li class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_DESCRIPTION' | translate"></label>
-                  <ov-editable ov-value="property.description" ov-type="text" ng-class="{'has-error': propertyForm.description.$invalid && propertyForm.$submitted}">
-                    <input type="text" ng-model="property.description" name="description" class="form-control" required ng-disabled="propertyForm.saving" />
+                  <ov-editable ov-name="description" ov-value="property.description" ov-type="text" ov-required="true" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.description.$invalid && propertyForm.$submitted}">     
                   </ov-editable>
                 </div>
               </li>
@@ -50,12 +46,11 @@
               <li class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_TYPE' | translate"></label>
-                  <ov-editable ov-value="property.type" ov-type="select" ng-class="{'has-error': propertyForm.type.$invalid && propertyForm.$submitted}">
-                  <select class="form-control" ng-model="property.type" ng-options="type.value as (type.label | translate) for type in supportedTypes" ng-disabled="propertyForm.saving">
-                  </select>
+                  <ov-editable ov-name="type" ov-options="supportedTypes" ov-value="property.typeValue" ov-type="select" ov-required="false" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.type.$invalid && propertyForm.$submitted}">
                   </ov-editable>
                 </div>
               </li>
+
             </ul>
             
             <div class="btn-group" role="group" ng-show="!propertyForm.edition">

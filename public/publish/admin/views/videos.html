@@ -11,7 +11,7 @@
       <div class="col-xs-2 hidden-xs"><strong ng-bind="'VIDEOS.ACTIONS_COLUMN' | translate"></strong></div>
     </div>
 
-    <div class="row pu-line" ng-repeat="video in videos" ng-class="{'bg-success': (video.status === 1 && video.state === 7), 'bg-info' : video.status === 2, 'bg-danger' : !video.status, 'bg-warning' : (video.state === 6 && video.status === 1)}">
+    <div class="row line" ng-repeat="video in videos" ng-class="{'bg-success': (video.status === 1 && video.state === 7), 'bg-info' : video.status === 2, 'bg-danger' : !video.status, 'bg-warning' : (video.state === 6 && video.status === 1)}">
       <div class="col-xs-12 col-sm-6" ng-click="toggleVideoDetails(video)"><span class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !video.opened, 'glyphicon-chevron-down' : video.opened}"></span> <strong>[[video.title || video.id]]</strong></div>
       <div class="col-xs-2 hidden-xs"><span ng-if="video.metadata.date">[[video.metadata.date * 1000 | date:'yyyy-MM-dd']]</span></div>
       <div class="col-xs-2 hidden-xs">[['VIDEOS.STATE_' + video.state | translate]] <span ng-if="!video.status">([[video.errorCode]])</span></div>
@@ -29,7 +29,7 @@
         </a>
       </div>
       <div class="row" ng-if="video.opened">
-        <div class="col-xs-12 pu-detail">
+        <div class="col-xs-12 detail">
 
           <form ov-form name="videoForm" ng-submit="videoForm.$valid && saveVideo(videoForm, video)" novalidate>
             <ul>
@@ -37,8 +37,7 @@
               <li class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label" ng-bind="'VIDEOS.ATTR_TITLE' | translate"></label>
-                  <ov-editable ov-value="video.title" ov-type="text" ng-class="{'has-error': videoForm.title.$invalid && videoForm.$submitted}">
-                    <input type="text" ng-model="video.title" name="title" class="form-control" required ng-disabled="videoForm.saving" />
+                  <ov-editable ov-name="title" ov-value="video.title" ov-type="text" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm.title.$invalid && videoForm.$submitted}">     
                   </ov-editable>
                 </div>
               </li>
@@ -46,8 +45,7 @@
               <li class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label" ng-bind="'VIDEOS.ATTR_DESCRIPTION' | translate"></label>
-                  <ov-editable ov-value="video.description" ov-type="text" ng-class="{'has-error': videoForm.description.$invalid && videoForm.$submitted}">
-                    <input type="text" ng-model="video.description" name="description" class="form-control" required ng-disabled="videoForm.saving" />
+                  <ov-editable ov-name="description" ov-value="video.description" ov-type="text" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm.description.$invalid && videoForm.$submitted}">     
                   </ov-editable>
                 </div>
               </li>
@@ -55,8 +53,7 @@
               <li ng-if="property.name" ng-repeat="property in video.properties" class="form-inline">
                 <div class="form-group">
                   <label class="label label-default control-label">[[property.name]]</label>
-                  <ov-editable ov-value="property.value" ov-type="[[property.type]]" ng-class="{'has-error': videoForm[property.name].$invalid && videoForm.$submitted}">
-                    <input type="text" ng-model="property.value" name="[[property.name]]" class="form-control" required ng-disabled="videoForm.saving" />
+                  <ov-editable ov-name="[[property.name]]" ov-value="property.value" ov-type="[[property.type]]" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm[property.name].$invalid && videoForm.$submitted}">
                   </ov-editable>
                 </div>
               </li>
