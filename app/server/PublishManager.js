@@ -290,7 +290,7 @@ PublishManager.prototype.publish = function(videoPackage){
       function(callback){
         self.logger.debug("Clean up PHASE " + videoPackage.originalPackagePath);
 
-        // Uncomment this code while the issue on the vimeo-api
+        // Uncomment this code while the issue on the vimeo api
         // is corrected. An issue is opened on project's page at 
         // https://github.com/vimeo/vimeo.js/issues/20
         // Clean up the tmp directory
