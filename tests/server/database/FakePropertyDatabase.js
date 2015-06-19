@@ -1,12 +1,14 @@
 "use strict"
 
 // Module dependencies
+var util = require("util");
 var openVeoAPI = require("openveo-api");
-var VideoProvider = openVeoAPI.VideoProvider;
+var Database = openVeoAPI.Database;
 
 function FakePropertyDatabase(){}
 
 module.exports = FakePropertyDatabase;
+util.inherits(FakePropertyDatabase, Database);
 
 FakePropertyDatabase.prototype.get = function(collection, criteria, projection, limit, callback){
   
@@ -39,6 +41,10 @@ FakePropertyDatabase.prototype.insert = function(collection, data, callback){
     case "properties":
       if(data.name === "name")
         callback();
+      else if(data.name === "name1")
+        callback();      
+      else
+        callback(new Error("Error"));      
     break;
   }
 };
@@ -67,6 +73,8 @@ FakePropertyDatabase.prototype.remove = function(collection, criteria, callback)
     case "properties" : 
       if(criteria.id === 1)
         callback();
+      else
+        callback(new Error("Error"));       
     break;
   }
 };

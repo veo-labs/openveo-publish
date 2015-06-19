@@ -11,14 +11,14 @@
   function VideoController($scope, $interval, publishService, videos){
     var pendingEdition = false;
     var pendingVideos;
-    $scope.videos = videos.data.videos;
+    $scope.videos = videos.data.entities;
 
     // Iterate through the list of videos, if at least one video
     // is pending, poll each 30 seconds to be informed of
     // its status
     var pollVideosPromise = $interval(function(){
       publishService.loadVideos(true).success(function(data, status, headers, config){
-        pendingVideos = publishService.getVideos().videos;
+        pendingVideos = publishService.getVideos();
 
         // Do not update videos if edition of a video is in progress by
         // the user

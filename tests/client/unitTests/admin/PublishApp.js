@@ -22,7 +22,7 @@ describe("PublishApp", function(){
   });
   
   it("Should be able to route to videos page after retrieving the list of videos", function(){
-    $httpBackend.expectGET("/admin/publish/videos");
+    $httpBackend.expectGET("/admin/crud/video");
     $httpBackend.expectGET("publish/admin/views/videos.html");
 
     $location.path("/publish/be/videos");
@@ -40,7 +40,7 @@ describe("PublishApp", function(){
   });
 
   it("Should be able to route to properties page after retrieving the list of properties", function(){
-    $httpBackend.expectGET("/admin/publish/properties");
+    $httpBackend.expectGET("/admin/crud/property");
     $httpBackend.expectGET("publish/admin/views/properties.html");
 
     $location.path("/publish/be/properties");

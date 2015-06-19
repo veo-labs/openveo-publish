@@ -19,7 +19,7 @@ describe("PublishService", function(){
   }));
   
   it("Should be able to ask server for the list of videos", function(){
-    $httpBackend.expectGET("/admin/publish/videos");
+    $httpBackend.expectGET("/admin/crud/video");
     publishService.loadVideos();
     $httpBackend.flush();
   });
@@ -55,13 +55,13 @@ describe("PublishService", function(){
   });
 
   it("Should be able to ask server to remove a video", function(){
-    $httpBackend.expectDELETE("/admin/publish/video/5");
+    $httpBackend.expectDELETE("/admin/crud/video/5");
     publishService.removeVideo(5);
     $httpBackend.flush();
   });
 
   it("Should be able to ask server to update a video", function(){
-    $httpBackend.expectPOST("/admin/publish/updateVideo/5", {
+    $httpBackend.expectPOST("/admin/crud/video/5", {
       title : "title",
       description : "description",
       properties : [
@@ -84,13 +84,13 @@ describe("PublishService", function(){
   });   
   
   it("Should be able to ask server for the list of properties", function(){
-    $httpBackend.expectGET("/admin/publish/properties");
+    $httpBackend.expectGET("/admin/crud/property");
     publishService.loadProperties();
     $httpBackend.flush();
   });
 
   it("Should be able to ask server to add a new property", function(){
-    $httpBackend.expectPUT("/admin/publish/property", {
+    $httpBackend.expectPUT("/admin/crud/property", {
       name : "name",
       description : "description",
       type : "type"
@@ -100,7 +100,7 @@ describe("PublishService", function(){
   });
 
   it("Should be able to ask server to update a property", function(){
-    $httpBackend.expectPOST("/admin/publish/updateProperty/1", {
+    $httpBackend.expectPOST("/admin/crud/property/1", {
       name : "name",
       description : "description",
       type : "type"
@@ -110,7 +110,7 @@ describe("PublishService", function(){
   });
 
   it("Should be able to ask server ro remove a property", function(){
-    $httpBackend.expectDELETE("/admin/publish/property/1");
+    $httpBackend.expectDELETE("/admin/crud/property/1");
     publishService.removeProperty(1);
     $httpBackend.flush();
   });

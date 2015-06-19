@@ -16,7 +16,7 @@
       }
     ];
     $scope.propertyType = $scope.supportedTypes[0].value;
-    $scope.properties = properties.data.properties;
+    $scope.properties = properties.data.entities;
     
     preparePropertiesTypes();
 
@@ -110,7 +110,7 @@
       publishService.addProperty($scope.propertyName, $scope.propertyDescription, $scope.propertyType).success(function(data, status, headers, config){
         form.saving = false;
         resetAddForm(form);
-        $scope.properties.push(data.property);
+        $scope.properties.push(data.entity);
         preparePropertiesTypes();
       }).error(function(data, status, headers, config){
         form.saving = false;

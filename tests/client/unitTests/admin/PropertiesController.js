@@ -27,7 +27,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" },
               { id : 2, name : "name", description : "description", type : "type" }
             ]
@@ -45,7 +45,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -62,14 +62,14 @@ describe("PropertiesController", function(){
   describe("removeProperty", function(){
     
     it("Should be able to remove a property if not saving", function(){
-      $httpBackend.when("DELETE", "/admin/publish/property/1").respond(200);
-      $httpBackend.expectDELETE("/admin/publish/property/1");
+      $httpBackend.when("DELETE", "/admin/crud/property/1").respond(200);
+      $httpBackend.expectDELETE("/admin/crud/property/1");
       
       $controller("PropertiesController", {
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -86,8 +86,8 @@ describe("PropertiesController", function(){
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("DELETE", "/admin/publish/property/1").respond(401);
-      $httpBackend.expectDELETE("/admin/publish/property/1");
+      $httpBackend.when("DELETE", "/admin/crud/property/1").respond(401);
+      $httpBackend.expectDELETE("/admin/crud/property/1");
       
       $rootScope.logout = function(){
         done();
@@ -97,7 +97,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -113,14 +113,14 @@ describe("PropertiesController", function(){
   describe("saveProperty", function(){
     
     it("Should be able to save a property if not already saving", function(done){
-      $httpBackend.when("POST", "/admin/publish/updateProperty/1").respond(200);
-      $httpBackend.expectPOST("/admin/publish/updateProperty/1");
+      $httpBackend.when("POST", "/admin/crud/property/1").respond(200);
+      $httpBackend.expectPOST("/admin/crud/property/1");
       
       $controller("PropertiesController", {
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -145,8 +145,8 @@ describe("PropertiesController", function(){
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("POST", "/admin/publish/updateProperty/1").respond(401);
-      $httpBackend.expectPOST("/admin/publish/updateProperty/1");
+      $httpBackend.when("POST", "/admin/crud/property/1").respond(401);
+      $httpBackend.expectPOST("/admin/crud/property/1");
       
       $rootScope.logout = function(){
         done();
@@ -156,7 +156,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -176,7 +176,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -200,7 +200,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : [
+            entities : [
               { id : 1, name : "name", description : "description", type : "type" }
             ]
           }
@@ -224,14 +224,14 @@ describe("PropertiesController", function(){
   describe("addProperty", function(){
     
     it("Should be able to add a new property", function(){
-      $httpBackend.when("PUT", "/admin/publish/property").respond(200, { property : {}});
-      $httpBackend.expectPUT("/admin/publish/property");
+      $httpBackend.when("PUT", "/admin/crud/property").respond(200, { entity : {}});
+      $httpBackend.expectPUT("/admin/crud/property");
       
       $controller("PropertiesController", {
         $scope: $scope,
         properties : {
           data : {
-            properties : []
+            entities : []
           }
         }
       });
@@ -246,8 +246,8 @@ describe("PropertiesController", function(){
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("PUT", "/admin/publish/property").respond(401);
-      $httpBackend.expectPUT("/admin/publish/property");
+      $httpBackend.when("PUT", "/admin/crud/property").respond(401);
+      $httpBackend.expectPUT("/admin/crud/property");
       
       $rootScope.logout = function(){
         done();
@@ -257,7 +257,7 @@ describe("PropertiesController", function(){
         $scope: $scope,
         properties : {
           data : {
-            properties : []
+            entities : []
           }
         }
       });

@@ -8,7 +8,7 @@ var path = require("path");
 var async = require("async");
 var openVeoAPI = require("openveo-api");
 var xml2js = require("xml2js");
-var VideoProvider = openVeoAPI.VideoProvider;
+var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
 var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
 var publishConf = process.requirePublish("config/publishConf.json");
 
@@ -35,9 +35,10 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
  *    * Object The published video package
  */
 function PublishManager(database, videoProviderConf, logger){
+  openVeoAPI.applicationStorage.setDatabase(database);
   this.queue = [];
   this.pendingVideos = [];
-  this.videoProvider = new VideoProvider(database);
+  this.videoModel = new VideoModel();
   this.videoProviderConf = videoProviderConf;
   this.logger = logger;
 
@@ -141,8 +142,8 @@ PublishManager.prototype.publish = function(videoPackage){
 
           // Add video package to the list of pending packages
           self.pendingVideos.push(videoPackage);
-          videoPackage.status = VideoProvider.PENDING_STATUS;
-          videoPackage.state = VideoProvider.PENDING_STATE;
+          videoPackage.status = VideoModel.PENDING_STATUS;
+          videoPackage.state = VideoModel.PENDING_STATE;
           videoPackage.link = null;
           videoPackage.videoId = null;
           videoPackage.published = false;
@@ -150,9 +151,9 @@ PublishManager.prototype.publish = function(videoPackage){
           videoPackage.properties = [];
 
           // Save video package information into database
-          self.videoProvider.add(videoPackage, function(error){
+          self.videoModel.add(videoPackage, function(error){
             if(error)
-              callback(new PublishError(error.message, VideoProvider.SAVE_VIDEO_DATA_ERROR));
+              callback(new PublishError(error.message, VideoModel.SAVE_VIDEO_DATA_ERROR));
             else
               callback();
           });
@@ -164,7 +165,7 @@ PublishManager.prototype.publish = function(videoPackage){
       // Copy PHASE
       function(callback){
         self.logger.debug("Copy PHASE " + videoPackage.originalPackagePath);
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.COPYING_STATE);
+        self.videoModel.updateState(videoPackage.id, VideoModel.COPYING_STATE);
         
         // Copy package file to tmp directory
         var destinationFilePath = path.join(publishConf.videoTmpDir, videoPackage.id + ".tar");
@@ -172,7 +173,7 @@ PublishManager.prototype.publish = function(videoPackage){
 
           // An error occurred during the copy
           if(copyError){
-            callback(new PublishError(copyError.message, VideoProvider.COPY_ERROR));
+            callback(new PublishError(copyError.message, VideoModel.COPY_ERROR));
           }
           else{
             videoPackage.packagePath = destinationFilePath;
@@ -190,19 +191,19 @@ PublishManager.prototype.publish = function(videoPackage){
         // Try to remove the source package
         fs.unlink(videoPackage.originalPackagePath, function(unlinkError){
           if(unlinkError)
-            self.emit("error", new PublishError(unlinkError.message, VideoProvider.UNLINK_ERROR));
+            self.emit("error", new PublishError(unlinkError.message, VideoModel.UNLINK_ERROR));
 
         });
 
         var extractDirectory = path.join(publishConf.videoTmpDir, "/" + videoPackage.id);
 
         // Extract package
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.EXTRACTING_STATE);
+        self.videoModel.updateState(videoPackage.id, VideoModel.EXTRACTING_STATE);
         openVeoAPI.fileSystem.extract(videoPackage.packagePath, extractDirectory, function(error){
 
           // Extraction failed
           if(error){
-            callback(new PublishError(error.message, VideoProvider.EXTRACT_ERROR));
+            callback(new PublishError(error.message, VideoModel.EXTRACT_ERROR));
           }
 
           // Extraction done
@@ -215,16 +216,16 @@ PublishManager.prototype.publish = function(videoPackage){
       // Validation PHASE
       function(callback){
         self.logger.debug("Validation PHASE " + videoPackage.originalPackagePath);
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.VALIDATING_STATE);
+        self.videoModel.updateState(videoPackage.id, VideoModel.VALIDATING_STATE);
         
         // Validate package content
         validatePackage.call(self, videoPackage, function(error, metadata){
           
           if(error)
-            callback(new PublishError(error.message, VideoProvider.VALIDATION_ERROR));
+            callback(new PublishError(error.message, VideoModel.VALIDATION_ERROR));
           else{
             videoPackage.metadata = metadata;
-            self.videoProvider.updateMetadata(videoPackage.id, videoPackage.metadata);
+            self.videoModel.updateMetadata(videoPackage.id, videoPackage.metadata);
             callback();
           }
         });
@@ -246,7 +247,7 @@ PublishManager.prototype.publish = function(videoPackage){
             // Create videos public directory
             fs.mkdir(videosDirectoryPath, function(error){
               if(error)
-                callback(new PublishError(error.message, VideoProvider.CREATE_VIDEOS_PUBLIC_DIR_ERROR));
+                callback(new PublishError(error.message, VideoModel.CREATE_VIDEOS_PUBLIC_DIR_ERROR));
               else
                 callback();
             });
@@ -257,12 +258,12 @@ PublishManager.prototype.publish = function(videoPackage){
       // Video directory preparation PHASE
       function(callback){
         self.logger.debug("Video directory preparation PHASE " + videoPackage.originalPackagePath);
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.PREPARING_STATE);
+        self.videoModel.updateState(videoPackage.id, VideoModel.PREPARING_STATE);
         
         // Create video public directory
  fs.mkdir(path.normalize(process.rootPublish + "/public/publish/videos/" + videoPackage.id), function(error){
           if(error)
-            callback(new PublishError(error.message, VideoProvider.CREATE_VIDEO_PUBLIC_DIR_ERROR));
+            callback(new PublishError(error.message, VideoModel.CREATE_VIDEO_PUBLIC_DIR_ERROR));
           else
             callback();
         });
@@ -272,7 +273,7 @@ PublishManager.prototype.publish = function(videoPackage){
       // Publication PHASE
       function(callback){
         self.logger.debug("Publication PHASE " + videoPackage.originalPackagePath);
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.SENDING_STATE);
+        self.videoModel.updateState(videoPackage.id, VideoModel.SENDING_STATE);
 
         startPublishing.call(self, videoPackage, function(error, uploadedVideo){
 
@@ -306,18 +307,18 @@ PublishManager.prototype.publish = function(videoPackage){
       
       // An error occurred
       if(error && (typeof error !== "string")){
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.ERROR_STATE);
-        self.videoProvider.updateErrorCode(videoPackage.id, error.code);
-        self.videoProvider.updateStatus(videoPackage.id, VideoProvider.ERROR_STATUS);
+        self.videoModel.updateState(videoPackage.id, VideoModel.ERROR_STATE);
+        self.videoModel.updateErrorCode(videoPackage.id, error.code);
+        self.videoModel.updateStatus(videoPackage.id, VideoModel.ERROR_STATUS);
         self.emit("error", error);
       }
       else if(!error){
         
         // Mark package as success in the database
-        self.videoProvider.updateStatus(videoPackage.id, VideoProvider.SUCCESS_STATUS);
-        self.videoProvider.updateState(videoPackage.id, VideoProvider.SENT_STATE);
-        self.videoProvider.updateLink(videoPackage.id, "/publish/video/" + videoPackage.id);
-        self.videoProvider.updateVideoId(videoPackage.id, videoPackage.videoId);
+        self.videoModel.updateStatus(videoPackage.id, VideoModel.SUCCESS_STATUS);
+        self.videoModel.updateState(videoPackage.id, VideoModel.SENT_STATE);
+        self.videoModel.updateLink(videoPackage.id, "/publish/video/" + videoPackage.id);
+        self.videoModel.updateVideoId(videoPackage.id, videoPackage.videoId);
         self.emit("complete", videoPackage);
 
       }
@@ -339,7 +340,7 @@ PublishManager.prototype.publish = function(videoPackage){
 
   }
   else
-    this.emit("error", new PublishError("videoPackage argument must be an Object", VideoProvider.PACKAGE_NOT_DEFINED_ERROR));
+    this.emit("error", new PublishError("videoPackage argument must be an Object", VideoModel.PACKAGE_NOT_DEFINED_ERROR));
 };
 
 /**
@@ -453,7 +454,7 @@ function startPublishing(videoPackage, callback){
     function(callback){
       saveTimecode(path.join(extractDirectory, publishConf.timecodeFileName), path.join(videoFinalDir, "synchro.json"), function(error){
         if(error)
-          callback(new PublishError(error.message, VideoProvider.SAVE_TIMECODE_ERROR));
+          callback(new PublishError(error.message, VideoModel.SAVE_TIMECODE_ERROR));
 
         callback();
       });
@@ -466,7 +467,7 @@ function startPublishing(videoPackage, callback){
       // Start uploading the video to the platform
       videoPlatformProvider.upload(videoPackage, function(error, videoId){
         if(error)
-          callback(new PublishError(error.message, VideoProvider.UPLOAD_ERROR));
+          callback(new PublishError(error.message, VideoModel.UPLOAD_ERROR));
         else{
           videoPackage.videoId = videoId;
           callback();
@@ -481,7 +482,7 @@ function startPublishing(videoPackage, callback){
       // Scan directory for images
       fs.readdir(extractDirectory, function(error, files){
         if(error)
-          callback(new PublishError(error.message, VideoProvider.SCAN_FOR_IMAGES_ERROR));
+          callback(new PublishError(error.message, VideoModel.SCAN_FOR_IMAGES_ERROR));
         else{
 
           var filesToCopy = [];

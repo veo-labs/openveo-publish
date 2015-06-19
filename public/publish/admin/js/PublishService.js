@@ -9,7 +9,7 @@
    * Defines a publish service to get publish information.
    */
   function PublishService($http, $q){
-    var basePath = "/admin/publish/";
+    var basePath = "/admin/";
     var properties, videos;
 
     /**
@@ -22,13 +22,13 @@
       if(!videos || force){
 
         // Get videos from server
-        return $http.get(basePath + "videos").success(function(videosObj){
-          videos = videosObj;
+        return $http.get(basePath + "crud/video").success(function(videosObj){
+          videos = videosObj.entities;
         });
 
       }
 
-      return $q.when({data : videos});
+      return $q.when({data : {entities : videos}});
     };
 
     /**
@@ -37,7 +37,7 @@
      * @return HttpPromise The HTTP promise
      */
     var publishVideo = function(id){
-      return $http.get(basePath + "publishVideo/" + id);
+      return $http.get(basePath + "publish/publishVideo/" + id);
     };
 
     /**
@@ -46,7 +46,7 @@
      * @return HttpPromise The HTTP promise
      */
     var unpublishVideo = function(id){
-      return $http.get(basePath + "unpublishVideo/" + id);
+      return $http.get(basePath + "publish/unpublishVideo/" + id);
     };
 
     /**
@@ -55,7 +55,7 @@
      * @return HttpPromise The HTTP promise
      */
     var removeVideo = function(id){
-      return $http.delete(basePath + "video/" + id);
+      return $http.delete(basePath + "crud/video/" + id);
     };
 
     /**
@@ -86,7 +86,7 @@
         });
       }
 
-      return $http.post(basePath + "updateVideo/" + id, {
+      return $http.post(basePath + "crud/video/" + id, {
         title : title,
         description : description,
         properties : filteredProperties
@@ -98,7 +98,7 @@
      * @return HttpPromise The HTTP promise
      */
     var getWatcherStatus = function(){
-      return $http.get(basePath + "watcherStatus");
+      return $http.get(basePath + "publish/watcherStatus");
     };
     
     /**
@@ -106,7 +106,7 @@
      * @return HttpPromise The HTTP promise
      */
     var startWatcher = function(){
-      return $http.get(basePath + "startWatcher");
+      return $http.get(basePath + "publish/startWatcher");
     };
 
     /**
@@ -114,7 +114,7 @@
      * @return HttpPromise The HTTP promise
      */
     var stopWatcher = function(){
-      return $http.get(basePath + "stopWatcher");
+      return $http.get(basePath + "publish/stopWatcher");
     };
 
     /**
@@ -126,13 +126,13 @@
       if(!properties){
 
         // Get properties from server
-        return $http.get(basePath + "properties").success(function(propertiesObj){
-          properties = propertiesObj;
+        return $http.get(basePath + "crud/property").success(function(propertiesObj){
+          properties = propertiesObj.entities;
         });
 
       }
 
-      return $q.when({data : properties});
+      return $q.when({data : {entities : properties}});
     };
 
     /**
@@ -150,7 +150,7 @@
      * @param String type The type of the property
      */
     var addProperty = function(name, description, type){
-      return $http.put(basePath + "property", {
+      return $http.put(basePath + "crud/property", {
         name : name,
         description : description,
         type : type
@@ -165,7 +165,7 @@
      * @return HttpPromise The HTTP promise
      */
     var updateProperty = function(id, name, description, type){
-      return $http.post(basePath + "updateProperty/" + id, {
+      return $http.post(basePath + "crud/property/" + id, {
         name : name,
         description : description,
         type : type
@@ -178,7 +178,7 @@
      * @return HttpPromise The HTTP promise
      */
     var removeProperty = function(id){
-      return $http.delete(basePath + "property/" + id);
+      return $http.delete(basePath + "crud/property/" + id);
     };    
 
     return{

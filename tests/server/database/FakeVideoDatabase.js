@@ -1,12 +1,16 @@
 "use strict"
 
 // Module dependencies
+var util = require("util");
 var openVeoAPI = require("openveo-api");
-var VideoProvider = openVeoAPI.VideoProvider;
+var Database = openVeoAPI.Database;
+
+var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
 
 function FakeVideoDatabase(){}
 
 module.exports = FakeVideoDatabase;
+util.inherits(FakeVideoDatabase, Database);
 
 FakeVideoDatabase.prototype.get = function(collection, criteria, projection, limit, callback){
 
@@ -19,12 +23,12 @@ FakeVideoDatabase.prototype.get = function(collection, criteria, projection, lim
         ]);
       }
       else if(criteria.id === 1){
-        callback(null, [{state : VideoProvider.PUBLISHED_STATE, id : "1"}]);
+        callback(null, [{state : VideoModel.PUBLISHED_STATE, id : "1"}]);
       }
       else if(criteria.id === 0)
         callback(new Error("An error occurred while retrieving video"));
       else
-        callback(null, []);
+        callback(new Error("Error"));
     break;
     case "properties" :
       if(!criteria && !projection && limit === -1){
@@ -52,13 +56,13 @@ FakeVideoDatabase.prototype.update = function(collection, criteria, data, callba
 
   switch(collection){
     case "videos" :
-      if(criteria.id === 1 && criteria.state === VideoProvider.SENT_STATE && data.state === VideoProvider.PUBLISHED_STATE)
+      if(criteria.id === 1 && criteria.state === VideoModel.SENT_STATE && data.state === VideoModel.PUBLISHED_STATE)
         callback();
-      else if(criteria.id === 2 && criteria.state === VideoProvider.SENT_STATE && data.state === VideoProvider.PUBLISHED_STATE)
+      else if(criteria.id === 2 && criteria.state === VideoModel.SENT_STATE && data.state === VideoModel.PUBLISHED_STATE)
         callback(new Error("No video found corresponding with state sent"));
-      else if(criteria.id === 3 && criteria.state === VideoProvider.PUBLISHED_STATE && data.state === VideoProvider.SENT_STATE)
+      else if(criteria.id === 3 && criteria.state === VideoModel.PUBLISHED_STATE && data.state === VideoModel.SENT_STATE)
         callback();
-      else if(criteria.id === 4 && criteria.state === VideoProvider.PUBLISHED_STATE && data.state === VideoProvider.SENT_STATE)
+      else if(criteria.id === 4 && criteria.state === VideoModel.PUBLISHED_STATE && data.state === VideoModel.SENT_STATE)
         callback(new Error("No video found corresponding with state published"));
       else if(criteria.id === 6 && data.title && data.description && data.properties.length === 1)
         callback();
@@ -75,12 +79,27 @@ FakeVideoDatabase.prototype.update = function(collection, criteria, data, callba
 
 };
 
+FakeVideoDatabase.prototype.insert = function(collection, data, callback){  
+  switch(collection){
+    case "videos":
+      if(data.id === "1")
+        callback();
+      else
+        callback(new Error("Error"));
+    break;
+  }
+};
+
 FakeVideoDatabase.prototype.remove = function(collection, criteria, callback){
 
   switch(collection){
     case "videos" :
-      if(criteria.id === 5)
+      if(criteria.id === 1)
+        callback();      
+      else if(criteria.id === 5)
         callback();
+      else
+        callback(new Error("Error"));       
     break;
   }
 

@@ -27,7 +27,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 },
               { id : 2, status : 1 }
             ]
@@ -45,7 +45,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 0 }
             ]
           }
@@ -61,7 +61,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 0 }
             ]
           }
@@ -85,7 +85,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -114,7 +114,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -137,7 +137,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -166,7 +166,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -182,14 +182,14 @@ describe("VideoController", function(){
   describe("removeVideo", function(){
 
     it("Should be able to remove a video if not saving", function(){
-      $httpBackend.when("DELETE", "/admin/publish/video/1").respond(200);
-      $httpBackend.expectDELETE("/admin/publish/video/1");
+      $httpBackend.when("DELETE", "/admin/crud/video/1").respond(200);
+      $httpBackend.expectDELETE("/admin/crud/video/1");
 
       $controller("VideoController", {
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -206,8 +206,8 @@ describe("VideoController", function(){
     });
 
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("DELETE", "/admin/publish/video/1").respond(401);
-      $httpBackend.expectDELETE("/admin/publish/video/1");
+      $httpBackend.when("DELETE", "/admin/crud/video/1").respond(401);
+      $httpBackend.expectDELETE("/admin/crud/video/1");
 
       $rootScope.logout = function(){
         done();
@@ -217,7 +217,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
@@ -233,14 +233,14 @@ describe("VideoController", function(){
   describe("saveVideo", function(){
 
     it("Should be able to save a video if not already saving", function(done){
-      $httpBackend.when("POST", "/admin/publish/updateVideo/1").respond(200);
-      $httpBackend.expectPOST("/admin/publish/updateVideo/1");
+      $httpBackend.when("POST", "/admin/crud/video/1").respond(200);
+      $httpBackend.expectPOST("/admin/crud/video/1");
 
       $controller("VideoController", {
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1, properties : [] }
             ]
           }
@@ -265,8 +265,8 @@ describe("VideoController", function(){
     });
 
     it("Should logout user if a 401 is returned by the server", function(done){
-      $httpBackend.when("POST", "/admin/publish/updateVideo/1").respond(401);
-      $httpBackend.expectPOST("/admin/publish/updateVideo/1");
+      $httpBackend.when("POST", "/admin/crud/video/1").respond(401);
+      $httpBackend.expectPOST("/admin/crud/video/1");
 
       $rootScope.logout = function(){
         done();
@@ -276,7 +276,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1, properties : [] }
             ]
           }
@@ -296,7 +296,7 @@ describe("VideoController", function(){
         $scope: $scope,
         videos : {
           data : {
-            videos : [
+            entities : [
               { id : 1, status : 1 }
             ]
           }
