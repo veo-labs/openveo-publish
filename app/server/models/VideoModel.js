@@ -274,7 +274,7 @@ VideoModel.prototype.getOne = function(id, callback){
           callback(error);
           return;
         }
-        else if(video && (video.state === VideoModel.PUBLISHED_STATE || request.user)){
+        else if(video && video.state === VideoModel.PUBLISHED_STATE){
 
           // Retreive video timecode file
           videoInfo = video;

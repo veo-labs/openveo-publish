@@ -2,21 +2,26 @@
 
 window.assert = chai.assert;
 
+// PublishService.js
 describe("PublishService", function(){
+  var $httpBackend, publishService;
   
+  // Load module publish
   beforeEach(module("ov.publish"));
     
-  var $httpBackend, publishService;
-
+  // Dependencies injections
   beforeEach(inject(function(_$httpBackend_, _publishService_){
     $httpBackend = _$httpBackend_;
     publishService = _publishService_;
+  }));
 
+  // Initializes tests
+  beforeEach(function(){
     $httpBackend.when("GET", /.*/).respond(200, "");
     $httpBackend.when("POST", /.*/).respond(200, "");
     $httpBackend.when("DELETE", /.*/).respond(200, "");
     $httpBackend.when("PUT", /.*/).respond(200, "");
-  }));
+  });
   
   it("Should be able to ask server for the list of videos", function(){
     $httpBackend.expectGET("/admin/crud/video");

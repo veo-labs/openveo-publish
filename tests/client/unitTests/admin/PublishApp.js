@@ -2,20 +2,25 @@
 
 window.assert = chai.assert;
 
+// PublishApp.js
 describe("PublishApp", function(){
+  var $httpBackend, $route, $location;
   
+  // Load module publish
   beforeEach(module("ov.publish"));
     
-  var $httpBackend, $route, $location;
-
+  // Dependencies injections
   beforeEach(inject(function(_$httpBackend_, _$route_, _$location_){
     $httpBackend = _$httpBackend_;
     $route = _$route_;
     $location = _$location_;
-
-    $httpBackend.when("GET", /.*/).respond(200, "");
   }));
   
+  // Initializes tests
+  beforeEach(function(){
+    $httpBackend.when("GET", /.*/).respond(200, "");
+  });
+
   it("Should register routes to pages videos and watcher", function(){
     assert.isDefined($route.routes["/publish/be/videos"]);
     assert.isDefined($route.routes["/publish/be/watcher"]);

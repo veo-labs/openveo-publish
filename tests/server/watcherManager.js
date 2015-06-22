@@ -1,18 +1,18 @@
 "use strict"
 
+// Module dependencies
 var path = require("path");
 var assert = require("chai").assert;
 
-// Set module root directory
-process.rootPublish = path.join(__dirname, "../../");
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.rootPublish + "/" + filePath));
-};
-
-var watcherManager = process.requirePublish("app/server/watcher/watcherManager.js");
-
 describe("WatcherManager", function(){
+  var watcherManager;
+
+  // Initializes tests
+  before(function(){
+   watcherManager = process.requirePublish("app/server/watcher/watcherManager.js");
+  });
   
+  // start method
   describe("start", function(){
     
     before(function(){

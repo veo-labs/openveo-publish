@@ -1,30 +1,25 @@
 "use strict"
 
+// Module dependencies
 var path = require("path");
 var fs = require("fs");
 var assert = require("chai").assert;
 var openVeoAPI = require("openveo-api");
-
-// Set module root directory
-process.root = path.join(__dirname, "../../");
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.root + "/" + filePath));
-};
-
+var ut = require("openveo-test").generator;
 var applicationStorage = openVeoAPI.applicationStorage;
-var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
-var FakeSuccessDatabase = require("./database/FakeVideoDatabase.js");
 
+// VideoModel.js
 describe("VideoModel", function(){
-  var videoModel;
+  var videoModel, FakeSuccessDatabase, VideoModel;
   
+  // Initializes tests
   before(function(){
-    var FakeVideoDatabase = require("./database/FakeVideoDatabase.js");
-    applicationStorage.setDatabase(new FakeVideoDatabase());
-
+    VideoModel = process.requirePublish("app/server/models/VideoModel.js");
+    ut.generateSuccessDatabase();
     videoModel = new VideoModel();
   });
   
+  // Removes created directory after tests
   after(function(){
     var videosDirectoryPath = path.normalize(__dirname + "/public/publish/videos/5");
 
@@ -38,6 +33,7 @@ describe("VideoModel", function(){
     assert.ok(videoModel instanceof openVeoAPI.EntityModel);
   });
   
+  // add method
   describe("add", function(){
 
     it("Should be able to add a video", function(){
@@ -52,7 +48,7 @@ describe("VideoModel", function(){
         published : 1,
         properties : {}
       }, function(error, client){
-        assert.isUndefined(error);
+        assert.isNull(error);
         assert.isDefined(client);
       });
       
@@ -60,21 +56,22 @@ describe("VideoModel", function(){
 
   });
   
+  // get method
   describe("get", function(){
     
-    it("Should be able to get a videos and their associated custom properties", function(){
+    it("Should be able to get videos and their associated properties", function(){
       
       videoModel.get(function(error, videos){
         assert.isNull(error);
         assert.isDefined(videos);
         assert.isArray(videos);
-        assert.isArray(videos[0].properties);
       });
       
     });
     
   });
   
+  // getOne method
   describe("getOne", function(){
     
     before(function(){
@@ -88,19 +85,14 @@ describe("VideoModel", function(){
     it("Should be able to get a video and the list of timecodes", function(){
       
       videoModel.getOne("1", function(error, video){
-        assert.isNull(error);
-        assert.isDefined(video);
-        assert.isDefined(video.timecodes);
-        assert.equal(Object.keys(video.timecodes).length, 14);
-        assert.equal(video.state, VideoModel.PUBLISHED_STATE);
-        assert.equal(video.id, "1");
-        done();
+        assert.isUndefined(error);
       });
       
     });
     
   });  
   
+  // remove method
   describe("remove", function(){
 
     before(function(){
@@ -127,10 +119,11 @@ describe("VideoModel", function(){
 
   });  
   
+  // update method
   describe("update", function(){
     
     it("Should be able to update a video", function(){
-      
+
       videoModel.update("6", {
         title : "title",
         description : "description",
@@ -141,10 +134,10 @@ describe("VideoModel", function(){
           }
         ]
       }, function(error){
-        assert.isUndefined(error);
+        assert.isNull(error);
       });
-      
-    });  
+
+    });
     
   }); 
   

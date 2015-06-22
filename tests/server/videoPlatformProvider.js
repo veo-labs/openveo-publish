@@ -1,22 +1,22 @@
 "use strict"
 
-var path = require("path");
+// Module dependencies
 var assert = require("chai").assert;
 
-// Set module root directory
-process.rootPublish = path.join(__dirname, "../../");
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.rootPublish + "/" + filePath));
-};
-
-var videoPlatformProvider = process.requirePublish("app/server/providers/videoPlatformProvider.js");
-var VimeoProvider = process.requirePublish("app/server/providers/videoPlatforms/VimeoProvider.js");
-
+// videoPlatformProvider.js
 describe("videoPlatformProvider", function(){
+  var videoPlatformProvider, VimeoProvider;
+
+  // Initializes tests
+  before(function(){
+    videoPlatformProvider = process.requirePublish("app/server/providers/videoPlatformProvider.js");
+    VimeoProvider = process.requirePublish("app/server/providers/videoPlatforms/VimeoProvider.js");
+  });
   
+  // getProvider method
   describe("getProvider", function(){
 
-    it("should be able to create a vimeo provider", function(){
+    it("Should be able to create a vimeo provider", function(){
       var videoProvider = videoPlatformProvider.getProvider("vimeo", {
         "clientId" : "clientId",
         "clientSecret" : "clientSecret",

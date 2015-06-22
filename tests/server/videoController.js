@@ -1,32 +1,30 @@
 "use strict"
 
-var path = require("path");
+// Module dependencies
 var assert = require("chai").assert;
 var openVeoAPI = require("openveo-api");
+var ut = require("openveo-test").generator;
 var applicationStorage = openVeoAPI.applicationStorage;
 
-// Set module root directory
-process.rootPublish = path.join(__dirname, "../../");
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.rootPublish + "/" + filePath));
-};
-
-var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
-var FakeSuccessDatabase = require("./database/FakeSuccessDatabase.js");
-var FakeFailDatabase = require("./database/FakeFailDatabase.js");
-
+// videoController.js
 describe("videoController", function(){
-  var request, response, videoController;
+  var request, response, videoController, VideoModel, FakeSuccessDatabase;
   
+  // Load depdendencies
+  before(function(){
+    VideoModel = process.requirePublish("app/server/models/VideoModel.js");
+  });
+
+  // Intializes tests
   beforeEach(function(){
     request = { params : {} };
     response = { locals : {} };
-    var FakeVideoDatabase = require("./database/FakeVideoDatabase.js");
-    applicationStorage.setDatabase(new FakeVideoDatabase());
-    videoController = process.requirePublish("app/server/controllers/videoController.js"); 
+    ut.generateSuccessDatabase();
+    videoController = process.requirePublish("app/server/controllers/videoController.js");
     applicationStorage.setPlugins([{name : "player"}]);
   });
 
+  // displayVideoAction method
   describe("displayVideoAction", function(){
 
     it("Should display the video page", function(done){
@@ -45,7 +43,8 @@ describe("videoController", function(){
     
   });
   
-  describe("publishVideoAction", function(){   
+  // publishVideoAction method
+  describe("publishVideoAction", function(){
 
     it("Should be able to publish a video (changing its state to published)", function(done){
       request.params.id = "1";
@@ -100,6 +99,7 @@ describe("videoController", function(){
 
   });
 
+  // unpublishVideoAction method
   describe("unpublishVideoAction", function(){
 
     it("Should be able to unpublish a video (changing its state to sent)", function(done){
@@ -156,6 +156,7 @@ describe("videoController", function(){
 
   });
 
+  // getVideoAction method
   describe("getVideoAction", function(){
     
     it("Should be able to retrieve a video", function(done){
@@ -172,7 +173,7 @@ describe("videoController", function(){
         assert.ok(false);
       });
 
-    });    
+    });
     
     it("Should return an HTTP code 400 if id is not found in url parameters", function(done){
       response.status = function(status){
@@ -187,11 +188,12 @@ describe("videoController", function(){
       videoController.getVideoAction(request, response, function(){
         assert.ok(false);
       });
-    }); 
+    });
     
     it("Should return an HTTP code 500 if something wen't wrong", function(done){
       request.params = { id: "1" };
-      applicationStorage.setDatabase(new FakeFailDatabase());
+      ut.generateFailDatabase();
+
       response.status = function(status){
         assert.equal(status, 500);
         return this;
