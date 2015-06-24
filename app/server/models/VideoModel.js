@@ -354,6 +354,7 @@ VideoModel.prototype.getOne = function(id, callback){
  * @param String id The id of the video
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
+ *   - Number The number of removed items
  * @Override
  */
 VideoModel.prototype.remove = function(id, callback){
