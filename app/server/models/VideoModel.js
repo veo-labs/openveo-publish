@@ -195,6 +195,7 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback){
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
  *   - Array The list of videos
+ * @Override
  */
 VideoModel.prototype.get = function(callback){
   var self = this;
@@ -274,6 +275,7 @@ VideoModel.prototype.get = function(callback){
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
  *   - Object The video
+ * @Override
  */
 VideoModel.prototype.getOne = function(id, callback){
   var self = this;
@@ -352,6 +354,7 @@ VideoModel.prototype.getOne = function(id, callback){
  * @param String id The id of the video
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
+ * @Override
  */
 VideoModel.prototype.remove = function(id, callback){
   var self = this;
@@ -385,6 +388,7 @@ VideoModel.prototype.remove = function(id, callback){
  * @param Object data The video info
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
+ * @Override
  */
 VideoModel.prototype.update = function(id, data, callback){
   var info = {};

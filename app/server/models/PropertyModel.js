@@ -27,6 +27,7 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
  * }
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
+ * @Override
  */
 PropertyModel.prototype.add = function(data, callback){
   if(!data.name || !data.description || !data.type){
@@ -57,6 +58,7 @@ PropertyModel.prototype.add = function(data, callback){
  * }
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise
+ * @Override
  */
 PropertyModel.prototype.update = function(id, data, callback){
   var property = {};
