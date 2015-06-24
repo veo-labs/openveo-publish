@@ -31,7 +31,7 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
  */
 PropertyModel.prototype.add = function(data, callback){
   if(!data.name || !data.description || !data.type){
-    callback(new Error("Requires name, description or type to update the property"));
+    callback(new Error("Requires name, description or type to add a property"));
     return;
   }
 
