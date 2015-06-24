@@ -9,7 +9,7 @@
    * Defines the watcher controller for the watcher page.
    */
   function WatcherController($scope, $interval, publishService, watcherStatus){
-    
+    var pollPromise;
     updateWatcherStatus(watcherStatus.data.status);
     
     /**
@@ -60,7 +60,7 @@
       if($scope.watcherStatus === 0 || $scope.watcherStatus === 2){
         
         // Poll every seconds to test watcher status
-        var pollPromise = $interval(function(){
+        pollPromise = $interval(function(){
           publishService.getWatcherStatus().success(function(data, status, headers, config){
             
             // Update status
@@ -76,6 +76,12 @@
       }
       
     }
+
+    // Listen to destroy event on the view to stop interval if any
+    $scope.$on("$destroy", function(event){
+      if(pollPromise)
+        $interval.cancel(pollPromise);
+    });
   }
   
 })(angular.module("ov.publish"));
