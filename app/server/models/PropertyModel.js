@@ -35,7 +35,7 @@ PropertyModel.prototype.add = function(data, callback){
   }
 
   var property = {
-    id : Date.now(),
+    id : Date.now().toString(),
     name : data.name,
     description : data.description,
     type : data.type

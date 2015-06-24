@@ -91,10 +91,11 @@ VideoModel.ERROR_STATE = 8;
  *   }
  * @param Function callback The function to call when it's done
  *   - Error The error if an error occurred, null otherwise 
+ * @Override
  */
 VideoModel.prototype.add = function(videoPackage, callback){
   var data = {
-    id : videoPackage.id, 
+    id : videoPackage.id + "",
     status : videoPackage.status,
     metadata : videoPackage.metadata,
     url : videoPackage.url,
