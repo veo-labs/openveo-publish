@@ -16,6 +16,25 @@
     "property" : "app/server/models/PropertyModel",
     "video" : "app/server/models/VideoModel"
   },
+  "permissions" : {
+    "manage-watcher" : {
+      "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
+      "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
+      "paths" : [
+        "get /watcherStatus",
+        "get /stopWatcher",
+        "get /startWatcher"
+      ]
+    },
+    "publish-video" : {
+      "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
+      "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
+      "paths" : [
+        "get /publishVideo*",
+        "get /unpublishVideo*"
+      ]
+    }
+  },
   "backOffice": {
     "menu" : [
       {

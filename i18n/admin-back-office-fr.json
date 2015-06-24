@@ -6,6 +6,28 @@
     "PROPERTIES" : "Propriétés personnalisées",
     "CATEGORIES" : "Catégories"
   },
+  "PERMISSIONS" : {
+    "CREATE_PROPERTY_NAME" : "Créer des propriétés",
+    "CREATE_PROPERTY_DESCRIPTION" : "Créer des propriétés personnalisées",
+    "READ_PROPERTY_NAME" : "Voir les propriétés",
+    "READ_PROPERTY_DESCRIPTION" : "Lister les propriétés personnalisées",
+    "UPDATE_PROPERTY_NAME" : "Editer les propriétés",
+    "UPDATE_PROPERTY_DESCRIPTION" : "Editer les propriétés personnalisées",
+    "DELETE_PROPERTY_NAME" : "Supprimer les propriétés",
+    "DELETE_PROPERTY_DESCRIPTION" : "Supprimer les propriétés personnalisées",
+    "CREATE_VIDEO_NAME" : "Créer des vidéos",
+    "CREATE_VIDEO_DESCRIPTION" : "Créer des vidéos",
+    "READ_VIDEO_NAME" : "Voir les vidéos",
+    "READ_VIDEO_DESCRIPTION" : "Lister les vidéos",
+    "UPDATE_VIDEO_NAME" : "Editer les vidéos",
+    "UPDATE_VIDEO_DESCRIPTION" : "Editer les vidéos",
+    "DELETE_VIDEO_NAME" : "Supprimer les vidéos",
+    "DELETE_VIDEO_DESCRIPTION" : "Supprimer les vidéos",
+    "MANAGE_WATCHER_NAME" : "Gérer le watcher",
+    "MANAGE_WATCHER_DESCRIPTION" : "Démarrer / Arrêter le watcher",
+    "PUBLISH_VIDEO_NAME" : "Publier des vidéos",
+    "PUBLISH_VIDEO_DESCRIPTION" : "Publier / Dépublier des vidéos"
+  },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
     "TITLE" : "Vidéos",
