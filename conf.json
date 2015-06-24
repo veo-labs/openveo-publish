@@ -42,15 +42,18 @@
         "subMenu" : [
           {
             "label" : "MENU.VIDEOS",
-            "path" : "/admin/publish/be/videos"
+            "path" : "/admin/publish/be/videos",
+            "permission" : "read-video"
           },
           {
             "label" : "MENU.WATCHER",
-            "path" : "/admin/publish/be/watcher"
+            "path" : "/admin/publish/be/watcher",
+            "permission" : "manage-watcher"
           },
           {
             "label" : "MENU.PROPERTIES",
-            "path" : "/admin/publish/be/properties"
+            "path" : "/admin/publish/be/properties",
+            "permission" : "read-property"
           },
           {
             "label" : "MENU.CATEGORIES",
