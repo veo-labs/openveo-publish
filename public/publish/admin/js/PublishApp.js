@@ -54,6 +54,22 @@
         }]
       }
     });
+    
+    // Add route /publish/be/categories with authentication
+    // (will be automatically mapped
+    // to /admin/publish/be/categories instead
+    // of /publish/be/categories).
+    // Also retrieve the list of properties
+    ovRouteProvider.when("/publish/be/categories", {
+      templateUrl: "publish/admin/views/categories.html",
+      controller: "CategoriesController",
+      title: "CATEGORIES.PAGE_TITLE",
+      resolve: {
+        categories : ["publishService", function(publishService){
+          return publishService.loadCategories();
+        }]
+      }
+    });
 
   }]);
   

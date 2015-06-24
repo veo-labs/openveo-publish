@@ -9,12 +9,14 @@
       "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
       "get /startWatcher" : "app/server/controllers/watcherController.startAction",
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
-      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction"
+      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
+      "get /getTaxonomy/:name" : "app/server/controllers/TaxonomyController.getTaxonomyAction"
     }
   },
   "entities" : {
     "property" : "app/server/models/PropertyModel",
-    "video" : "app/server/models/VideoModel"
+    "video" : "app/server/models/VideoModel",
+    "taxonomy" : "app/server/models/TaxonomyModel"
   },
   "backOffice": {
     "menu" : [
@@ -32,34 +34,39 @@
           {
             "label" : "MENU.PROPERTIES",
             "path" : "/admin/publish/be/properties"
+          },
+          {
+            "label" : "MENU.CATEGORIES",
+            "path" : "/admin/publish/be/categories"
           }
         ]
       }
     ],
     "scriptFiles" : [
-      "/publish/admin/js/PublishApp.js",
-      "/publish/admin/js/VideoController.js",
-      "/publish/admin/js/WatcherController.js",
-      "/publish/admin/js/PropertiesController.js",
-      "/publish/admin/js/PublishService.js"
+      "publish/admin/js/PublishApp.js",
+      "publish/admin/js/VideoController.js",
+      "publish/admin/js/WatcherController.js",
+      "publish/admin/js/PropertiesController.js",
+      "publish/admin/js/CategoriesController.js",
+      "publish/admin/js/PublishService.js"
     ],
     "cssFiles" : []
   },
   "custom" : {
     "scriptFiles" : [
-      "/publish/lib/angular/angular.js",
-      "/publish/lib/openveo-player/PlayerApp.js",
-      "/publish/lib/openveo-player/PlayerDirective.js",
-      "/publish/lib/openveo-player/TabsDirective.js",
-      "/publish/lib/openveo-player/ViewDirective.js",
-      "/publish/lib/openveo-player/PlayerInterface.js",
-      "/publish/lib/openveo-player/IndexDirective.js",
-      "/publish/lib/openveo-player/TimeFilter.js",
-      "/publish/lib/openveo-player/OrderTimeCodesFilter.js",
-      "/publish/lib/openveo-player/players/VimeoPlayer.js",    
-      "/publish/front/js/PublishPlayerApp.js",
-      "/publish/front/js/VideoService.js",
-      "/publish/front/js/PlayerController.js"
+      "publish/lib/angular/angular.js",
+      "publish/lib/openveo-player/PlayerApp.js",
+      "publish/lib/openveo-player/PlayerDirective.js",
+      "publish/lib/openveo-player/TabsDirective.js",
+      "publish/lib/openveo-player/ViewDirective.js",
+      "publish/lib/openveo-player/PlayerInterface.js",
+      "publish/lib/openveo-player/IndexDirective.js",
+      "publish/lib/openveo-player/TimeFilter.js",
+      "publish/lib/openveo-player/OrderTimeCodesFilter.js",
+      "publish/lib/openveo-player/players/VimeoPlayer.js",    
+      "publish/front/js/PublishPlayerApp.js",
+      "publish/front/js/VideoService.js",
+      "publish/front/js/PlayerController.js"
     ],
     "cssFiles" : [
       "/publish/lib/openveo-player/css/font.css",

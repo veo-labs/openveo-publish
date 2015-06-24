@@ -10,7 +10,7 @@
    */
   function PublishService($http, $q){
     var basePath = "/admin/";
-    var properties, videos;
+    var properties, videos, categories;
 
     /**
      * Loads the list of videos from server.
@@ -179,7 +179,67 @@
      */
     var removeProperty = function(id){
       return $http.delete(basePath + "crud/property/" + id);
-    };    
+    };  
+    
+    
+    
+    var loadCategories = function(){
+      if(!categories){
+       
+        // Get categories from server
+        return $http.get(basePath + "publish/gettaxonomy/categories").success(function(taxonomyObj){
+          categories = taxonomyObj;
+        });
+
+      }
+
+      return $q.when({data : categories});
+    };
+
+    /**
+     * Gets list of categories.
+     * @return HttpPromise The HTTP promise
+     */
+    var getEntity = function (type) {
+          switch (type) {
+              case "categories":
+                return categories;
+              break;
+              case "video":
+                 return videos;
+              break;
+              default: return;
+      }
+    };
+
+    /**
+     * Adds a new property.
+     * @param String name The name of the property
+     * @param String description The description of the property
+     * @param String type The type of the property
+     */
+    var addEntity = function(entityType, data){
+      return $http.put(basePath + "crud/" +entityType, data);
+    };
+    /**
+     * Updates category.
+     * @param String id The id of the category to update
+     * @param String name The name of the category
+     * @param String description The description of the category
+     * @return HttpPromise The HTTP promise
+     */
+    var updateEntity = function(entityType, id, data){
+      return $http.post(basePath + "crud/" +entityType+'/'+id, data);
+    };
+        /**
+     * Removes a property.
+     * @param String id The id of the property to remove
+     * @return HttpPromise The HTTP promise
+     */
+    var removeEntity = function(entityType, id){
+      return $http.delete(basePath + "crud/" +entityType+'/'+id);
+    };  
+
 
     return{
       loadVideos : loadVideos,
@@ -195,7 +255,12 @@
       addProperty : addProperty,
       updateProperty : updateProperty,
       removeProperty : removeProperty,
-      loadProperties : loadProperties
+      loadProperties : loadProperties,
+      loadCategories : loadCategories,
+      getEntity: getEntity,
+      addEntity: addEntity,
+      updateEntity: updateEntity,
+      removeEntity: removeEntity
     };
 
   }

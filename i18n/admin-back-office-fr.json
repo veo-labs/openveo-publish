@@ -3,7 +3,8 @@
     "PUBLISH" : "Publish",
     "VIDEOS" : "Vidéos",
     "WATCHER" : "Watcher",
-    "PROPERTIES" : "Propriétés personnalisées"
+    "PROPERTIES" : "Propriétés personnalisées",
+    "CATEGORIES" : "Catégories"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
@@ -66,5 +67,12 @@
     "FORM_ADD_NAME_DESC" : "Le nom de la propriété tel qu'il apparaîtra lors de l'édition d'une vidéo",
     "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
     "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété"
+  },
+  "CATEGORIES" : {
+    "PAGE_TITLE" : "Publish - Rubrique",
+    "TITLE" : "Rubrique des vidéos ",
+    "INFO" : "Definir des rubriques afin de classer les vidéos",
+    "SAVE" : "Enregistrer",
+    "RESET" : "Annuler"
   }
 }

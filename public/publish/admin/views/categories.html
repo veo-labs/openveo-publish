@@ -1,0 +1,35 @@
+<div class="pu-properties">
+  <h2 ng-bind="'CATEGORIES.TITLE' | translate"></h2>
+  <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
+  <div class="col-md-6">
+     <div class="input-group">
+      <input type="text" class="form-control" ng-model="newItem" placeholder="New item" aria-describedby="basic-addon1">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
+      </span>
+    </div>
+    
+    <!-- Nested list template -->
+    <script type="text/ng-template" id="items_renderer.html">
+      <div ui-tree-handle>
+        <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
+        [[item.title]]
+        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
+      </div>
+      <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
+        <li ng-repeat="item in item.items" ui-tree-node ng-include="'items_renderer.html'">
+        </li>
+      </ol>
+    </script>
+    <div ui-tree="options">
+      <ol ui-tree-nodes ng-model="list" >
+        <li ng-repeat="item in list" ui-tree-node ng-include="'items_renderer.html'"></li>
+      </ol>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <button class="btn btn-primary" type="button" ng-click="saveCategory()"  ng-disabled="saveIsDisabled" ng-bind="'CATEGORIES.SAVE' | translate"></button>
+    <button class="btn btn-default" type="button" ng-click="resetCategory()"  ng-disabled="saveIsDisabled" ng-bind="'CATEGORIES.RESET' | translate"></button>
+    <alert ng-repeat="alert in alerts" type="[[alert.type]]" close="closeAlert($index)">[[alert.msg]]</alert>
+  </div>
+</div>
