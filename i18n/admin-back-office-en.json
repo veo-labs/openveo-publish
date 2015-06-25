@@ -12,6 +12,7 @@
     "NAME_COLUMN" : "Video",
     "STATUS_COLUMN" : "Status",
     "ACTIONS_COLUMN" : "Actions",
+    "CATEGORY_COLUMN" : "Categories",
     "DATE_COLUMN" : "Date",
     "NO_VIDEO" : "No video yet",
     "FORM_EDIT" : "Edit",

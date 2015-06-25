@@ -12,6 +12,7 @@
     "NAME_COLUMN" : "Vidéo",
     "STATUS_COLUMN" : "Statut",
     "ACTIONS_COLUMN" : "Actions",
+    "CATEGORY_COLUMN" : "Rubriques",
     "DATE_COLUMN" : "Date",
     "NO_VIDEO" : "Pas de vidéo pour le moment",
     "FORM_EDIT" : "Editer",

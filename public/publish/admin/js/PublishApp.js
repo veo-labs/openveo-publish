@@ -20,6 +20,9 @@
       resolve: {
         videos : ["publishService", function(publishService){
           return publishService.loadVideos();
+        }],
+        categories : ["publishService", function(publishService){
+          return publishService.loadCategories();
         }]
       }
     });

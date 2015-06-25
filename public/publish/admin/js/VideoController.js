@@ -3,15 +3,26 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$interval", "applicationService", "publishService", "videos"];
+  VideoController.$inject = ["$scope", "$interval", "applicationService", "publishService", "videos", "categories", "jsonPath"];
 
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $interval, applicationService, publishService, videos){
+  function VideoController($scope, $interval, applicationService, publishService, videos, categories, jsonPath){
     var pendingEdition = false;
     var pendingVideos;
     $scope.videos = videos.data.entities;
+    
+    //Replace Id in Video by the name of the category
+    //Category Id can be overwritten, it is only for display purpose
+    var categories = categories.data.taxonomy;
+    angular.forEach($scope.videos, function(value, key) {
+      //Search the item title with the right id
+      var name = jsonPath(categories, '$..*[?(@.id=="'+value.category+'")].title');
+      if (name && name.length>0) value.category = name[0];
+      else value.category = "";
+    });
+    
 
     // Iterate through the list of videos, if at least one video
     // is pending, poll each 30 seconds to be informed of

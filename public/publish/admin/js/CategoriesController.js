@@ -17,12 +17,14 @@
     else $scope.listback = [];
     $scope.saveIsDisabled = $scope.list.length==0;
     
-
+    $scope.options = {
+      
+    }
 
 
     $scope.newSubItem = function(scope) {
       $scope.list.push({
-        id: $scope.list.length,
+        id: Date.now()+'',
         title: $scope.newItem,
         items: []
       });

@@ -101,6 +101,7 @@ VideoModel.prototype.add = function(videoPackage, callback){
     type : videoPackage.type,
     errorCode : videoPackage.errorCode,
     published : videoPackage.published,
+    category : videoPackage.category,
     properties : videoPackage.properties
   };
   
@@ -175,6 +176,18 @@ VideoModel.prototype.updateVideoId = function(id, idVideoPlatform, callback){
 VideoModel.prototype.updateMetadata = function(id, metadata, callback){
   updateVideoProperty.call(this, id, "metadata", metadata, callback);
 };
+
+/**
+ * Updates video category for video platform.
+ * @param Number id The id of the video to update
+ * @param String category The category id of the video in the video platform
+ * @param Function callback The function to call when it's done
+ *   - Error The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateCategory = function(id, categoryId, callback){
+  updateVideoProperty.call(this, id, "category", categoryId, callback);
+};
+
 
 /**
  * Gets the list of videos.
@@ -377,6 +390,7 @@ VideoModel.prototype.update = function(id, data, callback){
   if(data.title) info["title"] = data.title;
   if(data.description) info["description"] = data.description;
   if(data.properties) info["properties"] = data.properties;
+  if(data.category) info["category"] = data.category;
   
   this.provider.update(id, info, callback);
 };
