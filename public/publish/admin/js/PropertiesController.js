@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("PropertiesController", PropertiesController);
-  PropertiesController.$inject = ["$scope", "$interval", "publishService", "properties"];
+  PropertiesController.$inject = ["$scope", "$interval", "applicationService", "properties"];
 
   /**
    * Defines the properties controller for the properties page.
    */
-  function PropertiesController($scope, $interval, publishService, properties){
+  function PropertiesController($scope, $interval, applicationService, properties){
     $scope.supportedTypes = [
       {
         "value" : "text",
@@ -41,7 +41,7 @@
     $scope.removeProperty = function(property){
       if(!property.saving){
         property.saving = true;
-        publishService.removeProperty(property.id).success(function(data, status, headers, config){
+        applicationService.removeEntity('property',property.id).success(function(data, status, headers, config){
           var index = 0;
 
           // Look for property index
@@ -70,7 +70,11 @@
       property.saving = true;
       form.saving = true;
       
-      publishService.updateProperty(property.id, property.name, property.description, property.type).success(function(data, status, headers, config){
+      applicationService.updateEntity('property',property.id,{
+        name : property.name,
+        description : property.description,
+        type : property.type
+      }).success(function(data, status, headers, config){
         property.saving = form.saving = false;
         form.edition = false;
         form.closeEdition();
@@ -107,7 +111,11 @@
     $scope.addProperty = function(form){
       form.saving = true;
       
-      publishService.addProperty($scope.propertyName, $scope.propertyDescription, $scope.propertyType).success(function(data, status, headers, config){
+      applicationService.addEntity('property',{
+        name : $scope.propertyName,
+        description : $scope.propertyDescription,
+        type : $scope.propertyType
+      }).success(function(data, status, headers, config){
         form.saving = false;
         resetAddForm(form);
         $scope.properties.push(data.entity);

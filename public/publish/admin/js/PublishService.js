@@ -49,14 +49,6 @@
       return $http.get(basePath + "publish/unpublishVideo/" + id);
     };
 
-    /**
-     * Removes the given video.
-     * @param String id The id of the video to remove
-     * @return HttpPromise The HTTP promise
-     */
-    var removeVideo = function(id){
-      return $http.delete(basePath + "crud/video/" + id);
-    };
 
     /**
      * Gets the list of videos.
@@ -66,32 +58,6 @@
       return videos;
     };
 
-    /**
-     * Updates video properties.
-     * @param String id The id of the video to update
-     * @param String title The title of the video
-     * @param String description The description of the video
-     * @param Array properties The list of properties of the video
-     * @return HttpPromise The HTTP promise
-     */
-    var updateVideo = function(id, title, description, properties){
-
-      // Only save property's value and id
-      var filteredProperties = [];
-
-      for(var i = 0 ; i < properties.length ; i++){
-        filteredProperties.push({
-          id : properties[i].id,
-          value : properties[i].value
-        });
-      }
-
-      return $http.post(basePath + "crud/video/" + id, {
-        title : title,
-        description : description,
-        properties : filteredProperties
-      });
-    };
     
     /**
      * Gets watcher status.
@@ -142,52 +108,13 @@
     var getProperties = function(){
       return properties;
     };
-
-    /**
-     * Adds a new property.
-     * @param String name The name of the property
-     * @param String description The description of the property
-     * @param String type The type of the property
-     */
-    var addProperty = function(name, description, type){
-      return $http.put(basePath + "crud/property", {
-        name : name,
-        description : description,
-        type : type
-      });
-    };
-
-    /**
-     * Updates property.
-     * @param String id The id of the property to update
-     * @param String name The name of the property
-     * @param String description The description of the property
-     * @return HttpPromise The HTTP promise
-     */
-    var updateProperty = function(id, name, description, type){
-      return $http.post(basePath + "crud/property/" + id, {
-        name : name,
-        description : description,
-        type : type
-      });
-    };
-
-    /**
-     * Removes a property.
-     * @param String id The id of the property to remove
-     * @return HttpPromise The HTTP promise
-     */
-    var removeProperty = function(id){
-      return $http.delete(basePath + "crud/property/" + id);
-    };  
-    
     
     
     var loadCategories = function(){
       if(!categories){
        
         // Get categories from server
-        return $http.get(basePath + "publish/gettaxonomy/categories").success(function(taxonomyObj){
+        return $http.get(basePath + "gettaxonomy/categories").success(function(taxonomyObj){
           categories = taxonomyObj;
         });
 
@@ -195,72 +122,30 @@
 
       return $q.when({data : categories});
     };
-
+    
     /**
-     * Gets list of categories.
+     * Gets list of properties.
      * @return HttpPromise The HTTP promise
      */
-    var getEntity = function (type) {
-          switch (type) {
-              case "categories":
-                return categories;
-              break;
-              case "video":
-                 return videos;
-              break;
-              default: return;
-      }
+    var getCategories = function(){
+      return categories;
     };
-
-    /**
-     * Adds a new property.
-     * @param String name The name of the property
-     * @param String description The description of the property
-     * @param String type The type of the property
-     */
-    var addEntity = function(entityType, data){
-      return $http.put(basePath + "crud/" +entityType, data);
-    };
-    /**
-     * Updates category.
-     * @param String id The id of the category to update
-     * @param String name The name of the category
-     * @param String description The description of the category
-     * @return HttpPromise The HTTP promise
-     */
-    var updateEntity = function(entityType, id, data){
-      return $http.post(basePath + "crud/" +entityType+'/'+id, data);
-    };
-        /**
-     * Removes a property.
-     * @param String id The id of the property to remove
-     * @return HttpPromise The HTTP promise
-     */
-    var removeEntity = function(entityType, id){
-      return $http.delete(basePath + "crud/" +entityType+'/'+id);
-    };  
-
 
     return{
       loadVideos : loadVideos,
       getVideos : getVideos,
-      getWatcherStatus : getWatcherStatus,
-      startWatcher : startWatcher,
-      stopWatcher : stopWatcher,
       publishVideo : publishVideo,
       unpublishVideo : unpublishVideo,
-      removeVideo : removeVideo,
-      updateVideo : updateVideo,
-      getProperties : getProperties,
-      addProperty : addProperty,
-      updateProperty : updateProperty,
-      removeProperty : removeProperty,
+      
       loadProperties : loadProperties,
+      getProperties : getProperties,
+
       loadCategories : loadCategories,
-      getEntity: getEntity,
-      addEntity: addEntity,
-      updateEntity: updateEntity,
-      removeEntity: removeEntity
+      getCategories : getCategories,
+      
+      getWatcherStatus : getWatcherStatus,
+      startWatcher : startWatcher,
+      stopWatcher : stopWatcher
     };
 
   }

@@ -9,14 +9,12 @@
       "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
       "get /startWatcher" : "app/server/controllers/watcherController.startAction",
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
-      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
-      "get /getTaxonomy/:name" : "app/server/controllers/TaxonomyController.getTaxonomyAction"
+      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction"
     }
   },
   "entities" : {
     "property" : "app/server/models/PropertyModel",
-    "video" : "app/server/models/VideoModel",
-    "taxonomy" : "app/server/models/TaxonomyModel"
+    "video" : "app/server/models/VideoModel"
   },
   "backOffice": {
     "menu" : [

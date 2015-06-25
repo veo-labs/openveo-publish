@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$interval", "publishService", "videos"];
+  VideoController.$inject = ["$scope", "$interval", "applicationService", "publishService", "videos"];
 
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $interval, publishService, videos){
+  function VideoController($scope, $interval, applicationService, publishService, videos){
     var pendingEdition = false;
     var pendingVideos;
     $scope.videos = videos.data.entities;
@@ -88,7 +88,7 @@
     $scope.removeVideo = function(video){
       if(!video.saving){
         video.saving = true;
-        publishService.removeVideo(video.id).success(function(data, status, headers, config){
+        applicationService.removeEntity('video', video.id).success(function(data, status, headers, config){
 
           var index = 0;
 
@@ -138,8 +138,21 @@
       if(!video.saving){
         video.saving = true;
         form.saving = true;
+        
+        // Only save property's value and id
+        var filteredProperties = [];
+        for(var i = 0 ; i < video.properties.length ; i++){
+          filteredProperties.push({
+            id : video.properties[i].id,
+            value : video.properties[i].value
+          });
+        }
 
-        publishService.updateVideo(video.id, video.title, video.description, video.properties).success(function(data, status, headers, config){
+        applicationService.updateEntity('video',video.id,{
+          title : video.title,
+          description : video.description,
+          properties : filteredProperties
+        }).success(function(data, status, headers, config){
           video.saving = form.saving = false;
           form.edition = false;
           pendingEdition = false;
