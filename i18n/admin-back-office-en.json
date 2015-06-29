@@ -26,7 +26,10 @@
     "MANAGE_WATCHER_NAME" : "Manage watcher",
     "MANAGE_WATCHER_DESCRIPTION" : "Start / Stop the watcher",
     "PUBLISH_VIDEO_NAME" : "Publish videos",
-    "PUBLISH_VIDEO_DESCRIPTION" : "Publish / Unpublish videos"
+    "PUBLISH_VIDEO_DESCRIPTION" : "Publish / Unpublish videos",
+    "ACCESS_VIDEO_PAGE_NAME" : "Access videos page",
+    "ACCESS_WATCHER_PAGE_NAME" : "Access watcher page",
+    "ACCESS_PROPERTY_PAGE_NAME" : "Access properties page"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Videos",

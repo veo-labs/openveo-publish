@@ -16,8 +16,21 @@
     "property" : "app/server/models/PropertyModel",
     "video" : "app/server/models/VideoModel"
   },
-  "permissions" : {
-    "manage-watcher" : {
+  "permissions" : [
+    {
+      "id" : "access-video-page",
+      "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME"
+    },
+    {
+      "id" : "access-watcher-page",
+      "name" : "PERMISSIONS.ACCESS_WATCHER_PAGE_NAME"
+    },
+    {
+      "id" : "access-property-page",
+      "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME"
+    },
+    {
+      "id" : "manage-watcher",
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
       "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
       "paths" : [
@@ -26,15 +39,16 @@
         "get /startWatcher"
       ]
     },
-    "publish-video" : {
+    {
+      "id" : "publish-video",
       "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
       "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
       "paths" : [
-        "get /publishVideo*",
-        "get /unpublishVideo*"
+        "get /publishVideo",
+        "get /unpublishVideo"
       ]
     }
-  },
+  ],
   "backOffice": {
     "menu" : [
       {
@@ -43,17 +57,17 @@
           {
             "label" : "MENU.VIDEOS",
             "path" : "/admin/publish/be/videos",
-            "permission" : "read-video"
+            "permission" : "access-video-page"
           },
           {
             "label" : "MENU.WATCHER",
             "path" : "/admin/publish/be/watcher",
-            "permission" : "manage-watcher"
+            "permission" : "access-watcher-page"
           },
           {
             "label" : "MENU.PROPERTIES",
             "path" : "/admin/publish/be/properties",
-            "permission" : "read-property"
+            "permission" : "access-property-page"
           },
           {
             "label" : "MENU.CATEGORIES",
