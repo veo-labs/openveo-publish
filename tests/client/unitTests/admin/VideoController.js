@@ -6,8 +6,11 @@ window.assert = chai.assert;
 describe("VideoController", function(){
   var $rootScope, $controller, $httpBackend, scope;
 
-  // Load module publish
-  beforeEach(module("ov.publish"));
+  // Load module publish and ngJSONPath
+  beforeEach(function(){
+    module("ov.publish");
+    module("ngJSONPath");
+  });
 
   // Dependencies injections
   beforeEach(inject(function(_$rootScope_, _$controller_, _$httpBackend_){
