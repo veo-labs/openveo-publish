@@ -31,6 +31,11 @@ describe("VideoController", function(){
             { id : 2, status : 1, properties : [] }
           ]
         }
+      },
+      categories : {
+        data : {
+          entities : []
+        }
       }
     });
   });
