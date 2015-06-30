@@ -29,7 +29,8 @@
     "PUBLISH_VIDEO_DESCRIPTION" : "Publish / Unpublish videos",
     "ACCESS_VIDEO_PAGE_NAME" : "Access videos page",
     "ACCESS_WATCHER_PAGE_NAME" : "Access watcher page",
-    "ACCESS_PROPERTY_PAGE_NAME" : "Access properties page"
+    "ACCESS_PROPERTY_PAGE_NAME" : "Access properties page",
+    "ACCESS_CATEGORY_PAGE_NAME" : "Access categories page"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Videos",

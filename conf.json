@@ -30,6 +30,10 @@
       "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME"
     },
     {
+      "id" : "access-category-page",
+      "name" : "PERMISSIONS.ACCESS_CATEGORY_PAGE_NAME"
+    },
+    {
       "id" : "manage-watcher",
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
       "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
@@ -71,7 +75,8 @@
           },
           {
             "label" : "MENU.CATEGORIES",
-            "path" : "/admin/publish/be/categories"
+            "path" : "/admin/publish/be/categories",
+            "permission" : "access-category-page"
           }
         ]
       }

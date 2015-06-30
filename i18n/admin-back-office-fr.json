@@ -27,9 +27,10 @@
     "MANAGE_WATCHER_DESCRIPTION" : "Démarrer / Arrêter le watcher",
     "PUBLISH_VIDEO_NAME" : "Publier des vidéos",
     "PUBLISH_VIDEO_DESCRIPTION" : "Publier / Dépublier des vidéos",
-    "ACCESS_VIDEO_PAGE_NAME" : "Accés à la page des videos",
+    "ACCESS_VIDEO_PAGE_NAME" : "Accés à la page des vidéos",
     "ACCESS_WATCHER_PAGE_NAME" : "Accés à la page du watcher",
-    "ACCESS_PROPERTY_PAGE_NAME" : "Accés à la page des propertiétés"
+    "ACCESS_PROPERTY_PAGE_NAME" : "Accés à la page des propriétés",
+    "ACCESS_CATEGORY_PAGE_NAME" : "Accés à la page des catégories"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
