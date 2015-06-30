@@ -88,19 +88,19 @@
   },
   "custom" : {
     "scriptFiles" : [
-      "publish/lib/angular/angular.js",
-      "publish/lib/openveo-player/PlayerApp.js",
-      "publish/lib/openveo-player/PlayerDirective.js",
-      "publish/lib/openveo-player/TabsDirective.js",
-      "publish/lib/openveo-player/ViewDirective.js",
-      "publish/lib/openveo-player/PlayerInterface.js",
-      "publish/lib/openveo-player/IndexDirective.js",
-      "publish/lib/openveo-player/TimeFilter.js",
-      "publish/lib/openveo-player/OrderTimeCodesFilter.js",
-      "publish/lib/openveo-player/players/VimeoPlayer.js",    
-      "publish/front/js/PublishPlayerApp.js",
-      "publish/front/js/VideoService.js",
-      "publish/front/js/PlayerController.js"
+      "/publish/lib/angular/angular.js",
+      "/publish/lib/openveo-player/PlayerApp.js",
+      "/publish/lib/openveo-player/PlayerDirective.js",
+      "/publish/lib/openveo-player/TabsDirective.js",
+      "/publish/lib/openveo-player/ViewDirective.js",
+      "/publish/lib/openveo-player/PlayerInterface.js",
+      "/publish/lib/openveo-player/IndexDirective.js",
+      "/publish/lib/openveo-player/TimeFilter.js",
+      "/publish/lib/openveo-player/OrderTimeCodesFilter.js",
+      "/publish/lib/openveo-player/players/VimeoPlayer.js",
+      "/publish/front/js/PublishPlayerApp.js",
+      "/publish/front/js/VideoService.js",
+      "/publish/front/js/PlayerController.js"
     ],
     "cssFiles" : [
       "/publish/lib/openveo-player/css/font.css",
