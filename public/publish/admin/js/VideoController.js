@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$interval", "applicationService", "publishService", "videos", "categories", "jsonPath"];
+  VideoController.$inject = ["$scope", "$interval", "entityService", "publishService", "videos", "categories", "jsonPath"];
 
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $interval, applicationService, publishService, videos, categories, jsonPath){
+  function VideoController($scope, $interval, entityService, publishService, videos, categories, jsonPath){
     var pendingEdition = false;
     var pendingVideos;
     $scope.videos = videos.data.entities;
@@ -99,7 +99,7 @@
     $scope.removeVideo = function(video){
       if(!video.saving){
         video.saving = true;
-        applicationService.removeEntity('video', video.id).success(function(data, status, headers, config){
+        entityService.removeEntity('video', video.id).success(function(data, status, headers, config){
 
           var index = 0;
 
@@ -159,7 +159,7 @@
           });
         }
 
-        applicationService.updateEntity('video',video.id,{
+        entityService.updateEntity('video',video.id,{
           title : video.title,
           description : video.description,
           properties : filteredProperties

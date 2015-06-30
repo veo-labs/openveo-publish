@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("CategoriesController", CategoriesController);
-  CategoriesController.$inject = ["$scope", "applicationService", "categories"];
+  CategoriesController.$inject = ["$scope", "entityService", "categories"];
 
   /**
    * Defines the categories controller for the categories page.
    */
-  function CategoriesController($scope, applicationService, categories){
+  function CategoriesController($scope, entityService, categories){
     
     $scope.newItem = "";
     $scope.list = categories.data.taxonomy.tree;
@@ -40,10 +40,10 @@
       $scope.saveIsDisabled = true;
       //If no categories exist : Do create
       if(categories.data.taxonomy.id === undefined)
-        applicationService.addEntity("taxonomy", {name:"categories", tree:$scope.list}).success(successCb).error(errorCb);
+        entityService.addEntity("taxonomy", {name:"categories", tree:$scope.list}).success(successCb).error(errorCb);
       //Else : Do update
       else 
-        applicationService.updateEntity("taxonomy", categories.data.taxonomy.id, {tree:$scope.list}).success(successCb).error(errorCb);
+        entityService.updateEntity("taxonomy", categories.data.taxonomy.id, {tree:$scope.list}).success(successCb).error(errorCb);
     };
     
     $scope.alerts = [];

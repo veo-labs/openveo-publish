@@ -6,9 +6,10 @@ window.assert = chai.assert;
 describe("VideoController", function(){
   var $rootScope, $controller, $httpBackend, scope;
 
-  // Load module publish and ngJSONPath
+  // Load module publish, entity and ngJSONPath
   beforeEach(function(){
     module("ov.publish");
+    module("ov.entity");
     module("ngJSONPath");
   });
 

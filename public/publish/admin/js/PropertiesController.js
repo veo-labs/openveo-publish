@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("PropertiesController", PropertiesController);
-  PropertiesController.$inject = ["$scope", "$interval", "applicationService", "properties"];
+  PropertiesController.$inject = ["$scope", "$interval", "entityService", "properties"];
 
   /**
    * Defines the properties controller for the properties page.
    */
-  function PropertiesController($scope, $interval, applicationService, properties){
+  function PropertiesController($scope, $interval, entityService, properties){
     $scope.supportedTypes = [
       {
         "value" : "text",
@@ -41,7 +41,7 @@
     $scope.removeProperty = function(property){
       if(!property.saving){
         property.saving = true;
-        applicationService.removeEntity('property',property.id).success(function(data, status, headers, config){
+        entityService.removeEntity('property',property.id).success(function(data, status, headers, config){
           var index = 0;
 
           // Look for property index
@@ -70,7 +70,7 @@
       property.saving = true;
       form.saving = true;
       
-      applicationService.updateEntity('property',property.id,{
+      entityService.updateEntity('property',property.id,{
         name : property.name,
         description : property.description,
         type : property.type
@@ -111,7 +111,7 @@
     $scope.addProperty = function(form){
       form.saving = true;
       
-      applicationService.addEntity('property',{
+      entityService.addEntity('property',{
         name : $scope.propertyName,
         description : $scope.propertyDescription,
         type : $scope.propertyType

@@ -2,7 +2,7 @@
 
   "use strict"
 
-  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.edit"]);
+  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.edit", "ov.entity"]);
 
   /**
    * Configures the ov.publish application by adding new routes.
