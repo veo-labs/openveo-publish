@@ -4,12 +4,12 @@
 
   app.controller("CategoriesController", CategoriesController);
 
-  CategoriesController.$inject = ["$scope", "entityService","alertService", "categories"];
+  CategoriesController.$inject = ["$scope", "entityService", "categories"];
   /**
    * Defines the categories controller for the categories page.
    */
   
-  function CategoriesController($scope, entityService, alertService, categories){
+  function CategoriesController($scope, entityService, categories){
     
     $scope.newItem = "";
     $scope.list = categories.data.taxonomy.tree;
@@ -34,7 +34,7 @@
     };
     $scope.resetCategory = function(scope){
        $scope.list = $scope.listback.slice();
-       alertService.add('warning', 'All categories changes canceled.',0);
+       $scope.$emit("setAlert", 'warning', 'All categories changes canceled.',0);
     }
     
     $scope.saveCategory = function(form){
@@ -51,11 +51,11 @@
     function successCb(data, status, headers, config) {
         $scope.saveIsDisabled = $scope.list.length==0;
         $scope.listback = $scope.list.slice();
-        alertService.add('success', 'Categories saved.',2000);
+        $scope.$emit("setAlert", 'success', 'Categories saved.',2000);
     }
     function errorCb(data, status, headers, config){
         $scope.saveIsDisabled = $scope.list.length==0;
-        alertService.add('danger','Fail to save categories! Try later.',2000);
+        $scope.$emit('setAlert','danger','Fail to save categories! Try later.',2000);
         if(status === 401)
           $scope.$parent.logout();
     }
