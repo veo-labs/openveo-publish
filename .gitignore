@@ -30,3 +30,12 @@ public/publish/lib/*
 
 # Temporary directory for video packages
 tmp
+
+#Compiled files
+build/*
+public/publish/js/*
+
+#IDE
+nbproject/*
+
+
