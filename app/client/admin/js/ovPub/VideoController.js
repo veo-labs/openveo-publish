@@ -15,13 +15,9 @@
     
     //Replace Id in Video by the name of the category
     //Category Id can be overwritten, it is only for display purpose
-    var categories = categories.data.taxonomy;
-    angular.forEach($scope.videos, function(value, key) {
-      //Search the item title with the right id
-      var name = jsonPath(categories, '$..*[?(@.id=="'+value.category+'")].title');
-      if (name && name.length>0) value.category = name[0];
-      else value.category = "";
-    });
+    $scope.categories = categories.data.taxonomy;
+    replaceVideoIdByCategory();
+ 
     
 
     // Iterate through the list of videos, if at least one video
@@ -195,7 +191,22 @@
       if(pendingVideos){
         $scope.videos = pendingVideos;
         pendingVideos = null;
+        replaceVideoIdByCategory();
       }
+    }
+    
+    /**
+     * 
+     * Replace Id in Video by the name of the category
+     * Category Id can be overwritten, it is only for display purpose
+     */
+    function replaceVideoIdByCategory(){
+      angular.forEach($scope.videos, function(value, key) {
+      //Search the item title with the right id
+      var name = jsonPath($scope.categories, '$..*[?(@.id=="'+value.category+'")].title');
+      if (name && name.length>0) value.category = name[0];
+      else value.category = "";
+      });
     }
   
   }

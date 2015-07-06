@@ -1,0 +1,45 @@
+/* List of videos and custom properties */
+.pu-line { 
+  border-radius: 3px;
+  display:table; 
+  width:100%;
+  a{ 
+    color: #000; 
+  }
+  &.even{
+    background-color:  #ebebeb;
+  }
+  &:first-child{ 
+    border-top: 1px solid #ddd;
+  }
+  .pu-line > div{ 
+    height: 40px;
+    line-height: 40px;
+    border:1px solid #ddd;
+    border-top:0 none;
+    
+    &:first-child{ cursor: pointer; overflow: hidden;}
+  }
+  
+  .glyphicon{ cursor: pointer; }
+  .actions { display: inline; }
+}
+
+/* List details */
+.pu-detail { 
+  line-height: initial;
+  padding-bottom: 10px;
+  width:100%;
+  float:left;
+  border: 1px solid #ddd;
+  border-top:0 none;
+  
+  ul { 
+    list-style: none;
+    padding-left: 35px;
+  }
+  li{ line-height: 22px; }
+  .btn-group{ margin-left: 35px; }
+  .label{ margin-right: 5px; }
+   input{ margin: 1px 0; }
+}

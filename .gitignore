@@ -34,6 +34,7 @@ tmp
 #Compiled files
 build/*
 public/publish/js/*
+public/publish/css/*
 
 #IDE
 nbproject/*

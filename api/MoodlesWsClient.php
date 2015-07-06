@@ -12,6 +12,7 @@ class MoodlesWsClient extends RestCurlClient
   {
     $this->base_url = "http://localhost:3000";
     $this->headers = array(
+        'Accept: application/json',
         // Replace {CLIENT_ID} and {CLIENT_SECRET} by your credentials
         'Authorization: Basic ' . base64_encode('164895873b29632fc5e48584805236c6e60c64df' . ':' . '174bff8dea7c913094f9368a46f72c4090949066'),
         'Content-Type: application/json'

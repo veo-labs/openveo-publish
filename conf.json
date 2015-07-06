@@ -94,7 +94,7 @@
         "publish/js/openveoPublish.js"
       ]
     },
-    "cssFiles" : []
+    "cssFiles" : ["publish/css/publish.css"]
   },
   "custom" : {
     "scriptFiles" : [
