@@ -47,6 +47,7 @@
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
     "REMOVE" : "Supprimer",
+    "VIEW" : "Voir",
     "ATTR_TITLE" : "Titre",
     "ATTR_DESCRIPTION" : "Description",
     "STATE_0" : "En attente",

@@ -47,6 +47,7 @@
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
     "REMOVE" : "Remove",
+    "VIEW" : "View",
     "ATTR_TITLE" : "Title",
     "ATTR_DESCRIPTION" : "Description",
     "STATE_0" : "Pending",
