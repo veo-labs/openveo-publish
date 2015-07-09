@@ -4,7 +4,7 @@
 
   <div class="ng-hide" ng-show="videos.length">
 
-    <div class="header pu-line even line">
+    <div class="header even line">
       <div class="col-xs-12 col-sm-4"><strong ng-bind="'VIDEOS.NAME_COLUMN' | translate"></strong></div>
       <div class="col-xs-2 hidden-xs"><strong ng-bind="'VIDEOS.DATE_COLUMN' | translate"></strong></div>
       <div class="col-xs-2 hidden-xs"><strong ng-bind="'VIDEOS.CATEGORY_COLUMN' | translate"></strong></div>
@@ -35,12 +35,12 @@
       <div ng-if="video.opened">
         <div class="pu-detail">
 
-          <form ov-form name="videoForm" ng-submit="videoForm.$valid && saveVideo(videoForm, video)" novalidate>
+          <form class="form-horizontal" ov-form name="videoForm" ng-submit="videoForm.$valid && saveVideo(videoForm, video)" novalidate>
             <ul>
 
               <li class="form-inline">
                 <div class="form-group">
-                  <label class="strong"><span ng-bind="'VIDEOS.ATTR_TITLE' | translate"></span> : </label>
+                  <label class="strong control-label"><span ng-bind="'VIDEOS.ATTR_TITLE' | translate"></span> : </label>
                   <ov-editable ov-name="title" ov-value="video.title" ov-type="text" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm.title.$invalid && videoForm.$submitted}">     
                   </ov-editable>
                 </div>
@@ -48,16 +48,16 @@
 
               <li class="form-inline">
                 <div class="form-group">
-                   <label class="strong"><span ng-bind="'VIDEOS.ATTR_DESCRIPTION' | translate"> : </span></label>
+                   <label class="strong control-label"><span ng-bind="'VIDEOS.ATTR_DESCRIPTION' | translate"> : </span></label>
                   <ov-editable ov-name="description" ov-value="video.description" ov-type="text" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm.description.$invalid && videoForm.$submitted}">     
                   </ov-editable>
                 </div>
               </li>
 
-              <li ng-if="property.name" ng-repeat="property in video.properties" class="form-inline">
-                <div class="form-group">
-                  <label class="strong">[[property.name]]: </label>
-                  <ov-editable ov-name="[[property.name]]" ov-value="property.value" ov-type="[[property.type]]" ov-required="true" ov-disabled="videoForm.saving" ng-class="{'has-error': videoForm[property.name].$invalid && videoForm.$submitted}">
+              <li ng-if="property.name" ng-repeat="property in video.properties" class="form-inline" ng-class="{'has-error': videoForm[property.name].$invalid && videoForm.$submitted}">
+                <div class="form-group" ng-class="{'has-error': videoForm[property.name].$invalid && videoForm.$submitted}"> 
+                  <label class="strong control-label" >[[property.name]]: </label>
+                  <ov-editable class=""ov-name="[[property.name]]" ov-value="property.value" ov-type="[[property.type]]" ov-required="true" ov-disabled="videoForm.saving" >
                   </ov-editable>
                 </div>
               </li>

@@ -108,9 +108,9 @@
       "/publish/lib/openveo-player/TimeFilter.js",
       "/publish/lib/openveo-player/OrderTimeCodesFilter.js",
       "/publish/lib/openveo-player/players/VimeoPlayer.js",
-      "/publish/front/js/PublishPlayerApp.js",
-      "/publish/front/js/VideoService.js",
-      "/publish/front/js/PlayerController.js"
+      "/PublishPlayerApp.js",
+      "/VideoService.js",
+      "/PlayerController.js"
     ],
     "cssFiles" : [
       "/publish/lib/openveo-player/css/font.css",
