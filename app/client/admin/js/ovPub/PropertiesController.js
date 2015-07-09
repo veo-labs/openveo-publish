@@ -3,12 +3,73 @@
   "use strict"
 
   app.controller("PropertiesController", PropertiesController);
-  PropertiesController.$inject = ["$scope", "$interval", "entityService", "properties"];
+  PropertiesController.$inject = ["$scope", "$http", "$interval","$filter",  "entityService", "properties", "entityService"];
 
   /**
    * Defines the properties controller for the properties page.
    */
-  function PropertiesController($scope, $interval, entityService, properties){
+  function PropertiesController($scope, $http, $interval,$filter, entityService, properties) {
+    $scope.init = {
+      'count': 5,
+      'page': 1,
+      'sortBy': 'name',
+      'sortOrder': 'asc'
+    };
+    $scope.reloadCallback = function () {};
+    
+    
+    $scope.filterBy = {
+      'name': '',
+    };
+    $scope.rows = {};
+    $scope.header = [{
+            'key': "name",
+            'name': $filter('translate')('PROPERTIES.NAME_COLUMN')
+          },
+          {
+            'key': "action",
+            'name': $filter('translate')('PROPERTIES.ACTIONS_COLUMN')
+          }];
+    
+    $scope.notSortBy = ["action"];
+    
+    $scope.customTheme = {
+      iconUp: 'glyphicon glyphicon-triangle-bottom',
+      iconDown: 'glyphicon glyphicon-triangle-top',
+      listItemsPerPage: [5, 10, 20, 30],
+      itemsPerPage: 10,
+      loadOnInit: true
+    };
+
+    $scope.getResource = function (params, paramsObj) {
+      var param = {};
+      param['count'] = paramsObj.count;
+      param['page'] = paramsObj.page;
+      param['sort'] = {};
+      param['sort'][paramsObj.sortBy] = paramsObj.sortOrder=="dsc"? -1: 1;
+      param['filter'] = {"name" : {"$regex":".*"+$scope.filterBy.name+".*"}}
+      
+      return entityService.getEntities('property',param).then(function (response) {
+        $scope.rows = response.data.rows;
+        return {
+          'rows': $scope.rows ,
+          'header': $scope.header,
+          'pagination': response.data.pagination,
+          'sortBy': $scope.init.sortBy,
+          'sortOrder': $scope.init.sortOrder==-1?"dsc": "asc"
+        }
+      });
+    }
+    
+    $scope.toggleRowDetails = function(row){
+      if(!row.saving){
+        angular.forEach($scope.rows, function (value, key){
+          value.opened= (value.id === row.id) ? !value.opened : false;
+        })
+      }
+    };
+    
+    
     $scope.supportedTypes = [
       {
         "value" : "text",
@@ -20,18 +81,6 @@
     
     preparePropertiesTypes();
 
-    /**
-     * Toggles the property detail.
-     * Can't open / close detail of the property if its saving.
-     * @param Object property The property associated to the form
-     */
-    $scope.togglePropertyDetails = function(property){
-      if(!property.saving){
-        for(var i = 0 ; i < $scope.properties.length ; i++){
-          $scope.properties[i].opened = ($scope.properties[i].id === property.id) ? !$scope.properties[i].opened : false;
-        }
-      }
-    };
     
     /**
      * Removes the property.
@@ -42,16 +91,17 @@
       if(!property.saving){
         property.saving = true;
         entityService.removeEntity('property',property.id).success(function(data, status, headers, config){
-          var index = 0;
-
-          // Look for property index
-          for(index = 0 ; index < $scope.properties.length ; index++){
-            if($scope.properties[index].id === property.id)
-              break;
-          }
-
-          // Remove property from the list of properties
-          $scope.properties.splice(index, 1);
+          $scope.reloadCallback();
+//          var index = 0;
+//
+//          // Look for property index
+//          for(index = 0 ; index < $scope.properties.length ; index++){
+//            if($scope.properties[index].id === property.id)
+//              break;
+//          }
+//
+//          // Remove property from the list of properties
+//          $scope.properties.splice(index, 1);
 
         }).error(function(data, status, headers, config){
           property.saving = false;
@@ -78,7 +128,7 @@
         property.saving = form.saving = false;
         form.edition = false;
         form.closeEdition();
-        $scope.togglePropertyDetails(property);
+        $scope.toggleRowDetails(property);
       }).error(function(data, status, headers, config){
         property.saving = form.saving = false;
         if(status === 401)
@@ -116,10 +166,12 @@
         description : $scope.propertyDescription,
         type : $scope.propertyType
       }).success(function(data, status, headers, config){
+        $scope.reloadCallback();
         form.saving = false;
         resetAddForm(form);
-        $scope.properties.push(data.entity);
+//        $scope.properties.push(data.entity);
         preparePropertiesTypes();
+       
       }).error(function(data, status, headers, config){
         form.saving = false;
         if(status === 401)

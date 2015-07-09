@@ -3,12 +3,12 @@
   "use strict"
 
   app.factory("publishService", PublishService);
-  PublishService.$inject = ["$http", "$q"];
+  PublishService.$inject = ["$http", "$q", "entityService"];
 
   /**
    * Defines a publish service to get publish information.
    */
-  function PublishService($http, $q){
+  function PublishService($http, $q, entityService){
     var basePath = "/admin/";
     var properties, videos, categories;
 
@@ -22,7 +22,7 @@
       if(!videos || force){
 
         // Get videos from server
-        return $http.get(basePath + "crud/video").success(function(videosObj){
+        return entityService.getAllEntities('video').success(function(videosObj){
           videos = videosObj.entities;
         });
 
@@ -90,9 +90,7 @@
      */
     var loadProperties = function(){
       if(!properties){
-
-        // Get properties from server
-        return $http.get(basePath + "crud/property").success(function(propertiesObj){
+        return entityService.getAllEntities('property').success(function(propertiesObj){
           properties = propertiesObj.entities;
         });
 
