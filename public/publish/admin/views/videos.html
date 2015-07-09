@@ -12,7 +12,7 @@
       <div class="col-xs-2 hidden-xs"><strong ng-bind="'VIDEOS.ACTIONS_COLUMN' | translate"></strong></div>
     </div>
 
-    <div class="pu-line line" ng-repeat="video in videos"  ng-class-odd="'odd'" ng-class-even="'even'" >
+    <div class="line" ng-repeat="video in videos"  ng-class-odd="'odd'" ng-class-even="'even'" >
       <div class="col-xs-12 col-sm-4" ng-click="toggleVideoDetails(video)">
         <span ng-if="video.status" class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !video.opened, 'glyphicon-chevron-down' : video.opened}"></span> <strong>[[video.title || video.id]]</strong></div>
       <div class="col-xs-2 hidden-xs"><span ng-if="video.metadata.date">[[video.metadata.date * 1000 | date:'yyyy-MM-dd']]</span></div>

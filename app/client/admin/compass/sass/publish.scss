@@ -1,29 +1,5 @@
 /* List of videos and custom properties */
-.pu-line { 
-  border-radius: 3px;
-  display:table; 
-  width:100%;
-  a{ 
-    color: #000; 
-  }
-  &.even{
-    background-color:  #ebebeb;
-  }
-  &:first-child{ 
-    border-top: 1px solid #ddd;
-  }
-  .pu-line > div{ 
-    height: 40px;
-    line-height: 40px;
-    border:1px solid #ddd;
-    border-top:0 none;
-    
-    &:first-child{ cursor: pointer; overflow: hidden;}
-  }
-  
-  .glyphicon{ cursor: pointer; }
-  .actions { display: inline; }
-}
+
 
 /* List details */
 .pu-detail { 
