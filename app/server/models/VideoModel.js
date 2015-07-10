@@ -23,7 +23,7 @@ module.exports = VideoModel;
 util.inherits(VideoModel, openVeoAPI.EntityModel);
 
 // Error codes
-VideoModel.COPY_ERROR = 0,
+VideoModel.COPY_ERROR = 0;
 VideoModel.UNLINK_ERROR = 1;
 VideoModel.PACKAGE_NOT_DEFINED_ERROR = 2;
 VideoModel.EXTRACT_ERROR = 3;
