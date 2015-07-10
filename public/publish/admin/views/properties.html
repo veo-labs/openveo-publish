@@ -2,7 +2,7 @@
   <h2 ng-bind="'PROPERTIES.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PROPERTIES.INFO' | translate"></div>
   <p class="ng-hide" ng-show="!properties.length" ng-bind="'PROPERTIES.NO_PROPERTIES' | translate"></p>
-  <div >
+    <div >
     <div class="datatable form-group">
       <div class="col-sm-3">
         <label class="control-label">Search by name :</label>
@@ -15,8 +15,8 @@
         <tbody>
           <tr ng-repeat="row in rows">
             <td class="line col-sm-10">
-              <div ng-click="toggleRowDetails(row)"><span class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !row.opened, 'glyphicon-chevron-down' : row.opened}"></span> <strong>[[row.name]]</strong></div>
-              <div ng-if="row.opened">
+              <div ng-click="toggleRowDetails(row)" class="table-cell"><span class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !row.opened, 'glyphicon-chevron-down' : row.opened}"></span> <strong>[[row.name]]</strong></div>
+              <div ng-if="row.opened" class="open-tab open-tab-animate">
                 <div class="col-xs-12 detail">
                   <form ov-form name="propertyForm" ng-submit="propertyForm.$valid && saveProperty(propertyForm, row)" novalidate>
                     <ul>
@@ -65,9 +65,6 @@
                     Action <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu">  
-                    <li><a href="#">Visualiser</a></li>
-                    <li><a href="#">Publier</a></li>
-                    <li class="divider"></li>
                     <li role="presentation"><a role="menuitem" href="#" ng-click="removeProperty(row)" ng-bind="'PROPERTIES.REMOVE' | translate"></a></li>
                   </ul>
                 </div>
