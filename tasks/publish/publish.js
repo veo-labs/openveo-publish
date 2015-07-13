@@ -1,5 +1,5 @@
 module.exports = {
-  basePath: ['./node_modules/openveo-publish'],
+  basePath: ['.'],
   app: ['<%= publish.basePath %>/app'],
   admin: ['<%= publish.app %>/client/admin'],
   srcjs: ['<%= publish.admin %>/js/'],
