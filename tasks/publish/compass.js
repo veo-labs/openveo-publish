@@ -9,7 +9,7 @@ module.exports = {
   },
   publishdist: {
     options: {
-      sourcemap: true,
+      sourcemap: false,
       sassDir: '<%= publish.sass %>',
       cssDir: '<%= publish.css %>',
       environment: 'production'
