@@ -3,7 +3,6 @@
 // Module dependencies
 var assert = require("chai").assert;
 var openVeoAPI = require("openveo-api");
-var ut = require("openveo-test").generator;
 var applicationStorage = openVeoAPI.applicationStorage;
 
 // videoController.js
@@ -19,7 +18,10 @@ describe("videoController", function(){
   beforeEach(function(){
     request = { params : {} };
     response = { locals : {} };
-    ut.generateSuccessDatabase();
+
+    var FakeVideoDatabase = require("./database/FakeVideoDatabase.js");
+    applicationStorage.setDatabase(new FakeVideoDatabase());
+
     videoController = process.requirePublish("app/server/controllers/videoController.js");
     applicationStorage.setPlugins([{name : "player"}]);
   });
@@ -65,34 +67,22 @@ describe("videoController", function(){
     });
 
     it("Should return a 400 bad request if video id is not provided", function(done){
-      response.status = function(status){
-        assert.equal(status, 400);
-        return this;
-      };
 
-      response.send = function(data){
+      videoController.publishVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 400);
         done();
-      };
-
-      videoController.publishVideoAction(request, response, function(){
-        assert.ok(false);
       });
 
     });
 
     it("Should return an error 500 if trying to publish a video which is not in state sent", function(done){
-      request.params.id = "2";
-      response.status = function(status){
-        assert.equal(status, 500);
-        return this;
-      };
+      request.params.id = "error";
 
-      response.send = function(data){
+      videoController.publishVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 500);
         done();
-      };
-
-      videoController.publishVideoAction(request, response, function(){
-        assert.ok(false);
       });
 
     });
@@ -122,34 +112,22 @@ describe("videoController", function(){
 
     it("Should return a 400 bad request if video id is not provided", function(done){
       request.params.id = null;
-      response.status = function(status){
-        assert.equal(status, 400);
-        return this;
-      };
 
-      response.send = function(data){
+      videoController.unpublishVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 400);
         done();
-      };
-
-      videoController.unpublishVideoAction(request, response, function(){
-        assert.ok(false);
       });
 
     });
 
     it("Should return an error 500 if trying to unpublish a video which is not in state published", function(done){
-      request.params.id = "4";
-      response.status = function(status){
-        assert.equal(status, 500);
-        return this;
-      };
+      request.params.id = "error";
 
-      response.send = function(data){
+      videoController.unpublishVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 500);
         done();
-      };
-
-      videoController.unpublishVideoAction(request, response, function(){
-        assert.ok(false);
       });
 
     });
@@ -160,7 +138,7 @@ describe("videoController", function(){
   describe("getVideoAction", function(){
     
     it("Should be able to retrieve a video", function(done){
-      request.params.id = "1";
+      request.params.id = "5";
       response.status = function(status){
         assert.ok(false);
         return this;
@@ -176,36 +154,21 @@ describe("videoController", function(){
     });
     
     it("Should return an HTTP code 400 if id is not found in url parameters", function(done){
-      response.status = function(status){
-        assert.equal(status, 400);
-        return this;
-      };
-      response.send = function(data){
-        assert.ok(true);
-        done();
-      };
 
-      videoController.getVideoAction(request, response, function(){
-        assert.ok(false);
+      videoController.getVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 400);
+        done();
       });
     });
     
     it("Should return an HTTP code 500 if something wen't wrong", function(done){
-      request.params = { id: "1" };
-      ut.generateFailDatabase();
+      request.params = { id: "error" };
 
-      response.status = function(status){
-        assert.equal(status, 500);
-        return this;
-      };
-      
-      response.send = function(data){
-        assert.ok(true);
+      videoController.getVideoAction(request, response, function(error){
+        assert.isDefined(error);
+        assert.equal(error.httpCode, 500);
         done();
-      };
-
-      videoController.getVideoAction(request, response, function(){
-        assert.ok(false);
       });
     });
     

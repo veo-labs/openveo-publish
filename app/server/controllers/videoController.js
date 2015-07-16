@@ -3,6 +3,7 @@
 // Module dependencies
 var winston = require("winston");
 var openVeoAPI = require("openveo-api");
+var errors = process.requirePublish("app/server/httpErrors.js");
 
 var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
 var videoModel = new VideoModel();
@@ -58,10 +59,8 @@ module.exports.displayVideoAction = function(request, response, next){
 module.exports.getVideoAction = function(request, response, next){
   if(request.params.id){
     videoModel.getOne(request.params.id, function(error, video){
-      if(error){
-        logger.error(error && error.message);
-        response.status(500).send();
-      }
+      if(error)
+        next(errors.GET_VIDEO_ERROR);
       else
         response.send({ video : video });
     });
@@ -69,7 +68,7 @@ module.exports.getVideoAction = function(request, response, next){
 
   // Missing id of the video
   else
-    response.status(400).send();
+    next(errors.GET_VIDEO_MISSING_PARAMETERS);
 };
 
 /**
@@ -87,7 +86,7 @@ module.exports.publishVideoAction = function(request, response, next){
   if(request.params.id){
     videoModel.publishVideo(request.params.id, function(error){
       if(error)
-        response.status(500).send();
+        next(errors.PUBLISH_VIDEO_ERROR);
       else
         response.send({state : VideoModel.PUBLISHED_STATE});
     });
@@ -95,7 +94,7 @@ module.exports.publishVideoAction = function(request, response, next){
 
   // Missing type and / or id of the video
   else
-    response.status(400).send();
+    next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
 };
 
 /**
@@ -113,7 +112,7 @@ module.exports.unpublishVideoAction = function(request, response, next){
   if(request.params.id){
     videoModel.unpublishVideo(request.params.id, function(error){
       if(error)
-        response.status(500).send();
+        next(errors.UNPUBLISH_VIDEO_ERROR);
       else
         response.send({state : VideoModel.SENT_STATE});
     });
@@ -121,5 +120,5 @@ module.exports.unpublishVideoAction = function(request, response, next){
 
   // Missing type and / or id of the video
   else
-    response.status(400).send();
+    next(errors.UNPUBLISH_VIDEO_MISSING_PARAMETERS);
 };
