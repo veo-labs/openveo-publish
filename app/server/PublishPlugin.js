@@ -4,6 +4,7 @@
 var util = require("util");
 var express = require("express");
 var openVeoAPI = require("openveo-api");
+var watcherManager = process.requirePublish("app/server/watcher/watcherManager.js");
 
 function PublishPlugin(){
 
@@ -18,3 +19,10 @@ function PublishPlugin(){
 
 module.exports = PublishPlugin;
 util.inherits(PublishPlugin, openVeoAPI.Plugin);
+
+/**
+ * Starts the watcher when plugin is ready.
+ */
+PublishPlugin.prototype.start = function(){
+  watcherManager.start();
+};

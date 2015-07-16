@@ -23,8 +23,8 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
  * {
  *   "vimeo" : {
  *     "clientId" : "****",
- *     "clientSecret" : ""****",
- *     "accessToken" : ""****"
+ *     "clientSecret" : "****",
+ *     "accessToken" : "****"
  *   }
  * }
  * @param Object logger A Winston logger
