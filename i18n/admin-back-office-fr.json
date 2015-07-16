@@ -6,6 +6,10 @@
     "PROPERTIES" : "Propriétés personnalisées",
     "CATEGORIES" : "Catégories"
   },
+  "WS_SCOPES" : {
+    "GET_VIDEO_NAME" : "Récupérer les vidéos",
+    "GET_VIDEO_DESCRIPTION" : "Récupérer la liste des vidéos"
+  },
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Créer des propriétés",
     "CREATE_PROPERTY_DESCRIPTION" : "Créer des propriétés personnalisées",

@@ -16,6 +16,16 @@
     "property" : "app/server/models/PropertyModel",
     "video" : "app/server/models/VideoModel"
   },
+  "webServiceScopes" : {
+    "video" : {
+      "name" : "WS_SCOPES.GET_VIDEO_NAME",
+      "description" : "WS_SCOPES.GET_VIDEO_DESCRIPTON",
+      "paths" : [
+        "get /video",
+        "get /video/*"
+      ]
+    }
+  },
   "permissions" : [
     {
       "id" : "access-video-page",

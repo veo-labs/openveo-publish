@@ -6,6 +6,10 @@
     "PROPERTIES" : "Custom properties",
     "CATEGORIES" : "Categories"
   },
+  "WS_SCOPES" : {
+    "GET_VIDEO_NAME" : "Get videos",
+    "GET_VIDEO_DESCRIPTION" : "Get the list of videos"
+  },
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Create properties",
     "CREATE_PROPERTY_DESCRIPTION" : "Créer custom properties",
