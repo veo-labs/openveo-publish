@@ -46,11 +46,8 @@ var publishConf = process.requirePublish("config/publishConf.json");
 var videoPlatformConf = process.requirePublish("config/videoPlatformConf.json");
 var PublishManager = process.requirePublish("app/server/PublishManager.js");
 
-// Initialize logger
-process.requirePublish("app/server/watcher/watcherLogger.js");
-
-// Retrieve logger
-var logger = winston.loggers.get("watcher");
+// Get a logger
+var logger = openVeoAPI.logger.get("watcher", process.requirePublish("config/loggerConf.json").watcher);
 
 // hotFolders and videoTmpDir must be defined
 if(!watcherConf.hotFolders || !publishConf.videoTmpDir){
