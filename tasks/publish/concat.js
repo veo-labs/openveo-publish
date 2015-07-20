@@ -3,7 +3,7 @@ process.root = __dirname;
 process.require = function (filePath) {
   return require(path.normalize(process.root + "/" + filePath));
 };
-var applicationConf = process.require("../../node_modules/openveo-publish/conf.json");
+var applicationConf = process.require("../../conf.json");
 var jsFile = applicationConf["backOffice"]["scriptFiles"]["dev"];
 
 
