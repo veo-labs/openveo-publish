@@ -32,6 +32,7 @@ public/publish/lib/*
 tmp
 
 #Compiled files
+.sass-cache/*
 build/*
 public/publish/js/*
 public/publish/css/*
