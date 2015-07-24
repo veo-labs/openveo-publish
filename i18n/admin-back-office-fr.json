@@ -76,6 +76,7 @@
     "START_BUTTON" : "Démarrer le Watcher"
   },
   "PROPERTIES" : {
+    "SEARCH_BY" : "Rechercher par ",
     "PAGE_TITLE" : "Publish - Propriétés personnalisées",
     "TITLE" : "Propriétés personnalisées",
     "INFO" : "Les propriétés personnalisées permettent de rajouter des propriétés aux vidéos. Par défaut une vidéo posséde deux propriétés, titre et description. Toutes les propriétés présentes sur cette page seront disponibles lors de l'édition d'une vidéo.",    

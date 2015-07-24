@@ -2,108 +2,36 @@
   <h2 ng-bind="'PROPERTIES.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PROPERTIES.INFO' | translate"></div>
   <p class="ng-hide" ng-show="!properties.length" ng-bind="'PROPERTIES.NO_PROPERTIES' | translate"></p>
-    <div >
-    <div class="datatable form-group">
-      <div class="col-sm-3">
-        <label class="control-label">Search by name :</label>
-        <input type="text" class="form-control input-sm" ng-model="filterBy.name" />
-      </div>
-    </div>
-    <div tasty-table bind-theme="customTheme" bind-reload="reloadCallback" bind-resource-callback="getResource" bind-init="init" bind-filters="filterBy">
-      <table class="table table-striped table-condensed">
-        <thead tasty-thead bind-not-sort-by="notSortBy" ></thead>
-        <tbody>
-          <tr ng-repeat="row in rows">
-            <td class="line col-sm-10">
-              <div ng-click="toggleRowDetails(row)" class="table-cell"><span class="glyphicon" aria-hidden="true" ng-class="{'glyphicon-chevron-right' : !row.opened, 'glyphicon-chevron-down' : row.opened}"></span> <strong>[[row.name]]</strong></div>
-              <div ng-if="row.opened" class="open-tab open-tab-animate">
-                <div class="col-xs-12 detail">
-                  <form ov-form name="propertyForm" ng-submit="propertyForm.$valid && saveProperty(propertyForm, row)" novalidate>
-                    <ul>
-                      <li class="form-inline">
-                        <div class="form-group">
-                          <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_NAME' | translate"></label>
-                          <ov-editable ov-name="name" ov-value="row.name" ov-type="text" ov-required="true" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.name.$invalid && propertyForm.$submitted}">
-                          </ov-editable>
-                        </div>
-                      </li>
 
-                      <li class="form-inline">
-                        <div class="form-group">
-                          <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_DESCRIPTION' | translate"></label>
-                          <ov-editable ov-name="description" ov-value="row.description" ov-type="text" ov-required="true" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.description.$invalid && propertyForm.$submitted}">     
-                          </ov-editable>
-                        </div>
-                      </li>
-
-                      <li class="form-inline">
-                        <div class="form-group">
-                          <label class="label label-default control-label" ng-bind="'PROPERTIES.ATTR_TYPE' | translate"></label>
-                          <ov-editable ov-name="type" ov-options="supportedTypes" ov-value="row.typeValue" ov-type="select" ov-required="false" ov-disabled="propertyForm.saving" ng-class="{'has-error': propertyForm.type.$invalid && propertyForm.$submitted}">
-                          </ov-editable>
-                        </div>
-                      </li>
-
-                    </ul>
-
-                    <div class="btn-group" role="group" ng-show="!propertyForm.edition">
-                      <button type="button" ng-click="openEdition(propertyForm);" class="btn btn-primary" ng-bind="'PROPERTIES.FORM_EDIT' | translate"></button>
-                    </div>
-                    <div class="btn-group" role="group" ng-show="propertyForm.edition">
-                      <button type="button" ng-click="cancelEdition(propertyForm)" class="btn btn-default" ng-bind="'PROPERTIES.FORM_CANCEL' | translate" ng-disabled="property.saving"></button>
-                      <button ng-show="propertyForm.edition" type="submit" class="btn btn-primary" ng-bind="'PROPERTIES.FORM_SAVE' | translate" ng-disabled="property.saving"></button>
-                    </div>
-                  </form>
-                </div>
-              </div>  
-
-            </td>
-            <td>
-              <div class="col-xs-2 hidden-xs">
-                <div class="btn-group" dropdown>
-                  <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-                    Action <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">  
-                    <li role="presentation"><a role="menuitem" href="#" ng-click="removeProperty(row)" ng-bind="'PROPERTIES.REMOVE' | translate"></a></li>
-                  </ul>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div tasty-pagination></div>
-    </div>
-  </div>
+  <ng-include src="'/views/elements/dataTable.html'"></ng-include>
 
   <hr/>
-    <div class="col-xs-12 col-sm-6">
-      <h4><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <span ng-bind="'PROPERTIES.ADD_PROPERTY' | translate"></span></h4>
-      <form class="form-horizontal" name="addPropertyForm" ng-submit="addPropertyForm.$valid && addProperty(addPropertyForm)" novalidate>
+  <div class="col-xs-12 col-sm-6">
+    <h4><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <span ng-bind="'PROPERTIES.ADD_PROPERTY' | translate"></span></h4>
+    <form class="form-horizontal" name="addPropertyForm" ng-submit="addPropertyForm.$valid && addProperty(addPropertyForm)" novalidate>
 
-        <div class="form-group" ng-class="{'has-error': addPropertyForm.propertyName.$invalid && addPropertyForm.$submitted}">
-          <label for="propertyName" ng-bind="'PROPERTIES.FORM_ADD_NAME' | translate"></label>
-          <input type="text" name="propertyName" class="has-error form-control" id="propertyName" placeholder="[['PROPERTIES.FORM_ADD_NAME' | translate]]" ng-model="propertyName" ng-disabled="addPropertyForm.saving" required>
-          <small><em ng-bind="'PROPERTIES.FORM_ADD_NAME_DESC' | translate"></em></small>
-        </div>
+      <div class="form-group" ng-class="{'has-error': addPropertyForm.propertyName.$invalid && addPropertyForm.$submitted}">
+        <label for="propertyName" ng-bind="'PROPERTIES.FORM_ADD_NAME' | translate"></label>
+        <input type="text" name="propertyName" class="has-error form-control" id="propertyName" placeholder="[['PROPERTIES.FORM_ADD_NAME' | translate]]" ng-model="propertyName" ng-disabled="addPropertyForm.saving" required>
+        <small><em ng-bind="'PROPERTIES.FORM_ADD_NAME_DESC' | translate"></em></small>
+      </div>
 
-        <div class="form-group" ng-class="{'has-error': addPropertyForm.propertyDescription.$invalid && addPropertyForm.$submitted}">
-          <label for="propertyDescription" ng-bind="'PROPERTIES.FORM_ADD_DESCRIPTION' | translate"></label>
-          <input type="text" name="propertyDescription" class="form-control" id="propertyDescription" placeholder="[['PROPERTIES.FORM_ADD_DESCRIPTION' | translate]]" ng-model="propertyDescription" ng-disabled="addPropertyForm.saving" required>
-          <small><em ng-bind="'PROPERTIES.FORM_ADD_DESCRIPTION_DESC' | translate"></em></small>
-        </div>
+      <div class="form-group" ng-class="{'has-error': addPropertyForm.propertyDescription.$invalid && addPropertyForm.$submitted}">
+        <label for="propertyDescription" ng-bind="'PROPERTIES.FORM_ADD_DESCRIPTION' | translate"></label>
+        <input type="text" name="propertyDescription" class="form-control" id="propertyDescription" placeholder="[['PROPERTIES.FORM_ADD_DESCRIPTION' | translate]]" ng-model="propertyDescription" ng-disabled="addPropertyForm.saving" required>
+        <small><em ng-bind="'PROPERTIES.FORM_ADD_DESCRIPTION_DESC' | translate"></em></small>
+      </div>
 
-        <div class="form-group">
-          <label for="propertyType" ng-bind="'PROPERTIES.FORM_ADD_TYPE' | translate"></label>
-          <select class="form-control" ng-model="propertyType" ng-options="type.value as (type.label | translate) for type in supportedTypes" ng-disabled="addPropertyForm.saving"></select>
-          <small><em ng-bind="'PROPERTIES.FORM_ADD_TYPE_DESC' | translate"></em></small>
-        </div>
+      <div class="form-group">
+        <label for="propertyType" ng-bind="'PROPERTIES.FORM_ADD_TYPE' | translate"></label>
+        <select class="form-control" ng-model="propertyType" ng-options="type.value as (type.label | translate) for type in supportedTypes" ng-disabled="addPropertyForm.saving"></select>
+        <small><em ng-bind="'PROPERTIES.FORM_ADD_TYPE_DESC' | translate"></em></small>
+      </div>
 
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary" ng-bind="'PROPERTIES.FORM_ADD_BUTTON' | translate" ng-disabled="addPropertyForm.saving"></button>
-        </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary" ng-bind="'PROPERTIES.FORM_ADD_BUTTON' | translate" ng-disabled="addPropertyForm.saving"></button>
+      </div>
 
-      </form>
-    </div>
+    </form>
+  </div>
 </div>

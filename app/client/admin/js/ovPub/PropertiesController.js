@@ -9,65 +9,90 @@
    * Defines the properties controller for the properties page.
    */
   function PropertiesController($scope, $http, $interval,$filter, entityService, properties) {
-    $scope.init = {
-      'count': 5,
-      'page': 1,
-      'sortBy': 'name',
-      'sortOrder': 'asc'
-    };
-    $scope.reloadCallback = function () {};
-    
-    
-    $scope.filterBy = {
+    /**
+     * 
+     * DATATABLE
+     */
+    var scopeDataTable = $scope.tableContainer = {};
+    scopeDataTable.filterBy = {
       'name': '',
+      'description': ''
     };
-    $scope.rows = {};
-    $scope.header = [{
+    scopeDataTable.header = [{
             'key': "name",
             'name': $filter('translate')('PROPERTIES.NAME_COLUMN')
+          },
+          {
+            'key': "description",
+            'name': 'PROPERTIES.NAME_COLUMN'
           },
           {
             'key': "action",
             'name': $filter('translate')('PROPERTIES.ACTIONS_COLUMN')
           }];
+        
+    scopeDataTable.actions = [{
+        "label": "remove",
+        "condition": function(row){ return row.name != "Test";},
+        "callback": function(row){alert('remove ' + row.name);}
+      },
+      {
+        "label": "publish",
+        "condition": function(row){ return row.name != "Auteur";},
+        "callback": function(row){alert('publish ' + row.name);}
+      }];
     
-    $scope.notSortBy = ["action"];
     
-    $scope.customTheme = {
-      iconUp: 'glyphicon glyphicon-triangle-bottom',
-      iconDown: 'glyphicon glyphicon-triangle-top',
-      listItemsPerPage: [5, 10, 20, 30],
-      itemsPerPage: 10,
-      loadOnInit: true
-    };
-
-    $scope.getResource = function (params, paramsObj) {
-      var param = {};
-      param['count'] = paramsObj.count;
-      param['page'] = paramsObj.page;
-      param['sort'] = {};
-      param['sort'][paramsObj.sortBy] = paramsObj.sortOrder=="dsc"? -1: 1;
-      param['filter'] = {"name" : {"$regex":".*"+$scope.filterBy.name+".*"}}
-      
-      return entityService.getEntities('property',param).then(function (response) {
-        $scope.rows = response.data.rows;
-        return {
-          'rows': $scope.rows ,
-          'header': $scope.header,
-          'pagination': response.data.pagination,
-          'sortBy': $scope.init.sortBy,
-          'sortOrder': $scope.init.sortOrder==-1?"dsc": "asc"
-        }
-      });
-    }
-    
-    $scope.toggleRowDetails = function(row){
-      if(!row.saving){
-        angular.forEach($scope.rows, function (value, key){
-          value.opened= (value.id === row.id) ? !value.opened : false;
-        })
+    /**
+     * FORM
+     */
+    var scopeEditForm = $scope.formContainer = {};
+    scopeEditForm.model = {};
+    $scope.supportedTypes = [
+      {
+        "value" : "text",
+        "label" : "PROPERTIES.FORM_ADD_TEXT_TYPE"
       }
-    };
+    ];
+    scopeEditForm.fields = [
+      {
+        // the key to be used in the model values
+        // so this will be bound to vm.user.username
+        key: 'name',
+        type: 'horizontalExtendInput',
+        templateOptions: {
+          label: 'Username',
+          required: true,
+        }
+      },
+      {
+        key: 'description',
+        type: 'horizontalExtendInput',
+        templateOptions: {
+          label: 'Description',
+          required: true,
+        },
+        expressionProperties: {
+          'templateOptions.disabled': '!model.name' // disabled when username is blank
+        }
+      },
+      {
+        key: 'type',
+        type: 'horizontalExtendSelect',
+        templateOptions: {
+          label: 'Description',
+          required: true,
+          options: $scope.supportedTypes
+        },
+        expressionProperties: {
+          'templateOptions.disabled': '!model.name' // disabled when username is blank
+        }
+      }
+    ];
+  
+    scopeEditForm.onSubmit = function(model){
+      alert('form submitted: '+ JSON.stringify(model), null, 2);
+    }
     
     
     $scope.supportedTypes = [
@@ -80,7 +105,7 @@
     $scope.properties = properties.data.entities;
     
     preparePropertiesTypes();
-
+    
     
     /**
      * Removes the property.

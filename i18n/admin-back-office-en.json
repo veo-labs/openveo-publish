@@ -76,6 +76,7 @@
     "START_BUTTON" : "Start watcher"
   },
   "PROPERTIES" : {
+    "SEARCH_BY" : "Search by ",
     "PAGE_TITLE" : "Publish - Custom properties",
     "TITLE" : "Custom properties",
     "INFO" : "Custom properties help you add properties to videos. By default a video has two properties, the video title and the video description. All properties present on this page will be available while editing a video.",
