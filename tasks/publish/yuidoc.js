@@ -13,7 +13,7 @@ module.exports = {
         "data": [
           {
             "base" : "../../doc/openveo-api/",
-            "json" : "./doc/openveo-api/data.json"
+            "json" : "../../doc/openveo-api/data.json"
           }
         ]
       }
