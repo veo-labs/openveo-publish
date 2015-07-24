@@ -1,12 +1,22 @@
 "use strict"
 
+/**
+ * @module publish-providers
+ */
+
 /** 
  * Saves provider configuration.
- * Use function VideoPlatformProvider.getProvider to get an instance of
- * the appropriate video platform provider.
- * @param Object providerConf A video platform configuration object
- * it's structure depend on the provider's type, see extended objects for
- * more information
+ *
+ * Defines a VideoPlatformProvider class to interface with video
+ * platforms. Use getProvider method to get an instance of the
+ * appropriate VideoPlatformProvider.
+ *
+ * @class VideoPlatformProvider
+ * @constructor
+ * @extends EntityProvider
+ * @param {Object} providerConf A video platform configuration object
+ * it's structure depend on the provider's type, see extended objects
+ * for more information
  */
 function VideoPlatformProvider(providerConf){
   this.conf = providerConf;
@@ -20,12 +30,15 @@ module.exports = VideoPlatformProvider;
 /**
  * Gets an instance of a VideoPlatformProvider giving a type and a 
  * configuration object.
- * @param String type The type of the provider platform to instanciate
- * @param Object providerConf A video platform configuration object,
- * it's structure depend on the provider's type, see extended objects for
- * more information
- * @return VideoPlatformProvider An instance of a VideoPlatformProvider
- * sub object
+ *
+ * @method getProvider
+ * @static
+ * @param {String} type The type of the provider platform to instanciate
+ * @param {Object} providerConf A video platform configuration object,
+ * it's structure depend on the provider's type, see extended objects
+ * for more information
+ * @return {VideoPlatformProvider} An instance of a
+ * VideoPlatformProvider sub class
  */
 VideoPlatformProvider.getProvider = function(type, providerConf){
 
@@ -48,7 +61,11 @@ VideoPlatformProvider.getProvider = function(type, providerConf){
 
 /**
  * Uploads a video to the platform.
- * @param Function callback The function to call when the upload is done
- *   - Error The error if an error occurred, null otherwise 
+ *
+ * @method upload
+ * @async
+ * @param {Function} callback The function to call when the upload
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoPlatformProvider.prototype.upload = function(callback){throw new Error("upload method not implemented for this video platform provider");}

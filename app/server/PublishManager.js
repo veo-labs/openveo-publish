@@ -1,5 +1,13 @@
 "use scrict"
 
+/**
+ * Defines the PublishManager which handles all the process in video
+ * package publication. Video package is copied, extracted, interpreted
+ * and video is sent to the video provider.
+ *
+ * @module publish-manager
+ */
+
 // Module dependencies
 var util = require("util");
 var fs = require("fs");
@@ -18,21 +26,51 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
 /**
  * Creates a PublishManager to retrieve, validate and publish
  * a video pacakge. 
- * @param Database database A database to store information about the videos
- * @param Object videoProviderConf Video platforms provider configuration
- * {
- *   "vimeo" : {
- *     "clientId" : "****",
- *     "clientSecret" : "****",
- *     "accessToken" : "****"
- *   }
- * }
- * @param Object logger A Winston logger
+ *
+ * @example
+ *     var openVeoAPI = require("openveo-api");
+ *     var PublishManager = process.requirePublish("app/server/PublishManager.js");
+ *     var db = openVeoAPI.applicationStorage.getDatabase();
+ *     var logger = openVeoAPI.logger.get("openveo");
+ *
+ *     var videoPlatformConf = {
+ *       "vimeo" : {
+ *         "clientId" : "****",
+ *         "clientSecret" : "****",
+ *         "accessToken" : "****"
+ *       }
+ *     };
+ *
+ *     var publishManager = new PublishManager(db, videoPlatformConf, logger);
+ *
+ *     // Listen to errors dispatched by the publish manager
+ *     publishManager.on("error", function(error){
+ *       // Do something
+ *     });
+ *
+ *     // Listen to complete publications dispatched by the publish manager
+ *     publishManager.on("complete", function(videoPackage){
+ *       // Do something
+ *     });
+ *
+ *     publishManager.publish({
+ *       "type" : "vimeo", // The video platform to use
+ *       "path" : "C:/Temp/", // The path of the hot folder
+ *       "originalPackagePath" : "/tmp/video-package.tar" // Path of package to publish
+ *     });
+ *
+ * @class PublishManager
+ * @constructor
+ * @param {Database} database A database to store information about
+ * the videos
+ * @param {Object} videoProviderConf Video platforms provider
+ * configuration
+ * @param {Object} logger A Winston logger
  * PublishManager emits the following events : 
- *  - Event "error" An error occured
- *    * Error The error
- *  - Event "complete" A video package was successfully published
- *    * Object The published video package
+ *  - Event *error* An error occured
+ *    - **Error** The error
+ *  - Event *complete* A video package was successfully published
+ *    - **Object** The published video package
  */
 function PublishManager(database, videoProviderConf, logger){
   openVeoAPI.applicationStorage.setDatabase(database);
@@ -73,46 +111,48 @@ module.exports = PublishManager;
  * Package must be a valid tar file containing : 
  *  - A video file
  *  - A list of image files in jpeg format
- *  - A .session file describing the video package content. e.g
- *    {
- *      "profile": "2",
- *      "audio-input": "analog-top",
- *      "date": "13/01/1970 20:36:15",
- *      "format": "mix-pip",
- *      "rich-media": true,
- *      "profile-settings": {
- *        "video-bitrate": 1000000,
- *        "id": "2",
- *        "video-height": 720,
- *        "audio-bitrate": 128000,
- *        "name": "Haute définition"
- *      },
- *      "id": "1970-01-13_20-36-15",
- *      "format-settings": {
- *        "source": "mix-raw",
- *        "id": "mix-pip",
- *        "name": "Mélangé caméra incrustée",
- *        "template": "pip"
- *      },
- *      "date-epoch": 1107375,
- *      "storage-directory": "/data/1970-01-13_20-36-15",
- *      "filename": "video.mp4",
- *      "duration": 20
- *    }
+ *  - A .session file describing the video package content
  *  - A synchro.xml file with the mapping image / video for 
- *    a timecode. e.g
- *    <?xml version="1.0"?>
- *    <player>
- *      <synchro id="slide_00000.jpeg" timecode="0"/>
- *      <synchro id="slide_00001.jpeg" timecode="1200"/>
- *    </player>
+ *    a timecode.
  *
- * @param Object videoPackage Video package to publish e.g
- *   {
- *     "type" : "vimeo", // The video platform to use
- *     "path" : "C:/Temp/", // The path of the hot folder
- *     "originalPackagePath" : "C:/Temp/video-package.tar" // Path of package to publish
- *   }
+ * @example
+ *     // .session file example in video package
+ *     {
+ *       "profile": "2",
+ *       "audio-input": "analog-top",
+ *       "date": "13/01/1970 20:36:15",
+ *       "format": "mix-pip",
+ *       "rich-media": true,
+ *       "profile-settings": {
+ *         "video-bitrate": 1000000,
+ *         "id": "2",
+ *         "video-height": 720,
+ *         "audio-bitrate": 128000,
+ *         "name": "Haute définition"
+ *       },
+ *       "id": "1970-01-13_20-36-15",
+ *       "format-settings": {
+ *         "source": "mix-raw",
+ *         "id": "mix-pip",
+ *         "name": "Mélangé caméra incrustée",
+ *         "template": "pip"
+ *       },
+ *       "date-epoch": 1107375,
+ *       "storage-directory": "/data/1970-01-13_20-36-15",
+ *       "filename": "video.mp4",
+ *       "duration": 20
+ *     }
+ *
+ * @example
+ *     <!-- synchro.xml file example in video package -->
+ *     <?xml version="1.0"?>
+ *     <player>
+ *       <synchro id="slide_00000.jpeg" timecode="0"/>
+ *       <synchro id="slide_00001.jpeg" timecode="1200"/>
+ *     </player>
+ *
+ * @method publish
+ * @param {Object} videoPackage Video package to publish
  */
 PublishManager.prototype.publish = function(videoPackage){
   
@@ -345,20 +385,27 @@ PublishManager.prototype.publish = function(videoPackage){
 
 /**
  * Validates package content.
+ *
  * A video package must contain, at least a valid package information
  * file and a video file.
+ *
+ * @example
+ *     // videoPackage example
+ *     {
+ *       "id" : 1422731934859, // Internal video id
+ *       "type" : "vimeo", // The video platform to use
+ *       "path" : "C:/Temp/", // The path of the hot folder
+ *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
+ *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar" // The package path inside the tmp directory
+ *     }
  * 
+ * @method validatePackage
+ * @async
+ * @private
  * @param Object videoPackage Video package to publish e.g
- *   {
- *     "id" : 1422731934859, // Internal video id
- *     "type" : "vimeo", // The video platform to use
- *     "path" : "C:/Temp/", // The path of the hot folder
- *     "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *     "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar" // The package path inside the tmp directory
- *   }
- * @param Function callback The function to call when done
- *   - Error The error if an error occurred, null otherwise 
- *   - Object The package information object 
+ * @param {Function} callback The function to call when done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The package information object
  */
 function validatePackage(videoPackage, callback){
   var extractDirectory = path.join(publishConf.videoTmpDir, videoPackage.id + "");
@@ -406,41 +453,48 @@ function validatePackage(videoPackage, callback){
  * 3. TODO Resize presentation images
  * 4. Copy package images to public directory
  *
- * @param Object videoPackage Video package to publish e.g
- *   {
- *     "id" : 1422731934859, // Internal video id
- *     "type" : "vimeo", // The video platform to use
- *     "path" : "C:/Temp/", // The path of the hot folder
- *     "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *     "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar", // The package path inside the tmp directory
- *     "metadata" : {
- *       "profile": "2",
- *       "audio-input": "analog-top",
- *       "date": "13/01/1970 20:36:15",
- *       "format": "mix-pip",
- *       "rich-media": true,
- *       "profile-settings": {
- *         "video-bitrate": 1000000,
- *         "id": "2",
- *         "video-height": 720,
- *         "audio-bitrate": 128000,
- *         "name": "Haute définition"
- *       },
- *       "id": "1970-01-13_20-36-15",
- *       "format-settings": {
- *         "source": "mix-raw",
- *         "id": "mix-pip",
- *         "name": "Mélangé caméra incrustée",
- *         "template": "pip"
- *       },
- *       "date-epoch": 1107375,
- *       "storage-directory": "/data/1970-01-13_20-36-15",
- *       "filename": "video.mp4",
- *       "duration": 20
+ * @example
+ *     // videoPackage example
+ *     {
+ *       "id" : 1422731934859, // Internal video id
+ *       "type" : "vimeo", // The video platform to use
+ *       "path" : "C:/Temp/", // The path of the hot folder
+ *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
+ *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar", // The package path inside the tmp directory
+ *       "metadata" : {
+ *         "profile": "2",
+ *         "audio-input": "analog-top",
+ *         "date": "13/01/1970 20:36:15",
+ *         "format": "mix-pip",
+ *         "rich-media": true,
+ *         "profile-settings": {
+ *           "video-bitrate": 1000000,
+ *           "id": "2",
+ *           "video-height": 720,
+ *           "audio-bitrate": 128000,
+ *           "name": "Haute définition"
+ *         },
+ *         "id": "1970-01-13_20-36-15",
+ *         "format-settings": {
+ *           "source": "mix-raw",
+ *           "id": "mix-pip",
+ *           "name": "Mélangé caméra incrustée",
+ *           "template": "pip"
+ *         },
+ *         "date-epoch": 1107375,
+ *         "storage-directory": "/data/1970-01-13_20-36-15",
+ *         "filename": "video.mp4",
+ *         "duration": 20
+ *       }
  *     }
- *   }
- * @param Function callback The function to call when done
- *   - Error The error if an error occurred, null otherwise 
+ *
+ *
+ * @method startPublishing
+ * @async
+ * @private
+ * @param {Object} videoPackage Video package to publish
+ * @param {Function} callback The function to call when done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 function startPublishing(videoPackage, callback){
   var self = this;
@@ -527,7 +581,10 @@ function startPublishing(videoPackage, callback){
 
 /**
  * Removes a video package from pending packages.
- * @param Number packageId The package id to remove
+ *
+ * @method removeFromPending
+ * @async
+ * @param {Number} packageId The package id to remove
  */
 function removeFromPending(packageId){
   for(var i = 0 ; i < this.pendingVideos.length ; i++){
@@ -543,41 +600,50 @@ function removeFromPending(packageId){
  * 1. Test if timecode xml file exists
  * 2. Transcode XML file to a JSON equivalent 
  *    e.g.
- *    {
- *      "player": {
- *        "synchro": 
- *        [
- *          {
- *            "id": ["slide_00000.jpeg"],
- *            "timecode": ["0"]
- *          }, {
- *            "id": ["slide_00001.jpeg"],
- *            "timecode": ["1200"]
- *          }
- *        ]
- *      }
- *    }
  * 3. Format JSON
  *    e.g.
- *    {
- *      "0": {
- *        "image": {
- *          "small": "slide_00000.jpeg",
- *          "large": "slide_00000.jpeg"
- *        }
- *      },
- *      "1200": {
- *        "image": {
- *          "small": "slide_00001.jpeg",
- *          "large": "slide_00001.jpeg"
- *        }
- *      }
- *    }
  *
- * @param String xmlTimecodeFilePath The timecode file to save
- * @param String destinationFilePath The JSON timecode file path
- * @param Function callback The function to call when done
- *   - Error The error if an error occurred, null otherwise
+ * @example
+ *     // Transform XML timecodes into JSON
+ *     // From : 
+ *     {
+ *       "player": {
+ *         "synchro":
+ *         [
+ *           {
+ *             "id": ["slide_00000.jpeg"],
+ *             "timecode": ["0"]
+ *           }, {
+ *             "id": ["slide_00001.jpeg"],
+ *             "timecode": ["1200"]
+ *           }
+ *         ]
+ *       }
+ *     }
+ *
+ *     // To :
+ *     {
+ *       "0": {
+ *         "image": {
+ *           "small": "slide_00000.jpeg",
+ *           "large": "slide_00000.jpeg"
+ *         }
+ *       },
+ *       "1200": {
+ *         "image": {
+ *           "small": "slide_00001.jpeg",
+ *           "large": "slide_00001.jpeg"
+ *         }
+ *       }
+ *     }
+ *
+ * @method saveTimecode
+ * @private
+ * @async
+ * @param {String} xmlTimecodeFilePath The timecode file to save
+ * @param {String} destinationFilePath The JSON timecode file path
+ * @param {Function} callback The function to call when done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
 
@@ -651,8 +717,12 @@ function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
 
 /**
  * Defines a custom error with an error code.
- * @param String message The error message
- * @param String code The error code
+ *
+ * @class PublishError
+ * @constructor
+ * @extends Error
+ * @param {String} message The error message
+ * @param {String} code The error code
  */
 function PublishError(message, code){
   this.name = "PublishError";

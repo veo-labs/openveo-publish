@@ -1,5 +1,15 @@
 "use strict"
 
+/**
+ * @module publish-controllers
+ */
+
+/**
+ * Provides route actions for all requests relative to videos.
+ *
+ * @class videoController
+ */
+
 // Module dependencies
 var winston = require("winston");
 var openVeoAPI = require("openveo-api");
@@ -14,8 +24,12 @@ var logger = winston.loggers.get("openveo");
 
 /**
  * Displays video player template.
+ *
  * Checks first if the video id is valid and if the video is published
  * before returning the template.
+ *
+ * @method displayVideoAction
+ * @static
  */
 module.exports.displayVideoAction = function(request, response, next){
   response.locals.scripts = [];
@@ -46,15 +60,20 @@ module.exports.displayVideoAction = function(request, response, next){
 
 /**
  * Gets information about a video.
+ *
  * Expects one GET parameter :
- *  - id The id of the video
- * Return information about the video as a JSON object :
- * {
- *   video : {
- *     id : 123456789,
- *     ...
- *   }
- * }
+ *  - **id** The id of the video
+ *
+ * @example
+ *     {
+ *       video : {
+ *         id : 123456789,
+ *         ...
+ *       }
+ *     }
+ *
+ * @method getVideoAction
+ * @static
  */
 module.exports.getVideoAction = function(request, response, next){
   if(request.params.id){
@@ -73,14 +92,19 @@ module.exports.getVideoAction = function(request, response, next){
 
 /**
  * Publishes a video.
+ *
  * Expects one GET parameter :
- *  - id The id of the video
+ *  - **id** The id of the video
+ *
  * Change the state of the video to published
- * Return the new video state as a JSON object :
- * e.g.
- * {
- *   state : 7
- * }
+ *
+ * @example
+ *     {
+ *       state : 7
+ *     }
+ *
+ * @method publishVideoAction
+ * @static
  */
 module.exports.publishVideoAction = function(request, response, next){
   if(request.params.id){
@@ -99,14 +123,19 @@ module.exports.publishVideoAction = function(request, response, next){
 
 /**
  * Unpublishes a video.
+ *
  * Expects one GET parameter :
- *  - id The id of the video
+ *  - **id** The id of the video
+ *
  * Change the state of the video to unpublished.
- * Return the new video state as a JSON object :
- * e.g.
- * {
- *   state : 6
- * }
+ *
+ * @example
+ *     {
+ *       state : 6
+ *     }
+ *
+ * @method unpublishVideoAction
+ * @static
  */
 module.exports.unpublishVideoAction = function(request, response, next){
   if(request.params.id){

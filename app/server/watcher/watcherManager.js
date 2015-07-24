@@ -1,3 +1,12 @@
+"use strict"
+
+/**
+ * Provides functions to manage a watcher sub process.
+ *
+ * @module publish-watcher
+ * @class watcherManager
+ */
+
 // Module dependencies
 var path = require("path");
 var child_process = require("child_process");
@@ -16,6 +25,8 @@ var watcher, status = this.STOPPED_STATUS;
 
 /**
  * Starts the watcher as a child process if not already started.
+ *
+ * @method start
  */
 module.exports.start = function(){
   var self = this;
@@ -53,6 +64,8 @@ module.exports.start = function(){
 
 /**
  * Stops the watcher if started.
+ *
+ * @method stop
  */
 module.exports.stop = function(){
   if(watcher && status === this.STARTED_STATUS){
@@ -64,7 +77,9 @@ module.exports.stop = function(){
 
 /**
  * Gets watcher status.
- * @return Number The watcher status with 
+ *
+ * @method getStatus
+ * @return {Number} The watcher status with
  *  - 0 Starting
  *  - 1 Started
  *  - 2 Stopping

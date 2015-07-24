@@ -40,4 +40,5 @@ public/publish/css/*
 #IDE
 nbproject/*
 
-
+# Documentation (yuidoc)
+doc

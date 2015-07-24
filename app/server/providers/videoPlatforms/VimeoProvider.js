@@ -1,5 +1,9 @@
 "use strict"
 
+/**
+ * @module publish-providers
+ */
+
 // Module dependencies
 var path = require("path");
 var util = require("util");
@@ -9,14 +13,21 @@ var vimeoAPI = require("vimeo");
 var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
 
 /**
- * Creates a VimeoProvider instance to interact with the Vimeo platform
+ * Defines a VimeoProvider class to interact with vimeo platform
  * (https://vimeo.com/).
- * @param Object providerConf A vimeo configuration object like
- * {
- *  "clientId" : "****",
- *  "clientSecret" : "****",
- *  "accessToken" : "****"
- * }
+ *
+ * @example
+ *     // providerConf example
+ *     {
+ *       "clientId" : "****",
+ *       "clientSecret" : "****",
+ *       "accessToken" : "****"
+ *     }
+ *
+ * @class VimeoProvider
+ * @constructor
+ * @extends VideoPlatformProvider
+ * @param {Object} providerConf A vimeo configuration object
  */
 function VimeoProvider(providerConf){
   VideoPlatformProvider.call(this, providerConf);
@@ -33,41 +44,47 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
  * TODO Find a way to avoid sending default preset request on Vimeo
  * for each upload.
  *
- * @param Object videoPackage Video package to upload e.g
- *   {
- *     "id" : 1422731934859,
- *     "type" : "vimeo",
- *     "path" : "C:/Temp/",
- *     "originalPackagePath" : "C:/Temp/video-package.tar",
- *     "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
- *     "metadata" : {
- *       "profile": "2",
- *       "audio-input": "analog-top",
- *       "date": "13/01/1970 20:36:15",
- *       "format": "mix-pip",
- *       "rich-media": true,
- *       "profile-settings": {
- *         "video-bitrate": 1000000,
- *         "id": "2",
- *         "video-height": 720,
- *         "audio-bitrate": 128000,
- *         "name": "Haute définition"
- *       },
- *       "id": "1970-01-13_20-36-15",
- *       "format-settings": {
- *         "source": "mix-raw",
- *         "id": "mix-pip",
- *         "name": "Mélangé caméra incrustée",
- *         "template": "pip"
- *       },
- *       "date-epoch": 1107375,
- *       "storage-directory": "/data/1970-01-13_20-36-15",
- *       "filename": "video.mp4",
- *       "duration": 20
+ * @example
+ *     // videoPackage example
+ *     {
+ *       "id" : 1422731934859,
+ *       "type" : "vimeo",
+ *       "path" : "C:/Temp/",
+ *       "originalPackagePath" : "C:/Temp/video-package.tar",
+ *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
+ *       "metadata" : {
+ *         "profile": "2",
+ *         "audio-input": "analog-top",
+ *         "date": "13/01/1970 20:36:15",
+ *         "format": "mix-pip",
+ *         "rich-media": true,
+ *         "profile-settings": {
+ *           "video-bitrate": 1000000,
+ *           "id": "2",
+ *           "video-height": 720,
+ *           "audio-bitrate": 128000,
+ *           "name": "Haute définition"
+ *         },
+ *         "id": "1970-01-13_20-36-15",
+ *         "format-settings": {
+ *           "source": "mix-raw",
+ *           "id": "mix-pip",
+ *           "name": "Mélangé caméra incrustée",
+ *           "template": "pip"
+ *         },
+ *         "date-epoch": 1107375,
+ *         "storage-directory": "/data/1970-01-13_20-36-15",
+ *         "filename": "video.mp4",
+ *         "duration": 20
+ *       }
  *     }
- *   }
- * @param Function callback The function to call when the upload is done
- *   - Error The error if an error occurred, null otherwise 
+ *
+ * @method upload
+ * @async
+ * @param {Object} videoPackage Video package to upload
+ * @param {Function} callback The function to call when the upload
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoPlatformProvider.prototype.upload = function(videoPackage, callback){
   var self = this;

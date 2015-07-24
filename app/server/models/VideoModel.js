@@ -1,5 +1,9 @@
 "use strict"
 
+/**
+ * @module publish-models
+ */
+
 // Module dependencies
 var util = require("util");
 var path = require("path");
@@ -11,7 +15,11 @@ var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.j
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
 
 /**
- * Creates a VideoModel.
+ * Defines a VideoModel class to manipulate videos.
+ *
+ * @class VideoModel
+ * @constructor
+ * @extends EntityModel
  */
 function VideoModel(){
   openVeoAPI.EntityModel.prototype.init.call(this, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
@@ -53,45 +61,49 @@ VideoModel.ERROR_STATE = 8;
 
 /**
  * Adds a new video.
- * @param Object videoPackage Information about the video
- *   {
- *     "id" : 1422731934859,
- *     "status" : 1,
- *     "properties" : [],
- *     "published" : false,
- *     "type" : "vimeo",
- *     "path" : "C:/Temp/",
- *     "originalPackagePath" : "C:/Temp/video-package.tar",
- *     "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
- *     "metadata" : {
- *       "profile": "2",
- *       "audio-input": "analog-top",
- *       "date": "13/01/1970 20:36:15",
- *       "format": "mix-pip",
- *       "rich-media": true,
- *       "profile-settings": {
- *         "video-bitrate": 1000000,
- *         "id": "2",
- *         "video-height": 720,
- *         "audio-bitrate": 128000,
- *         "name": "Haute définition"
- *       },
- *       "id": "1970-01-13_20-36-15",
- *       "format-settings": {
- *         "source": "mix-raw",
- *         "id": "mix-pip",
- *         "name": "Mélangé caméra incrustée",
- *         "template": "pip"
- *       },
- *       "date-epoch": 1107375,
- *       "storage-directory": "/data/1970-01-13_20-36-15",
- *       "filename": "video.mp4",
- *       "duration": 20
- *     }
- *   }
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise 
- * @Override
+ *
+ * @example
+ *     {
+ *      "id" : 1422731934859,
+ *      "status" : 1,
+ *      "properties" : [],
+ *      "published" : false,
+ *      "type" : "vimeo",
+ *      "path" : "C:/Temp/",
+ *      "originalPackagePath" : "C:/Temp/video-package.tar",
+ *      "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
+ *      "metadata" : {
+ *        "profile": "2",
+ *        "audio-input": "analog-top",
+ *        "date": "13/01/1970 20:36:15",
+ *        "format": "mix-pip",
+ *        "rich-media": true,
+ *        "profile-settings": {
+ *          "video-bitrate": 1000000,
+ *          "id": "2",
+ *          "video-height": 720,
+ *          "audio-bitrate": 128000,
+ *          "name": "Haute définition"
+ *        },
+ *        "id": "1970-01-13_20-36-15",
+ *        "format-settings": {
+ *          "source": "mix-raw",
+ *          "id": "mix-pip",
+ *          "name": "Mélangé caméra incrustée",
+ *          "template": "pip"
+ *        },
+ *        "date-epoch": 1107375,
+ *        "storage-directory": "/data/1970-01-13_20-36-15",
+ *        "filename": "video.mp4",
+ *        "duration": 20
+ *      }
+ *    }
+ *
+ * @method add
+ * @async
+ * @param {Object} videoPackage Information about the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.add = function(videoPackage, callback){
   var data = {
@@ -114,10 +126,13 @@ VideoModel.prototype.add = function(videoPackage, callback){
 
 /**
  * Updates video state.
- * @param Number id The id of the video to update
- * @param String state The state of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateState
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} state The state of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateState = function(id, state, callback){
   updateVideoProperty.call(this, id, "state", state, callback);
@@ -125,10 +140,13 @@ VideoModel.prototype.updateState = function(id, state, callback){
 
 /**
  * Updates video status.
- * @param Number id The id of the video to update
- * @param String status The status of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateStatus
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} status The status of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateStatus = function(id, status, callback){
   updateVideoProperty.call(this, id, "status", status, callback);
@@ -136,10 +154,13 @@ VideoModel.prototype.updateStatus = function(id, status, callback){
 
 /**
  * Updates video error code.
- * @param Number id The id of the video to update
- * @param Number errorCode The error code of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateErrorCode
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {Number} errorCode The error code of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateErrorCode = function(id, errorCode, callback){
   updateVideoProperty.call(this, id, "errorCode", errorCode, callback);
@@ -147,10 +168,13 @@ VideoModel.prototype.updateErrorCode = function(id, errorCode, callback){
 
 /**
  * Updates video link.
- * @param Number id The id of the video to update
- * @param String link The link of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateLink
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} link The link of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateLink = function(id, link, callback){
   updateVideoProperty.call(this, id, "link", link, callback);
@@ -158,10 +182,13 @@ VideoModel.prototype.updateLink = function(id, link, callback){
 
 /**
  * Updates video id for video platform.
- * @param String id The id of the video to update
- * @param String idVideoPlatform The id of the video in the video platform
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateVideoId
+ * @async
+ * @param {String} id The id of the video to update
+ * @param {String} idVideoPlatform The id of the video in the video platform
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateVideoId = function(id, idVideoPlatform, callback){
   updateVideoProperty.call(this, id, "videoId", idVideoPlatform, callback);
@@ -169,10 +196,13 @@ VideoModel.prototype.updateVideoId = function(id, idVideoPlatform, callback){
 
 /**
  * Updates video metadata for video platform.
- * @param Number id The id of the video to update
- * @param String metadata The metadata of the video in the video platform
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateMetadata
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} metadata The metadata of the video in the video platform
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateMetadata = function(id, metadata, callback){
   updateVideoProperty.call(this, id, "metadata", metadata, callback);
@@ -180,10 +210,13 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback){
 
 /**
  * Updates video category for video platform.
- * @param Number id The id of the video to update
- * @param String category The category id of the video in the video platform
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method updateCategory
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} category The category id of the video in the video platform
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateCategory = function(id, categoryId, callback){
   updateVideoProperty.call(this, id, "category", categoryId, callback);
@@ -192,10 +225,12 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback){
 
 /**
  * Gets the list of videos.
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
- *   - Array The list of videos
- * @Override
+ *
+ * @method get
+ * @async
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Array** The list of videos
  */
 VideoModel.prototype.get = function(callback){
   var self = this;
@@ -271,11 +306,13 @@ VideoModel.prototype.get = function(callback){
 
 /**
  * Gets a video.
- * @param String id The id of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
- *   - Object The video
- * @Override
+ *
+ * @method getOne
+ * @async
+ * @param {String} id The id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The video
  */
 VideoModel.prototype.getOne = function(id, callback){
   var self = this;
@@ -351,11 +388,13 @@ VideoModel.prototype.getOne = function(id, callback){
 
 /**
  * Removes a video.
- * @param String id The id of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
- *   - Number The number of removed items
- * @Override
+ *
+ * @method remove
+ * @async
+ * @param {String} id The id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of removed items
  */
 VideoModel.prototype.remove = function(id, callback){
   var self = this;
@@ -385,11 +424,13 @@ VideoModel.prototype.remove = function(id, callback){
 
 /**
  * Updates a video.
- * @param String id The id of the video
- * @param Object data The video info
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
- * @Override
+ *
+ * @method update
+ * @async
+ * @param {String} id The id of the video
+ * @param {Object} data The video info
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.update = function(id, data, callback){
   var info = {};
@@ -403,11 +444,15 @@ VideoModel.prototype.update = function(id, data, callback){
 
 /**
  * Publishes a video.
+ *
  * Change the state of the video to published only if its state if 
  * actually sent.
- * @param String id The id of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method publishVideo
+ * @async
+ * @param {String} id The id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.publishVideo = function(id, callback){
   this.provider.updateVideoState(id, VideoModel.SENT_STATE, VideoModel.PUBLISHED_STATE, callback);
@@ -415,11 +460,15 @@ VideoModel.prototype.publishVideo = function(id, callback){
 
 /**
  * Unpublishes a video.
+ *
  * Change the state of the video to sent only if its state if
  * actually published.
- * @param String id The id of the video
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise
+ *
+ * @method unpublishVideo
+ * @async
+ * @param {String} id The id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.unpublishVideo = function(id, callback){
   this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.SENT_STATE, callback);
@@ -427,11 +476,19 @@ VideoModel.prototype.unpublishVideo = function(id, callback){
 
 /**
  * Updates the property of a given video.
+ *
  * Update operations are grouped by event loop and only one request 
  * is made to the database for each video id.
- * @param Number videoId The id of the video to update
- * @param String propertyName The name of the property to update
- * @param PrimitiveValue propertyValue The value of the property 
+ *
+ * @method updateVideoProperty
+ * @private
+ * @async
+ * @param {Number} videoId The id of the video to update
+ * @param {String} propertyName The name of the property to update
+ * @param {String|Number|Boolean} propertyValue The value of the
+ * property
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 function updateVideoProperty(videoId, propertyName, propertyValue, callback){
   var self = this;
@@ -458,16 +515,19 @@ function updateVideoProperty(videoId, propertyName, propertyValue, callback){
 /**
  * Updates a list of properties for the given video.
  *
- * e.g.
- * updateVideoProperties("13545", {
- *   "link" : "/publish/video/13545",
- *   "errorCode" : 2
- * });
+ * @example
+ *     updateVideoProperties("13545", {
+ *       "link" : "/publish/video/13545",
+ *       "errorCode" : 2
+ *     });
  *
- * @param Number id The id of the video to update
- * @param Object properties A key value of properties to update
- * @param Function callback The function to call when it's done
- *   - Error The error if an error occurred, null otherwise 
+ * @method updateVideoProperties
+ * @private
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {Object} properties A key value of properties to update
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
  */
 function updateVideoProperties(id, properties, callback){
   if(properties && typeof properties === "object")

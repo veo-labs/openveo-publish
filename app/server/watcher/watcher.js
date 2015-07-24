@@ -1,10 +1,19 @@
 "use strict"
 
 /**
- * watcher.js can be run as a standalone script 
- * (e.g. node watcher.js --rootPublish "E:\ov-apps\applications\openveo\node_modules\openveo-publish\app\server\watcher\
-watcher.js" --databaseConf "E:\ov-apps\applications\openveo\config\databaseConf.json"
- * or as a child process. 
+ * Watcher process.
+ *
+ * **watcher.js** is an independant process and can be run without
+ * running openveo publish. By default it is run as a sub process
+ * while launching the application server.
+ *
+ * **watcher.js** can be run as a standalone script or as a child
+ * process.
+ *
+ *     node watcher.js --rootPublish "/home/veo-labs/openveo/node_modules/openveo-publish/app/server/watcher/watcher.js" --databaseConf "/home/veo-labs/openveo/config/databaseConf.json"
+ *
+ * @module publish-watcher
+ * @class watcher.js
  */
 
 // Module dependencies
