@@ -17,17 +17,14 @@ describe("VideoModel", function(){
     VideoModel = process.requirePublish("app/server/models/VideoModel.js");
     ut.generateSuccessDatabase();
     videoModel = new VideoModel();
-  });
-  
-  // Removes created directory after tests
-  after(function(){
+    
     var videosDirectoryPath = path.normalize(__dirname + "/public/publish/videos/5");
 
     fs.exists(videosDirectoryPath, function(exists){
       if(!exists)
         fs.mkdir(videosDirectoryPath, function(error){});
     });
-  });  
+  });
   
   it("Should be an instance of EntityModel", function(){
     assert.ok(videoModel instanceof openVeoAPI.EntityModel);
