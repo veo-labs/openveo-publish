@@ -9,7 +9,7 @@ describe("videoPlatformProvider", function(){
 
   // Initializes tests
   before(function(){
-    videoPlatformProvider = process.requirePublish("app/server/providers/videoPlatformProvider.js");
+    videoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
     VimeoProvider = process.requirePublish("app/server/providers/videoPlatforms/VimeoProvider.js");
   });
   
