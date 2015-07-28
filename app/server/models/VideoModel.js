@@ -236,7 +236,6 @@ VideoModel.prototype.get = function(callback){
   var self = this;
   var videos = [];
   var properties = [];
-  var newProperties = [];
 
   async.parallel([
 
@@ -271,37 +270,65 @@ VideoModel.prototype.get = function(callback){
 
           // Videos
           for(var i in videos){
-            var videoProperties = videos[i].properties;
-
             // Custom properties
-            for(var j in properties){
-              var found = false;
-
-              // Video properties
-              for(var k in videoProperties){
-
-                // Video already has the property
-                // Merge definition of the custom property to the video
-                // property
-                if(properties[j].id === videoProperties[k].id){
-                  found = true;
-                  openVeoAPI.util.merge(videoProperties[k], properties[j]);
-                  break;
-                }
-
-              }
-
-              if(!found && videoProperties)
-                videoProperties.push(properties[j]);
-
+            for(var j in properties){    
+              if(!videos[i].properties[''+properties[j].id]) videos[i].properties[''+properties[j].id] = "";
             }
           }
-
         }
-
         callback(null, videos);
       }
   });
+};
+
+VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback){
+  var self = this;
+  var videos = [];
+  var properties = [];
+  var pagination = {};
+  async.parallel([
+
+    // Get the list of videos
+    function(callback){
+      self.provider.getPaginatedFilteredEntities(filter, count, page, sort, function(error, videoList, pageArray){
+        videos = videoList;
+        pagination = pageArray;
+        callback(error);
+      });
+    },
+
+    // Get the list of custom properties
+    function(callback){
+      self.propertyProvider.get(function(error, propertyList){
+        properties = propertyList;
+        callback(error);
+      });
+    }
+
+  ], function(error, result){
+      if(error){
+        callback(error);
+      }
+      else{
+        if(videos && properties){
+
+          // Videos may not have custom properties or just some of them.
+          // Furthermore only the id and value of properties are stored
+          // with videos, not complete information about the properties
+          // (no name, no description and no type).
+          // Inject all custom properties information inside video objects
+
+          // Videos
+          for(var i in videos){
+            // Custom properties
+            for(var j in properties){    
+              if(!videos[i].properties[''+properties[j].id]) videos[i].properties[''+properties[j].id] = "";
+            }
+          }
+        }
+        callback(null, videos, pagination);
+      }
+  }); 
 };
 
 /**

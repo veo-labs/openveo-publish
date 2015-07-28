@@ -18,11 +18,11 @@
       controller: "VideoController",
       title: "VIDEOS.PAGE_TITLE",
       resolve: {
-        videos : ["publishService", function(publishService){
-          return publishService.loadVideos();
-        }],
         categories : ["publishService", function(publishService){
           return publishService.loadCategories();
+        }],
+        properties : ["publishService", function(publishService){
+          return publishService.loadProperties();
         }]
       }
     });
@@ -50,13 +50,7 @@
     ovRouteProvider.when("/publish/be/properties", {
       templateUrl: "publish/admin/views/properties.html",
       controller: "PropertiesController",
-      title: "PROPERTIES.PAGE_TITLE",
-      resolve: {
-        properties : ["publishService", function(publishService){
-          return publishService.loadProperties();
-        }]
-      }
-    });
+      title: "PROPERTIES.PAGE_TITLE"});
     
     // Add route /publish/be/categories with authentication
     // (will be automatically mapped
