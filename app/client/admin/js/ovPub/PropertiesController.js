@@ -3,12 +3,12 @@
   "use strict"
 
   app.controller("PropertiesController", PropertiesController);
-  PropertiesController.$inject = ["$scope", "$filter", "entityService"];
+  PropertiesController.$inject = ["$scope", "$filter", "entityService", "publishService"];
 
   /**
    * Defines the properties controller for the properties page.
    */
-  function PropertiesController($scope, $filter, entityService) {
+  function PropertiesController($scope, $filter, entityService, publishService) {
   
     /**
      * 
@@ -30,7 +30,7 @@
       }];
 
     scopeDataTable.actions = [{
-        "label": "remove",
+        "label": $filter('translate')('UI.REMOVE'),
         "callback": function (row) {
           removeRow(row);
         }
@@ -57,7 +57,7 @@
         type: 'horizontalExtendInput',
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_NAME'),
-          required: true,
+          required: true
         }
       },
       {
@@ -65,7 +65,7 @@
         type: 'horizontalExtendInput',
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_DESCRIPTION'),
-          required: true,
+          required: true
         },
         expressionProperties: {
           'templateOptions.disabled': '!model.name' // disabled when username is blank
@@ -94,12 +94,16 @@
     var removeRow = function (row) {
       if (!row.saving) {
         row.saving = true;
-        entityService.removeEntity('property', row.id).error(function (data, status, headers, config) {
-          $scope.$emit("setAlert", 'error', 'Fail remove property! Try later.', 4000);
-          row.saving = false;
-          if (status === 401)
-            $scope.$parent.logout();
-        });
+        entityService.removeEntity('property', row.id)
+                .success(function (data) {
+                  publishService.cacheClear("properties");
+                })
+                .error(function (data, status, headers, config) {
+                  $scope.$emit("setAlert", 'danger', 'Fail remove property! Try later.', 4000);
+                  row.saving = false;
+                  if (status === 401)
+                    $scope.$parent.logout();
+                });
       }
     };
 
@@ -116,6 +120,7 @@
         type: property.type
       }).success(function (data, status, headers, config) {
         property.saving = false;
+        publishService.cacheClear("properties");
         successCb();
       }).error(function (data, status, headers, config) {
         property.saving = false;
@@ -141,6 +146,7 @@
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_NAME'),
           required: true,
+          description : $filter('translate')('PROPERTIES.FORM_ADD_NAME_DESC')
         }
       },
       {
@@ -149,6 +155,7 @@
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_DESCRIPTION'),
           required: true,
+          description : $filter('translate')('PROPERTIES.FORM_ADD_DESCRIPTION_DESC')
         },
         expressionProperties: {
           'templateOptions.disabled': '!model.name' // disabled when username is blank
@@ -160,6 +167,7 @@
         templateOptions: {
           label:  $filter('translate')('PROPERTIES.ATTR_TYPE'),
           required: true,
+          description : $filter('translate')('PROPERTIES.FORM_ADD_TYPE_DESC'),
           options: supportedTypes
         },
         expressionProperties: {
@@ -179,6 +187,7 @@
     var addProperty = function (model, successCb, errorCb) {
       entityService.addEntity('property', model)
               .success(function (data, status, headers, config) {
+                publishService.cacheClear('properties');
                 successCb();
               })
               .error(function (data, status, headers, config) {

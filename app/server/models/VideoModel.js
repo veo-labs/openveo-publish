@@ -320,10 +320,13 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
 
           // Videos
           for(var i in videos){
+            var newVideoProperty = {};
             // Custom properties
             for(var j in properties){    
-              if(!videos[i].properties[''+properties[j].id]) videos[i].properties[''+properties[j].id] = "";
+              if(!videos[i].properties[''+properties[j].id]) newVideoProperty[''+properties[j].id] = "";
+              else newVideoProperty[''+properties[j].id] = videos[i].properties[''+properties[j].id];
             }
+            videos[i].properties = newVideoProperty;             
           }
         }
         callback(null, videos, pagination);

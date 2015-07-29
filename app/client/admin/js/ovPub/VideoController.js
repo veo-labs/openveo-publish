@@ -3,7 +3,7 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$filter", "$location", "$interval", "entityService", "publishService", "properties", "categories", "jsonPath", "tableReloadEventService"];
+  VideoController.$inject = ["$scope", "$filter", "$location", "$interval", "entityService", "publishService", "properties", "categories","jsonPath", "tableReloadEventService"];
   /**
    * Defines the video controller for the videos page.
    */
@@ -53,7 +53,7 @@
       }];
     scopeDataTable.actions = [
       {
-        "label": "view",
+        "label": $filter('translate')('UI.VIEW'),
         "condition": function (row) {
           return row.state == 7;
         },
@@ -62,7 +62,7 @@
         }
       },
       {
-        "label": "publish",
+        "label": $filter('translate')('VIDEOS.PUBLISH'),
         "condition": function (row) {
           return row.state == 6;
         },
@@ -71,7 +71,7 @@
         }
       },
       {
-        "label": "unpublish",
+        "label": $filter('translate')('VIDEOS.UNPUBLISH'),
         "condition": function (row) {
           return row.state == 7;
         },
@@ -80,7 +80,7 @@
         }
       },
       {
-        "label": "remove",
+        "label": $filter('translate')('UI.REMOVE'),
         "condition": function (row) {
           return row.state >= 6;
         },
@@ -158,9 +158,10 @@
           found = i;
           break;
         }
-      }
-      ;
-      return $scope.properties[found].name
+      };
+      if(found!=-1)
+        return $scope.properties[found].name
+      else return id;
     };
     
     
@@ -236,7 +237,7 @@
       if (!row.saving) {
         row.saving = true;
         entityService.removeEntity('video', row.id).error(function (data, status, headers, config) {
-          $scope.$emit("setAlert", 'error', 'Fail remove video! Try later.', 4000);
+          $scope.$emit("setAlert", 'danger', 'Fail remove video! Try later.', 4000);
           row.saving = false;
           if (status === 401)
             $scope.$parent.logout();

@@ -107,7 +107,6 @@
       return properties;
     };
     
-    
     var loadCategories = function(){
       if(!categories){
        
@@ -128,6 +127,21 @@
     var getCategories = function(){
       return categories;
     };
+    
+    var cacheClear = function(type){
+      if(!type) properties = videos = categories = null;
+      else switch(type){
+        case "properties":
+          properties = null;
+          break;
+        case "categories":
+          categories = null;
+          break;
+        case "videos":
+          videos = null;
+          break;
+      }
+    }
 
     return{
       loadVideos : loadVideos,
@@ -143,7 +157,9 @@
       
       getWatcherStatus : getWatcherStatus,
       startWatcher : startWatcher,
-      stopWatcher : stopWatcher
+      stopWatcher : stopWatcher,
+      
+      cacheClear : cacheClear
     };
 
   }
