@@ -1,15 +1,19 @@
 <div class="pu-properties">
   <h2 ng-bind="'PROPERTIES.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PROPERTIES.INFO' | translate"></div>
-  <p class="ng-hide" ng-show="!properties.length" ng-bind="'PROPERTIES.NO_PROPERTIES' | translate"></p>
-
+  <hr/>
+   <div class="container">
+     <div class="col-xs-12 col-md-6">
+       <div class="add-element" ng-init="isCollapsed = true;" ng-click="isCollapsed = !isCollapsed">
+         <span class="glyphicon" ng-class="isCollapsed?'glyphicon-plus':'glyphicon-minus'"aria-hidden="true"></span>
+         <span ng-bind="'PROPERTIES.ADD_PROPERTY' | translate"></span></div>
+       <div collapse="isCollapsed">
+         <ng-include src="'/views/elements/form.html'"></ng-include>
+       </div>
+     </div>
+   </div>
+  <hr/>
   <ng-include src="'/views/elements/dataTable.html'"></ng-include>
 
-  <hr/>
-  <div class="col-xs-12 col-sm-6">
-    <h4 class="add-element" ng-init="isCollapsed=true;" ng-click="isCollapsed = !isCollapsed"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <span ng-bind="'PROPERTIES.ADD_PROPERTY' | translate"></span></h4>
-    <div collapse="isCollapsed">
-    <ng-include src="'/views/elements/form.html'"></ng-include>
-    </div>
-  </div>
+ 
 </div>

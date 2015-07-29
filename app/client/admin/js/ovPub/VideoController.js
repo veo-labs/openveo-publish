@@ -24,7 +24,8 @@
       return (row.status == 1);
     }
     scopeDataTable.filterBy = {
-      'title': ''
+      'title': '',
+      'description':''
     };
     scopeDataTable.header = [
       {
