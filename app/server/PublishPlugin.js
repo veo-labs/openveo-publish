@@ -1,4 +1,4 @@
-"use scrict"
+"use strict"
 
 /**
  * Defines the Publish Plugin that will be loaded by the core application.

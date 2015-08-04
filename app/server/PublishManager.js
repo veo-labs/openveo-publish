@@ -1,4 +1,4 @@
-"use scrict"
+"use strict"
 
 /**
  * Defines the PublishManager which handles all the process in video
