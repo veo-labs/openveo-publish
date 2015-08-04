@@ -6,7 +6,7 @@
 
 // Module dependencies
 var util = require("util");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = process.requireModule("openveo-api");
 
 /**
  * Defines a VideoProvider class to get and save videos.

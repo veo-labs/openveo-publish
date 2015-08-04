@@ -10,7 +10,7 @@
  * **watcher.js** can be run as a standalone script or as a child
  * process.
  *
- *     node watcher.js --rootPublish "/home/veo-labs/openveo/node_modules/openveo-publish/app/server/watcher/watcher.js" --databaseConf "/home/veo-labs/openveo/config/databaseConf.json"
+ *     node watcher.js --root ""/home/veo-labs/openveo" --rootPublish "/home/veo-labs/openveo/node_modules/openveo-publish" --databaseConf "/home/veo-labs/openveo/config/databaseConf.json"
  *
  * @module publish-watcher
  * @class watcher.js
@@ -20,16 +20,15 @@
 var path = require("path");
 var fs = require("fs");
 var util = require("util");
-var async = require("async");
 var chokidar = require("chokidar");
-var winston = require("winston");
-var openVeoAPI = require("openveo-api");
 var databaseConf;
 
 // Process script arguments
 for(var i = 0 ; i < process.argv.length ; i++){
 
   switch(process.argv[i]){
+    case "--root":
+      process.root = process.argv[i + 1] || null;
     case "--rootPublish":
       process.rootPublish = process.argv[i + 1] || null;
     break;
@@ -44,10 +43,20 @@ for(var i = 0 ; i < process.argv.length ; i++){
 if(!process.rootPublish)
   throw new Error("--rootPublish argument must be passed to the watcher.js script and point to the openveo-publish module root directory");
 
+// Define a custom require function to load modules of the core from plugins
+process.requireModule = function(moduleName){
+  module.paths.push(path.join(process.root, "node_modules"));
+  return require(moduleName);
+};
+
 // Define a function to easily require files inside the module
 process.requirePublish = function(filePath){
   return require(path.normalize(process.rootPublish + "/" + filePath));
 };
+
+var async = process.requireModule("async");
+var winston = process.requireModule("winston");
+var openVeoAPI = process.requireModule("openveo-api");
 
 // Module files
 var watcherConf = process.requirePublish("config/watcherConf.json");

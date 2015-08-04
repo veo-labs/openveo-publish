@@ -6,7 +6,7 @@
 
 // Module dependencies
 var util = require("util");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = process.requireModule("openveo-api");
 
 /**
  * Defines a PropertyProvider class to get and save custom properties.

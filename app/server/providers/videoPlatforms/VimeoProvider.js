@@ -8,8 +8,8 @@
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
-var async = require("async");
 var vimeoAPI = require("vimeo");
+var async = process.requireModule("async");
 var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
 
 /**

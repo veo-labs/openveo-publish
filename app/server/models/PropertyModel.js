@@ -6,7 +6,7 @@
 
 // Module dependencies
 var util = require("util");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = process.requireModule("openveo-api");
 
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
 

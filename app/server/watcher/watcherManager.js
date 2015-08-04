@@ -10,7 +10,7 @@
 // Module dependencies
 var path = require("path");
 var child_process = require("child_process");
-var winston = require("winston");
+var winston = process.requireModule("winston");
 
 // Retrieve logger
 var logger = winston.loggers.get("openveo");
@@ -38,6 +38,7 @@ module.exports.start = function(){
     
     // Executes watcher as a child process
     watcher = child_process.fork(path.normalize(process.rootPublish + "/app/server/watcher/watcher.js"), [
+      "--root", process.root,
       "--rootPublish", process.rootPublish,
       "--databaseConf", path.normalize(process.root + "/config/databaseConf.json"),
     ]);

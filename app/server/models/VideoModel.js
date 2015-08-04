@@ -7,9 +7,9 @@
 // Module dependencies
 var util = require("util");
 var path = require("path");
-var async = require("async");
 var fs = require("fs");
-var openVeoAPI = require("openveo-api");
+var async = process.requireModule("async");
+var openVeoAPI = process.requireModule("openveo-api");
 
 var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.js");
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
