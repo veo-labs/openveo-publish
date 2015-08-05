@@ -108,7 +108,8 @@ module.exports.getVideoAction = function(request, response, next){
  */
 module.exports.publishVideoAction = function(request, response, next){
   if(request.params.id){
-    videoModel.publishVideo(request.params.id, function(error){
+    var arrayId = request.params.id.split(',');
+    videoModel.publishVideo(arrayId, function(error){
       if(error)
         next(errors.PUBLISH_VIDEO_ERROR);
       else
@@ -139,7 +140,8 @@ module.exports.publishVideoAction = function(request, response, next){
  */
 module.exports.unpublishVideoAction = function(request, response, next){
   if(request.params.id){
-    videoModel.unpublishVideo(request.params.id, function(error){
+    var arrayId = request.params.id.split(',');
+    videoModel.unpublishVideo(arrayId, function(error){
       if(error)
         next(errors.UNPUBLISH_VIDEO_ERROR);
       else

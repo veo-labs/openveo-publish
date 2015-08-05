@@ -22,17 +22,22 @@
     };
     scopeDataTable.header = [{
         'key': "name",
-        'name': $filter('translate')('PROPERTIES.NAME_COLUMN')
+        'name': $filter('translate')('PROPERTIES.NAME_COLUMN'),
+        "class": ['col-xs-12 col-sm-11']
       },
       {
         'key': "action",
-        'name': $filter('translate')('UI.ACTIONS_COLUMN')
+        'name': $filter('translate')('UI.ACTIONS_COLUMN'),
+        "class": ['hidden-xs col-sm-1']
       }];
 
     scopeDataTable.actions = [{
         "label": $filter('translate')('UI.REMOVE'),
         "callback": function (row) {
-          removeRow(row);
+          removeRows([row.id]);
+        },
+        "global": function(selected){
+          removeRows(selected);
         }
       }];
 
@@ -91,20 +96,17 @@
      * Can't remove a property if its saving.
      * @param Object property The property to remove
      */
-    var removeRow = function (row) {
-      if (!row.saving) {
-        row.saving = true;
-        entityService.removeEntity('property', row.id)
+    var removeRows = function (selected) {
+        entityService.removeEntity('property', selected.join(','))
                 .success(function (data) {
-                  publishService.cacheClear("properties");
+                 publishService.cacheClear("properties");
+                  $scope.$emit("setAlert", 'success', 'property deleted', 4000);
                 })
                 .error(function (data, status, headers, config) {
                   $scope.$emit("setAlert", 'danger', 'Fail remove property! Try later.', 4000);
-                  row.saving = false;
                   if (status === 401)
                     $scope.$parent.logout();
                 });
-      }
     };
 
     /**

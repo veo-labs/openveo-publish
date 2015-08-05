@@ -30,26 +30,31 @@
     scopeDataTable.header = [
       {
         'key': "title",
-        'name': $filter('translate')('VIDEOS.NAME_COLUMN')
+        'name': $filter('translate')('VIDEOS.NAME_COLUMN'),
+        "class": ['col-xs-12 col-sm-5']
       },
       {
         'key': "metadata.date",
         'type': "date",
         'name': $filter('translate')('VIDEOS.DATE_COLUMN'),
+        "class": ['hidden-xs col-sm-1']
       },
       {
         'key': "category",
         'type': "category",
-        'name': $filter('translate')('VIDEOS.CATEGORY_COLUMN')
+        'name': $filter('translate')('VIDEOS.CATEGORY_COLUMN'),
+        "class": ['hidden-xs col-sm-3']
       },
       {
         'key': "state",
         'type': "status",
-        'name': $filter('translate')('VIDEOS.STATUS_COLUMN')
+        'name': $filter('translate')('VIDEOS.STATUS_COLUMN'),
+        "class": ['hidden-xs col-sm-2']
       },
       {
         'key': "action",
-        'name': $filter('translate')('UI.ACTIONS_COLUMN')
+        'name': $filter('translate')('UI.ACTIONS_COLUMN'),
+        "class": [' hidden-xs col-sm-1']
       }];
     scopeDataTable.actions = [
       {
@@ -67,8 +72,12 @@
           return row.state == 6;
         },
         "callback": function (row) {
-          publishVideo(row);
+          publishVideo([row.id]);
+        },
+        "global": function(selected){
+          publishVideo(selected);
         }
+        
       },
       {
         "label": $filter('translate')('VIDEOS.UNPUBLISH'),
@@ -76,7 +85,10 @@
           return row.state == 7;
         },
         "callback": function (row) {
-          unpublishVideo(row);
+          unpublishVideo([row.id]);
+        },
+        "global": function(selected){
+          unpublishVideo(selected);
         }
       },
       {
@@ -85,7 +97,10 @@
           return row.state >= 6;
         },
         "callback": function (row) {
-          removeRow(row);
+          removeRows([row.id]);
+        },
+        "global": function(selected){
+          removeRows(selected);
         }
       }
     ];
@@ -198,17 +213,13 @@
      * @param Object video The video to publish
      */
     var publishVideo = function (video) {
-      if (!video.saving) {
-        video.saving = true;
-        publishService.publishVideo(video.id).success(function (data, status, headers, config) {
-          video.state = data.state;
-          video.saving = false;
-        }).error(function (data, status, headers, config) {
-          video.saving = false;
-          if (status === 401)
-            $scope.$parent.logout();
-        });
-      }
+        publishService.publishVideo(video.join(','))
+              .success(function (data, status, headers, config) {
+              })
+              .error(function (data, status, headers, config) {
+                if (status === 401)
+                  $scope.$parent.logout();
+              });
     };
     /**
      * Unpublishes the given video.
@@ -216,34 +227,32 @@
      * @param Object video The video to publish
      */
     var unpublishVideo = function (video) {
-      if (!video.saving) {
-        video.saving = true;
-        publishService.unpublishVideo(video.id).success(function (data, status, headers, config) {
-          video.state = data.state;
-          video.saving = false;
-        }).error(function (data, status, headers, config) {
-          video.saving = false;
-          if (status === 401)
-            $scope.$parent.logout();
-        });
-      }
+      publishService.unpublishVideo(video.join(','))
+              .success(function (data, status, headers, config) {
+              })
+              .error(function (data, status, headers, config) {
+
+                if (status === 401)
+                  $scope.$parent.logout();
+              });
     };
     /**
      * Removes the row.
      * Can't remove a row if its saving.
      * @param Object row The row to remove
      */
-    var removeRow = function (row) {
-      if (!row.saving) {
-        row.saving = true;
-        entityService.removeEntity('video', row.id).error(function (data, status, headers, config) {
-          $scope.$emit("setAlert", 'danger', 'Fail remove video! Try later.', 4000);
-          row.saving = false;
-          if (status === 401)
-            $scope.$parent.logout();
-        });
-      }
+    var removeRows = function (selected) {
+        entityService.removeEntity('video', selected.join(','))
+                .success(function (data) {
+                  $scope.$emit("setAlert", 'success', 'video deleted', 4000);
+                })
+                .error(function (data, status, headers, config) {
+                  $scope.$emit("setAlert", 'danger', 'Fail remove video! Try later.', 4000);
+                  if (status === 401)
+                    $scope.$parent.logout();
+                });
     };
+    
     /**
      * Saves video information.
      * @param Object form The angular edition form controller
