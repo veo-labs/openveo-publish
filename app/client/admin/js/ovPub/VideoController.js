@@ -8,8 +8,7 @@
    * Defines the video controller for the videos page.
    */
   function VideoController($scope, $filter, $location, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
-    var pendingEdition = false;
-    var pendingVideos;
+    
     $scope.properties = properties.data.entities;
     //Replace Id in Video by the name of the category
     //Category Id can be overwritten, it is only for display purpose
@@ -109,6 +108,7 @@
      */
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
+    scopeEditForm.pendingEdition = false;
     scopeEditForm.fieldsBase = [
       {
         key: 'title',
@@ -188,16 +188,8 @@
     // is pending, poll each 30 seconds to be informed of
     // its status
     var pollVideosPromise = $interval(function () {
-      publishService.loadVideos(true).success(function (data, status, headers, config) {
-        pendingVideos = publishService.getVideos();
-        // Do not update videos if edition of a video is in progress by
-        // the user
-        if (!pendingEdition)
+        if (!scopeEditForm.pendingEdition)
           tableReloadEventService.broadcast();
-      }).error(function (data, status, headers, config) {
-        if (status === 401)
-          $scope.$parent.logout();
-      });
     }, 30000);
     /**
      * 
@@ -268,7 +260,7 @@
           category:video.category,
         }).success(function (data, status, headers, config) {
           video.saving = false;
-          pendingEdition = false;
+          scopeEditForm.pendingEdition =false;
           successCb();
         }).error(function (data, status, headers, config) {
           video.saving = false;
