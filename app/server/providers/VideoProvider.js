@@ -35,7 +35,7 @@ util.inherits(VideoProvider, openVeoAPI.EntityProvider);
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoProvider.prototype.updateVideoState = function(id, oldState, newState, callback){
-  this.database.updateMany(this.collection, {id : {$in : id}, state : oldState}, {state : newState}, function(error){
+  this.database.update(this.collection, {id : {$in : id}, state : oldState}, {state : newState}, function(error){
     if(callback)
       callback(error);
   });

@@ -21,7 +21,7 @@ FakeVideoDatabase.prototype.insert = function(collection, data, callback){
 };
 
 FakeVideoDatabase.prototype.update = function(collection, criteria, data, callback){
-  if(criteria.id === "error")
+  if(criteria.id === "error" || criteria.id.$in[0] === "error")
     callback(new Error("Error"));
   else
     callback(null);
