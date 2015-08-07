@@ -271,29 +271,30 @@ VideoModel.prototype.get = function(callback){
           // Videos
           for(var i in videos){
             var videoProperties = videos[i].properties;
+            var videoPropertiesWithValues = [];
 
             // Custom properties
             for(var j in properties){
               var found = false;
 
               // Video properties
-              for(var k in videoProperties){
+              for(var propertyId in videoProperties){
 
                 // Video already has the property
-                // Merge definition of the custom property to the video
-                // property
-                if(properties[j].id === videoProperties[k].id){
+                // Add property information
+                if(properties[j].id === propertyId){
                   found = true;
-                  openVeoAPI.util.merge(videoProperties[k], properties[j]);
+                  properties[j].value = videoProperties[propertyId];
                   break;
                 }
 
               }
 
-              if(!found && videoProperties)
-                videoProperties.push(properties[j]);
+              videoPropertiesWithValues.push(properties[j]);
 
             }
+
+            videos[i].properties = videoPropertiesWithValues;
           }
 
         }
