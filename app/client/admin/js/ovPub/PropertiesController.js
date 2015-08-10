@@ -100,10 +100,10 @@
         entityService.removeEntity('property', selected.join(','))
                 .success(function (data) {
                  publishService.cacheClear("properties");
-                  $scope.$emit("setAlert", 'success', 'property deleted', 4000);
+                  $scope.$emit("setAlert", 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
                 })
                 .error(function (data, status, headers, config) {
-                  $scope.$emit("setAlert", 'danger', 'Fail remove property! Try later.', 4000);
+                  $scope.$emit("setAlert", 'danger', $filter('translate')('PROPERTIES.REMOVE_FAIL'), 4000);
                   if (status === 401)
                     $scope.$parent.logout();
                 });

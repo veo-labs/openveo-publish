@@ -207,8 +207,10 @@
     var publishVideo = function (video) {
         publishService.publishVideo(video.join(','))
               .success(function (data, status, headers, config) {
+                $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
               })
               .error(function (data, status, headers, config) {
+                 $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.PUBLISHED_FAIL'), 4000);
                 if (status === 401)
                   $scope.$parent.logout();
               });
@@ -221,9 +223,10 @@
     var unpublishVideo = function (video) {
       publishService.unpublishVideo(video.join(','))
               .success(function (data, status, headers, config) {
+                 $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
               })
               .error(function (data, status, headers, config) {
-
+                 $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.UNPUBLISHED_FAIL'), 4000);
                 if (status === 401)
                   $scope.$parent.logout();
               });
@@ -236,10 +239,10 @@
     var removeRows = function (selected) {
         entityService.removeEntity('video', selected.join(','))
                 .success(function (data) {
-                  $scope.$emit("setAlert", 'success', 'video deleted', 4000);
+                  $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.REMOVE_SUCCESS'), 4000);
                 })
                 .error(function (data, status, headers, config) {
-                  $scope.$emit("setAlert", 'danger', 'Fail remove video! Try later.', 4000);
+                  $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.REMOVE_FAIL'), 4000);
                   if (status === 401)
                     $scope.$parent.logout();
                 });

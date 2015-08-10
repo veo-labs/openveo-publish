@@ -57,7 +57,13 @@
     "STATE_5" : "Envoi",
     "STATE_6" : "Envoyé",
     "STATE_7" : "Publié",
-    "STATE_8" : "Erreur"
+    "STATE_8" : "Erreur",
+    "REMOVE_SUCCESS" : "La vidéo à été supprimée.",
+    "REMOVE_FAIL" : "Une erreur est survenue. La suppression de la vidéo a échoué.",
+    "PUBLISH_SUCCESS" : "L'application à été publiée.",
+    "PUBLISH_FAIL" : "Une erreur est survenue. La publication de la vidéo a échoué.",
+    "UNPUBLISH_SUCCESS" : "La vidéo à été dépubliée.",
+    "UNPUBLISH_FAIL" : "Une erreur est survenu. La dépublication de la vidéo a échoué."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
@@ -84,11 +90,16 @@
     "FORM_ADD_TEXT_TYPE" : "Texte",
     "FORM_ADD_NAME_DESC" : "Le nom de la propriété tel qu'il apparaîtra lors de l'édition d'une vidéo",
     "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
-    "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété"
+    "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété",
+    "REMOVE_SUCCESS" : "La propriété à été supprimée.",
+    "REMOVE_FAIL" : "Une erreur est survenue. La suppression de la propriété a échoué."
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Rubrique",
     "TITLE" : "Rubrique des vidéos ",
-    "INFO" : "Definir des rubriques afin de classer les vidéos"
+    "INFO" : "Definir des rubriques afin de classer les vidéos",
+    "RESET": "Les changements ont été surprimés",
+    "SAVE_SUCCESS" : "Les rubriques ont été enregistrés",
+    "SAVE_FAIL" : "Une erreur est survenue. L'enregistrement des rubriques a échoué."
   }
 }

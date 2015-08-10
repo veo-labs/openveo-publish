@@ -57,7 +57,9 @@
     "STATE_5" : "Sending",
     "STATE_6" : "Sent",
     "STATE_7" : "Published",
-    "STATE_8" : "Error"
+    "STATE_8" : "Error",
+    "REMOVE_SUCCESS" : "Video successfully removed.",
+    "REMOVE_FAIL" : "An error occured. Fail to remove video."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
@@ -84,11 +86,16 @@
     "FORM_ADD_TEXT_TYPE" : "Text",
     "FORM_ADD_NAME_DESC" : "Name of the property as it will appear while editing a video",
     "FORM_ADD_DESCRIPTION_DESC" : "A short description of the property",
-    "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value"
+    "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",
+    "REMOVE_SUCCESS" : "Property successfully removed.",
+    "REMOVE_FAIL" : "An error occured. Fail to remove property."
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Categorie",
     "TITLE" : "Video Categories",
-    "INFO" : "Define Categories in order to add category to videos."
+    "INFO" : "Define Categories in order to add category to videos.",
+    "RESET": "All categories changes canceled.",
+    "SAVE_SUCCESS" : "Category successfully saved.",
+    "SAVE_FAIL" : "An error occured. Fail to save category."
   }
 }

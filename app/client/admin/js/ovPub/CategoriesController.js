@@ -4,12 +4,12 @@
 
   app.controller("CategoriesController", CategoriesController);
 
-  CategoriesController.$inject = ["$scope", "entityService", "categories"];
+  CategoriesController.$inject = ["$scope","$filter", "entityService", "categories"];
   /**
    * Defines the categories controller for the categories page.
    */
   
-  function CategoriesController($scope, entityService, categories){
+  function CategoriesController($scope, $filter, entityService, categories){
     
     $scope.newItem = "";
     $scope.list = categories.data.taxonomy.tree;
@@ -19,7 +19,6 @@
     $scope.saveIsDisabled = $scope.list.length==0;
     
     $scope.options = {
-      
     }
 
 
@@ -34,8 +33,8 @@
     };
     $scope.resetCategory = function(scope){
        $scope.list = $scope.listback.slice();
-       $scope.$emit("setAlert", 'warning', 'All categories changes canceled.',0);
-    }
+       $scope.$emit("setAlert", 'info', $filter('translate')('CATEGORIES.RESET'),4000);
+    },
     
     $scope.saveCategory = function(form){
       $scope.saveIsDisabled = true;
@@ -51,11 +50,11 @@
     function successCb(data, status, headers, config) {
         $scope.saveIsDisabled = $scope.list.length==0;
         $scope.listback = $scope.list.slice();
-        $scope.$emit("setAlert", 'success', 'Categories saved.',2000);
+        $scope.$emit("setAlert", 'success', $filter('translate')('CATEGORIES.SAVE_SUCCESS'),4000);
     }
     function errorCb(data, status, headers, config){
         $scope.saveIsDisabled = $scope.list.length==0;
-        $scope.$emit('setAlert','danger','Fail to save categories! Try later.',2000);
+        $scope.$emit('setAlert','danger',$filter('translate')('CATEGORIES.SAVE_FAIL'),4000);
         if(status === 401)
           $scope.$parent.logout();
     }
