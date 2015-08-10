@@ -60,10 +60,10 @@
     "STATE_8" : "Erreur",
     "REMOVE_SUCCESS" : "La vidéo à été supprimée.",
     "REMOVE_FAIL" : "Une erreur est survenue. La suppression de la vidéo a échoué.",
-    "PUBLISH_SUCCESS" : "L'application à été publiée.",
-    "PUBLISH_FAIL" : "Une erreur est survenue. La publication de la vidéo a échoué.",
-    "UNPUBLISH_SUCCESS" : "La vidéo à été dépubliée.",
-    "UNPUBLISH_FAIL" : "Une erreur est survenu. La dépublication de la vidéo a échoué."
+    "PUBLISHED_SUCCESS" : "L'application à été publiée.",
+    "PUBLISHED_FAIL" : "Une erreur est survenue. La publication de la vidéo a échoué.",
+    "UNPUBLISHED_SUCCESS" : "La vidéo à été dépubliée.",
+    "UNPUBLISHED_FAIL" : "Une erreur est survenu. La dépublication de la vidéo a échoué."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",

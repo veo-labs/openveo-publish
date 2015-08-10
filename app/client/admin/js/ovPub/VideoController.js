@@ -95,6 +95,7 @@
         "condition": function (row) {
           return row.state >= 6;
         },
+        "warningPopup": true,
         "callback": function (row) {
           removeRows([row.id]);
         },
