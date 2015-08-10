@@ -1,4 +1,6 @@
 /* List of videos and custom properties */
+@import "../../../../../../../app/client/admin/compass/sass/bootstrap/override";
+
 .pu-videos{
     padding-bottom: 150px;
 }
@@ -21,4 +23,20 @@
   .btn-group{ margin-left: 35px; }
   .label{ margin-right: 5px; }
    input{ margin: 1px 0; }
+}
+
+.pu-categories{
+  .input-group{
+    margin-bottom: 30px;
+  }
+  .add.btn{
+    padding: 6px 12px 7px;
+   color: $brand-primary;
+      background-color: white;
+    &:hover{
+       color: white;
+    background-color: $brand-primary;
+      
+    }
+  }
 }

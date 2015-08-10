@@ -98,6 +98,9 @@
     "PAGE_TITLE" : "Publish - Rubrique",
     "TITLE" : "Rubrique des vidéos ",
     "INFO" : "Definir des rubriques afin de classer les vidéos",
+    "NEW_ITEM" : "Nouvel item",
+    "NAME_ELEMENT" : "Nom de la nouvelle category",
+    "ADD_ELEMENT" : "Ajouter une nouvelle rubrique",
     "RESET": "Les changements ont été surprimés",
     "SAVE_SUCCESS" : "Les rubriques ont été enregistrés",
     "SAVE_FAIL" : "Une erreur est survenue. L'enregistrement des rubriques a échoué."

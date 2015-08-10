@@ -94,6 +94,9 @@
     "PAGE_TITLE" : "Publish - Categorie",
     "TITLE" : "Video Categories",
     "INFO" : "Define Categories in order to add category to videos.",
+    "NEW_ITEM" : "New item",
+    "NAME_ELEMENT" : "Name of the new category",
+    "ADD_ELEMENT" : "Add a new category",
     "RESET": "All categories changes canceled.",
     "SAVE_SUCCESS" : "Category successfully saved.",
     "SAVE_FAIL" : "An error occured. Fail to save category."

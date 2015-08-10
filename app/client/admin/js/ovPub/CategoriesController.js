@@ -19,7 +19,7 @@
     $scope.saveIsDisabled = $scope.list.length==0;
     
     $scope.options = {
-    }
+    };
 
 
     $scope.newSubItem = function(scope) {
@@ -34,7 +34,7 @@
     $scope.resetCategory = function(scope){
        $scope.list = $scope.listback.slice();
        $scope.$emit("setAlert", 'info', $filter('translate')('CATEGORIES.RESET'),4000);
-    },
+    };
     
     $scope.saveCategory = function(form){
       $scope.saveIsDisabled = true;

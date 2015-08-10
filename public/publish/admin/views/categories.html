@@ -3,9 +3,9 @@
   <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
      <div class="input-group">
-      <input type="text" class="form-control" ng-model="newItem" placeholder="New item" aria-describedby="basic-addon1">
-      <span class="input-group-btn">
-        <button class="btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
+      <input type="text" class="form-control" ng-model="newItem" placeholder="[['CATEGORIES.NEW_ITEM' | translate]]" aria-describedby="basic-addon1" popover="[['CATEGORIES.NAME_ELEMENT' | translate]]" popover-trigger="mouseenter">
+      <span class="input-group-btn" popover="[['CATEGORIES.ADD_ELEMENT' | translate]]" popover-trigger="mouseenter">
+        <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
       </span>
     </div>
     
