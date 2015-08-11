@@ -39,6 +39,7 @@
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
     "TITLE" : "Vidéos",
+    "INFO" : "Cette page affiche toutes les vidéos uploadées ainsi que leur statut. Chaque vidéo peut ainsi être publiée, dépubliée, visualisée ou supprimée.",
     "NAME_COLUMN" : "Vidéo",
     "STATUS_COLUMN" : "Statut",
     "CATEGORY_COLUMN" : "Rubriques",

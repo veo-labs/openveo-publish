@@ -39,6 +39,7 @@
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Videos",
     "TITLE" : "Videos",
+    "INFO" : "This page display all uploaded videos and display their status. Each video can be published, unpublished, viewed or deleted.",
     "NAME_COLUMN" : "Video",
     "STATUS_COLUMN" : "Status",
     "CATEGORY_COLUMN" : "Categories",
