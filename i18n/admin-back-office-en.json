@@ -63,7 +63,8 @@
     "REMOVE_FAIL" : "An error occured. Fail to remove video.",
     "TITLE_FILTER": "Video's name",
     "DESCRIPTION_FILTER": "Description",
-    "DATE_FILTER": "Date"
+    "DATE_FILTER": "Date",
+    "CATEGORY_FILTER" : "Category"
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",

@@ -36,6 +36,12 @@
        'type': 'date',
        'value':'',
        'label': $filter('translate')('VIDEOS.DATE_FILTER')
+     },{
+       'key':'category',
+       'type': 'select',
+       'value':'',
+       'label': $filter('translate')('VIDEOS.CATEGORY_FILTER'),
+       'options': getSelectableCategories()
      }
     ];
     scopeDataTable.header = [
@@ -164,7 +170,10 @@
       });
     };
 
-    
+    function getSelectableCategories(){
+      var catArray = categoryOptions();
+      return [{'value':'', 'name':$filter('translate')('UI.ALL')}].concat(catArray);
+    }
 
     function categoryOptions() {
       var categories = jsonPath($scope.categories, '$..*[?(@.id)]');
