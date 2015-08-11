@@ -3,11 +3,11 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$filter", "$location", "$interval", "entityService", "publishService", "properties", "categories","jsonPath", "tableReloadEventService"];
+  VideoController.$inject = ["$scope", "$filter", "$window", "$interval", "entityService", "publishService", "properties", "categories","jsonPath", "tableReloadEventService"];
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $filter, $location, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
+  function VideoController($scope, $filter, $window, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
     
     $scope.properties = properties.data.entities;
     //Replace Id in Video by the name of the category
@@ -198,7 +198,7 @@
      * 
      */
     var goToPath = function (row) {
-      $location.path(row.link);
+      $window.open(row.link, '_blank');
     };
     /**
      * Publishes a video.
