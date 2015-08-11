@@ -1,8 +1,8 @@
 /* List of videos and custom properties */
-@import "../../../../../../../app/client/admin/compass/sass/bootstrap/override";
+$brand-primary:         #1FBBEB !default;
 
 .pu-videos{
-    padding-bottom: 150px;
+  padding-bottom: 150px;
 }
 
 
@@ -14,7 +14,7 @@
   float:left;
   border: 1px solid #ddd;
   border-top:0 none;
-  
+
   ul { 
     list-style: none;
     padding-left: 35px;
@@ -22,7 +22,7 @@
   li{ line-height: 22px; }
   .btn-group{ margin-left: 35px; }
   .label{ margin-right: 5px; }
-   input{ margin: 1px 0; }
+  input{ margin: 1px 0; }
 }
 
 .pu-categories{
@@ -31,12 +31,11 @@
   }
   .add.btn{
     padding: 6px 12px 7px;
-   color: $brand-primary;
-      background-color: white;
+    color: $brand-primary;
+    background-color: white;
     &:hover{
-       color: white;
-    background-color: $brand-primary;
-      
+      color: white;
+      background-color: $brand-primary;
     }
   }
 }
