@@ -64,7 +64,10 @@
     "PUBLISHED_SUCCESS" : "L'application à été publiée.",
     "PUBLISHED_FAIL" : "Une erreur est survenue. La publication de la vidéo a échoué.",
     "UNPUBLISHED_SUCCESS" : "La vidéo à été dépubliée.",
-    "UNPUBLISHED_FAIL" : "Une erreur est survenu. La dépublication de la vidéo a échoué."
+    "UNPUBLISHED_FAIL" : "Une erreur est survenu. La dépublication de la vidéo a échoué.",
+    "TITLE_FILTER": "Nom de la vidéo",
+    "DESCRIPTION_FILTER": "Description",
+    "DATE_FILTER": "Date"
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
@@ -93,7 +96,9 @@
     "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
     "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété",
     "REMOVE_SUCCESS" : "La propriété à été supprimée.",
-    "REMOVE_FAIL" : "Une erreur est survenue. La suppression de la propriété a échoué."
+    "REMOVE_FAIL" : "Une erreur est survenue. La suppression de la propriété a échoué.",
+    "TITLE_FILTER": "Nom",
+    "DESCRIPTION_FILTER": "Description"
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Rubrique",

@@ -60,7 +60,10 @@
     "STATE_7" : "Published",
     "STATE_8" : "Error",
     "REMOVE_SUCCESS" : "Video successfully removed.",
-    "REMOVE_FAIL" : "An error occured. Fail to remove video."
+    "REMOVE_FAIL" : "An error occured. Fail to remove video.",
+    "TITLE_FILTER": "Video's name",
+    "DESCRIPTION_FILTER": "Description",
+    "DATE_FILTER": "Date"
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
@@ -89,7 +92,9 @@
     "FORM_ADD_DESCRIPTION_DESC" : "A short description of the property",
     "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",
     "REMOVE_SUCCESS" : "Property successfully removed.",
-    "REMOVE_FAIL" : "An error occured. Fail to remove property."
+    "REMOVE_FAIL" : "An error occured. Fail to remove property.",
+    "TITLE_FILTER": "Name",
+    "DESCRIPTION_FILTER": "Description"
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Categorie",

@@ -22,10 +22,22 @@
     scopeDataTable.conditionTogleDetail = function (row) {
       return (row.status == 1);
     }
-    scopeDataTable.filterBy = {
-      'title': '',
-      'description':''
-    };
+    scopeDataTable.filterBy = [
+      {
+       'key':'title',
+       'value':'',
+       'label': $filter('translate')('VIDEOS.TITLE_FILTER')
+     },{
+       'key':'description',
+       'value':'',
+       'label': $filter('translate')('VIDEOS.DESCRIPTION_FILTER')
+     },{
+       'key':'metadata.date',
+       'type': 'date',
+       'value':'',
+       'label': $filter('translate')('VIDEOS.DATE_FILTER')
+     }
+    ];
     scopeDataTable.header = [
       {
         'key': "title",

@@ -16,10 +16,18 @@
      */
     var scopeDataTable = $scope.tableContainer = {};
     scopeDataTable.entityType = "property";
-    scopeDataTable.filterBy = {
-      'name': '',
-      'description': ''
-    };
+    scopeDataTable.filterBy = [
+      {
+        'key': 'name',
+        'value': '',
+        'label': $filter('translate')('PROPERTIES.TITLE_FILTER')
+      },
+      {
+        'key': 'description',
+        'value': '',
+        'label': $filter('translate')('PROPERTIES.DESCRIPTION_FILTER')
+      }
+    ];
     scopeDataTable.header = [{
         'key': "name",
         'name': $filter('translate')('PROPERTIES.NAME_COLUMN'),
