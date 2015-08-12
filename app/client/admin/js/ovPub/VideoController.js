@@ -20,7 +20,7 @@
     var scopeDataTable = $scope.tableContainer = {};
     scopeDataTable.entityType = "video";
     scopeDataTable.conditionTogleDetail = function (row) {
-      return (row.status == 1);
+      return (row.state === 6 || row.state === 7);
     }
     scopeDataTable.filterBy = [
       {
@@ -131,7 +131,7 @@
       {
         "label": $filter('translate')('UI.REMOVE'),
         "condition": function (row) {
-          return row.state >= 6;
+          return row.state === 6 || row.state === 7;
         },
         "warningPopup": true,
         "callback": function (row, reload) {

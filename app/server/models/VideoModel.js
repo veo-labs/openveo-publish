@@ -43,11 +43,6 @@ VideoModel.UPLOAD_ERROR = 8;
 VideoModel.SCAN_FOR_IMAGES_ERROR = 9;
 VideoModel.CREATE_VIDEOS_PUBLIC_DIR_ERROR = 10;
 
-// Status codes
-VideoModel.ERROR_STATUS = 0;
-VideoModel.SUCCESS_STATUS = 1;
-VideoModel.PENDING_STATUS = 2;
-
 // States codes
 VideoModel.PENDING_STATE = 0;
 VideoModel.COPYING_STATE = 1;
@@ -136,20 +131,6 @@ VideoModel.prototype.add = function(videoPackage, callback){
  */
 VideoModel.prototype.updateState = function(id, state, callback){
   updateVideoProperty.call(this, id, "state", state, callback);
-};
-
-/**
- * Updates video status.
- *
- * @method updateStatus
- * @async
- * @param {Number} id The id of the video to update
- * @param {String} status The status of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- */
-VideoModel.prototype.updateStatus = function(id, status, callback){
-  updateVideoProperty.call(this, id, "status", status, callback);
 };
 
 /**

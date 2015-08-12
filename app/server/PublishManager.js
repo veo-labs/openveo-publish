@@ -182,7 +182,6 @@ PublishManager.prototype.publish = function(videoPackage){
 
           // Add video package to the list of pending packages
           self.pendingVideos.push(videoPackage);
-          videoPackage.status = VideoModel.PENDING_STATUS;
           videoPackage.state = VideoModel.PENDING_STATE;
           videoPackage.link = null;
           videoPackage.videoId = null;
@@ -349,13 +348,11 @@ PublishManager.prototype.publish = function(videoPackage){
       if(error && (typeof error !== "string")){
         self.videoModel.updateState(videoPackage.id, VideoModel.ERROR_STATE);
         self.videoModel.updateErrorCode(videoPackage.id, error.code);
-        self.videoModel.updateStatus(videoPackage.id, VideoModel.ERROR_STATUS);
         self.emit("error", error);
       }
       else if(!error){
         
         // Mark package as success in the database
-        self.videoModel.updateStatus(videoPackage.id, VideoModel.SUCCESS_STATUS);
         self.videoModel.updateState(videoPackage.id, VideoModel.SENT_STATE);
         self.videoModel.updateLink(videoPackage.id, "/publish/video/" + videoPackage.id);
         self.videoModel.updateVideoId(videoPackage.id, videoPackage.videoId);
