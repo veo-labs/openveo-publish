@@ -92,7 +92,7 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.upload = function(videoPackage, callback){
+VimeoProvider.prototype.upload = function(videoPackage, callback){
   var self = this;
   
   // Retrieve video tmp directory
