@@ -37,6 +37,7 @@
      * @return HttpPromise The HTTP promise
      */
     var publishVideo = function(id){
+      entityService.deleteCache("video");
       return $http.get(basePath + "publish/publishVideo/" + id);
     };
 
@@ -46,6 +47,7 @@
      * @return HttpPromise The HTTP promise
      */
     var unpublishVideo = function(id){
+      entityService.deleteCache("video");
       return $http.get(basePath + "publish/unpublishVideo/" + id);
     };
 

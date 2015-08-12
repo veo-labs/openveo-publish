@@ -42,11 +42,11 @@
     scopeDataTable.actions = [{
         "label": $filter('translate')('UI.REMOVE'),
         "warningPopup": true,
-        "callback": function (row) {
-          removeRows([row.id]);
+        "callback": function (row, reload) {
+          removeRows([row.id], reload);
         },
-        "global": function(selected){
-          removeRows(selected);
+        "global": function(selected, reload){
+          removeRows(selected, reload);
         }
       }];
 
@@ -105,11 +105,12 @@
      * Can't remove a property if its saving.
      * @param Object property The property to remove
      */
-    var removeRows = function (selected) {
+    var removeRows = function (selected, reload) {
         entityService.removeEntity('property', selected.join(','))
                 .success(function (data) {
-                 publishService.cacheClear("properties");
+                  publishService.cacheClear("properties");
                   $scope.$emit("setAlert", 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
+                  reload();
                 })
                 .error(function (data, status, headers, config) {
                   $scope.$emit("setAlert", 'danger', $filter('translate')('PROPERTIES.REMOVE_FAIL'), 4000);

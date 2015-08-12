@@ -79,7 +79,7 @@
         "condition": function (row) {
           return row.state == 7;
         },
-        "callback": function (row) {
+        "callback": function (row, reload) {
           goToPath(row);
         }
       },
@@ -88,11 +88,11 @@
         "condition": function (row) {
           return row.state == 6;
         },
-        "callback": function (row) {
-          publishVideo([row.id]);
+        "callback": function (row, reload) {
+          publishVideo([row.id], reload);
         },
-        "global": function(selected){
-          publishVideo(selected);
+        "global": function(selected, reload){
+          publishVideo(selected, reload);
         }
         
       },
@@ -101,11 +101,11 @@
         "condition": function (row) {
           return row.state == 7;
         },
-        "callback": function (row) {
-          unpublishVideo([row.id]);
+        "callback": function (row, reload) {
+          unpublishVideo([row.id], reload);
         },
-        "global": function(selected){
-          unpublishVideo(selected);
+        "global": function(selected, reload){
+          unpublishVideo(selected, reload);
         }
       },
       {
@@ -114,11 +114,11 @@
           return row.state >= 6;
         },
         "warningPopup": true,
-        "callback": function (row) {
-          removeRows([row.id]);
+        "callback": function (row, reload) {
+          removeRows([row.id], reload);
         },
-        "global": function(selected){
-          removeRows(selected);
+        "global": function(selected, reload){
+          removeRows(selected, reload);
         }
       }
     ];
@@ -228,10 +228,12 @@
      * Can't publish the video if its saving.
      * @param Object video The video to publish
      */
-    var publishVideo = function (video) {
+    var publishVideo = function (video, reload) {
         publishService.publishVideo(video.join(','))
               .success(function (data, status, headers, config) {
                 $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
+                entityService.deleteCache(scopeDataTable.entityType);
+                reload();
               })
               .error(function (data, status, headers, config) {
                  $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.PUBLISHED_FAIL'), 4000);
@@ -244,10 +246,12 @@
      * Can't unpublish the video if its saving.
      * @param Object video The video to publish
      */
-    var unpublishVideo = function (video) {
+    var unpublishVideo = function (video, reload) {
       publishService.unpublishVideo(video.join(','))
               .success(function (data, status, headers, config) {
-                 $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
+                $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
+                entityService.deleteCache(scopeDataTable.entityType);
+                reload();
               })
               .error(function (data, status, headers, config) {
                  $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.UNPUBLISHED_FAIL'), 4000);
@@ -260,10 +264,11 @@
      * Can't remove a row if its saving.
      * @param Object row The row to remove
      */
-    var removeRows = function (selected) {
+    var removeRows = function (selected, reload) {
         entityService.removeEntity('video', selected.join(','))
                 .success(function (data) {
                   $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.REMOVE_SUCCESS'), 4000);
+                  reload();
                 })
                 .error(function (data, status, headers, config) {
                   $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.REMOVE_FAIL'), 4000);
