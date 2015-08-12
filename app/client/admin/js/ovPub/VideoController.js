@@ -232,7 +232,6 @@
         publishService.publishVideo(video.join(','))
               .success(function (data, status, headers, config) {
                 $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
-                entityService.deleteCache(scopeDataTable.entityType);
                 reload();
               })
               .error(function (data, status, headers, config) {
@@ -250,7 +249,6 @@
       publishService.unpublishVideo(video.join(','))
               .success(function (data, status, headers, config) {
                 $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
-                entityService.deleteCache(scopeDataTable.entityType);
                 reload();
               })
               .error(function (data, status, headers, config) {
