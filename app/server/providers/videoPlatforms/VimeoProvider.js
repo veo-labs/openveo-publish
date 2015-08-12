@@ -157,54 +157,63 @@ VideoPlatformProvider.prototype.upload = function(videoPackage, callback){
         }
 
         // {
-        //   date: 'Thu, 15 Jan 2015 11:00:27 GMT',
-        //   server: 'Apache',
-        //   vary: 'Accept,Vimeo-Client-Id,Accept-Encoding',
-        //   'cache-control': 'no-cache, max-age=315360000',
-        //   location: '/videos/116849110',
-        //   expires: 'Sun, 12 Jan 2025 11:00:27 GMT',
-        //   'content-length': '0',
-        //   'keep-alive': 'timeout=100, max=94',
-        //   connection: 'Keep-Alive',
-        //   'content-type': 'text/html; charset=UTF-8',
-        //   via: '1.1 fra1-10' 
+        //   "date" : "Thu, 15 Jan 2015 11:00:27 GMT",
+        //   "server" : "Apache",
+        //   "vary" : "Accept,Vimeo-Client-Id,Accept-Encoding",
+        //   "cache-control" : "no-cache, max-age=315360000",
+        //   "location" : "/videos/116849110",
+        //   "expires" : "Sun, 12 Jan 2025 11:00:27 GMT",
+        //   "content-length" : "0",
+        //   "keep-alive" : "timeout=100, max=94",
+        //   "connection" : "Keep-Alive",
+        //   "content-type" : "text/html; charset=UTF-8",
+        //   "via" : "1.1 fra1-10"
         // }
         videoId = path.basename(headers.location);
         callback();
       });
     },
     
-    // Update video metada on Vimeo
-    // TODO parallelize both metadata update and preset
-    function(callback){
-      self.vimeo.request({
-        "method" : "PATCH",
-        "path" : "/videos/" + videoId,
-        "query" : {
-          "name" : "Video name",
-          "description" : "Video description",
-          "license" : "by",
-          "privacy.view" : "nobody",
-          "privacy.embed" : "private",
-          "review_link" : false
-        }
-      }, function(error, body, statusCode, headers){
-        callback(error);
-      });
-    },
-
-    // Add preset to the video
-    // TODO parallelize both metadata update and preset
+    // Set video metadata and preset
     function(callback){
       
-      self.vimeo.request({
-        "method" : "PUT",
-        "path" : "/videos/" + videoId + "/presets/" + presetId
-      }, function(error, body, statusCode, headers){   
-        callback(error);
-      });
+      async.parallel([
+
+          // Update video metadata on Vimeo
+          // TODO Replace name and description when available in video package
+          function(callback){
+            self.vimeo.request({
+              "method" : "PATCH",
+              "path" : "/videos/" + videoId,
+              "query" : {
+                "name" : "Video name",
+                "description" : "Video description",
+                "license" : "by",
+                "privacy.view" : "nobody",
+                "privacy.embed" : "private",
+                "review_link" : false
+              }
+            }, function(error, body, statusCode, headers){
+              callback(error);
+            });
+          },
+
+          // Add preset to the video
+          function(callback){
+            self.vimeo.request({
+              "method" : "PUT",
+              "path" : "/videos/" + videoId + "/presets/" + presetId
+            }, function(error, body, statusCode, headers){
+              callback(error);
+            });
+          }
+
+        ], function(error, result){
+          callback(error);
+        });
 
     }
+
   ], function(error, results){
     callback(error, videoId);
   });
