@@ -105,7 +105,6 @@ VideoModel.prototype.add = function(videoPackage, callback){
     id : videoPackage.id + "",
     status : videoPackage.status,
     metadata : videoPackage.metadata,
-    url : videoPackage.url,
     type : videoPackage.type,
     errorCode : videoPackage.errorCode,
     published : videoPackage.published,
