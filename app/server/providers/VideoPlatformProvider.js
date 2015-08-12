@@ -27,6 +27,11 @@ function VideoPlatformProvider(providerConf){
 
 module.exports = VideoPlatformProvider;
 
+// Video qualities
+VideoPlatformProvider.MOBILE_QUALITY = 0;
+VideoPlatformProvider.SD_QUALITY = 1;
+VideoPlatformProvider.HD_QUALITY = 2;
+
 /**
  * Gets an instance of a VideoPlatformProvider giving a type and a 
  * configuration object.
@@ -69,3 +74,38 @@ VideoPlatformProvider.getProvider = function(type, providerConf){
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoPlatformProvider.prototype.upload = function(callback){throw new Error("upload method not implemented for this video platform provider");}
+
+/**
+ * Gets information about a video from video platform.
+ *
+ * @example
+ *     // Returned data example
+ *     {
+ *       available : true,
+ *       pictures : [
+ *         {
+ *           width : 100,
+ *           height : 75,
+ *           link : "https://i.vimeocdn.com/video/530303243_100x75.jpg"
+ *         },
+ *         ...
+ *       ],
+ *       files : [
+ *         {
+ *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd
+ *           width : 640,
+ *           height : 360,
+ *           link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
+ *         },
+ *         ...
+ *       ]
+ *     }
+ *
+ * @method getVideoInfo
+ * @async
+ * @param {String} videoId The platform id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** Information about the video
+ */
+VideoPlatformProvider.prototype.getVideoInfo = function(callback){throw new Error("getVideoInfo method not implemented for this video platform provider");}

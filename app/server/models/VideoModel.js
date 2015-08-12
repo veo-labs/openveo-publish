@@ -13,6 +13,8 @@ var openVeoAPI = process.requireModule("openveo-api");
 
 var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.js");
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
+var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
+var videoPlatformConf = process.requirePublish("config/videoPlatformConf.json");
 
 /**
  * Defines a VideoModel class to manipulate videos.
@@ -340,12 +342,75 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
 /**
  * Gets a video.
  *
+ * {
+ *   "video" : {
+ *      "id" : "1439286245225", // Openveo video id
+ *      "metadata" : { // Metadata sent by the media encoder
+ *        "profile" : "2",
+ *        "audio-input" : "hdmi-camera",
+ *        "date" : 1425916390,
+ *        "format" : "camera",
+ *        "rich-media" : true, // true if there are slides associated to the video
+ *        "profile-settings" : {
+ *          "video-bitrate" : 1000000,
+ *          "id" : "2",
+ *          "video-height" : 720,
+ *          "audio-bitrate" : 128000,
+ *          "name" : "HD"
+ *        },
+ *        "id" : "2015-03-09_16-53-10",
+ *        "format-settings" : {
+ *          "source" : "camera-scale-raw",
+ *          "id" : "camera"
+ *        },
+ *        "storage-directory" : "/data/2015-03-09_16-53-10",
+ *        "filename" : "video.mp4",
+ *        "duration" : 30
+ *      },
+ *      "type" : "vimeo", // The video platform
+ *      "errorCode" : -1, // The error code if status = 0
+ *      "published" : false, // true if video is published
+ *      "category" : null, // Category the video belongs to
+ *      "properties" : [], // A list of custom properties
+ *      "state" : 7, // Actual state in publishing process (0 = Pending, 1 = Copying, 2 = Extracting, 3 = Validating, 4 = Preparing, 5 = Sending, 6 = Sent, 7 = Published, 8 = Error)
+ *      "link" : "/publish/video/1439286245225", // Link to the openveo player
+ *      "videoId" : "135956519", // Platform id of the video
+ *      "timecodes" : { // The list of slides with timecodes
+ *        "0" : {
+ *          "image" : {
+ *            "small" : "/publish/videos/1439286245225/slide_00000.jpeg",
+ *            "large" : "/publish/videos/1439286245225/slide_00000.jpeg"
+ *          }
+ *        }
+ *        ...
+ *      },
+ *      available : true,
+ *      pictures : [ // Video thumbnails
+ *        {
+ *          width : 100,
+ *          height : 75,
+ *          link : "https://i.vimeocdn.com/video/530303243_100x75.jpg"
+ *        },
+ *        ...
+ *      ],
+ *      files : [ // Video original files
+ *        {
+ *          quality : 0, // 0 = mobile, 1 = sd, 2 = hd
+ *          width : 640,
+ *          height : 360,
+ *          link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
+ *        },
+ *        ...
+ *     ]
+ *   }
+ * }
+ *
  * @method getOne
  * @async
  * @param {String} id The id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The video
+ *   - **Object** The video information (see example)
  */
 VideoModel.prototype.getOne = function(id, callback){
   var self = this;
@@ -371,6 +436,29 @@ VideoModel.prototype.getOne = function(id, callback){
 
         callback();
 
+      });
+    },
+
+    // Retrieve video information from video platform
+    function(callback){
+
+      // Video information already retrieved
+      if(videoInfo.files)
+        return callback();
+
+      var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
+      videoPlatformProvider.getVideoInfo(videoInfo.videoId, function(error, info){
+        if(error){
+          callback(error);
+          return;
+        }
+
+        videoInfo.available = info.available;
+        videoInfo.files = info.files;
+        videoInfo.pictures = info.pictures;
+
+        self.provider.update(videoInfo.id, info);
+        callback();
       });
     },
 
