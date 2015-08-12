@@ -2,7 +2,7 @@
 
   "use strict"
   
-  var app = angular.module("ov.publish.player", ["ov.player"]);
+  var app = angular.module("ov.publish.player", ["ngAnimate", "ov.player"]);
   
   /**
    * Configures the ov.publish application by adding new routes.

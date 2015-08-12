@@ -109,7 +109,8 @@
   },
   "custom" : {
     "scriptFiles" : [
-      "/publish/lib/angular/angular.js",
+      "/publish/lib/angular/angular.min.js",
+      "/publish/lib/angular-animate/angular-animate.min.js",
       "/publish/lib/openveo-player/PlayerApp.js",
       "/publish/lib/openveo-player/PlayerDirective.js",
       "/publish/lib/openveo-player/TabsDirective.js",
