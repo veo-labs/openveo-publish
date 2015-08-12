@@ -210,8 +210,10 @@
     // is pending, poll each 30 seconds to be informed of
     // its status
     var pollVideosPromise = $interval(function () {
-        if (!scopeEditForm.pendingEdition)
+        if (!scopeEditForm.pendingEdition){
+          entityService.deleteCache(scopeDataTable.entityType);
           tableReloadEventService.broadcast();
+        }
     }, 30000);
     /**
      * 
