@@ -41,7 +41,18 @@
        'type': 'select',
        'value':'',
        'label': $filter('translate')('VIDEOS.CATEGORY_FILTER'),
-       'options': getSelectableCategories()
+       /*
+        * [{
+          "value": 'id',
+          "name": 'title',
+          "children" : 'id1,id2,id3'
+          },
+            ...
+          ];
+        */
+       'options': getSelectableCategories(),
+       //if enable filter will filter with the selectId AND additionnal id set in the "children" key of each options
+       'filterWithChildren':true
      }
     ];
     scopeDataTable.header = [
@@ -188,9 +199,11 @@
       var categories = jsonPath($scope.categories, '$..*[?(@.id)]');
       var options = [];
       angular.forEach(categories, function (value, key) {
+        var children = jsonPath($scope.categories, '$..[?(@.id=='+value.id+')]..*[?(@.id)].id');
         options.push({
           "value": value.id,
-          "name": value.title
+          "name": value.title,
+          "children" : children?children.join(','):''
         });
       });
       return options;
