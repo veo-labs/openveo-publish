@@ -84,6 +84,15 @@
         }
       },
       {
+        "label": $filter('translate')('UI.SHARE'),
+        "condition": function (row) {
+          return row.state == 7;
+        },
+        "callback": function (row, reload) {
+          shareCode(row);
+        }
+      },
+      {
         "label": $filter('translate')('VIDEOS.PUBLISH'),
         "condition": function (row) {
           return row.state == 6;
@@ -304,5 +313,14 @@
     $scope.$on("$destroy", function (event) {
       $interval.cancel(pollVideosPromise);
     });
+    
+    var shareCode = function(video){
+       $scope.$emit("setAlert", 'info', [
+         $filter('translate')('VIDEOS.SHARECODE'),
+         '<br><br><div class="well well-sm"><code>',
+         '&lt;iframe width="480" height="270" src='+video.link+'?fullscreen"frameborder="0"&gt;&lt;/iframe&gt;',
+         '</div>'
+       ].join(''), 0);
+    }
   }
 })(angular.module("ov.publish"));

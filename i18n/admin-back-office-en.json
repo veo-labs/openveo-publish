@@ -47,6 +47,7 @@
     "NO_VIDEO" : "No video yet",
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
+    "SHARECODE" : "To share the video, copy the HTML code below and paste it in your page :",
     "ATTR_TITLE" : "Title",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Category",
@@ -100,7 +101,7 @@
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Categorie",
     "TITLE" : "Video Categories",
-    "INFO" : "Define Categories in order to add category to videos.",
+    "INFO" : "This page allow to define categories to videos in order to organize and search them easily.",
     "NEW_ITEM" : "New item",
     "NAME_ELEMENT" : "Name of the new category",
     "ADD_ELEMENT" : "Add a new category",

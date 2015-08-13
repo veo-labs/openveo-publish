@@ -14,7 +14,7 @@
     $scope.newItem = "";
     $scope.list = categories.data.taxonomy.tree;
     if($scope.list.length>0)
-      $scope.listback = $scope.list.slice();
+      $scope.listback = angular.copy($scope.list);
     else $scope.listback = [];
     $scope.saveIsDisabled = $scope.list.length==0;
     
@@ -32,7 +32,7 @@
       $scope.saveIsDisabled = $scope.list.length==0;
     };
     $scope.resetCategory = function(scope){
-       $scope.list = $scope.listback.slice();
+       $scope.list = angular.copy($scope.listback);
        $scope.$emit("setAlert", 'info', $filter('translate')('CATEGORIES.RESET'),4000);
     };
     
@@ -49,7 +49,7 @@
     
     function successCb(data, status, headers, config) {
         $scope.saveIsDisabled = $scope.list.length==0;
-        $scope.listback = $scope.list.slice();
+        $scope.listback = angular.copy($scope.list);
         $scope.$emit("setAlert", 'success', $filter('translate')('CATEGORIES.SAVE_SUCCESS'),4000);
     }
     function errorCb(data, status, headers, config){
