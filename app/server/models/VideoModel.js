@@ -441,25 +441,28 @@ VideoModel.prototype.getOne = function(id, callback){
 
     // Retrieve video information from video platform
     function(callback){
+      if(videoInfo){
 
-      // Video information already retrieved
-      if(videoInfo.files)
-        return callback();
+        // Video information already retrieved
+        if(videoInfo.files)
+          return callback();
 
-      var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
-      videoPlatformProvider.getVideoInfo(videoInfo.videoId, function(error, info){
-        if(error){
-          callback(error);
-          return;
-        }
+        var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
+        videoPlatformProvider.getVideoInfo(videoInfo.videoId, function(error, info){
+          if(error){
+            callback(error);
+            return;
+          }
 
-        videoInfo.available = info.available;
-        videoInfo.files = info.files;
-        videoInfo.pictures = info.pictures;
+          videoInfo.available = info.available;
+          videoInfo.files = info.files;
+          videoInfo.pictures = info.pictures;
 
-        self.provider.update(videoInfo.id, info);
-        callback();
-      });
+          self.provider.update(videoInfo.id, info);
+          callback();
+        });
+
+      }
     },
 
     // Retrieve video timecodes

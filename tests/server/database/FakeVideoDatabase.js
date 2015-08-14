@@ -12,6 +12,8 @@ util.inherits(FakeVideoDatabase, Database);
 FakeVideoDatabase.prototype.get = function(collection, criteria, projection, limit, callback){
   if(criteria.id === "error")
     callback(new Error("Error"));
+  else if(criteria.id == 5)
+    callback(null, [{state : 7, files: []}]);
   else
     callback(null, [{}]);
 };
