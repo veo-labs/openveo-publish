@@ -119,6 +119,7 @@
       "/publish/lib/openveo-player/IndexDirective.js",
       "/publish/lib/openveo-player/TimeFilter.js",
       "/publish/lib/openveo-player/OrderTimeCodesFilter.js",
+      "/publish/lib/openveo-player/players/HTMLPlayer.js",
       "/publish/lib/openveo-player/players/VimeoPlayer.js",
       "/PublishPlayerApp.js",
       "/VideoService.js",
