@@ -496,14 +496,12 @@ VideoModel.prototype.getOne = function(id, callback){
         
         for(var time in timecodes){
           videoInfo.timecodes[parseInt(time)] = {};
-          videoInfo.timecodes[parseInt(time)]["image"] = {
-            "small" : "/publish/videos/" + videoInfo.id + "/" + timecodes[time]["image"]["small"],
-            "large" : "/publish/videos/" + videoInfo.id + "/" + timecodes[time]["image"]["large"]
+          videoInfo.timecodes[parseInt(time)]['image'] = {
+            "small" : '/'+videoInfo.id + "/" + timecodes[time]["image"]+"?thumb=small",
+            "large" : '/'+videoInfo.id + "/" + timecodes[time]["image"],
           };
         }
-        
       }
-      
       callback(null, videoInfo);
     }
     

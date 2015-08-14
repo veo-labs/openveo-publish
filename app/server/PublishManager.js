@@ -681,10 +681,7 @@ function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
                   formattedTimecodes[timecode] = { "image" : {}};
 
                   if(timecodeInfo["id"] && timecodeInfo["id"].length){
-                    formattedTimecodes[timecode]["image"] = {
-                      "small" : timecodeInfo["id"][0],
-                      "large" : timecodeInfo["id"][0]
-                    };
+                    formattedTimecodes[timecode] = { "image" : timecodeInfo["id"][0]};
                   }
                 }
               });
