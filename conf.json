@@ -133,5 +133,11 @@
   },
   "viewsFolders" : [
     "app/client/front/views"
-  ]
+  ],
+  "imageProcessing": {
+    "imagesFolders": ["public/publish/videos"],
+    "imagesStyle": {
+      "small": 200
+    }
+  }
 }
