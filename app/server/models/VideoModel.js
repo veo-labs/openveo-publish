@@ -163,17 +163,17 @@ VideoModel.prototype.updateLink = function(id, link, callback){
 };
 
 /**
- * Updates video id for video platform.
+ * Updates media id for media platform.
  *
- * @method updateVideoId
+ * @method updateMediaId
  * @async
- * @param {String} id The id of the video to update
- * @param {String} idVideoPlatform The id of the video in the video platform
+ * @param {String} id The id of the media to update
+ * @param {String} idMediaPlatform The id of the media in the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateVideoId = function(id, idVideoPlatform, callback){
-  updateVideoProperty.call(this, id, "videoId", idVideoPlatform, callback);
+VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback){
+  updateVideoProperty.call(this, id, "mediaId", idMediaPlatform, callback);
 };
 
 /**
@@ -374,7 +374,7 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
  *      "properties" : [], // A list of custom properties
  *      "state" : 7, // Actual state in publishing process (0 = Pending, 1 = Copying, 2 = Extracting, 3 = Validating, 4 = Preparing, 5 = Sending, 6 = Sent, 7 = Published, 8 = Error)
  *      "link" : "/publish/video/1439286245225", // Link to the openveo player
- *      "videoId" : "135956519", // Platform id of the video
+ *      "mediaId" : "135956519", // Platform id of the video
  *      "timecodes" : { // The list of slides with timecodes
  *        "0" : {
  *          "image" : {
@@ -448,7 +448,7 @@ VideoModel.prototype.getOne = function(id, callback){
           return callback();
 
         var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
-        videoPlatformProvider.getVideoInfo(videoInfo.videoId, function(error, info){
+        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, function(error, info){
           if(error){
             callback(error);
             return;
@@ -605,14 +605,14 @@ VideoModel.prototype.unpublishVideo = function(id, callback){
  * @method updateVideoProperty
  * @private
  * @async
- * @param {Number} videoId The id of the video to update
+ * @param {Number} mediaId The id of the media to update
  * @param {String} propertyName The name of the property to update
  * @param {String|Number|Boolean} propertyValue The value of the
  * property
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-function updateVideoProperty(videoId, propertyName, propertyValue, callback){
+function updateVideoProperty(mediaId, propertyName, propertyValue, callback){
   var self = this;
   
   // No pending update operations for now
@@ -620,18 +620,18 @@ function updateVideoProperty(videoId, propertyName, propertyValue, callback){
     this.pendingUpdateOperations = {};
     
     process.nextTick(function(){
-      for(var videoId in self.pendingUpdateOperations){
-        self.provider.update(videoId, self.pendingUpdateOperations[videoId], callback);
+      for(var mediaId in self.pendingUpdateOperations){
+        self.provider.update(mediaId, self.pendingUpdateOperations[mediaId], callback);
       }
       self.pendingUpdateOperations = null;
     });
   }
   
   // Add update opration to pending operations
-  if(!this.pendingUpdateOperations[videoId])
-    this.pendingUpdateOperations[videoId] = {};
+  if(!this.pendingUpdateOperations[mediaId])
+    this.pendingUpdateOperations[mediaId] = {};
 
-  this.pendingUpdateOperations[videoId][propertyName] = propertyValue;
+  this.pendingUpdateOperations[mediaId][propertyName] = propertyValue;
 }
 
 /**

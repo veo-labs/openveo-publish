@@ -98,7 +98,7 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
   // Retrieve video tmp directory
   // e.g E:/openveo/node_modules/openveo-publish/tmp/
   var videoTmpDir = path.dirname(videoPackage.packagePath);
-  var presetId, videoId;
+  var presetId, mediaId;
   
   // Get video file path
   // e.g E:/openveo/node_modules/openveo-publish/tmp/1422731934859/video.mp4
@@ -175,7 +175,7 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
         //   "content-type" : "text/html; charset=UTF-8",
         //   "via" : "1.1 fra1-10"
         // }
-        videoId = path.basename(headers.location);
+        mediaId = path.basename(headers.location);
         callback();
       });
     },
@@ -190,7 +190,7 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
           function(callback){
             self.vimeo.request({
               "method" : "PATCH",
-              "path" : "/videos/" + videoId,
+              "path" : "/videos/" + mediaId,
               "query" : {
                 "name" : "Video name",
                 "description" : "Video description",
@@ -208,7 +208,7 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
           function(callback){
             self.vimeo.request({
               "method" : "PUT",
-              "path" : "/videos/" + videoId + "/presets/" + presetId
+              "path" : "/videos/" + mediaId + "/presets/" + presetId
             }, function(error, body, statusCode, headers){
               callback(error);
             });
@@ -221,7 +221,7 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
     }
 
   ], function(error, results){
-    callback(error, videoId);
+    callback(error, mediaId);
   });
   
 };
@@ -254,17 +254,17 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
  *
  * @method getVideoInfo
  * @async
- * @param {String} videoId The Vimeo id of the video
+ * @param {String} mediaId The Vimeo id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-VimeoProvider.prototype.getVideoInfo = function(videoId, callback){
-  if(videoId){
+VimeoProvider.prototype.getVideoInfo = function(mediaId, callback){
+  if(mediaId){
     var self = this;
 
     // Ask Vimeo for video information
-    this.vimeo.request({method : "GET", path : "/videos/" + videoId}, function(error, body, statusCode, headers){
+    this.vimeo.request({method : "GET", path : "/videos/" + mediaId}, function(error, body, statusCode, headers){
       var info = null;
 
       if(!error){

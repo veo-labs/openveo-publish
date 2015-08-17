@@ -103,7 +103,7 @@ VideoPlatformProvider.prototype.upload = function(callback){throw new Error("upl
  *
  * @method getVideoInfo
  * @async
- * @param {String} videoId The platform id of the video
+ * @param {String} mediaId The platform id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video

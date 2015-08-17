@@ -12,11 +12,11 @@
 
     /**
      * Gets information about a video.
-     * @param String videoId The video id
+     * @param String mediaId The media id
      * @param Function callback The function to call when its done
      */
-    var getVideo = function(videoId, callback){
-      return $http.get("/publish/getVideo/" + videoId).then(function(response){
+    var getVideo = function(mediaId, callback){
+      return $http.get("/publish/getVideo/" + mediaId).then(function(response){
         callback(response.data.video);
       }, function(){
         callback();

@@ -15,9 +15,9 @@
     
     // Got a video id from url
     if(urlChunks.length){
-      var videoId = urlChunks[1];
+      var mediaId = urlChunks[1];
       
-      videoService.getVideo(videoId, function(video){
+      videoService.getVideo(mediaId, function(video){
         if(video){
 
           // Retrieve url parameters 

@@ -184,7 +184,7 @@ PublishManager.prototype.publish = function(videoPackage){
           self.pendingVideos.push(videoPackage);
           videoPackage.state = VideoModel.PENDING_STATE;
           videoPackage.link = null;
-          videoPackage.videoId = null;
+          videoPackage.mediaId = null;
           videoPackage.published = false;
           videoPackage.errorCode = -1;
           videoPackage.properties = [];
@@ -336,7 +336,7 @@ PublishManager.prototype.publish = function(videoPackage){
         // Clean up the tmp directory
         openVeoAPI.fileSystem.rmdir(path.join(publishConf.videoTmpDir, "/" + videoPackage.id), function(error){
           if(error)
-            self.logger.error("Couldn't remove directory " + path.join(publishConf.videoTmpDir, "/" + videoPackage.id), {"action" : "cleanUp", "videoId" : videoPackage.id});
+            self.logger.error("Couldn't remove directory " + path.join(publishConf.videoTmpDir, "/" + videoPackage.id), {"action" : "cleanUp", "mediaId" : videoPackage.id});
           
           callback();
         });
@@ -355,7 +355,7 @@ PublishManager.prototype.publish = function(videoPackage){
         // Mark package as success in the database
         self.videoModel.updateState(videoPackage.id, VideoModel.SENT_STATE);
         self.videoModel.updateLink(videoPackage.id, "/publish/video/" + videoPackage.id);
-        self.videoModel.updateVideoId(videoPackage.id, videoPackage.videoId);
+        self.videoModel.updateMediaId(videoPackage.id, videoPackage.mediaId);
         self.emit("complete", videoPackage);
 
       }
@@ -516,11 +516,11 @@ function startPublishing(videoPackage, callback){
       var videoPlatformProvider = VideoPlatformProvider.getProvider(videoPackage.type, self.videoProviderConf[videoPackage.type]);
 
       // Start uploading the video to the platform
-      videoPlatformProvider.upload(videoPackage, function(error, videoId){
+      videoPlatformProvider.upload(videoPackage, function(error, mediaId){
         if(error)
           callback(new PublishError(error.message, VideoModel.UPLOAD_ERROR));
         else{
-          videoPackage.videoId = videoId;
+          videoPackage.mediaId = mediaId;
           callback();
         }
       });
@@ -551,7 +551,7 @@ function startPublishing(videoPackage, callback){
             openVeoAPI.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error){
 
               if(error)
-                self.logger.warn(error.message, {"action" : "copyImages", "videoId" : videoPackage.id});
+                self.logger.warn(error.message, {"action" : "copyImages", "mediaId" : videoPackage.id});
               
               filesLeftToCopy--;
 
