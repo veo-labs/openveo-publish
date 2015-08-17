@@ -22,9 +22,8 @@
   <body>
 
     <ov-player 
-      ov-player-type="playerType"
-      ov-mode-icon="displayModeIcon"
-      ov-full-viewport="fullViewport"
+      ov-player-type="{{playerType}}"
+      ov-full-viewport="isFullViewport"
       ov-data="data"
       ng-show="ready"
     ></ov-player>
