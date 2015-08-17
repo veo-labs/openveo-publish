@@ -24,6 +24,7 @@
           var urlParams = $location.search();
 
           $scope.fullViewport = urlParams["fullscreen"] || false;
+          $scope.playerType = urlParams["type"] || "vimeo";
           $scope.displayModeIcon = true;
           $scope.data = video;
           $scope.ready = true;
