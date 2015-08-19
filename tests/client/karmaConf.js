@@ -11,6 +11,7 @@ module.exports = function(config){
     files: [
       "public/publish/lib/angular/angular.js",
       "public/publish/lib/angular-route/angular-route.js",
+      "public/publish/lib/angular-animate/angular-animate.js",
       "public/publish/lib/angular-cookies/angular-cookies.js",
       "public/publish/lib/angular-animate/angular-animate.js",
       "public/publish/lib/angular-mocks/angular-mocks.js",
