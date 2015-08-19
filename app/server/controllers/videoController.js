@@ -22,6 +22,8 @@ var applicationStorage = openVeoAPI.applicationStorage;
 // Retrieve logger
 var logger = winston.loggers.get("openveo");
 
+var env = ( process.env.NODE_ENV === "production") ? "prod" : "dev";
+
 /**
  * Displays video player template.
  *
@@ -44,7 +46,12 @@ module.exports.displayVideoAction = function(request, response, next){
     plugins.forEach(function(subPlugin){
       if(subPlugin.name === "publish"){
         if(subPlugin.custom){
-          response.locals.scripts = response.locals.scripts.concat(subPlugin.custom.scriptFiles || []);
+          var customScripts = subPlugin.custom.scriptFiles;
+          response.locals.scripts = response.locals.scripts.concat(
+            (customScripts["base"] || []),
+            ((customScripts["player"] && customScripts["player"][env]) ? customScripts["player"][env] : []),
+            ((customScripts["publishPlayer"] && customScripts["publishPlayer"][env]) ? customScripts["publishPlayer"][env] : [])
+          );
           response.locals.css = response.locals.css.concat(subPlugin.custom.cssFiles || []);
         }
       }
