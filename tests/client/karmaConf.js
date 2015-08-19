@@ -25,8 +25,8 @@ module.exports = function(config){
       "app/client/admin/js/ovPub/**/*.js",
       "app/client/front/js/PublishPlayerApp.js",
       "app/client/front/js/**/*.js",
-      "public/publish/lib/openveo-player/PlayerApp.js",
-      "public/publish/lib/openveo-player/**/*.js",
+      "public/publish/lib/openveo-player/js/PlayerApp.js",
+      "public/publish/lib/openveo-player/js/**/*.js",
       "tests/client/unitTests/admin/*.js",
       "tests/client/unitTests/front/*.js"
     ],
