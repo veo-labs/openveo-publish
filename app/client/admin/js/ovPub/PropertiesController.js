@@ -42,6 +42,9 @@
     scopeDataTable.actions = [{
         "label": $filter('translate')('UI.REMOVE'),
         "warningPopup": true,
+        "condition": function(row){
+          return !row.saving;
+        },
         "callback": function (row, reload) {
           removeRows([row.id], reload);
         },
@@ -102,7 +105,6 @@
 
     /**
      * Removes the property.
-     * Can't remove a property if its saving.
      * @param Object property The property to remove
      */
     var removeRows = function (selected, reload) {
@@ -125,17 +127,14 @@
      * @param Object property The property associated to the form
      */
     var saveProperty = function (property, successCb, errorCb) {
-      property.saving = true;
       entityService.updateEntity('property', property.id, {
         name: property.name,
         description: property.description,
         type: property.type
       }).success(function (data, status, headers, config) {
-        property.saving = false;
         publishService.cacheClear("properties");
         successCb();
       }).error(function (data, status, headers, config) {
-        property.saving = false;
         errorCb();
         if (status === 401)
           $scope.$parent.logout();

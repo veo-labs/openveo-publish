@@ -22,16 +22,13 @@ describe("PropertiesController", function(){
   // Initializes tests
   beforeEach(function(){
     scope = $rootScope.$new();
-    $controller("PropertiesController", {
-      $scope: scope,
-      properties : {
-        data : {
-          entities : [
+    scope.test = {};
+    scope.test.rows = [
             { id : 1, name : "name", description : "description", type : "type" },
             { id : 2, name : "name", description : "description", type : "type" }
           ]
-        }
-      }
+    $controller("PropertiesController", {
+      $scope: scope
     });
   });
 
@@ -41,41 +38,38 @@ describe("PropertiesController", function(){
     $httpBackend.verifyNoOutstandingRequest();
   });
   
-  // togglePropertyDetails method
-  describe("togglePropertyDetails", function(){
-    
-    it("Should be able to open the property details", function(){
-      scope.togglePropertyDetails(scope.properties[0]);
-      assert.ok(scope.properties[0].opened);
-      assert.notOk(scope.properties[1].opened);
-    });
-    
-    it("Should not open / close property details if property is saving", function(){
-      scope.properties[0].saving = true;
-      scope.togglePropertyDetails(scope.properties[0]);
-      assert.notOk(scope.properties[0].opened);
-    });    
-
-  });   
   
   // removeProperty method
   describe("removeProperty", function(){
     
-    it("Should be able to remove a property if not saving", function(){
+    it("Should be able to remove a property if not saving", function(done){
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
       $httpBackend.when("DELETE", "/admin/crud/property/1").respond(200);
       $httpBackend.expectDELETE("/admin/crud/property/1");
       
-      scope.properties[0].saving = true;
-      scope.removeProperty(scope.properties[0]);
-      
-      scope.properties[0].saving = false;
-      scope.removeProperty(scope.properties[0]);
+      scope.tableContainer.actions[0].callback(scope.test.rows[0], done);
       
       $httpBackend.flush();
-      assert.equal(scope.properties.length, 1);
+    });
+    
+    it("Should be able to remove many properties ", function(done){
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
+      $httpBackend.when("DELETE", "/admin/crud/property/1,2").respond(200);
+      $httpBackend.expectDELETE("/admin/crud/property/1,2");
+           
+      scope.tableContainer.actions[0].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
+
+      $httpBackend.flush();
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
       $httpBackend.when("DELETE", "/admin/crud/property/1").respond(401);
       $httpBackend.expectDELETE("/admin/crud/property/1");
       
@@ -83,7 +77,9 @@ describe("PropertiesController", function(){
         done();
       };
       
-      scope.removeProperty(scope.properties[0]);
+      scope.tableContainer.actions[0].callback(scope.test.rows[0], function(){
+        assert.notOk("everything");
+      });
       $httpBackend.flush();
     });    
 
@@ -93,28 +89,23 @@ describe("PropertiesController", function(){
   describe("saveProperty", function(){
     
     it("Should be able to save a property if not already saving", function(done){
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
       $httpBackend.when("POST", "/admin/crud/property/1").respond(200);
       $httpBackend.expectPOST("/admin/crud/property/1");
       
-      var form = {
-        edition : true,
-        closeEdition : function(){
-          assert.notOk(this.edition);
-          done();
-        }
-      };
-      
-      scope.properties[0].saving = true;
-      scope.saveProperty(form, scope.properties[0]);
-
-      scope.properties[0].saving = false;
-      scope.properties[0].title = "title";
-      scope.saveProperty(form, scope.properties[0]);
+      scope.editFormContainer.onSubmit(scope.test.rows[0], done, function(){
+        assert.notOk(true);
+      });
       
       $httpBackend.flush();
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
       $httpBackend.when("POST", "/admin/crud/property/1").respond(401);
       $httpBackend.expectPOST("/admin/crud/property/1");
       
@@ -122,58 +113,41 @@ describe("PropertiesController", function(){
         done();
       };
       
-      scope.saveProperty({}, scope.properties[0]);
+      scope.editFormContainer.onSubmit(scope.test.rows[0], function(){
+        assert.notOk(true);
+      }, function(){
+        assert.ok(true);
+      });
       $httpBackend.flush();
     });    
 
   });    
   
-  // toogleEdition method
-  describe("toggleEdition", function(){
-    
-    it("Should be able to cancel property edition", function(done){
-      var form = {
-        edition : true,
-        cancelEdition : function(){
-          assert.notOk(this.edition);
-          done();
-        }
-      };
-
-      scope.cancelEdition(form);
-    }); 
-    
-    it("Should be able to open property edition", function(done){
-      var form = {
-        edition : false,
-        openEdition : function(){
-          assert.ok(this.edition);
-          done();
-        }
-      };
-
-      scope.openEdition(form);
-    });     
-
-  }); 
+  
   
   // addProperty method
   describe("addProperty", function(){
     
-    it("Should be able to add a new property", function(){
+    it("Should be able to add a new property", function(done){
+       $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("POST", /.*/).respond(200, "");
       $httpBackend.when("PUT", "/admin/crud/property").respond(200, { entity : {}});
       $httpBackend.expectPUT("/admin/crud/property");
       
-      scope.propertyName = "name";
-      scope.propertyDescription = "description";
-      scope.propertyType = "type";
-      
-      scope.addProperty({});
+      scope.addFormContainer.onSubmit({},
+        done,
+        function () {
+          assert.notOk(true);
+        }
+      );
       $httpBackend.flush();
-      assert.equal(scope.properties.length, 3);
     });
     
     it("Should logout user if a 401 is returned by the server", function(done){
+       $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("GET", /.*/).respond(200, "");
+      $httpBackend.when("POST", /.*/).respond(200, "");
       $httpBackend.when("PUT", "/admin/crud/property").respond(401);
       $httpBackend.expectPUT("/admin/crud/property");
       
@@ -181,11 +155,12 @@ describe("PropertiesController", function(){
         done();
       };
       
-      scope.propertyName = "name";
-      scope.propertyDescription = "description";
-      scope.propertyType = "type";
-      
-      scope.addProperty({});
+      scope.addFormContainer.onSubmit({}, function(){
+        assert.notOk(true);
+      }, function(){
+        assert.ok(true);
+      });
+
       $httpBackend.flush();
     });    
 

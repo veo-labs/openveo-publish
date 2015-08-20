@@ -8,6 +8,7 @@
 
   function EntityService($http, $q){
     var basePath = "/admin/";
+    var entityCache = {};
      
     var addEntity = function(entityType, data){
       return $http.put(basePath + "crud/" + entityType, data);
@@ -20,11 +21,21 @@
     var removeEntity = function(entityType, id){
       return $http.delete(basePath + "crud/" + entityType + "/" + id);
     };  
+    
+    var getAllEntities = function(entityType){
+       return $http.get(basePath + "crud/" + entityType);
+    }
+            
+    var deleteCache = function(entity){
+      delete entityCache[entity];
+    }
 
     return{
       addEntity: addEntity,
       updateEntity: updateEntity,
-      removeEntity: removeEntity
+      removeEntity: removeEntity,
+      getAllEntities : getAllEntities,
+      deleteCache : deleteCache
     };
 
   }
