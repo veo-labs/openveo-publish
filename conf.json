@@ -119,12 +119,13 @@
           "/publish/lib/openveo-player/js/PlayerDirective.js",
           "/publish/lib/openveo-player/js/TabsDirective.js",
           "/publish/lib/openveo-player/js/ViewDirective.js",
-          "/publish/lib/openveo-player/js/PlayerInterface.js",
+          "/publish/lib/openveo-player/js/Player.js",
           "/publish/lib/openveo-player/js/IndexDirective.js",
           "/publish/lib/openveo-player/js/TimeFilter.js",
           "/publish/lib/openveo-player/js/OrderTimeCodesFilter.js",
           "/publish/lib/openveo-player/js/players/HTMLPlayer.js",
-          "/publish/lib/openveo-player/js/players/VimeoPlayer.js"
+          "/publish/lib/openveo-player/js/players/VimeoPlayer.js",
+          "/publish/lib/openveo-player/js/players/FlowPlayer.js"
         ],
         "prod" : [
           "/publish/lib/openveo-player/dist/openveo-player.min.js"
@@ -144,7 +145,8 @@
     "cssFiles" : [
       "/publish/lib/openveo-player/css/font.css",
       "/publish/lib/openveo-player/css/reset.css",
-      "/publish/lib/openveo-player/css/style.css"
+      "/publish/lib/openveo-player/css/style.css",
+      "/publish/lib/openveo-player/css/flowplayer.css"
     ]
   },
   "viewsFolders" : [

@@ -28,13 +28,14 @@ module.exports = function(config){
       "app/client/front/js/**/*.js",
       "public/publish/lib/openveo-player/js/PlayerApp.js",
       "public/publish/lib/openveo-player/js/**/*.js",
+      "public/publish/lib/openveo-player/tests/*.js",
       "tests/client/unitTests/admin/*.js",
       "tests/client/unitTests/front/*.js"
     ],
     
     // Templates mock
     preprocessors: {
-      "public/publish/lib/openveo-player/templates/**/*.html": "html2js"
+      "public/publish/lib/openveo-player/templates/*.html": "html2js"
     }
     
   });
