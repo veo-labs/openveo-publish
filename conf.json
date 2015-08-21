@@ -143,10 +143,7 @@
       }
     },
     "cssFiles" : [
-      "/publish/lib/openveo-player/css/font.css",
-      "/publish/lib/openveo-player/css/reset.css",
-      "/publish/lib/openveo-player/css/style.css",
-      "/publish/lib/openveo-player/css/flowplayer.css"
+      "/publish/lib/openveo-player/dist/openveo-player.css"
     ]
   },
   "viewsFolders" : [
