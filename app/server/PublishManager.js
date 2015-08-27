@@ -678,11 +678,11 @@ function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
                 
                 if(timecodeInfo["timecode"] && timecodeInfo["timecode"].length){
                   var timecode = timecodeInfo["timecode"][0];
-                  formattedTimecodes[timecode] = { "image" : {}};
+                  formattedTimecodes[timecode] = {};
 
-                  if(timecodeInfo["id"] && timecodeInfo["id"].length){
-                    formattedTimecodes[timecode] = { "image" : timecodeInfo["id"][0]};
-                  }
+                  if(timecodeInfo["id"] && timecodeInfo["id"].length)
+                    formattedTimecodes[timecode].image = timecodeInfo["id"][0];
+
                 }
               });
 
