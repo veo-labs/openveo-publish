@@ -48,6 +48,8 @@ module.exports = function(grunt){
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-yuidoc");
+  grunt.loadNpmTasks("grunt-mocha-test");
+  grunt.loadNpmTasks("grunt-karma");
 
   // only watch core scss
   grunt.registerTask("default", ["compass:publishdev", "watch"]);
@@ -56,5 +58,5 @@ module.exports = function(grunt){
   grunt.registerTask("concatpublish", ["uglify", "concat"]);
   
   // core Prod process (CSS+JS)
-  grunt.registerTask('prod', ['compass:publishdist', "concatpublish"]);
+  grunt.registerTask("prod", ["compass:publishdist", "concatpublish"]);
 };
