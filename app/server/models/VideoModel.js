@@ -8,8 +8,8 @@
 var util = require("util");
 var path = require("path");
 var fs = require("fs");
-var async = process.requireModule("async");
-var openVeoAPI = process.requireModule("openveo-api");
+var async = require("async");
+var openVeoAPI = require("openveo-api");
 
 var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.js");
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");

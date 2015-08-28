@@ -10,7 +10,7 @@
 // Module dependencies
 var path = require("path");
 var child_process = require("child_process");
-var winston = process.requireModule("winston");
+var winston = require("winston");
 
 // Retrieve logger
 var logger = winston.loggers.get("openveo");

@@ -8,6 +8,3 @@ process.rootPublish = path.join(__dirname, "../../");
 process.requirePublish = function(filePath){
   return require(path.normalize(process.rootPublish + "/" + filePath));
 };
-process.requireModule = function(moduleName){
-  return require(moduleName);
-};
