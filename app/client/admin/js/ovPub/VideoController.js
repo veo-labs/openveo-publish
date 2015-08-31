@@ -3,11 +3,11 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$filter", "$window", "$interval", "entityService", "publishService", "properties", "categories", "jsonPath", "tableReloadEventService"];
+  VideoController.$inject = ["$scope", "$filter", "$location", "$window", "$interval", "entityService", "publishService", "properties", "categories", "jsonPath", "tableReloadEventService"];
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $filter, $window, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
+  function VideoController($scope, $filter, $location, $window, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
 
     $scope.properties = properties.data.entities;
     //Replace Id in Video by the name of the category
@@ -126,6 +126,15 @@
         },
         "global": function (selected, reload) {
           unpublishVideo(selected, reload);
+        }
+      },
+      {
+        "label": $filter('translate')('VIDEOS.CHAPTER_EDIT'),
+        "condition": function (row) {
+          return !row.saving && (row.state == 6 || row.state == 7);
+        },
+        "callback": function (row, reload) {
+          editChapter(row);
         }
       },
       {
@@ -329,5 +338,8 @@
         '</div>'
       ].join(''), 0);
     }
-  }
+    
+    var editChapter = function(video){
+      $location.path('admin/publish/be/video/'+video.id);
+    }}
 })(angular.module("ov.publish"));

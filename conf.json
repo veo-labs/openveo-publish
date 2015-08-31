@@ -92,20 +92,36 @@
         ]
       }
     ],
-    "scriptFiles" : {
+    "scriptLibFiles" : {
+      "base" : [ ],
       "dev" : [
+        "multirange/multirange.js"
+      ],
+      "prod" : [
+        "/js/libOpenveoPublish.js"
+      ]
+    },
+    "scriptFiles" : {
+      "base": [
+        "/publish/lib/openveo-player/dist/openveo-player.js"
+      ],
+      "dev": [
         "ovPub/PublishApp.js",
         "ovPub/VideoController.js",
         "ovPub/WatcherController.js",
         "ovPub/PropertiesController.js",
         "ovPub/CategoriesController.js",
+        "ovPub/ChapterController.js",
         "ovPub/PublishService.js"
       ],
       "prod" : [
         "publish/js/openveoPublish.js"
       ]
     },
-    "cssFiles" : ["publish/css/publish.css"]
+    "cssFiles" : [
+      "publish/css/publish.css",
+      "publish/lib/openveo-player/dist/openveo-player.css"
+      ]
   },
   "custom" : {
     "scriptFiles" : {

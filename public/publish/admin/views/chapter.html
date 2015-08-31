@@ -1,0 +1,86 @@
+<div class="pu-chapter">
+  <h2 ng-bind="'CHAPTER.TITLE' | translate"></h2>
+  <div class="well well-lg" ng-bind="'CHAPTER.INFO' | translate"></div>
+  <div class="row video-viewer">
+    <div class='col-sm-8'>
+
+       <ov-player 
+         ov-player-type="vimeo" 
+         ov-data="videoPlayer"></ov-player>
+
+      <!--<input type="number" ng-model="view" placeholder="View index">-->
+    </div>
+    <div class='col-sm-4'>
+      <!--<div tasty-table class="chapter-table" bind-resource="resource" bind-watch-resource="collection">-->
+      <table class="table table-striped table-condensed chapter-table">
+        <!--<thead tasty-thead bind-not-sort-by="notSortBy"></thead>-->
+        <thead>
+          <tr><th class='active'>{{ 'CHAPTER.HEAD_TIME' | translate}}</th><th class='active'>{{ 'CHAPTER.HEAD_TITLE' | translate}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in video.chapter| orderBy:'+value'" ng-click="select(row.value)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
+            <td>{{ (row.value*duration-3600)*1000 | date:'H:mm:ss'}}</td>
+            <td>{{ row.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="btn-group btn-group-justified" role="group">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" ng-click="openNew()">New</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" ng-disabled="!selectRow" ng-click="openEdit()">Edit</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" ng-disabled="!selectRow || !isCollapsed" ng-click="remove()">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="editform" collapse="isCollapsed">
+    <div class='well container-fluid'>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label for="time">Time</label>
+          <input type="type" class="form-control" id="time" ng-model="modelToEdit.value" ng-bind="modelToEdit.value*duration">
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" class="form-control" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type">
+        </div>
+      </div>
+      <div class="col-sm-5" >
+        <div class="form-group"  ng-if="!modelToEdit.type">
+          <label for="title">Title</label>
+          <textarea class="form-control" rows="5" ng-model="modelToEdit.description"></textarea>
+        </div>
+      </div>
+      <div class="col-sm-3 button">
+        <button type="submit" class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
+        <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'UI.FORM_CANCEL' | translate"></button>
+      </div>
+    </div>
+    <!--<input type="number" ng-model="view" placeholder="View index">-->
+  </div>
+ 
+   <div class="multirange-container" ng-click="select(-1);">
+     <div class="pull-left" style="margin-bottom: 5px"> 
+       <button  popover="{{!beginIsInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginIsInArray"  ng-click="toggleBegin()" btn-checkbox> 
+         <i class="glyphicon glyphicon-log-out"></i> 
+       </button>
+       <button  popover="{{!endIsInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate}}" popover-trigger="mouseenter" class="btn btn-default"ng-model="endIsInArray" ng-click="toggleEnd()" btn-checkbox> 
+         <i class="glyphicon glyphicon-log-in"></i> </button> 
+     </div>
+     <div class="pull-right" style="margin-bottom: 5px"> 
+       <span class="ng-binding">Zoom x<span ng-bind="slider.view+1"></span></span> 
+       <button class="btn btn-default" ng-disabled="slider.view == slider.views.length-1" ng-click="changeSliderView($event, 1)"> 
+         <i class="glyphicon glyphicon-zoom-in"></i> 
+       </button>
+       <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)"> 
+         <i class="glyphicon glyphicon-zoom-out"></i> </button> 
+     </div>
+     <vds-multirange class="row" ng-model="video.chapter" on-select="select" on-mouserelease="saveChapter" views="slider.views" view="slider.view"></vds-multirange>
+   </div>
+</div>

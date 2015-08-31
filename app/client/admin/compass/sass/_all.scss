@@ -1,0 +1,94 @@
+.pu-videos{
+  padding-bottom: 150px;
+}
+
+
+/* List details */
+.pu-detail { 
+  line-height: initial;
+  padding-bottom: 10px;
+  width:100%;
+  float:left;
+  border: 1px solid #ddd;
+  border-top:0 none;
+
+  ul { 
+    list-style: none;
+    padding-left: 35px;
+  }
+  li{ line-height: 22px; }
+  .btn-group{ margin-left: 35px; }
+  .label{ margin-right: 5px; }
+  input{ margin: 1px 0; }
+}
+
+.pu-categories{
+  .input-group{
+    margin-bottom: 30px;
+  }
+  .add.btn{
+    padding: 6px 12px 7px;
+    color: $brand-primary;
+    background-color: white;
+    &:hover{
+      color: white;
+      background-color: $brand-primary;
+    }
+  }
+}
+
+.pu-chapter{
+  .video-viewer.row{
+    margin-bottom:15px;
+  }
+  .chapter-table{
+    tr{
+      width: 100%;
+      display: inline-table;
+    }
+    tbody {
+      height: 358px;
+      max-height: 358px;
+      overflow-y: auto;
+      display: inline-block;
+      tr {
+        cursor:pointer;
+        transition: background-color 0.2s;
+        &.selected{
+          background-color: $brand-primary;
+          color:white;
+        }
+        &.end{
+          background-color: lighten($brand-danger, 30%);
+          &.selected{
+          background-color: $brand-danger;
+          }
+        }
+        &.begin{
+          background-color: lighten($brand-success, 30%);
+          &.selected{
+            background-color: $brand-success;
+          }
+        }
+      }
+    }
+  }
+  .multirange-container{
+    margin-top:15px;
+  }
+
+  .editform{
+    textarea{
+      max-width:100%;
+    }
+    .button{
+      line-height: 150px;
+    }
+    .well{
+      margin-bottom:0px;
+    }
+  }
+  .ov-player{
+    height:450px;
+  }
+}

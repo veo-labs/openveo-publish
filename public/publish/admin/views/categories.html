@@ -3,8 +3,8 @@
   <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
      <div class="input-group">
-      <input type="text" class="form-control" ng-model="newItem" placeholder="[['CATEGORIES.NEW_ITEM' | translate]]" aria-describedby="basic-addon1" popover="[['CATEGORIES.NAME_ELEMENT' | translate]]" popover-trigger="mouseenter">
-      <span class="input-group-btn" popover="[['CATEGORIES.ADD_ELEMENT' | translate]]" popover-trigger="mouseenter">
+      <input type="text" class="form-control" ng-model="newItem" placeholder="{{'CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" popover="{{'CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
+      <span class="input-group-btn" popover="{{'CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
         <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
       </span>
     </div>
@@ -13,7 +13,7 @@
     <script type="text/ng-template" id="items_renderer.html">
       <div ui-tree-handle>
         <a class="btn btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
-        [[item.title]]
+        {{item.title}}
         <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
       </div>
       <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">

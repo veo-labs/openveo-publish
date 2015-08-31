@@ -47,6 +47,7 @@
     "NO_VIDEO" : "Pas de vidéo pour le moment",
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
+    "CHAPTER_EDIT": "Chapitre",
     "SHARECODE" : "Pour partager la vidéo, copiez le code HTML ci-dessous dans votre page :",
     "ATTR_TITLE" : "Titre",
     "ATTR_DESCRIPTION" : "Description",
@@ -112,5 +113,17 @@
     "RESET": "Les changements ont été supprimés",
     "SAVE_SUCCESS" : "Les rubriques ont été enregistrés",
     "SAVE_FAIL" : "Une erreur est survenue. L'enregistrement des rubriques a échoué."
+  },
+  "CHAPTER" : {
+    "PAGE_TITLE" : "Publish - Chapitres",
+    "TITLE" : "Video - Chapitres",
+    "INFO" : "Organisez votre contenu en rajoutant des chapitres pour illustrer et détailler votre sujet.",
+    "HEAD_TITLE": "Titre",
+    "HEAD_TIME": "Temps",
+    "ADD_END": "Couper la fin",
+    "REMOVE_END": "Enlever la coupe de fin",
+    "ADD_BEGIN": "Couper le début",
+    "REMOVE_BEGIN": "Enlever la coupe de début",
+    "SAVE_ERROR": "Une erreur est survenu. Vos modifications n'ont pas pu etre sauvegardé."
   }
 }

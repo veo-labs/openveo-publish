@@ -11,6 +11,7 @@
   function PublishService($http, $q, entityService){
     var basePath = "/admin/";
     var properties, videos, categories;
+    var videoChapter = {};
 
     /**
      * Loads the list of videos from server.
@@ -130,8 +131,20 @@
       return categories;
     };
     
+    var getVideoChapter = function (id) {
+      if (!videoChapter[id]) {
+        return entityService.getEntity('video', id).success(function (obj) {
+          videoChapter[id] = obj;
+        });
+      }
+      return $q.when({data : videoChapter[id]});
+    }
+    
     var cacheClear = function(type){
-      if(!type) properties = videos = categories = null;
+      if(!type){
+        properties = videos = categories = null;
+        videoChapter = {};
+      }
       else switch(type){
         case "properties":
           properties = null;
@@ -141,6 +154,9 @@
           break;
         case "videos":
           videos = null;
+          break;
+        case "chapter":
+          videoChapter = {};
           break;
       }
     }
@@ -160,6 +176,8 @@
       getWatcherStatus : getWatcherStatus,
       startWatcher : startWatcher,
       stopWatcher : stopWatcher,
+      
+      getVideoChapter:getVideoChapter,
       
       cacheClear : cacheClear
     };

@@ -1,8 +1,10 @@
+
+var ovPlayerDirectory = "/publish/lib/openveo-player";
 (function(angular){
 
   "use strict"
 
-  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity"]);
+  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player"]);
 
   /**
    * Configures the ov.publish application by adding new routes.
@@ -23,6 +25,23 @@
         }],
         properties : ["publishService", function(publishService){
           return publishService.loadProperties();
+        }]
+      }
+    });
+        
+    // Add route /publish/be/videos/videosId with authentication
+    // (will be automatically mapped
+    // to /admin/publish/be/videos/videosId instead
+    // of /publish/be/videos/videosId).
+    // Also retrieve the list of properties
+    ovRouteProvider.when("/publish/be/video/:videoId", {
+      templateUrl: "publish/admin/views/chapter.html",
+      controller: "ChapterController",
+      title: "CHAPTER.PAGE_TITLE",
+      resolve: {
+        video : ["publishService", "$route", function(publishService, $route){
+          var videoId= $route.current.params.videoId;
+          return publishService.getVideoChapter(videoId);
         }]
       }
     });
@@ -50,7 +69,8 @@
     ovRouteProvider.when("/publish/be/properties", {
       templateUrl: "publish/admin/views/properties.html",
       controller: "PropertiesController",
-      title: "PROPERTIES.PAGE_TITLE"});
+      title: "PROPERTIES.PAGE_TITLE"
+    });
     
     // Add route /publish/be/categories with authentication
     // (will be automatically mapped

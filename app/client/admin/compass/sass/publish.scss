@@ -1,41 +1,8 @@
 /* List of videos and custom properties */
 $brand-primary:         #1FBBEB !default;
-
-.pu-videos{
-  padding-bottom: 150px;
-}
-
-
-/* List details */
-.pu-detail { 
-  line-height: initial;
-  padding-bottom: 10px;
-  width:100%;
-  float:left;
-  border: 1px solid #ddd;
-  border-top:0 none;
-
-  ul { 
-    list-style: none;
-    padding-left: 35px;
-  }
-  li{ line-height: 22px; }
-  .btn-group{ margin-left: 35px; }
-  .label{ margin-right: 5px; }
-  input{ margin: 1px 0; }
-}
-
-.pu-categories{
-  .input-group{
-    margin-bottom: 30px;
-  }
-  .add.btn{
-    padding: 6px 12px 7px;
-    color: $brand-primary;
-    background-color: white;
-    &:hover{
-      color: white;
-      background-color: $brand-primary;
-    }
-  }
-}
+$brand-success:         #5cb85c !default;
+$brand-info:            #5bc0de !default;
+$brand-warning:         #f0ad4e !default;
+$brand-danger:          #d9534f !default;
+@import "all";
+@import "multirange";

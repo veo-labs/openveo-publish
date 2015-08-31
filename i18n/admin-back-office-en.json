@@ -48,6 +48,7 @@
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
     "SHARECODE" : "To share the video, copy the HTML code below and paste it in your page :",
+    "CHAPTER_EDIT": "Chapter",
     "ATTR_TITLE" : "Title",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Category",
@@ -108,5 +109,17 @@
     "RESET": "All categories changes canceled.",
     "SAVE_SUCCESS" : "Category successfully saved.",
     "SAVE_FAIL" : "An error occured. Fail to save category."
+  },
+  "CHAPTER" : {
+    "PAGE_TITLE" : "Publish - Chapter",
+    "TITLE" : "Video - Chapter",
+    "INFO" : "This page allow to define Chapter to illustrate the video with description.",
+    "HEAD_TITLE": "Title",
+    "HEAD_TIME": "Time",
+    "ADD_END": "Add end cut",
+    "REMOVE_END": "Remove end cut",
+    "ADD_BEGIN": "Add begin cut",
+    "REMOVE_BEGIN": "Remove begin cut",
+    "SAVE_ERROR": "An error occured. Your changes could not be saved."
   }
 }
