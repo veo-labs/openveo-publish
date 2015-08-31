@@ -20,25 +20,25 @@ logs
 *.log
 
 # Project npm dependencies
-node_modules/*
+node_modules
 
 # Published video packages
-public/publish/videos/*
+public/publish/videos
 
 # Bower libraries
-public/publish/lib/*
+public/publish/lib
 
 # Temporary directory for video packages
 tmp
 
 #Compiled files
-.sass-cache/*
-build/*
-public/publish/js/*
-public/publish/css/*
+.sass-cache
+build
+public/publish/js
+public/publish/css
 
 #IDE
-nbproject/*
+nbproject
 
 # Documentation (yuidoc)
 doc

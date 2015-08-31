@@ -57,7 +57,7 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
  *       "type" : "vimeo",
  *       "path" : "C:/Temp/",
  *       "originalPackagePath" : "C:/Temp/video-package.tar",
- *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
+ *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar",
  *       "metadata" : {
  *         "profile": "2",
  *         "audio-input": "analog-top",
@@ -96,12 +96,12 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
   var self = this;
   
   // Retrieve video tmp directory
-  // e.g E:/openveo/node_modules/openveo-publish/tmp/
+  // e.g E:/openveo/node_modules/@openveo/publish/tmp/
   var videoTmpDir = path.dirname(videoPackage.packagePath);
   var presetId, mediaId;
   
   // Get video file path
-  // e.g E:/openveo/node_modules/openveo-publish/tmp/1422731934859/video.mp4
+  // e.g E:/openveo/node_modules/@openveo/publish/tmp/1422731934859/video.mp4
   var videoFilePath = path.join(videoTmpDir, "/" + videoPackage.id, "/" + videoPackage.metadata.filename);
 
   async.series([

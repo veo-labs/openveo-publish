@@ -9,7 +9,7 @@ var util = require("util");
 var path = require("path");
 var fs = require("fs");
 var async = require("async");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 
 var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.js");
 var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
@@ -68,7 +68,7 @@ VideoModel.ERROR_STATE = 8;
  *      "type" : "vimeo",
  *      "path" : "C:/Temp/",
  *      "originalPackagePath" : "C:/Temp/video-package.tar",
- *      "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar",
+ *      "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar",
  *      "metadata" : {
  *        "profile": "2",
  *        "audio-input": "analog-top",

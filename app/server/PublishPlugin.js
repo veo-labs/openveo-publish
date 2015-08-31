@@ -9,7 +9,7 @@
 // Module dependencies
 var util = require("util");
 var express = require("express");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 var watcherManager = process.requirePublish("app/server/watcher/watcherManager.js");
 
 /**

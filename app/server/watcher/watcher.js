@@ -10,7 +10,7 @@
  * **watcher.js** can be run as a standalone script or as a child
  * process.
  *
- *     node watcher.js --root ""/home/veo-labs/openveo" --rootPublish "/home/veo-labs/openveo/node_modules/openveo-publish" --databaseConf "/home/veo-labs/openveo/config/databaseConf.json"
+ *     node watcher.js --root ""/home/veo-labs/openveo" --rootPublish "/home/veo-labs/openveo/node_modules/@openveo/publish" --databaseConf "/home/veo-labs/openveo/config/databaseConf.json"
  *
  * @module publish-watcher
  * @class watcher.js
@@ -41,7 +41,7 @@ for(var i = 0 ; i < process.argv.length ; i++){
 
 // Validate rootPublish argument
 if(!process.rootPublish)
-  throw new Error("--rootPublish argument must be passed to the watcher.js script and point to the openveo-publish module root directory");
+  throw new Error("--rootPublish argument must be passed to the watcher.js script and point to the @openveo/publish module root directory");
 
 // Define a function to easily require files inside the module
 process.requirePublish = function(filePath){
@@ -50,7 +50,7 @@ process.requirePublish = function(filePath){
 
 var async = require("async");
 var winston = require("winston");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 
 // Module files
 var watcherConf = process.requirePublish("config/watcherConf.json");

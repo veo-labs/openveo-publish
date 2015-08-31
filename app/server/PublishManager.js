@@ -15,7 +15,7 @@ var events = require("events");
 var path = require("path");
 var xml2js = require("xml2js");
 var async = require("async");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
 var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
 var publishConf = process.requirePublish("config/publishConf.json");
@@ -28,7 +28,7 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
  * a video pacakge. 
  *
  * @example
- *     var openVeoAPI = require("openveo-api");
+ *     var openVeoAPI = require("@openveo/api");
  *     var PublishManager = process.requirePublish("app/server/PublishManager.js");
  *     var db = openVeoAPI.applicationStorage.getDatabase();
  *     var logger = openVeoAPI.logger.get("openveo");
@@ -393,7 +393,7 @@ PublishManager.prototype.publish = function(videoPackage){
  *       "type" : "vimeo", // The video platform to use
  *       "path" : "C:/Temp/", // The path of the hot folder
  *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar" // The package path inside the tmp directory
+ *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar" // The package path inside the tmp directory
  *     }
  * 
  * @method validatePackage
@@ -457,7 +457,7 @@ function validatePackage(videoPackage, callback){
  *       "type" : "vimeo", // The video platform to use
  *       "path" : "C:/Temp/", // The path of the hot folder
  *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *       "packagePath" : "E:/openveo/node_modules/openveo-publish/tmp/1422731934859.tar", // The package path inside the tmp directory
+ *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar", // The package path inside the tmp directory
  *       "metadata" : {
  *         "profile": "2",
  *         "audio-input": "analog-top",
