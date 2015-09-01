@@ -1,0 +1,22 @@
+// setting mq configuration
+
+// mq breakpoints
+$mq-breakpoints: (
+    mobile:  $screen-xs,
+    tablet:  $screen-sm,
+    desktop: $screen-md,
+    wide:    $screen-lg,
+
+    // Tweakpoints
+    desktopAd: 810px,
+    mobileLandscape: 768px
+);
+
+// default breakpoint
+$mq-static-breakpoint: desktop;
+
+// display active breakpoint in the top corner during development
+/*$mq-show-breakpoints: (mobile, mobileLandscape, tablet, desktop, wide);*/
+
+// import mq mixin
+@import 'mixins/library/mq';

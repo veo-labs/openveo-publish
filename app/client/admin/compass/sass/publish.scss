@@ -1,8 +1,21 @@
-/* List of videos and custom properties */
-$brand-primary:         #1FBBEB !default;
-$brand-success:         #5cb85c !default;
-$brand-info:            #5bc0de !default;
-$brand-warning:         #f0ad4e !default;
-$brand-danger:          #d9534f !default;
+@import "bootstrap/override";
+
+/**
+ * Initialize stylesheet with base CSS, mixins and helper, then your css, and extern css package
+ */
+@import "base/base";
+
+// add support responsive
+@import "base/on-responsive";
+@import "base/browser-support";
+
+/**
+ * Mixins / Helper / Function
+ */
+@import "mixins/responsive";
+@import "mixins/animation";
+@import "mixins/retina";
+
+//Component
 @import "all";
 @import "multirange";

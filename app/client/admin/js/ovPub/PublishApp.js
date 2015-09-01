@@ -6,6 +6,22 @@ var ovPlayerDirectory = "/publish/lib/openveo-player";
 
   var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player"]);
 
+  app.run(["$rootScope", "$window", function ($rootScope, $window) {
+      $rootScope.$on("$locationChangeStart", function (event, next, current) {
+        // url slug : shortening the url to stuff that follows after "#"
+        current = current.slice(current.lastIndexOf('/publish/be/') + 12, current.length);
+        next = next.slice(next.lastIndexOf('/publish/be/') + 12, next.length);
+        if(current == 'videos' && next.lastIndexOf("video/")>= 0){
+          $rootScope.newAnimation = "RL";
+        } else if (current.lastIndexOf("video/")>= 0 && next == 'videos'){
+          $rootScope.newAnimation = "LR";
+        } else {
+          $rootScope.newAnimation = "";
+        }
+//        console.log("$locationChangeStart");
+//        console.log($rootScope.newAnimation);
+      });
+    }]);
   /**
    * Configures the ov.publish application by adding new routes.
    */

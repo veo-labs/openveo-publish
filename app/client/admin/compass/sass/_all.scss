@@ -51,6 +51,9 @@
       max-height: 358px;
       overflow-y: auto;
       display: inline-block;
+      @include mobile(){
+        height:auto;
+      }
       tr {
         cursor:pointer;
         transition: background-color 0.2s;

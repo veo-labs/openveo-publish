@@ -4,12 +4,12 @@
 
   app.controller("ChapterController", ChapterController);
 
-  ChapterController.$inject = ["$scope", "$filter", "entityService", "publishService","vdsMultirangeViews", "vdsUtils", "video"];
+  ChapterController.$inject = ["$window", "$scope", "$filter", "entityService", "publishService","vdsMultirangeViews", "vdsUtils", "video"];
   /**
    * Defines the categories controller for the categories page.
    */
 
-  function ChapterController($scope, $filter, entityService, publishService, vdsMultirangeViews, vdsUtils, video) {
+  function ChapterController($window, $scope, $filter, entityService, publishService, vdsMultirangeViews, vdsUtils, video) {
     $scope.video = video.data.entity;
     
     //Init object for player
@@ -20,7 +20,6 @@
     var indexTimecodes = $scope.video.timecodes;
     $scope.duration = 60*60|| $scope.video.metadata.duration;
     $scope.isCollapsed = true;
-
 
     if(!$scope.video.chapter){
       $scope.video.chapter = [];
@@ -179,6 +178,9 @@
         if (status === 401)
           $scope.$parent.logout();
       });
+    }
+    $scope.back = function(){
+      $window.history.back();
     }
   }
 })(angular.module("ov.publish"));
