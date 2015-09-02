@@ -10,12 +10,13 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
         _views: '=views',
         _view: '=view',
         onSelect: '=',
-        onMouserelease : "="
+        onMouserelease : "=",
+        onEnablemouseover: "="
       },
       template:
       '<div class="vds-multirange-mk2-container">' +
-        '<vds-multirange-labels render="renderedStyle" on-select="onSelect" ng-model="ngModel"></vds-multirange-labels>' +
-        '<vds-multirange-lite ng-model="ngModel" on-select="onSelect" on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step"></vds-multirange-lite>' +
+        '<vds-multirange-labels render="renderedStyle" on-enablemouseover="onEnablemouseover"  on-select="onSelect" ng-model="ngModel"></vds-multirange-labels>' +
+        '<vds-multirange-lite ng-model="ngModel" on-select="onSelect" on-enablemouseover="onEnablemouseover" on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step"></vds-multirange-lite>' +
         '<vds-multirange-hairlines render="renderedStyle" ng-model="units"></vds-multirange-hairlines>' +
       '</div>',
       link: function (scope, elem, attr) {
@@ -86,12 +87,13 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
       scope: {
         ngModel: '=',
         render: '=',
-        onSelect : '='
+        onSelect : '=',
+        onEnablemouseover : '='
       },
       template:
       '<div class="vds-multirange-mk2-labels-container" ng-style="render.container">' +
         '<ul class="vds-multirange-mk2-labels" ng-style="render.content">' +
-          '<li class="vds-multirange-mk2-label" ng-class="{\'active\':range.select}" ng-repeat="range in ngModel" ng-style="renderRange(range)" ng-mouseover="mouseover(range, onSelect)" >' +
+          '<li class="vds-multirange-mk2-label" ng-class="{\'active\':range.select}" ng-repeat="range in ngModel" ng-style="renderRange(range)" ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
             '<span ng-if="range.name && !range.type">{{ range.name }}</span>' +
             '<span ng-if="!range.name && !range.type"><div class="glyphicon glyphicon-map-marker"></div></span>' +
             '<span ng-if="range.type && range.type==\'begin\'" ng-class="range.type"><div class="glyphicon glyphicon-log-out"></div></span>'+
@@ -106,8 +108,8 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
             zIndex: range._depth
           }
         }
-        scope.mouseover = function(range, select){
-          if(!range.select) select(range.value);
+        scope.mouseover = function(range, select, condition){
+          if(!range.select && condition) select(range.value);
         }
       }
     }
@@ -209,12 +211,13 @@ angular.module('vds.multirange.lite', [])
         ngModel: '=',
         step: '=',
         onSelect: '=',
-        onMouserelease : "=" 
+        onMouserelease : "=" ,
+        onEnablemouseover: '='
       },
       template:
       '<div class="vds-multirange-container" ng-mousemove="onMouseMove($event)">' +
         '<div class="vds-multirange-track"></div>' +
-        '<div class="vds-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ng-mouseup="mouserelease(onMouserelease)"  ng-mouseover="mouseover(range, onSelect)" >' +
+        '<div class="vds-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ng-mouseup="mouserelease(onMouserelease)"  ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
           '<vds-range class="vds-multirange" ng-class="{\'active\':range.select}" position="range.value" min="0" max="{{ precision }}" step="{{ preciseStep }}">' +
         '</div>' +
       '</div>',
@@ -229,8 +232,8 @@ angular.module('vds.multirange.lite', [])
         scope.mouserelease = function(release){
           release();
         }
-        scope.mouseover = function(range, select){
-          if(!range.select) select(range.value);
+        scope.mouseover = function(range, select, condition){
+          if(!range.select && condition) select(range.value);
         }
         scope.computeDepth = function (range) {
           range._depth = 100 - Math.round(Math.abs(mousex-range.value)*100);

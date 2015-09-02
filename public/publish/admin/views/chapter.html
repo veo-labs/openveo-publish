@@ -1,7 +1,7 @@
 <div class="pu-chapter">
   <h2>
     <div class='btn btn-default' ng-click='back()'><span class='glyphicon glyphicon-chevron-left'></span>{{'UI.BACK'| translate}}</div>
-    {{'CHAPTER.TITLE' | translate}}
+    {{'CHAPTER.TITLE' | translate}} - {{video.title}}
   </h2>
   <div class="well well-lg" ng-bind="'CHAPTER.INFO' | translate"></div>
   <div class="row video-viewer">
@@ -25,7 +25,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="row in video.chapter| orderBy:'+value'" ng-click="select(row.value)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
-            <td class="col-sm-3">{{ (row.value*duration-3600)*1000 | date:'H:mm:ss'}}</td>
+            <td class="col-sm-3">{{ (row.value*duration)*1000 | date:'H:mm:ss':'+0000'}}</td>
             <td class="col-sm-9">{{ row.name }}</td>
           </tr>
         </tbody>
@@ -47,13 +47,14 @@
 
   <div class="editform" collapse="isCollapsed">
     <div class='well container-fluid'>
+      <form name="myForm">
       <div class="col-sm-4">
         <div class="form-group">
           <label for="time">{{ 'CHAPTER.FORM_TIME' | translate}}</label>
-          <input type="type" class="form-control" id="time" ng-model="modelToEdit.value" ng-bind="modelToEdit.value*duration">
+          <input type="time" step="1" name="time" class="form-control" id="time" ng-model="editTime" ng-change="updateRange()">
         </div>
         <div class="form-group">
-          <label for="title">{{ 'CHAPTER.FORM_TITlE' | translate}}</label>
+          <label for="title">{{ 'CHAPTER.FORM_TITLE' | translate}}</label>
           <input type="text" class="form-control" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type">
         </div>
       </div>
@@ -64,14 +65,15 @@
         </div>
       </div>
       <div class="col-sm-3 button">
-        <button type="submit" class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
+        <button type="submit" ng-disabled="!myForm.time.$valid" class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
         <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'UI.FORM_CANCEL' | translate"></button>
       </div>
+      </form>
     </div>
     <!--<input type="number" ng-model="view" placeholder="View index">-->
   </div>
  
-   <div class="multirange-container" ng-click="select(-1);">
+   <div class="multirange-container" ng-click="select(-1);" ng-swipe-disable-mouse>
      <div class="pull-left" style="margin-bottom: 5px"> 
        <button  popover="{{!beginIsInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginIsInArray"  ng-click="toggleBegin()" btn-checkbox> 
          <i class="glyphicon glyphicon-log-out"></i> 
@@ -87,6 +89,6 @@
        <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)"> 
          <i class="glyphicon glyphicon-zoom-out"></i> </button> 
      </div>
-     <vds-multirange class="row" ng-model="video.chapter" on-select="select" on-mouserelease="saveChapter" views="slider.views" view="slider.view"></vds-multirange>
+     <vds-multirange class="row" ng-model="video.chapter" on-select="select" on-mouserelease="saveChapter" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></vds-multirange>
    </div>
 </div>
