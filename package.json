@@ -13,18 +13,15 @@
     "vimeo",
     "veo-labs"
   ],
-  "homepage": "https://gitlab.com/TODO",
+  "homepage": "https://gitlab.com/veo-labs/openveo-publish",
   "bugs": {
-    "url": "https://gitlab.com/TODO"
+    "url": "https://gitlab.com/veo-labs/openveo-publish/issues"
   },
-  "license": "TODO",
+  "license": "MIT",
   "author": "Veo-Labs <info@veo-labs.com> (http://www.veo-labs.com/)",
-  "files": [
-    "An array of files to automatically include in the project's package"
-  ],
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/TODO"
+    "url": "https://gitlab.com/veo-labs/openveo-publish.git"
   },
   "dependencies": {
     "chokidar": "^0.12.6",
@@ -54,7 +51,10 @@
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4"
   },
-  "engines": {
-    "node": "^0.10.0"
+  "peerDependencies": {
+    "@openveo/core": ">=0.0.2"
+  },
+  "scripts": {
+    "postinstall": "bower install"
   }
 }
