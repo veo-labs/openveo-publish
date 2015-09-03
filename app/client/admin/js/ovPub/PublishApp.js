@@ -4,7 +4,7 @@ var ovPlayerDirectory = "/publish/lib/openveo-player";
 
   "use strict"
 
-  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player"]);
+  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player", "vds.multirange",]);
 
   app.run(["$rootScope", "$window", function ($rootScope, $window) {
       $rootScope.$on("$locationChangeStart", function (event, next, current) {
@@ -18,8 +18,6 @@ var ovPlayerDirectory = "/publish/lib/openveo-player";
         } else {
           $rootScope.newAnimation = "";
         }
-//        console.log("$locationChangeStart");
-//        console.log($rootScope.newAnimation);
       });
     }]);
   /**
