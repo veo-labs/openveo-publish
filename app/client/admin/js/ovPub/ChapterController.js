@@ -37,6 +37,14 @@
     var orderBy = $filter('orderBy');
     $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
     
+    //If no cut add it
+    if(!$scope.video.cut) $scope.video.cut = [];
+    
+    var updateRange = function(){
+       $scope.ranges = $scope.video.chapter.concat($scope.video.cut);
+       orderBy( $scope.ranges, '+value', false);
+    }
+    $scope.ranges; updateRange();
     
     // Search a value, by time or value and return or delete it
     var search = function(value, type, action){
@@ -44,14 +52,16 @@
       if (value === parseFloat(value)) 
         searchObj = $filter('filter')($scope.video.chapter, {value:value}, true);
       else if(type) 
-        searchObj = $filter('filter')($scope.video.chapter, {type:type}, true);
+        searchObj = $filter('filter')($scope.video.cut, {type:type}, true);
       
       if(searchObj.length > 0){
         //return
         if(!action) return searchObj[0];
         else {
           //or Delete
-          $scope.video.chapter.splice($scope.video.chapter.indexOf(searchObj[0]),1);
+          if(value) $scope.video.chapter.splice($scope.video.chapter.indexOf(searchObj[0]),1);
+          else if(type) $scope.video.cut.splice($scope.video.cut.indexOf(searchObj[0]),1);
+          updateRange();
           return true;
         };
       }
@@ -90,7 +100,7 @@
       if (!$scope.selectRow) {
         //ADD the new model
         $scope.video.chapter.push($scope.modelToEdit);
-        $scope.video.chapter = orderBy($scope.video.chapter, '+value', false);
+        updateRange();
       } else {
         $scope.selectRow.select = false;
       }
@@ -122,12 +132,12 @@
     $scope.select= function (value) {
       if ($scope.isCollapsed) {
         $scope.selectRow = null;
-        for (var i = 0; i < $scope.video.chapter.length ; i++) {
-          if ($scope.video.chapter[i].value == value && !$scope.video.chapter[i].select && !$scope.selectRow) {
-            $scope.video.chapter[i].select = true;
-            $scope.selectRow = $scope.video.chapter[i];
+        for (var i = 0; i <  $scope.ranges.length ; i++) {
+          if ( $scope.ranges[i].value == value && ! $scope.ranges[i].select && !$scope.selectRow) {
+             $scope.ranges[i].select = true;
+            $scope.selectRow =  $scope.ranges[i];
           } else {
-            $scope.video.chapter[i].select = false;
+             $scope.ranges[i].select = false;
           }
         }
       } else {// if close by toggle, close edit form
@@ -169,8 +179,8 @@
     $scope.toggleBegin = function(){
       if(!$scope.beginIsInArray){
         // Add begin Object to range array
-        $scope.video.chapter.push($scope.beginRange);
-        $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
+        $scope.video.cut.push($scope.beginRange);
+        updateRange();
       }else{
         //search and delete
         search(null, 'begin', true);
@@ -192,8 +202,8 @@
     //Toggle End
     $scope.toggleEnd = function(){
       if(!$scope.endIsInArray){
-        $scope.video.chapter.push($scope.endRange);
-        $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
+        $scope.video.cut.push($scope.endRange);
+        updateRange();
       }else {
         //search and delete
         search(null, 'end', true);
@@ -201,17 +211,24 @@
       $scope.saveChapter();
     }
       
+    //Save chapter and cut
     $scope.saveChapter = function(){
+      //Validate if end is after begin
       if($scope.endIsInArray && $scope.beginIsInArray && $scope.endRange.value <= $scope.beginRange.value){
+        //else delete end in range
         search(null, 'end', true);
+        //and reset end
         $scope.endRange.value = 1;
         $scope.endIsInArray = false;
       }
+      
       $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
+      $scope.video.cut = orderBy($scope.video.cut, '+value',false);
       
       //CALL SAVE HTTP
       entityService.updateEntity('video', $scope.video.id, {
-        chapter: $scope.video.chapter
+        chapter: $scope.video.chapter,
+        cut: $scope.video.cut
       }).success(function (data, status, headers, config) {
 
       }).error(function (data, status, headers, config) {
