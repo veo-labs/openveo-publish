@@ -13,7 +13,7 @@ describe("VideoModel", function(){
   var videoModel, FakeSuccessDatabase, VideoModel;
   
   // Initializes tests
-  before(function(){
+  beforeEach(function(){
     VideoModel = process.requirePublish("app/server/models/VideoModel.js");
     ut.generateSuccessDatabase();
     videoModel = new VideoModel();
@@ -71,17 +71,11 @@ describe("VideoModel", function(){
   // getOne method
   describe("getOne", function(){
     
-    before(function(){
-      process.rootPublish = path.join(__dirname);
-    });
-    
-    after(function(){
-      process.rootPublish = path.join(__dirname, "../../");
-    });    
-    
     it("Should be able to get a video and the list of timecodes", function(){
       
+      process.rootPublish = path.join(__dirname);
       videoModel.getOne("1", function(error, video){
+        process.rootPublish = path.join(__dirname, "../../");
         assert.isUndefined(error);
       });
       
@@ -92,19 +86,14 @@ describe("VideoModel", function(){
   // remove method
   describe("remove", function(){
 
-    before(function(){
-      process.rootPublish = path.join(__dirname);
-    });
-
-    after(function(){
-      process.rootPublish = path.join(__dirname, "../../");
-    });
-
     it("Should be able to remove a video from database and its public directory", function(done){
       
+      process.rootPublish = __dirname;
       videoModel.remove("5", function(error){
         assert.isUndefined(error);
         var videosDirectoryPath = path.normalize(process.rootPublish + "/public/publish/videos/5");
+
+        process.rootPublish = path.join(__dirname, "../../");
 
         fs.exists(videosDirectoryPath, function(exists){
           assert.notOk(exists);
