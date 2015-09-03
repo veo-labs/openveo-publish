@@ -16,29 +16,29 @@ Desktop.ini
 ehthumbs.db
 
 # Logs
-logs
 *.log
+/logs
 
 # Project npm dependencies
-node_modules
+/node_modules
 
 # Published video packages
-public/publish/videos
+/public/publish/videos
 
 # Bower libraries
-public/publish/lib
+/public/publish/lib
 
 # Temporary directory for video packages
-tmp
+/tmp
 
 #Compiled files
 .sass-cache
-build
-public/publish/js
-public/publish/css
+/build
+/public/publish/js
+/public/publish/css
 
 #IDE
 nbproject
 
 # Documentation (yuidoc)
-doc
+/doc
