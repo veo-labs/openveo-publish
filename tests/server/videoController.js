@@ -2,7 +2,7 @@
 
 // Module dependencies
 var assert = require("chai").assert;
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 var applicationStorage = openVeoAPI.applicationStorage;
 
 // videoController.js

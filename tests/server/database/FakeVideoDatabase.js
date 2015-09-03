@@ -1,7 +1,7 @@
 "use strict"
 
 var util = require("util");
-var openVeoAPI = require("openveo-api");
+var openVeoAPI = require("@openveo/api");
 var Database = openVeoAPI.Database;
 
 function FakeVideoDatabase(){}
