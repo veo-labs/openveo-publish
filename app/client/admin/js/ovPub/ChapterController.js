@@ -13,7 +13,7 @@
 
     //Init
     $scope.video = video.data.entity;
-    $scope.duration = 60*60|| $scope.video.metadata.duration;
+    $scope.duration = $scope.video.metadata.duration;
     $scope.isCollapsed = true;
     $scope.selectRow = null;
     //Copy of object to edit or add
