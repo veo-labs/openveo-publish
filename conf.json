@@ -67,6 +67,7 @@
   "backOffice": {
     "menu" : [
       {
+        "weight" : -100,
         "label" : "MENU.PUBLISH",
         "subMenu" : [
           {
@@ -75,9 +76,9 @@
             "permission" : "access-video-page"
           },
           {
-            "label" : "MENU.WATCHER",
-            "path" : "/admin/publish/be/watcher",
-            "permission" : "access-watcher-page"
+            "label" : "MENU.CATEGORIES",
+            "path" : "/admin/publish/be/categories",
+            "permission" : "access-category-page"
           },
           {
             "label" : "MENU.PROPERTIES",
@@ -85,9 +86,9 @@
             "permission" : "access-property-page"
           },
           {
-            "label" : "MENU.CATEGORIES",
-            "path" : "/admin/publish/be/categories",
-            "permission" : "access-category-page"
+            "label" : "MENU.WATCHER",
+            "path" : "/admin/publish/be/watcher",
+            "permission" : "access-watcher-page"
           }
         ]
       }
