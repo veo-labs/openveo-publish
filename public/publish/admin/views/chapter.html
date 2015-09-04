@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="col-sm-3 button">
-        <button type="submit" ng-disabled="!myForm.time.$valid" class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
+        <button type="submit" ng-disabled="!myForm.time.$valid || !editTime " class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
         <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'UI.FORM_CANCEL' | translate"></button>
       </div>
       </form>

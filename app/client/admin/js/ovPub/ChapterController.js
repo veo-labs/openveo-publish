@@ -255,7 +255,7 @@
       } else changebyRange = true;
     }
     $scope.updateRange = function(){
-      if($scope.myForm.time.$valid){
+      if($scope.myForm.time.$valid && $scope.editTime){
         var d = new Date($scope.editTime.getTime());
         var local = d.getTime() - (d.getTimezoneOffset() * 60000);
         changebyRange = false;
