@@ -560,6 +560,7 @@ VideoModel.prototype.update = function(id, data, callback){
   if(data.description) info["description"] = data.description;
   if(data.properties) info["properties"] = data.properties;
   if(data.category) info["category"] = data.category;
+  else info["category"] = "";
   if(data.cut) info["cut"] = data.cut;
   if(data.chapter) info["chapter"] = data.chapter;
   

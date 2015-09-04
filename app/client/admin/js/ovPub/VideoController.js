@@ -50,7 +50,7 @@
          ...
          ];
          */
-        'options': getSelectableCategories(),
+        'options': getSelectableCategories('UI.ALL'),
         //if enable filter will filter with the selectId AND additionnal id set in the "children" key of each options
         'filterWithChildren': true
       }
@@ -179,8 +179,7 @@
         type: 'horizontalExtendSelect',
         templateOptions: {
           label: $filter('translate')('VIDEOS.ATTR_CATEGORY'),
-          required: true,
-          options: categoryOptions()
+          options: getSelectableCategories('UI.NONE')
         }
       }
     ];
@@ -199,9 +198,9 @@
       });
     };
 
-    function getSelectableCategories() {
+    function getSelectableCategories(label) {
       var catArray = categoryOptions();
-      return [{'value': '', 'name': $filter('translate')('UI.ALL')}].concat(catArray);
+      return [{'value': '', 'name': $filter('translate')(label)}].concat(catArray);
     }
 
     function categoryOptions() {
