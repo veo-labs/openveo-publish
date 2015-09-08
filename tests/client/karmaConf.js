@@ -21,6 +21,7 @@ module.exports = function(config){
       "tests/client/unitTests/admin/route/RouteApp.js",
       "tests/client/unitTests/admin/i18n/I18nApp.js",
       "tests/client/unitTests/admin/entity/EntityApp.js",
+      "app/client/admin/js/multirange/multirange.js",
       "app/client/admin/js/ovPub/PublishApp.js",
       "app/client/admin/js/ovPub/**/*.js",
       "app/client/front/js/PublishPlayerApp.js",

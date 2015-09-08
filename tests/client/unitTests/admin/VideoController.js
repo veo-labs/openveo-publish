@@ -153,7 +153,7 @@ describe("VideoController", function () {
       $httpBackend.when("DELETE", "/admin/crud/video/1").respond(200);
       $httpBackend.expectDELETE("/admin/crud/video/1");
 
-      scope.tableContainer.actions[4].callback(scope.test.rows[0], done);
+      scope.tableContainer.actions[5].callback(scope.test.rows[0], done);
 
       $httpBackend.flush();
     });
@@ -165,7 +165,7 @@ describe("VideoController", function () {
       $httpBackend.when("DELETE", "/admin/crud/video/1,2").respond(200);
       $httpBackend.expectDELETE("/admin/crud/video/1,2");
 
-      scope.tableContainer.actions[4].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
+      scope.tableContainer.actions[5].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
       $httpBackend.flush();
     });
@@ -181,7 +181,7 @@ describe("VideoController", function () {
         done();
       };
 
-      scope.tableContainer.actions[4].callback(scope.test.rows[0], function () {
+      scope.tableContainer.actions[5].callback(scope.test.rows[0], function () {
         assert.notOk("everything");
       });
       $httpBackend.flush();
