@@ -1,5 +1,5 @@
 
-var ovPlayerDirectory = "/publish/lib/openveo-player";
+var ovPlayerDirectory = "/publish/lib/openveo-player/";
 (function(angular){
 
   "use strict"
