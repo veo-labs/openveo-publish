@@ -243,6 +243,7 @@
     // its status
     var pollVideosPromise = $interval(function () {
       if (!scopeEditForm.pendingEdition) {
+        $scope.$emit("setAlert", 'info', $filter('translate')('VIDEOS.RELOAD'), 4000);
         entityService.deleteCache(scopeDataTable.entityType);
         tableReloadEventService.broadcast();
       }

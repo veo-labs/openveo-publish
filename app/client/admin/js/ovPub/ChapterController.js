@@ -11,9 +11,21 @@
 
   function ChapterController($window, $scope, $filter, entityService, publishService, vdsMultirangeViews, vdsUtils, video) {
 
+    var myPlayer = document.getElementById("chapterPlayer");
+    var playerController;
+    angular.element(myPlayer).on("durationChange", function (event, duration) {
+      
+      playerController = angular.element(myPlayer).controller("ovPlayer");
+      //set Duration
+      $scope.duration = duration / 1000 || $scope.video.metadata.duration;
+      init();
+     
+    });
+    
     //Init
     $scope.video = video.data.entity;
-    $scope.duration = $scope.video.metadata.duration;
+    console.log($scope.video);
+    
     $scope.isCollapsed = true;
     $scope.selectRow = null;
     //Copy of object to edit or add
@@ -24,27 +36,60 @@
     //Init object for player
     $scope.videoPlayer = angular.copy($scope.video);
     delete $scope.videoPlayer.chapter;
+    
+    var init = function(){
+       //If no chapter, add timecodes with empty values and sort them
+      if (!$scope.video.chapter) {
+        $scope.video.chapter = [];
+        var indexTimecodes = $scope.video.timecodes;
+        angular.forEach(indexTimecodes, function (value, key) {
+          if (key != 0)
+            $scope.video.chapter.push({'value': parseInt(key) / ($scope.duration * 1000), 'name': "", 'description': ""});
+        });
+      }
+     
+      $scope.video.chapter = orderBy($scope.video.chapter, '+value', false);
 
-    //If no chapter, add timecodes with empty values and sort them
-    if(!$scope.video.chapter){
-      $scope.video.chapter = [];
-      var indexTimecodes = $scope.video.timecodes;
-      angular.forEach(indexTimecodes, function(value, key) {
-        if(key!=0)
-        $scope.video.chapter.push({'value':parseInt(key)/($scope.duration * 1000), 'name':"", 'description':""});
-      });
+      //If no cut add it
+      if (!$scope.video.cut)
+        $scope.video.cut = [];
+      
+      $scope.ranges;
+      updateRange();
+
+      //Init begin
+      var begin;
+      //At start, if begin exist, init with it, else init to 0
+      if (begin = search(null, 'begin')) {
+        $scope.beginRange = begin;
+        $scope.beginIsInArray = true;
+      } else {
+        $scope.beginRange = {'value': 0, 'name': $filter('translate')('UI.BEGIN'), 'description': "", 'type': 'begin'};
+        $scope.beginIsInArray = false;
+      }
+
+      //Init end
+      var end;
+      //At start, if end exist, init with it, else init to 1
+      if (end = search(null, 'end')) {
+        $scope.endRange = end;
+        $scope.endIsInArray = true;
+      } else {
+        $scope.endRange = {'value': 1, 'name': $filter('translate')('UI.END'), 'description': "", 'type': 'end'};
+        $scope.endIsInArray = false;
+      }
+      
+      $scope.slider = {
+        views: vdsMultirangeViews.TIME($scope.duration),
+        view: 0
+      };
     }
+    
     var orderBy = $filter('orderBy');
-    $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
-    
-    //If no cut add it
-    if(!$scope.video.cut) $scope.video.cut = [];
-    
-    var updateRange = function(){
-       $scope.ranges = $scope.video.chapter.concat($scope.video.cut);
-       orderBy( $scope.ranges, '+value', false);
+    var updateRange = function () {
+      $scope.ranges = $scope.video.chapter.concat($scope.video.cut);
+      orderBy($scope.ranges, '+value', false);
     }
-    $scope.ranges; updateRange();
     
     // Search a value, by time or value and return or delete it
     var search = function(value, type, action){
@@ -150,31 +195,26 @@
      * Slider
      */
 
-    $scope.slider = {
-        views: vdsMultirangeViews.TIME($scope.duration),
-        view: 0
-    };
+    
 
     $scope.changeSliderView = function(event, direction) {
         var indexView = $scope.slider.view + direction;
         0 > indexView ? indexView = 0 : indexView >= $scope.slider.views.length && (indexView = $scope.slider.views.length - 1),
         $scope.slider.view = indexView;
-    }
+    };
+    
+    $scope.releaseRange = function(){
+      playerController.setTime(parseInt($scope.selectRow.value* $scope.duration)* 1000);
+      $scope.saveChapter();
+    };
+    
+ 
     
     /**
      * CUT
      */
     
-    //Init begin
-    var begin;
-    //At start, if begin exist, init with it, else init to 0
-    if(begin = search(null, 'begin')){
-      $scope.beginRange = begin;
-      $scope.beginIsInArray = true;
-    } else {
-      $scope.beginRange = {'value':0, 'name':$filter('translate')('UI.BEGIN'), 'description':"", 'type':'begin'};
-      $scope.beginIsInArray = false; 
-    }
+ 
     //Toggle Begin
     $scope.toggleBegin = function(){
       if(!$scope.beginIsInArray){
@@ -189,16 +229,7 @@
       $scope.saveChapter();
     }
     
-    //Init end
-    var end;
-    //At start, if end exist, init with it, else init to 1
-    if(end = search(null, 'end')){
-      $scope.endRange = end;
-      $scope.endIsInArray = true;
-    } else {
-      $scope.endRange = {'value':1, 'name':$filter('translate')('UI.END'), 'description':"", 'type':'end'};
-      $scope.endIsInArray = false; 
-    }
+    
     //Toggle End
     $scope.toggleEnd = function(){
       if(!$scope.endIsInArray){

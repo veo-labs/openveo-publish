@@ -70,7 +70,8 @@
     "TITLE_FILTER": "Nom de la vidéo",
     "DESCRIPTION_FILTER": "Description",
     "DATE_FILTER": "Date",
-    "CATEGORY_FILTER" : "Rubrique"
+    "CATEGORY_FILTER" : "Rubrique",
+    "RELOAD": "Toutes les vidéos ont été rechargées avec succés.<br><br>Rechargement automatique dans 30s."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",

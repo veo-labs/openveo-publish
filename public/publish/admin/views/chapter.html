@@ -10,7 +10,9 @@
 
        <ov-player 
          ov-player-type="vimeo" 
-         ov-data="videoPlayer"></ov-player>
+         ov-data="videoPlayer"
+         id="chapterPlayer"
+         ></ov-player>
 
       <!--<input type="number" ng-model="view" placeholder="View index">-->
     </div>
@@ -89,6 +91,6 @@
        <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)"> 
          <i class="glyphicon glyphicon-zoom-out"></i> </button> 
      </div>
-     <vds-multirange class="row" ng-model="ranges" on-select="select" on-mouserelease="saveChapter" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></vds-multirange>
+     <vds-multirange class="row" ng-model="ranges" on-select="select" on-mouserelease="releaseRange" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></vds-multirange>
    </div>
 </div>

@@ -66,7 +66,8 @@
     "TITLE_FILTER": "Video's name",
     "DESCRIPTION_FILTER": "Description",
     "DATE_FILTER": "Date",
-    "CATEGORY_FILTER" : "Category"
+    "CATEGORY_FILTER" : "Category",
+    "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",
