@@ -667,7 +667,7 @@ function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
         else{
           xml2js.parseString(data, {mergeAttrs : true}, function(error, timecodes){
 
-            var formattedTimecodes = {};
+            var formattedTimecodes = [];
             
             // Transform timecode format to
             if(timecodes && timecodes.player && timecodes.player.synchro){
@@ -677,11 +677,13 @@ function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
               timecodes.player.synchro.forEach(function(timecodeInfo){
                 
                 if(timecodeInfo["timecode"] && timecodeInfo["timecode"].length){
-                  var timecode = timecodeInfo["timecode"][0];
-                  formattedTimecodes[timecode] = {};
 
-                  if(timecodeInfo["id"] && timecodeInfo["id"].length)
-                    formattedTimecodes[timecode].image = timecodeInfo["id"][0];
+                  if(timecodeInfo["id"] && timecodeInfo["id"].length){
+                    formattedTimecodes.push({
+                      timecode: parseInt(timecodeInfo["timecode"][0]),
+                      image: timecodeInfo["id"][0]
+                    });
+                  }
 
                 }
               });

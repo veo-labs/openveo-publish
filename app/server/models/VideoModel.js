@@ -490,16 +490,19 @@ VideoModel.prototype.getOne = function(id, callback){
       callback(error);
     }
     else{
+      videoInfo.timecodes = [];
       
       // Got timecodes for this video
       if(timecodes){
         
-        for(var time in timecodes){
-          videoInfo.timecodes[parseInt(time)] = {};
-          videoInfo.timecodes[parseInt(time)]['image'] = {
-            "small" : '/'+videoInfo.id + "/" + timecodes[time]["image"]+"?thumb=small",
-            "large" : '/'+videoInfo.id + "/" + timecodes[time]["image"],
-          };
+        for(var i = 0 ; i < timecodes.length ; i++){
+          videoInfo.timecodes.push({
+            timecode: timecodes[i].timecode,
+            image: {
+              small: "/" + videoInfo.id + "/" + timecodes[i].image + "?thumb=small",
+              large: "/" + videoInfo.id + "/" + timecodes[i].image
+            }
+          });
         }
       }
       callback(null, videoInfo);
