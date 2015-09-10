@@ -12,6 +12,14 @@
     var pollPromise;
     updateWatcherStatus(watcherStatus.data.status);
     
+       /**
+     * 
+     * RIGHTS
+     * 
+     */
+    $scope.rights = {};
+    $scope.rights.edit = $scope.checkAccess('manage-watcher');
+    
     /**
      * Starts the watcher.
      */

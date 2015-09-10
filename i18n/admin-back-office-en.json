@@ -13,16 +13,12 @@
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Create properties",
     "CREATE_PROPERTY_DESCRIPTION" : "Créer custom properties",
-    "READ_PROPERTY_NAME" : "See properties",
-    "READ_PROPERTY_DESCRIPTION" : "List custom properties",
     "UPDATE_PROPERTY_NAME" : "Edit properties",
     "UPDATE_PROPERTY_DESCRIPTION" : "Edit custom properties",
     "DELETE_PROPERTY_NAME" : "Remove properties",
     "DELETE_PROPERTY_DESCRIPTION" : "Remove custom properties",
     "CREATE_VIDEO_NAME" : "Create videos",
     "CREATE_VIDEO_DESCRIPTION" : "Create videos",
-    "READ_VIDEO_NAME" : "See videos",
-    "READ_VIDEO_DESCRIPTION" : "List videos",
     "UPDATE_VIDEO_NAME" : "Edit videos",
     "UPDATE_VIDEO_DESCRIPTION" : "Edit videos",
     "DELETE_VIDEO_NAME" : "Remove videos",
@@ -34,7 +30,9 @@
     "ACCESS_VIDEO_PAGE_NAME" : "Access videos page",
     "ACCESS_WATCHER_PAGE_NAME" : "Access watcher page",
     "ACCESS_PROPERTY_PAGE_NAME" : "Access properties page",
-    "ACCESS_CATEGORY_PAGE_NAME" : "Access categories page"
+    "ACCESS_CATEGORIES_PAGE_NAME" : "Access categories page",
+    "EDIT_CHAPTER_NAME": "Edit chapters",
+    "EDIT_CHAPTER_DESCRIPTION": "Edit custom chapters"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Videos",

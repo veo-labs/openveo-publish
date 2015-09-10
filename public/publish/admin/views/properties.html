@@ -2,6 +2,7 @@
   <h2 ng-bind="'PROPERTIES.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PROPERTIES.INFO' | translate"></div>
   <hr/>
+  <div ng-if="rights.add">
    <div class="container">
      <div class="add-form col-xs-12 col-md-6">
        <div class="add-element" ng-init="isCollapsed = true;" ng-click="isCollapsed = !isCollapsed">
@@ -13,6 +14,7 @@
      </div>
    </div>
   <hr/>
+  </div>
   <ng-include src="'/views/elements/dataTable.html'"></ng-include>
 
  

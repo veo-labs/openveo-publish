@@ -2,7 +2,7 @@
   <h2 ng-bind="'CATEGORIES.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
-     <div class="input-group">
+    <div class="input-group" ng-if="rights.add || rights.edit">
       <input type="text" class="form-control" ng-model="newItem" placeholder="{{'CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" popover="{{'CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
       <span class="input-group-btn" popover="{{'CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
         <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
@@ -14,7 +14,7 @@
       <div ui-tree-handle>
         <a class="btn btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
         {{item.title}}
-        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
+        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-if="rights.delete" ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
       </div>
       <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
         <li ng-repeat="item in item.items" ui-tree-node ng-include="'items_renderer.html'">
@@ -27,7 +27,7 @@
       </ol>
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6" ng-if="rights.add || rights.edit || rights.delete">
     <button class="btn btn-primary" type="button" ng-click="saveCategory()"  ng-disabled="saveIsDisabled" ng-bind="'UI.FORM_SAVE' | translate"></button>
     <button class="btn btn-default" type="button" ng-click="resetCategory()"  ng-disabled="saveIsDisabled" ng-bind="'UI.FORM_CANCEL' | translate"></button>
   </div>

@@ -20,8 +20,7 @@
     
     $scope.options = {
     };
-
-
+    
     $scope.newSubItem = function(scope) {
       $scope.list.push({
         id: Date.now()+'',
@@ -45,7 +44,6 @@
       else 
         entityService.updateEntity("taxonomy", categories.data.taxonomy.id, {tree:$scope.list}).success(successCb).error(errorCb);
     };
-
     
     function successCb(data, status, headers, config) {
         $scope.saveIsDisabled = $scope.list.length==0;
@@ -58,6 +56,17 @@
         if(status === 401)
           $scope.$parent.logout();
     }
+    
+    /**
+     * 
+     * Rights
+     * 
+     */
+    $scope.rights = {};
+    $scope.rights.add = $scope.checkAccess('create-taxonomy');
+    $scope.rights.edit = $scope.checkAccess('update-taxonomy');
+    $scope.rights.delete = $scope.checkAccess('delete-taxonomy');
+    
   }
 
 })(angular.module("ov.publish"));

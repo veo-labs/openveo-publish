@@ -24,7 +24,6 @@
     
     //Init
     $scope.video = video.data.entity;
-    console.log($scope.video);
     
     $scope.isCollapsed = true;
     $scope.selectRow = null;

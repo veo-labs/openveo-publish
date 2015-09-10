@@ -34,7 +34,9 @@
     "ACCESS_VIDEO_PAGE_NAME" : "Accés à la page des vidéos",
     "ACCESS_WATCHER_PAGE_NAME" : "Accés à la page du watcher",
     "ACCESS_PROPERTY_PAGE_NAME" : "Accés à la page des propriétés",
-    "ACCESS_CATEGORY_PAGE_NAME" : "Accés à la page des catégories"
+    "ACCESS_CATEGORIES_PAGE_NAME" : "Accés à la page des catégories",
+    "EDIT_CHAPTER_NAME": "Editer les chapitres",
+    "EDIT_CHAPTER_DESCRIPTION": "Editer les chapitres personnalisées"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",

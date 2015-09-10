@@ -29,27 +29,41 @@
   ],
   "permissions" : [
     {
-      "id" : "access-video-page",
-      "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME"
+      "id" : "access-videos-page",
+      "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME",
+      "description" : "PERMISSIONS.ACCESS_VIDEO_PAGE_DESCRIPTION",
+      "paths" : [
+        "get /admin/publish/be/videos",
+        "get /admin/crud/property",
+        "get /admin/gettaxonomy/categories"
+      ]
+    },
+    {
+      "id" : "access-properties-page",
+      "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME",
+      "description" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_DESCRIPTION",
+      "paths" : [
+        "get /admin/publish/be/properties"
+      ]
+    },
+    {
+      "id" : "access-categories-page",
+      "name" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME",
+      "description" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_DESCRIPTION",
+      "paths" : [
+        "get /admin/publish/be/categories",
+        "get /admin/gettaxonomy/categories"
+      ]
     },
     {
       "id" : "access-watcher-page",
       "name" : "PERMISSIONS.ACCESS_WATCHER_PAGE_NAME"
     },
     {
-      "id" : "access-property-page",
-      "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME"
-    },
-    {
-      "id" : "access-category-page",
-      "name" : "PERMISSIONS.ACCESS_CATEGORY_PAGE_NAME"
-    },
-    {
       "id" : "manage-watcher",
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
       "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
       "paths" : [
-        "get /watcherStatus",
         "get /stopWatcher",
         "get /startWatcher"
       ]
@@ -62,7 +76,13 @@
         "get /publishVideo",
         "get /unpublishVideo"
       ]
+    },
+    {
+      "id" : "chapter-video",
+      "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
+      "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
     }
+    
   ],
   "backOffice": {
     "menu" : [
@@ -73,17 +93,17 @@
           {
             "label" : "MENU.VIDEOS",
             "path" : "/admin/publish/be/videos",
-            "permission" : "access-video-page"
+            "permission" : "access-videos-page"
           },
           {
             "label" : "MENU.CATEGORIES",
             "path" : "/admin/publish/be/categories",
-            "permission" : "access-category-page"
+            "permission" : "access-categories-page"
           },
           {
             "label" : "MENU.PROPERTIES",
             "path" : "/admin/publish/be/properties",
-            "permission" : "access-property-page"
+            "permission" : "access-properties-page"
           },
           {
             "label" : "MENU.WATCHER",

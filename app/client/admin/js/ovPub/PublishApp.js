@@ -33,6 +33,7 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
       templateUrl: "publish/admin/views/videos.html",
       controller: "VideoController",
       title: "VIDEOS.PAGE_TITLE",
+      access: "access-videos-page",
       resolve: {
         categories : ["publishService", function(publishService){
           return publishService.loadCategories();
@@ -52,6 +53,7 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
       templateUrl: "publish/admin/views/chapter.html",
       controller: "ChapterController",
       title: "CHAPTER.PAGE_TITLE",
+      access: "chapter-video",
       resolve: {
         video : ["publishService", "$route", function(publishService, $route){
           var videoId= $route.current.params.videoId;
@@ -68,6 +70,7 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
       templateUrl: "publish/admin/views/watcher.html",
       controller: "WatcherController",
       title: "WATCHER.PAGE_TITLE",
+      access: "access-watcher-page",
       resolve: {
         watcherStatus : ["publishService", function(publishService){
           return publishService.getWatcherStatus();
@@ -83,7 +86,8 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
     ovRouteProvider.when("/publish/be/properties", {
       templateUrl: "publish/admin/views/properties.html",
       controller: "PropertiesController",
-      title: "PROPERTIES.PAGE_TITLE"
+      title: "PROPERTIES.PAGE_TITLE",
+      access: "access-properties-page"
     });
     
     // Add route /publish/be/categories with authentication
@@ -95,6 +99,7 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
       templateUrl: "publish/admin/views/categories.html",
       controller: "CategoriesController",
       title: "CATEGORIES.PAGE_TITLE",
+      access: "access-categories-page",
       resolve: {
         categories : ["publishService", function(publishService){
           return publishService.loadCategories();

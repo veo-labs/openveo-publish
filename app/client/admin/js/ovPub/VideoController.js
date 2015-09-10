@@ -13,6 +13,19 @@
     //Replace Id in Video by the name of the category
     //Category Id can be overwritten, it is only for display purpose
     $scope.categories = categories.data.taxonomy;
+    
+    
+    /**
+     * 
+     * RIGHTS
+     * 
+     */
+    $scope.rights = {};
+    $scope.rights.edit = $scope.checkAccess('update-video');
+    $scope.rights.delete = $scope.checkAccess('delete-video');
+    $scope.rights.publish = $scope.checkAccess('publish-video');
+    $scope.rights.chapter = $scope.checkAccess('chapter-video');
+    
     /**
      * 
      * DATATABLE
@@ -106,7 +119,7 @@
       {
         "label": $filter('translate')('VIDEOS.PUBLISH'),
         "condition": function (row) {
-          return row.state == 6 && !row.saving;
+          return $scope.rights.publish && row.state == 6 && !row.saving;
         },
         "callback": function (row, reload) {
           publishVideo([row.id], reload);
@@ -119,7 +132,7 @@
       {
         "label": $filter('translate')('VIDEOS.UNPUBLISH'),
         "condition": function (row) {
-          return row.state == 7 && !row.saving;
+          return $scope.rights.publish && row.state == 7 && !row.saving;
         },
         "callback": function (row, reload) {
           unpublishVideo([row.id], reload);
@@ -131,7 +144,7 @@
       {
         "label": $filter('translate')('VIDEOS.CHAPTER_EDIT'),
         "condition": function (row) {
-          return !row.saving && (row.state == 6 || row.state == 7);
+          return $scope.rights.chapter && !row.saving && (row.state == 6 || row.state == 7);
         },
         "callback": function (row, reload) {
           editChapter(row);
@@ -140,7 +153,7 @@
       {
         "label": $filter('translate')('UI.REMOVE'),
         "condition": function (row) {
-          return !row.saving && (row.state === 6 || row.state === 7 || row.state === 8);
+          return $scope.rights.delete && !row.locked && !row.saving && (row.state === 6 || row.state === 7 || row.state === 8);
         },
         "warningPopup": true,
         "callback": function (row, reload) {
@@ -233,7 +246,9 @@
         return id;
     };
 
-
+    scopeEditForm.conditionEditDetail = function (row) {
+      return $scope.rights.edit && !row.locked ;
+    }
     scopeEditForm.onSubmit = function (model, successCb, errorCb) {
       saveVideo(model, successCb, errorCb);
     };
