@@ -339,6 +339,17 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
   }); 
 };
 
+
+VideoModel.prototype.getOnePublished = function(id, callback){
+  this.getOne(id, function(error, video){
+    if(error)
+      callback(error)
+    else 
+      if(video && video.state === VideoModel.PUBLISHED_STATE)
+        callback(null, video)
+      else callback(new Error())
+  });
+}
 /**
  * Gets a video.
  *
@@ -425,7 +436,7 @@ VideoModel.prototype.getOne = function(id, callback){
           callback(error);
           return;
         }
-        else if(video && video.state === VideoModel.PUBLISHED_STATE){
+        else {
 
           // Retreive video timecode file
           videoInfo = video;

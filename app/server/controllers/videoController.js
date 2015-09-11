@@ -84,7 +84,7 @@ module.exports.displayVideoAction = function(request, response, next){
  */
 module.exports.getVideoAction = function(request, response, next){
   if(request.params.id){
-    videoModel.getOne(request.params.id, function(error, video){
+    videoModel.getOnePublished(request.params.id, function(error, video){
       if(error)
         next(errors.GET_VIDEO_ERROR);
       else
