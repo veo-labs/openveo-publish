@@ -34,20 +34,21 @@
     
     //Init object for player
     $scope.videoPlayer = angular.copy($scope.video);
-    delete $scope.videoPlayer.chapter;
+    delete $scope.videoPlayer.chapters;
+    delete $scope.videoPlayer.cut;
     
     var init = function(){
        //If no chapter, add timecodes with empty values and sort them
-      if (!$scope.video.chapter) {
-        $scope.video.chapter = [];
+      if (!$scope.video.chapters) {
+        $scope.video.chapters = [];
         var indexTimecodes = $scope.video.timecodes;
         angular.forEach(indexTimecodes, function (value, key) {
           if (key != 0)
-            $scope.video.chapter.push({'value': parseInt(key) / ($scope.duration * 1000), 'name': "", 'description': ""});
+            $scope.video.chapters.push({'value': parseInt(key) / ($scope.duration * 1000), 'name': "", 'description': ""});
         });
       }
      
-      $scope.video.chapter = orderBy($scope.video.chapter, '+value', false);
+      $scope.video.chapters = orderBy($scope.video.chapters, '+value', false);
 
       //If no cut add it
       if (!$scope.video.cut)
@@ -86,7 +87,7 @@
     
     var orderBy = $filter('orderBy');
     var updateRange = function () {
-      $scope.ranges = $scope.video.chapter.concat($scope.video.cut);
+      $scope.ranges = $scope.video.chapters.concat($scope.video.cut);
       orderBy($scope.ranges, '+value', false);
     }
     
@@ -94,7 +95,7 @@
     var search = function(value, type, action){
       var searchObj = []
       if (value === parseFloat(value)) 
-        searchObj = $filter('filter')($scope.video.chapter, {value:value}, true);
+        searchObj = $filter('filter')($scope.video.chapters, {value:value}, true);
       else if(type) 
         searchObj = $filter('filter')($scope.video.cut, {type:type}, true);
       
@@ -103,7 +104,7 @@
         if(!action) return searchObj[0];
         else {
           //or Delete
-          if(value) $scope.video.chapter.splice($scope.video.chapter.indexOf(searchObj[0]),1);
+          if(value) $scope.video.chapters.splice($scope.video.chapters.indexOf(searchObj[0]),1);
           else if(type) $scope.video.cut.splice($scope.video.cut.indexOf(searchObj[0]),1);
           updateRange();
           return true;
@@ -143,7 +144,7 @@
       
       if (!$scope.selectRow) {
         //ADD the new model
-        $scope.video.chapter.push($scope.modelToEdit);
+        $scope.video.chapters.push($scope.modelToEdit);
         updateRange();
       } else {
         $scope.selectRow.select = false;
@@ -252,12 +253,12 @@
         $scope.endIsInArray = false;
       }
       
-      $scope.video.chapter = orderBy($scope.video.chapter, '+value',false);
+      $scope.video.chapters = orderBy($scope.video.chapters, '+value',false);
       $scope.video.cut = orderBy($scope.video.cut, '+value',false);
       
       //CALL SAVE HTTP
       entityService.updateEntity('video', $scope.video.id, {
-        chapter: $scope.video.chapter,
+        chapters: $scope.video.chapters,
         cut: $scope.video.cut
       }).success(function (data, status, headers, config) {
 
