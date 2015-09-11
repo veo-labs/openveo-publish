@@ -24,6 +24,7 @@ describe("VideoController", function () {
   // Initializes tests
   beforeEach(function () {
     scope = $rootScope.$new();
+    scope.checkAccess = function(){return true};
     scope.test = {};
     scope.test.rows = [
       {id: 1, status: 1, properties: []},

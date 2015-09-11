@@ -19,7 +19,7 @@ describe("WatcherController", function(){
   // Initializes tests
   beforeEach(function(){
     scope = $rootScope.$new();
-
+    scope.checkAccess = function(){return true};
     $controller("WatcherController", {
       $scope: scope,
       watcherStatus : { data : { status : 0 }}

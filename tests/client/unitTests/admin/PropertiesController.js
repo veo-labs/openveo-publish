@@ -22,6 +22,7 @@ describe("PropertiesController", function(){
   // Initializes tests
   beforeEach(function(){
     scope = $rootScope.$new();
+    scope.checkAccess = function(){return true};
     scope.test = {};
     scope.test.rows = [
             { id : 1, name : "name", description : "description", type : "type" },
