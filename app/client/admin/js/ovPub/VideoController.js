@@ -245,9 +245,13 @@
       else
         return id;
     };
+    
+    scopeEditForm.conditionToggleDetail = function(row){
+       return row.state !== 8;
+    }
 
     scopeEditForm.conditionEditDetail = function (row) {
-      return $scope.rights.edit && !row.locked ;
+      return $scope.rights.edit && !row.locked && row.state !== 8;
     }
     scopeEditForm.onSubmit = function (model, successCb, errorCb) {
       saveVideo(model, successCb, errorCb);
