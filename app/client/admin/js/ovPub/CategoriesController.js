@@ -11,7 +11,9 @@
   
   function CategoriesController($scope, $filter, entityService, categories){
     
-    $scope.newItem = "";
+    $scope.newitem = {
+      items: []
+    };
     $scope.list = categories.data.taxonomy.tree;
     if($scope.list.length>0)
       $scope.listback = angular.copy($scope.list);
@@ -21,16 +23,15 @@
     $scope.options = {
     };
     
-    $scope.newSubItem = function(scope) {
-      $scope.list.push({
-        id: Date.now()+'',
-        title: $scope.newItem,
+    $scope.newSubItem = function() {
+      $scope.newitem.id = Date.now()+'';
+      $scope.list.push(angular.copy($scope.newitem));
+      $scope.newitem = {
         items: []
-      });
-      $scope.newItem = ""; 
+      };
       $scope.saveIsDisabled = $scope.list.length==0;
     };
-    $scope.resetCategory = function(scope){
+    $scope.resetCategory = function(){
        $scope.list = angular.copy($scope.listback);
        $scope.$emit("setAlert", 'info', $filter('translate')('CATEGORIES.RESET'),4000);
     };
