@@ -11,10 +11,19 @@
     
     <!-- Nested list template -->
     <script type="text/ng-template" id="items_renderer.html">
-      <div ui-tree-handle>
-        <a class="btn btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
-        {{item.title}}
+      <div ui-tree-handle ng-if="!rights.edit" data-nodrag>
+        <a class="btn btn-xs" data-nodrag ng-click="toggle(this)" ng-if="item.items.length!=0">
+          <span class="glyphicon"  ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span>
+        </a>
         <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-if="rights.delete" ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
+        <span data-nodrag ng-if="!rights.edit" ng-bind='item.title'></span>
+      </div>
+      <div ui-tree-handle ng-if="rights.edit">
+        <a class="btn btn-xs" data-nodrag ng-click="toggle(this)" ng-if="item.items.length!=0"  >
+          <span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span>
+        </a>
+        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-if="rights.delete" ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
+        <input ng-if="rights.edit" type="text" class="form-control" ng-model='item.title'>
       </div>
       <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
         <li ng-repeat="item in item.items" ui-tree-node ng-include="'items_renderer.html'">
