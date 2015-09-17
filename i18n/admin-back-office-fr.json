@@ -128,6 +128,7 @@
     "FORM_DESCRIPTION" : "Description",
     "ADD_END": "Couper la fin",
     "REMOVE_END": "Enlever la coupe de fin",
+    "DELETE_END_CUT": "La coupure de fin ne peut pas etre avant la coupure de début. La coupure de fin est supprimée.",
     "ADD_BEGIN": "Couper le début",
     "REMOVE_BEGIN": "Enlever la coupe de début",
     "SAVE_ERROR": "Une erreur est survenu. Vos modifications n'ont pas pu etre sauvegardé."

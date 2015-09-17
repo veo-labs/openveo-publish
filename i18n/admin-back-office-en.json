@@ -120,6 +120,7 @@
     "FORM_DESCRIPTION" : "Description",
     "ADD_END": "Add end cut",
     "REMOVE_END": "Remove end cut",
+    "DELETE_END_CUT": "End cut can't be before start cut. End cut is deleted before saving.",
     "ADD_BEGIN": "Add begin cut",
     "REMOVE_BEGIN": "Remove begin cut",
     "SAVE_ERROR": "An error occured. Your changes could not be saved."

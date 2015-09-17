@@ -251,6 +251,7 @@
         //and reset end
         $scope.endRange.value = 1;
         $scope.endIsInArray = false;
+        $scope.$emit("setAlert", 'warning', $filter('translate')('CHAPTER.DELETE_END_CUT'), 8000);
       }
       
       $scope.video.chapters = orderBy($scope.video.chapters, '+value',false);

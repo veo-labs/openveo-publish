@@ -40,7 +40,7 @@
           <button type="button" class="btn btn-default" ng-disabled="!selectRow" ng-click="openEdit()">{{ 'UI.FORM_EDIT' | translate}}</button>
         </div>
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" ng-disabled="!selectRow || !isCollapsed" ng-click="remove()">{{ 'UI.REMOVE' | translate}}</button>
+          <button type="button" class="btn btn-default" ng-disabled="!selectRow || !isCollapsed || (selectRow && selectRow.type)" ng-click="remove()">{{ 'UI.REMOVE' | translate}}</button>
         </div>
       </div>
     </div>
