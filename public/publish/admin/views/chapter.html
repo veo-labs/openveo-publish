@@ -56,8 +56,8 @@
           <input type="time" step="1" name="time" class="form-control" id="time" ng-model="editTime" ng-change="updateRange()" min="00:00:00" max="{{ duration*1000 | date:'HH:mm:ss':'+0000'}}">
         </div>
         <div class="form-group">
-          <label for="title">{{ 'CHAPTER.FORM_TITLE' | translate}}</label>
-          <input type="text" class="form-control" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type">
+          <label for="title">{{ 'CHAPTER.FORM_TITLE' | translate}}*</label>
+          <input type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
         </div>
       </div>
       <div class="col-sm-5" >
@@ -67,7 +67,7 @@
         </div>
       </div>
       <div class="col-sm-3 button">
-        <button type="submit" ng-disabled="!myForm.time.$valid || !editTime " class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
+        <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime " class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'UI.FORM_SAVE':'UI.FORM_ADD' | translate"></button>
         <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'UI.FORM_CANCEL' | translate"></button>
       </div>
       </form>

@@ -258,9 +258,22 @@
       $scope.video.cut = orderBy($scope.video.cut, '+value',false);
       
       //CALL SAVE HTTP
+      var chapter = [];
+      for(var i = 0; i<$scope.video.chapters.length; i++) {
+        chapter[i] = angular.copy($scope.video.chapters[i])
+        delete chapter[i]['_depth'];
+        delete chapter[i]['select'];
+      }
+      var cut = [];
+      for(var i = 0; i<$scope.video.cut.length; i++) {
+        cut[i] = angular.copy($scope.video.cut[i])
+        delete cut[i]['_depth'];
+        delete cut[i]['select'];
+      }
+      
       entityService.updateEntity('video', $scope.video.id, {
-        chapters: $scope.video.chapters,
-        cut: $scope.video.cut
+        chapters: chapter,
+        cut: cut
       }).success(function (data, status, headers, config) {
 
       }).error(function (data, status, headers, config) {
