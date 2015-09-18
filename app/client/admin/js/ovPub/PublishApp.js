@@ -1,11 +1,65 @@
 
 var ovPlayerDirectory = "/publish/lib/openveo-player/";
-(function(angular){
+(function(angular) {
 
   "use strict"
 
-  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player", "vds.multirange",]);
+  var app = angular.module("ov.publish", ["ov.route", "ov.i18n", "ov.entity", "ov.player", "vds.multirange", ]);
+  app.filter('status', StatusFilter);
+  app.filter('category', CategoryFilter);
+// Filter to display content in the table (cf. dataTable.html)
+  StatusFilter.$inject = ['$filter'];
+  CategoryFilter.$inject = ['jsonPath'];
 
+  /**
+   * Defines a filter to print status in cells.
+   *
+   * This filter has one optional Number parameter which must be specified
+   * if the input is equal to 8 (error status), to precise the error code.
+   */
+  function StatusFilter($filter) {
+    return function (input, errorCode) {
+      var label = $filter("translate")("VIDEOS.STATE_" + input);
+      var type = "label-danger";
+
+      // Video is published
+      if (input == 7)
+        type = "label-success";
+
+      // Video is sent
+      else if (input == 6)
+        type = "label-warning";
+
+      // All other video states
+      else if (input !== 8)
+        type = "label-info";
+
+      // Video is on error
+      if (input === 8)
+        label = label + "(" + errorCode + ")";
+
+      return "<span class='label " + type + "'>" + label + "</span>";
+    };
+  }
+  
+
+  /**
+   * 
+   * Filter to print Category in cells
+   * 
+   */
+  function CategoryFilter(jsonPath) {
+    return function (input, rubrics) {
+      //get title of elements in rubrics where id is "input"
+      var name = jsonPath(rubrics, '$..*[?(@.id=="' + input + '")].title');
+      if (name && name.length > 0)
+        return name[0];
+      else
+        return "";
+    };
+  }
+  
+  
   app.run(["$rootScope", "$window", function ($rootScope, $window) {
       $rootScope.$on("$locationChangeStart", function (event, next, current) {
         // url slug : shortening the url to stuff that follows after "#"

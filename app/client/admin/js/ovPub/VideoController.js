@@ -32,6 +32,7 @@
      */
     var scopeDataTable = $scope.tableContainer = {};
     scopeDataTable.entityType = "video";
+    scopeDataTable.cellTheme = "publish/admin/views/partial/publishCells.html";
     scopeDataTable.conditionTogleDetail = function (row) {
       return (row.state === 6 || row.state === 7);
     }

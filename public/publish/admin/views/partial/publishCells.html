@@ -1,0 +1,2 @@
+<span ng-if="entities.type && entities.type == 'category'">{{dataTable.getDescendantProp(row, entities.key) | category:categories }}</span>
+<span ng-if="entities.type && entities.type == 'status'" ng-bind-html="dataTable.getDescendantProp(row, entities.key) | status:row.errorCode "></span>
