@@ -32,29 +32,20 @@ function VideoModel(){
 module.exports = VideoModel;
 util.inherits(VideoModel, openVeoAPI.EntityModel);
 
-// Error codes
-VideoModel.COPY_ERROR = 0;
-VideoModel.UNLINK_ERROR = 1;
-VideoModel.PACKAGE_NOT_DEFINED_ERROR = 2;
-VideoModel.EXTRACT_ERROR = 3;
-VideoModel.VALIDATION_ERROR = 4;
-VideoModel.CREATE_VIDEO_PUBLIC_DIR_ERROR = 5;
-VideoModel.SAVE_VIDEO_DATA_ERROR = 6;
-VideoModel.SAVE_TIMECODE_ERROR = 7;
-VideoModel.UPLOAD_ERROR = 8;
-VideoModel.SCAN_FOR_IMAGES_ERROR = 9;
-VideoModel.CREATE_VIDEOS_PUBLIC_DIR_ERROR = 10;
-
 // States codes
-VideoModel.PENDING_STATE = 0;
-VideoModel.COPYING_STATE = 1;
-VideoModel.EXTRACTING_STATE = 2;
-VideoModel.VALIDATING_STATE = 3;
-VideoModel.PREPARING_STATE = 4;
-VideoModel.SENDING_STATE = 5;
-VideoModel.SENT_STATE = 6;
-VideoModel.PUBLISHED_STATE = 7;
-VideoModel.ERROR_STATE = 8;
+VideoModel.ERROR_STATE = 0;
+VideoModel.PENDING_STATE = 1;
+VideoModel.COPYING_STATE = 2;
+VideoModel.EXTRACTING_STATE = 3;
+VideoModel.VALIDATING_STATE = 4;
+VideoModel.PREPARING_STATE = 5;
+VideoModel.WAITING_FOR_UPLOAD_STATE = 6;
+VideoModel.UPLOADING_STATE = 7;
+VideoModel.CONFIGURING_STATE = 8;
+VideoModel.SAVING_TIMECODES_STATE = 9;
+VideoModel.COPYING_IMAGES_STATE = 10;
+VideoModel.READY_STATE = 11;
+VideoModel.PUBLISHED_STATE = 12;
 
 /**
  * Adds a new video.
@@ -62,7 +53,10 @@ VideoModel.ERROR_STATE = 8;
  * @example
  *     {
  *      "id" : 1422731934859,
- *      "status" : 1,
+ *      "state" : 1,
+ *      "packageType" : "tar",
+ *      "lastState" : "packageCopied",
+ *      "lastTransition" : "initPackage",
  *      "properties" : [],
  *      "published" : false,
  *      "type" : "vimeo",
@@ -70,27 +64,8 @@ VideoModel.ERROR_STATE = 8;
  *      "originalPackagePath" : "C:/Temp/video-package.tar",
  *      "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar",
  *      "metadata" : {
- *        "profile": "2",
- *        "audio-input": "analog-top",
- *        "date": "13/01/1970 20:36:15",
- *        "format": "mix-pip",
+ *        "date": 1425916390,
  *        "rich-media": true,
- *        "profile-settings": {
- *          "video-bitrate": 1000000,
- *          "id": "2",
- *          "video-height": 720,
- *          "audio-bitrate": 128000,
- *          "name": "Haute définition"
- *        },
- *        "id": "1970-01-13_20-36-15",
- *        "format-settings": {
- *          "source": "mix-raw",
- *          "id": "mix-pip",
- *          "name": "Mélangé caméra incrustée",
- *          "template": "pip"
- *        },
- *        "date-epoch": 1107375,
- *        "storage-directory": "/data/1970-01-13_20-36-15",
  *        "filename": "video.mp4",
  *        "duration": 20
  *      }
@@ -105,13 +80,18 @@ VideoModel.ERROR_STATE = 8;
 VideoModel.prototype.add = function(videoPackage, callback){
   var data = {
     id : videoPackage.id + "",
-    status : videoPackage.status,
+    state : videoPackage.state,
+    date : videoPackage.date,
     metadata : videoPackage.metadata,
     type : videoPackage.type,
     errorCode : videoPackage.errorCode,
     published : videoPackage.published,
     category : videoPackage.category,
-    properties : videoPackage.properties
+    properties : videoPackage.properties,
+    packageType : videoPackage.packageType,
+    lastState : videoPackage.lastState,
+    lastTransition : videoPackage.lastTransition,
+    originalPackagePath : videoPackage.originalPackagePath
   };
   
   this.provider.add(data, function(error){
@@ -132,6 +112,34 @@ VideoModel.prototype.add = function(videoPackage, callback){
  */
 VideoModel.prototype.updateState = function(id, state, callback){
   updateVideoProperty.call(this, id, "state", state, callback);
+};
+
+/**
+ * Updates last video state.
+ *
+ * @method updateLastState
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} state The last state of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateLastState = function(id, state, callback){
+  updateVideoProperty.call(this, id, "lastState", state, callback);
+};
+
+/**
+ * Updates last video transition.
+ *
+ * @method updateLastTransition
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} state The last transition of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateLastTransition = function(id, state, callback){
+  updateVideoProperty.call(this, id, "lastTransition", state, callback);
 };
 
 /**
@@ -191,6 +199,20 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback){
 };
 
 /**
+ * Updates video date timestamp.
+ *
+ * @method updateDate
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {Number} date The date of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateDate = function(id, date, callback){
+  updateVideoProperty.call(this, id, "date", date, callback);
+};
+
+/**
  * Updates video category for video platform.
  *
  * @method updateCategory
@@ -204,6 +226,19 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback){
   updateVideoProperty.call(this, id, "category", categoryId, callback);
 };
 
+/**
+ * Updates video platform type.
+ *
+ * @method updateType
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} type The type of the video platform
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateType = function(id, type, callback){
+  updateVideoProperty.call(this, id, "type", type, callback);
+};
 
 /**
  * Gets the list of videos.
@@ -452,10 +487,10 @@ VideoModel.prototype.getOne = function(id, callback){
 
     // Retrieve video information from video platform
     function(callback){
-      if(videoInfo){
+      if(videoInfo && videoInfo.type){
 
         // Video information already retrieved
-        if(videoInfo.files)
+        if(videoInfo.files && videoInfo.files.length)
           return callback();
 
         var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
@@ -545,9 +580,22 @@ VideoModel.prototype.remove = function(id, callback){
 
     // Remove video's public directory
     function(callback){
-      openVeoAPI.fileSystem.rmdir(path.normalize(process.rootPublish + "/public/publish/videos/" + id), function(error){
-        callback(error);
+      var videoPublicDirectory = path.normalize(process.rootPublish + "/public/publish/videos/" + id);
+
+      // Test if video public directory exist
+      fs.exists(videoPublicDirectory, function(exists){
+        if(exists){
+
+          // Remove directory
+          openVeoAPI.fileSystem.rmdir(videoPublicDirectory, function(error){
+            callback(error);
+          });
+
+        }
+        else
+          return callback();
       });
+
     }
 
   ], function(error, result){
@@ -584,8 +632,8 @@ VideoModel.prototype.update = function(id, data, callback){
 /**
  * Publishes a video.
  *
- * Change the state of the video to published only if its state if 
- * actually sent.
+ * Change the state of the video to "published" only if its state is
+ * actually "ready".
  *
  * @method publishVideo
  * @async
@@ -594,14 +642,14 @@ VideoModel.prototype.update = function(id, data, callback){
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.publishVideo = function(id, callback){
-  this.provider.updateVideoState(id, VideoModel.SENT_STATE, VideoModel.PUBLISHED_STATE, callback);
+  this.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
 };
 
 /**
  * Unpublishes a video.
  *
- * Change the state of the video to sent only if its state if
- * actually published.
+ * Change the state of the video to "ready" only if its state if
+ * actually "published".
  *
  * @method unpublishVideo
  * @async
@@ -610,7 +658,7 @@ VideoModel.prototype.publishVideo = function(id, callback){
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.unpublishVideo = function(id, callback){
-  this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.SENT_STATE, callback);
+  this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
 };
 
 /**

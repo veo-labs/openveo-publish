@@ -14,6 +14,7 @@
 var winston = require("winston");
 var openVeoAPI = require("@openveo/api");
 var errors = process.requirePublish("app/server/httpErrors.js");
+var platforms = process.requirePublish("config/videoPlatformConf.json");
 
 var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
 var videoModel = new VideoModel();
@@ -66,6 +67,21 @@ module.exports.displayVideoAction = function(request, response, next){
 };
 
 /**
+ * Gets all media platforms available.
+ *
+ * @example
+ *     {
+ *       "platforms" : ["vimeo", "youtube"]
+ *     }
+ *
+ * @method getPlatformsAction
+ * @static
+ */
+module.exports.getPlatformsAction = function(request, response, next){
+  response.send({ platforms: Object.keys(platforms) || [] });
+};
+
+/**
  * Gets information about a video.
  *
  * Expects one GET parameter :
@@ -107,7 +123,7 @@ module.exports.getVideoAction = function(request, response, next){
  *
  * @example
  *     {
- *       state : 7
+ *       state : 12
  *     }
  *
  * @method publishVideoAction
@@ -139,7 +155,7 @@ module.exports.publishVideoAction = function(request, response, next){
  *
  * @example
  *     {
- *       state : 6
+ *       state : 11
  *     }
  *
  * @method unpublishVideoAction
@@ -152,7 +168,7 @@ module.exports.unpublishVideoAction = function(request, response, next){
       if(error)
         next(errors.UNPUBLISH_VIDEO_ERROR);
       else
-        response.send({state : VideoModel.SENT_STATE});
+        response.send({state : VideoModel.READY_STATE});
     });
   }
 

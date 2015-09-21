@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "chokidar": "^0.12.6",
+    "javascript-state-machine": "^2.3.5",
     "vimeo": "^1.1.4",
     "xml2js": "^0.4.4"
   },

@@ -3,16 +3,17 @@
   "use strict"
 
   app.controller("VideoController", VideoController);
-  VideoController.$inject = ["$scope", "$filter", "$location", "$window", "$interval", "entityService", "publishService", "properties", "categories", "jsonPath", "tableReloadEventService"];
+  VideoController.$inject = ["$scope", "$filter", "$location", "$window", "$interval", "$timeout", "entityService", "publishService", "properties", "categories", "platforms", "jsonPath", "tableReloadEventService"];
   /**
    * Defines the video controller for the videos page.
    */
-  function VideoController($scope, $filter, $location, $window, $interval, entityService, publishService, properties, categories, jsonPath, tableReloadEventService) {
+  function VideoController($scope, $filter, $location, $window, $interval, $timeout, entityService, publishService, properties, categories, platforms, jsonPath, tableReloadEventService) {
 
     $scope.properties = properties.data.entities;
     //Replace Id in Video by the name of the category
     //Category Id can be overwritten, it is only for display purpose
     $scope.categories = categories.data.taxonomy;
+    $scope.platforms = platforms.data.platforms;
     
     
     /**
@@ -34,7 +35,8 @@
     scopeDataTable.entityType = "video";
     scopeDataTable.cellTheme = "publish/admin/views/partial/publishCells.html";
     scopeDataTable.conditionTogleDetail = function (row) {
-      return (row.state === 6 || row.state === 7);
+      console.log(row.state);
+      return (row.state === 11 || row.state === 12);
     }
     scopeDataTable.filterBy = [
       {
@@ -102,7 +104,7 @@
       {
         "label": $filter('translate')('UI.VIEW'),
         "condition": function (row) {
-          return row.state == 7;
+          return row.state == 12;
         },
         "callback": function (row, reload) {
           goToPath(row);
@@ -111,7 +113,7 @@
       {
         "label": $filter('translate')('UI.SHARE'),
         "condition": function (row) {
-          return row.state == 7;
+          return row.state == 12;
         },
         "callback": function (row, reload) {
           shareCode(row);
@@ -120,7 +122,7 @@
       {
         "label": $filter('translate')('VIDEOS.PUBLISH'),
         "condition": function (row) {
-          return $scope.rights.publish && row.state == 6 && !row.saving;
+          return $scope.rights.publish && row.state == 11 && !row.saving;
         },
         "callback": function (row, reload) {
           publishVideo([row.id], reload);
@@ -128,12 +130,11 @@
         "global": function (selected, reload) {
           publishVideo(selected, reload);
         }
-
       },
       {
         "label": $filter('translate')('VIDEOS.UNPUBLISH'),
         "condition": function (row) {
-          return $scope.rights.publish && row.state == 7 && !row.saving;
+          return $scope.rights.publish && row.state == 12 && !row.saving;
         },
         "callback": function (row, reload) {
           unpublishVideo([row.id], reload);
@@ -145,16 +146,25 @@
       {
         "label": $filter('translate')('VIDEOS.CHAPTER_EDIT'),
         "condition": function (row) {
-          return $scope.rights.chapter && !row.saving && (row.state == 6 || row.state == 7);
+          return $scope.rights.chapter && !row.saving && (row.state == 11 || row.state == 12);
         },
         "callback": function (row, reload) {
           editChapter(row);
         }
       },
       {
+        "label": $filter('translate')('VIDEOS.RETRY'),
+        "condition": function (row) {
+          return row.state == 0 && !row.saving;
+        },
+        "callback": function (row, reload) {
+          retryVideo([row.id], reload);
+        }
+      },
+      {
         "label": $filter('translate')('UI.REMOVE'),
         "condition": function (row) {
-          return $scope.rights.delete && !row.locked && !row.saving && (row.state === 6 || row.state === 7 || row.state === 8);
+          return $scope.rights.delete && !row.locked && !row.saving && (row.state === 6 || row.state === 11 || row.state === 12 || row.state === 0);
         },
         "warningPopup": true,
         "callback": function (row, reload) {
@@ -165,6 +175,22 @@
         }
       }
     ];
+
+    // Add upload actions
+    for(var i = 0 ; i < $scope.platforms.length ; i++){
+      var platformName = $scope.platforms[i];
+      scopeDataTable.actions.push({
+        "label": $filter('translate')('VIDEOS.UPLOAD_' + platformName.toUpperCase()),
+        "condition": function (row) {
+          return row.state == 6 && !row.saving;
+        },
+        "callback": function (row, reload) {
+          startVideoUpload([row.id], this.platform, reload);
+        },
+        "platform": platformName
+      });
+    }
+
     /**
      * FORM
      */
@@ -248,11 +274,11 @@
     };
     
     scopeEditForm.conditionToggleDetail = function(row){
-       return row.state !== 8;
+       return row.state !== 0;
     }
 
     scopeEditForm.conditionEditDetail = function (row) {
-      return $scope.rights.edit && !row.locked && row.state !== 8;
+      return $scope.rights.edit && !row.locked && row.state !== 0;
     }
     scopeEditForm.onSubmit = function (model, successCb, errorCb) {
       saveVideo(model, successCb, errorCb);
@@ -276,6 +302,44 @@
     var goToPath = function (row) {
       $window.open(row.link, '_blank');
     };
+
+    /**
+     * Retries a video which is on error.
+     * @param Array videos The list of videos to work on
+     * @param Function reload Function to reload the datatable
+     */
+    var retryVideo = function (videos, reload) {
+      publishService.retryVideo(videos.join(','))
+        .success(function (data, status, headers, config) {
+          $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.RETRY_SUCCESS'), 4000);
+          reload();
+        })
+        .error(function (data, status, headers, config) {
+          $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.RETRY_FAIL'), 4000);
+          if (status === 401)
+            $scope.$parent.logout();
+        });
+    };
+
+    /**
+     * Asks server to start uploading the video to the chosen platform.
+     * @param Array videos The list of videos to work on
+     * @param String platformName The name of platform to upload to
+     * @param Function reload Function to reload the datatable
+     */
+    var startVideoUpload = function (videos, platformName, reload) {
+      publishService.startVideoUpload(videos.join(','), platformName)
+        .success(function (data, status, headers, config) {
+          $scope.$emit("setAlert", 'success', $filter('translate')('VIDEOS.UPLOAD_START_SUCCESS'), 4000);
+          reload();
+        })
+        .error(function (data, status, headers, config) {
+          $scope.$emit("setAlert", 'danger', $filter('translate')('VIDEOS.UPLOAD_START_FAIL'), 4000);
+          if (status === 401)
+            $scope.$parent.logout();
+        });
+    };
+
     /**
      * Publishes a video.
      * @param Object video The video to publish

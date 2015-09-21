@@ -41,6 +41,11 @@ describe("VideoController", function () {
         data: {
           entities: []
         }
+      },
+      platforms: {
+        data: {
+          platforms: ["vimeo", "youtube"]
+        }
       }
 
     });
@@ -52,6 +57,41 @@ describe("VideoController", function () {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
+  // startVideoUpload method
+  describe("startVideoUpload", function () {
+
+    it("Should be able to start uploading a video if not saving", function (done) {
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
+      $httpBackend.when("GET", "/admin/publish/startUpload/1/vimeo").respond(200);
+      $httpBackend.expectGET("/admin/publish/startUpload/1/vimeo");
+
+      scope.tableContainer.actions[7].callback(scope.test.rows[0], done);
+
+      $httpBackend.flush();
+    });
+
+    it("Should logout user if a 401 is returned by the server", function (done) {
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
+      $httpBackend.when("GET", "/admin/publish/startUpload/1/vimeo").respond(401);
+      $httpBackend.expectGET("/admin/publish/startUpload/1/vimeo");
+
+      $rootScope.logout = function () {
+        done();
+      };
+
+      scope.tableContainer.actions[7].callback(scope.test.rows[0], function () {
+        assert.ok(false);
+      });
+
+      $httpBackend.flush();
+    });
+
+  });
+
   // publishVideo method
   describe("publishVideo", function () {
 
@@ -59,7 +99,7 @@ describe("VideoController", function () {
       $httpBackend.when("POST", /.*/).respond(200, "");
       $httpBackend.when("DELETE", /.*/).respond(200, "");
       $httpBackend.when("PUT", /.*/).respond(200, "");
-      $httpBackend.when("GET", "/admin/publish/publishVideo/1").respond(200, {state: 7});
+      $httpBackend.when("GET", "/admin/publish/publishVideo/1").respond(200, {state: 12});
       $httpBackend.expectGET("/admin/publish/publishVideo/1");
 
       scope.tableContainer.actions[2].callback(scope.test.rows[0], done);
@@ -105,7 +145,7 @@ describe("VideoController", function () {
       $httpBackend.when("POST", /.*/).respond(200, "");
       $httpBackend.when("DELETE", /.*/).respond(200, "");
       $httpBackend.when("PUT", /.*/).respond(200, "");
-      $httpBackend.when("GET", "/admin/publish/unpublishVideo/1").respond(200, {state: 7});
+      $httpBackend.when("GET", "/admin/publish/unpublishVideo/1").respond(200, {state: 12});
       $httpBackend.expectGET("/admin/publish/unpublishVideo/1");
 
       scope.tableContainer.actions[3].callback(scope.test.rows[0], done);
@@ -144,6 +184,40 @@ describe("VideoController", function () {
 
   });
 
+  // retryVideo method
+  describe("retryVideo", function () {
+
+    it("Should be able to retry a video if not saving", function (done) {
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
+      $httpBackend.when("GET", "/admin/publish/retryVideo/1").respond(200);
+      $httpBackend.expectGET("/admin/publish/retryVideo/1");
+
+      scope.tableContainer.actions[5].callback(scope.test.rows[0], done);
+
+      $httpBackend.flush();
+    });
+
+    it("Should logout user if a 401 is returned by the server", function (done) {
+      $httpBackend.when("POST", /.*/).respond(200, "");
+      $httpBackend.when("DELETE", /.*/).respond(200, "");
+      $httpBackend.when("PUT", /.*/).respond(200, "");
+      $httpBackend.when("GET", "/admin/publish/retryVideo/1").respond(401);
+      $httpBackend.expectGET("/admin/publish/retryVideo/1");
+
+      $rootScope.logout = function () {
+        done();
+      };
+
+      scope.tableContainer.actions[5].callback(scope.test.rows[0], function () {
+        assert.ok(false);
+      });
+      $httpBackend.flush();
+    });
+
+  });
+
 // removeVideo method
   describe("removeVideo", function () {
 
@@ -154,7 +228,7 @@ describe("VideoController", function () {
       $httpBackend.when("DELETE", "/admin/crud/video/1").respond(200);
       $httpBackend.expectDELETE("/admin/crud/video/1");
 
-      scope.tableContainer.actions[5].callback(scope.test.rows[0], done);
+      scope.tableContainer.actions[6].callback(scope.test.rows[0], done);
 
       $httpBackend.flush();
     });
@@ -166,7 +240,7 @@ describe("VideoController", function () {
       $httpBackend.when("DELETE", "/admin/crud/video/1,2").respond(200);
       $httpBackend.expectDELETE("/admin/crud/video/1,2");
 
-      scope.tableContainer.actions[5].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
+      scope.tableContainer.actions[6].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
       $httpBackend.flush();
     });
@@ -182,7 +256,7 @@ describe("VideoController", function () {
         done();
       };
 
-      scope.tableContainer.actions[5].callback(scope.test.rows[0], function () {
+      scope.tableContainer.actions[6].callback(scope.test.rows[0], function () {
         assert.notOk("everything");
       });
       $httpBackend.flush();

@@ -23,19 +23,19 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
       var type = "label-danger";
 
       // Video is published
-      if (input == 7)
+      if(input == 12)
         type = "label-success";
 
       // Video is sent
-      else if (input == 6)
+      else if(input == 11)
         type = "label-warning";
 
       // All other video states
-      else if (input !== 8)
+      else if (input !== 0)
         type = "label-info";
 
       // Video is on error
-      if (input === 8)
+      if(input === 0)
         label = label + "(" + errorCode + ")";
 
       return "<span class='label " + type + "'>" + label + "</span>";
@@ -94,6 +94,9 @@ var ovPlayerDirectory = "/publish/lib/openveo-player/";
         }],
         properties : ["publishService", function(publishService){
           return publishService.loadProperties();
+        }],
+        platforms : ["publishService", function(publishService){
+          return publishService.loadPlatforms();
         }]
       }
     });

@@ -1,31 +1,9 @@
 "use strict"
 
 /**
- * Defines the PublishManager which handles all the process in video
- * package publication. Video package is copied, extracted, interpreted
- * and video is sent to the video provider.
- *
- * @module publish-manager
- */
-
-// Module dependencies
-var util = require("util");
-var fs = require("fs");
-var events = require("events");
-var path = require("path");
-var xml2js = require("xml2js");
-var async = require("async");
-var openVeoAPI = require("@openveo/api");
-var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
-var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
-var publishConf = process.requirePublish("config/publishConf.json");
-
-var maxConcurrentPublish = publishConf.maxConcurrentPublish || 3;
-var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
-
-/**
- * Creates a PublishManager to retrieve, validate and publish
- * a video pacakge. 
+ * Defines the PublishManager which handles all the process in
+ * package publication. Package is copied, extracted, interpreted
+ * and video is sent to the specified video provider.
  *
  * @example
  *     var openVeoAPI = require("@openveo/api");
@@ -33,15 +11,7 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
  *     var db = openVeoAPI.applicationStorage.getDatabase();
  *     var logger = openVeoAPI.logger.get("openveo");
  *
- *     var videoPlatformConf = {
- *       "vimeo" : {
- *         "clientId" : "****",
- *         "clientSecret" : "****",
- *         "accessToken" : "****"
- *       }
- *     };
- *
- *     var publishManager = new PublishManager(db, videoPlatformConf, logger);
+ *     var publishManager = new PublishManager(db, logger);
  *
  *     // Listen to errors dispatched by the publish manager
  *     publishManager.on("error", function(error){
@@ -49,50 +19,52 @@ var acceptedImagesExtensions = ["jpeg", "jpg", "gif", "bmp"];
  *     });
  *
  *     // Listen to complete publications dispatched by the publish manager
- *     publishManager.on("complete", function(videoPackage){
+ *     publishManager.on("complete", function(mediaPackage){
  *       // Do something
  *     });
  *
  *     publishManager.publish({
  *       "type" : "vimeo", // The video platform to use
- *       "path" : "C:/Temp/", // The path of the hot folder
  *       "originalPackagePath" : "/tmp/video-package.tar" // Path of package to publish
  *     });
+ *
+ * @module publish-manager
+ */
+
+// Module dependencies
+var util = require("util");
+var events = require("events");
+var path = require("path");
+var openVeoAPI = require("@openveo/api");
+var Package = process.requirePublish("app/server/packages/Package.js");
+var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
+var publishConf = process.requirePublish("config/publishConf.json");
+var errors = process.requirePublish("app/server/packages/errors.js");
+
+var maxConcurrentPublish = publishConf.maxConcurrentPublish || 3;
+var acceptedPackagesExtensions = ["tar", "mp4"];
+
+/**
+ * Creates a PublishManager to retrieve, validate and publish
+ * a package.
  *
  * @class PublishManager
  * @constructor
  * @param {Database} database A database to store information about
- * the videos
- * @param {Object} videoProviderConf Video platforms provider
- * configuration
+ * the package
  * @param {Object} logger A Winston logger
- * PublishManager emits the following events : 
+ * PublishManager emits the following events :
  *  - Event *error* An error occured
  *    - **Error** The error
- *  - Event *complete* A video package was successfully published
- *    - **Object** The published video package
+ *  - Event *complete* A package was successfully published
+ *    - **Object** The published package
  */
-function PublishManager(database, videoProviderConf, logger){
+function PublishManager(database, logger){
   openVeoAPI.applicationStorage.setDatabase(database);
   this.queue = [];
-  this.pendingVideos = [];
+  this.pendingPackages = [];
   this.videoModel = new VideoModel();
-  this.videoProviderConf = videoProviderConf;
   this.logger = logger;
-
-  // Validate conf
-
-  // Validate video temporary directory
-  if(!publishConf.videoTmpDir || (typeof publishConf.videoTmpDir !== "string"))
-    throw new Error("videoTmpDir in publishConf.json must be a String");
-  
-  // Validate package timecode file name
-  if(!publishConf.timecodeFileName || (typeof publishConf.timecodeFileName !== "string"))
-    throw new Error("timecodeFileName in publishConf.json must be a String");
-  
-  // Validate package metadata file name
-  if(!publishConf.metadataFileName || (typeof publishConf.metadataFileName !== "string"))
-    throw new Error("metadataFileName in publishConf.json must be a String");  
 }
 
 util.inherits(PublishManager, events.EventEmitter);
@@ -101,614 +73,248 @@ module.exports = PublishManager;
 /**
  * Publishes the given package.
  *
- * 1. Copy the package to the temporary directory
- * 2. Extract the package to the temporary directory
- * 3. Validate the package
- * 4. Create a public directory to hold the video package files
- * 5. Publish package
- * 6. Clean up the temporary directory removing extracted files
- *
- * Package must be a valid tar file containing : 
- *  - A video file
- *  - A list of image files in jpeg format
- *  - A .session file describing the video package content
- *  - A synchro.xml file with the mapping image / video for 
- *    a timecode.
+ * Package must be one of the supported type.
  *
  * @example
- *     // .session file example in video package
+ *     // video package object example
  *     {
- *       "profile": "2",
- *       "audio-input": "analog-top",
- *       "date": "13/01/1970 20:36:15",
- *       "format": "mix-pip",
- *       "rich-media": true,
- *       "profile-settings": {
- *         "video-bitrate": 1000000,
- *         "id": "2",
- *         "video-height": 720,
- *         "audio-bitrate": 128000,
- *         "name": "Haute définition"
- *       },
- *       "id": "1970-01-13_20-36-15",
- *       "format-settings": {
- *         "source": "mix-raw",
- *         "id": "mix-pip",
- *         "name": "Mélangé caméra incrustée",
- *         "template": "pip"
- *       },
- *       "date-epoch": 1107375,
- *       "storage-directory": "/data/1970-01-13_20-36-15",
- *       "filename": "video.mp4",
- *       "duration": 20
+ *       "type": "vimeo", // Platform type
+ *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
  *     }
  *
- * @example
- *     <!-- synchro.xml file example in video package -->
- *     <?xml version="1.0"?>
- *     <player>
- *       <synchro id="slide_00000.jpeg" timecode="0"/>
- *       <synchro id="slide_00001.jpeg" timecode="1200"/>
- *     </player>
- *
  * @method publish
- * @param {Object} videoPackage Video package to publish
+ * @param {Object} mediaPackage Package to publish
  */
-PublishManager.prototype.publish = function(videoPackage){
-  
-  if(videoPackage && (typeof videoPackage === "object")){
+PublishManager.prototype.publish = function(mediaPackage){
+  if(mediaPackage && (typeof mediaPackage === "object")){
     var self = this;
-    videoPackage.id = Date.now();
     
-    async.series([
-      
-      // Queue management PHASE
-      function(callback){
-        self.logger.debug("Queue management PHASE " + videoPackage.originalPackagePath);
-        self.logger.debug("Pending videos : " + self.pendingVideos.length);
-        
-        // Too much videos actually publishing
-        if(self.pendingVideos.length >= maxConcurrentPublish){
+    // Generate a package id
+    mediaPackage.id = Date.now();
 
-          // Add package to queue
-          self.queue.push(videoPackage);
-          self.logger.debug("Add package " + videoPackage.originalPackagePath + " to queue");
-          
-          callback("Too much concurrent publishing, add package " + videoPackage.id + " to queue");
-        }
+    // Defines transitions to perform depending on package extension
+    mediaPackage.packageType = path.extname(mediaPackage.originalPackagePath).slice(1);
 
-        // Process can deal with the package
-        else{
+    // Validate extension
+    if(!isValidPackageType(mediaPackage.packageType))
+      return this.emit("error", new PublishError("Package type is not valid (" + mediaPackage.packageType + ")", errors.INVALID_PACKAGE_TYPE_ERROR));
+    
+    var mediaPackageManager = createMediaPackageManager.call(this, mediaPackage);
 
-          // Add video package to the list of pending packages
-          self.pendingVideos.push(videoPackage);
-          videoPackage.state = VideoModel.PENDING_STATE;
-          videoPackage.link = null;
-          videoPackage.mediaId = null;
-          videoPackage.published = false;
-          videoPackage.errorCode = -1;
-          videoPackage.properties = [];
+    mediaPackageManager.init(Package.PACKAGE_SUBMITTED_STATE, Package.INIT_TRANSITION);
 
-          // Save video package information into database
-          self.videoModel.add(videoPackage, function(error){
-            if(error)
-              callback(new PublishError(error.message, VideoModel.SAVE_VIDEO_DATA_ERROR));
-            else
-              callback();
-          });
-
-        }
-
-      },
-
-      // Copy PHASE
-      function(callback){
-        self.logger.debug("Copy PHASE " + videoPackage.originalPackagePath);
-        self.videoModel.updateState(videoPackage.id, VideoModel.COPYING_STATE);
-        
-        // Copy package file to tmp directory
-        var destinationFilePath = path.join(publishConf.videoTmpDir, videoPackage.id + ".tar");
-        openVeoAPI.fileSystem.copy(videoPackage.originalPackagePath, destinationFilePath, function(copyError){
-
-          // An error occurred during the copy
-          if(copyError){
-            callback(new PublishError(copyError.message, VideoModel.COPY_ERROR));
-          }
-          else{
-            videoPackage.packagePath = destinationFilePath;
-            callback();
-          }
-
-        });
-
-      },
-      
-      // Extraction PHASE
-      function(callback){
-        self.logger.debug("Extraction PHASE " + videoPackage.originalPackagePath);
-        
-        // Try to remove the source package
-        fs.unlink(videoPackage.originalPackagePath, function(unlinkError){
-          if(unlinkError)
-            self.emit("error", new PublishError(unlinkError.message, VideoModel.UNLINK_ERROR));
-
-        });
-
-        var extractDirectory = path.join(publishConf.videoTmpDir, "/" + videoPackage.id);
-
-        // Extract package
-        self.videoModel.updateState(videoPackage.id, VideoModel.EXTRACTING_STATE);
-        openVeoAPI.fileSystem.extract(videoPackage.packagePath, extractDirectory, function(error){
-
-          // Extraction failed
-          if(error){
-            callback(new PublishError(error.message, VideoModel.EXTRACT_ERROR));
-          }
-
-          // Extraction done
-          else
-            callback();
-
-        });
-      },
-      
-      // Validation PHASE
-      function(callback){
-        self.logger.debug("Validation PHASE " + videoPackage.originalPackagePath);
-        self.videoModel.updateState(videoPackage.id, VideoModel.VALIDATING_STATE);
-        
-        // Validate package content
-        validatePackage.call(self, videoPackage, function(error, metadata){
-          
-          if(error)
-            callback(new PublishError(error.message, VideoModel.VALIDATION_ERROR));
-          else{
-            videoPackage.metadata = metadata;
-            self.videoModel.updateMetadata(videoPackage.id, videoPackage.metadata);
-            callback();
-          }
-        });
-        
-      },
-
-      // Videos directory preparation PHASE
-      function(callback){
-        self.logger.debug("Videos directory preparation PHASE " + videoPackage.originalPackagePath);
-        
-        // Test if video temporary directory exists
-        var videosDirectoryPath = path.normalize(process.rootPublish + "/public/publish/videos");
-
-        fs.exists(videosDirectoryPath, function(exists){
-          if(exists)
-            callback();
-          else{
-
-            // Create videos public directory
-            fs.mkdir(videosDirectoryPath, function(error){
-              if(error)
-                callback(new PublishError(error.message, VideoModel.CREATE_VIDEOS_PUBLIC_DIR_ERROR));
-              else
-                callback();
-            });
-          }
-        });
-      },
-      
-      // Video directory preparation PHASE
-      function(callback){
-        self.logger.debug("Video directory preparation PHASE " + videoPackage.originalPackagePath);
-        self.videoModel.updateState(videoPackage.id, VideoModel.PREPARING_STATE);
-        
-        // Create video public directory
- fs.mkdir(path.normalize(process.rootPublish + "/public/publish/videos/" + videoPackage.id), function(error){
-          if(error)
-            callback(new PublishError(error.message, VideoModel.CREATE_VIDEO_PUBLIC_DIR_ERROR));
-          else
-            callback();
-        });
-
-      },
-      
-      // Publication PHASE
-      function(callback){
-        self.logger.debug("Publication PHASE " + videoPackage.originalPackagePath);
-        self.videoModel.updateState(videoPackage.id, VideoModel.SENDING_STATE);
-
-        startPublishing.call(self, videoPackage, function(error, uploadedVideo){
-
-          if(error)
-            callback(error);
-          else{
-            videoPackage = uploadedVideo;
-            callback();
-          }
-
-        });
-      },
-
-      // Clean up PHASE
-      function(callback){
-        self.logger.debug("Clean up PHASE " + videoPackage.originalPackagePath);
-
-        // Uncomment this code while the issue on the vimeo api
-        // is corrected. An issue is opened on project's page at 
-        // https://github.com/vimeo/vimeo.js/issues/20
-        // Clean up the tmp directory
-        openVeoAPI.fileSystem.rmdir(path.join(publishConf.videoTmpDir, "/" + videoPackage.id), function(error){
-          if(error)
-            self.logger.error("Couldn't remove directory " + path.join(publishConf.videoTmpDir, "/" + videoPackage.id), {"action" : "cleanUp", "mediaId" : videoPackage.id});
-          
-          callback();
-        });
-        
-      },
-    ], function(error, results){
-      
-      // An error occurred
-      if(error && (typeof error !== "string")){
-        self.videoModel.updateState(videoPackage.id, VideoModel.ERROR_STATE);
-        self.videoModel.updateErrorCode(videoPackage.id, error.code);
-        self.emit("error", error);
-      }
-      else if(!error){
-        
-        // Mark package as success in the database
-        self.videoModel.updateState(videoPackage.id, VideoModel.SENT_STATE);
-        self.videoModel.updateLink(videoPackage.id, "/publish/video/" + videoPackage.id);
-        self.videoModel.updateMediaId(videoPackage.id, videoPackage.mediaId);
-        self.emit("complete", videoPackage);
-
-      }
-      
-      // For both error and complete publication
-      // Remove video from pending videos and launch
-      // next queued video
-      if(!error || (typeof error !== "string")){
-
-        // Remove video from pending videos
-        removeFromPending.call(self, videoPackage.id);
-
-        // Publish pending package from FIFO queue
-        if(self.queue.length)
-          self.publish(self.queue.shift(0));
-      }
-
-    });
+    // Package can be added to pending packages
+    if(addPackage.call(this, mediaPackage))
+      mediaPackageManager.executeTransition(Package.INIT_TRANSITION);
 
   }
   else
-    this.emit("error", new PublishError("videoPackage argument must be an Object", VideoModel.PACKAGE_NOT_DEFINED_ERROR));
+    this.emit("error", new PublishError("mediaPackage argument must be an Object", errors.PACKAGE_NOT_DEFINED_ERROR));
 };
 
 /**
- * Validates package content.
+ * Retries publishing a package which is on error.
  *
- * A video package must contain, at least a valid package information
- * file and a video file.
- *
- * @example
- *     // videoPackage example
- *     {
- *       "id" : 1422731934859, // Internal video id
- *       "type" : "vimeo", // The video platform to use
- *       "path" : "C:/Temp/", // The path of the hot folder
- *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar" // The package path inside the tmp directory
- *     }
- * 
- * @method validatePackage
- * @async
- * @private
- * @param Object videoPackage Video package to publish e.g
- * @param {Function} callback The function to call when done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The package information object
+ * @method retry
+ * @param {String} packageId The id of the package on error
  */
-function validatePackage(videoPackage, callback){
-  var extractDirectory = path.join(publishConf.videoTmpDir, videoPackage.id + "");
+PublishManager.prototype.retry = function(packageId){
+  if(packageId){
+    var self = this;
 
-  // Read package information file
-  openVeoAPI.fileSystem.getJSONFileContent(path.join(extractDirectory, publishConf.metadataFileName), function(error, packageInformation){
+    // Retrieve package information
+    this.videoModel.getByFilter({id: packageId}, function(error, mediaPackage){
+      
+      // Package does not exist
+      if(error || !mediaPackage)
+        self.emit("error", new PublishError("Cannot retry package " + packageId + " (not found)", errors.PACKAGE_NOT_FOUND));
 
-    // Failed reading file or parsing JSON
-    if(error)
-      callback(new Error(error.message));
-    
-    // Got JSON Object
-    else{
+      // Got package information
+      else{
 
-      // Got the name of the video file
-      if(packageInformation.filename){
+        // Package is indeed in error
+        if(mediaPackage.state === VideoModel.ERROR_STATE){
+          self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE);
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
 
-        // Test if video file really exists in package
-        fs.exists(path.join(extractDirectory, "/" + packageInformation.filename), function(exists){
+          self.logger.info("Retry package " + mediaPackage.id);
 
-          if(exists)
-            callback(null, packageInformation);
-          else
-            callback(new Error("Missing file " + packageInformation.filename));
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
 
-        });
+          // Package can be added to pending packages
+          if(addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+        }
 
       }
-
-      // No video file name in metadata, package is not valid
-      else
-        callback(new Error("No video file name found in metadata file"));
-
-    }
-
-  });
-  
-}
+    });
+  }
+};
 
 /**
- * Publishes the video package.
- * 
- * 1. Translate XML timecode file into a JSON equivalent
- * 2. Upload the video to the video platform
- * 3. TODO Resize presentation images
- * 4. Copy package images to public directory
+ * Uploads a media blocked in waiting to upload state.
  *
- * @example
- *     // videoPackage example
- *     {
- *       "id" : 1422731934859, // Internal video id
- *       "type" : "vimeo", // The video platform to use
- *       "path" : "C:/Temp/", // The path of the hot folder
- *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar", // The package path inside the tmp directory
- *       "metadata" : {
- *         "profile": "2",
- *         "audio-input": "analog-top",
- *         "date": "13/01/1970 20:36:15",
- *         "format": "mix-pip",
- *         "rich-media": true,
- *         "profile-settings": {
- *           "video-bitrate": 1000000,
- *           "id": "2",
- *           "video-height": 720,
- *           "audio-bitrate": 128000,
- *           "name": "Haute définition"
- *         },
- *         "id": "1970-01-13_20-36-15",
- *         "format-settings": {
- *           "source": "mix-raw",
- *           "id": "mix-pip",
- *           "name": "Mélangé caméra incrustée",
- *           "template": "pip"
- *         },
- *         "date-epoch": 1107375,
- *         "storage-directory": "/data/1970-01-13_20-36-15",
- *         "filename": "video.mp4",
- *         "duration": 20
- *       }
- *     }
- *
- *
- * @method startPublishing
- * @async
- * @private
- * @param {Object} videoPackage Video package to publish
- * @param {Function} callback The function to call when done
- *   - **Error** The error if an error occurred, null otherwise
+ * @method upload
+ * @param {String} packageId The id of the package waiting to be uploaded
+ * @param {String} platform The type of the video platform to upload to
  */
-function startPublishing(videoPackage, callback){
-  var self = this;
-  
-  var extractDirectory = path.join(publishConf.videoTmpDir, videoPackage.id + "");
-  var videoFinalDir = path.normalize(process.rootPublish + "/public/publish/videos/" + videoPackage.id);
-
-  async.parallel([
+PublishManager.prototype.upload = function(packageId, platform){
+  if(packageId && platform){
+    var self = this;
     
-    // Translate xml timecode file into a JSON file
-    function(callback){
-      saveTimecode(path.join(extractDirectory, publishConf.timecodeFileName), path.join(videoFinalDir, "synchro.json"), function(error){
-        if(error)
-          callback(new PublishError(error.message, VideoModel.SAVE_TIMECODE_ERROR));
+    // Retrieve package information
+    this.videoModel.getByFilter({id: packageId}, function(error, mediaPackage){
 
-        callback();
-      });
-    },
-
-    // Upload video to video platform
-    function(callback){
-      var videoPlatformProvider = VideoPlatformProvider.getProvider(videoPackage.type, self.videoProviderConf[videoPackage.type]);
-
-      // Start uploading the video to the platform
-      videoPlatformProvider.upload(videoPackage, function(error, mediaId){
-        if(error)
-          callback(new PublishError(error.message, VideoModel.UPLOAD_ERROR));
-        else{
-          videoPackage.mediaId = mediaId;
-          callback();
-        }
-      });
-
-    },
-    
-    // Copy images to public directory
-    function(callback){
-
-      // Scan directory for images
-      fs.readdir(extractDirectory, function(error, files){
-        if(error)
-          callback(new PublishError(error.message, VideoModel.SCAN_FOR_IMAGES_ERROR));
-        else{
-
-          var filesToCopy = [];
-          files.forEach(function(file){
-
-            // File extension is part of the accepted extensions
- if(acceptedImagesExtensions.indexOf(path.extname(file).slice(1)) >= 0)
-              filesToCopy.push(file);
-            
-          });
-          
-          var filesLeftToCopy = filesToCopy.length;
-          filesToCopy.forEach(function(file){
-            
-            openVeoAPI.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error){
-
-              if(error)
-                self.logger.warn(error.message, {"action" : "copyImages", "mediaId" : videoPackage.id});
-              
-              filesLeftToCopy--;
-
-              if(filesLeftToCopy === 0)
-                callback();
-
-            });
-            
-          });
-        }
-      });
+      // Package does not exist
+      if(error || !mediaPackage)
+        self.emit("error", new PublishError("Cannot upload package " + packageId + " (not found)", errors.PACKAGE_NOT_FOUND));
       
-    }
+      // Package is indeed in error
+      else{
 
-  ], function(error, result){
+        // Package is indeed waiting for upload
+        if(mediaPackage.state === VideoModel.WAITING_FOR_UPLOAD_STATE){
+          self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE);
+          self.videoModel.updateType(mediaPackage.id, platform);
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
 
-    if(error)
-      callback(error);
-    else
-      callback(null, videoPackage);
+          self.logger.info("Force upload package " + mediaPackage.id);
+          mediaPackage.type = platform;
 
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
+
+          // Package can be added to pending packages
+          if(addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+        }
+
+      }
+    });
+  }
+};
+
+/**
+ * Creates a media package manager corresponding to the package type.
+ *
+ * @method createMediaPackageManager
+ * @private
+ * @param {Object} mediaPackage The media package to manage
+ * @return {Package} A Package manager
+ */
+function createMediaPackageManager(mediaPackage){
+  var self = this;
+  var mediaPackageManager = Package.getPackage(mediaPackage.packageType, mediaPackage, this.logger);
+
+  // Handle errors from package manager
+  mediaPackageManager.on("error", function(error){
+    onError.call(self, error, mediaPackage);
   });
+
+  // Handle complete events from package manager
+  mediaPackageManager.on("complete", function(completePackage){
+    onComplete.call(self, completePackage);
+  });
+  
+  return mediaPackageManager;
 }
 
 /**
- * Removes a video package from pending packages.
+ * Handles Package error event.
+ *
+ * @method onError
+ * @private
+ * @param {Error} error The dispatched errors
+ * @param {Object} mediaPackage The package on error
+ */
+function onError(error, mediaPackage){
+
+  // Remove video from pending videos
+  removeFromPending.call(this, mediaPackage.id);
+
+  // Publish pending package from FIFO queue
+  if(this.queue.length)
+    this.publish(this.queue.shift(0));
+
+  this.emit("error", error, error.code);
+}
+
+/**
+ * Handles Package complete event.
+ *
+ * @method onComplete
+ * @private
+ * @param {Object} mediaPackage The package on error
+ */
+function onComplete(mediaPackage){
+
+  // Remove package from pending packages
+  removeFromPending.call(this, mediaPackage.id);
+
+  // Publish pending package from FIFO queue
+  if(this.queue.length)
+    this.publish(this.queue.shift(0));
+
+  this.emit("complete", mediaPackage);
+}
+
+/**
+ * Adds packages to the list of pending packages.
+ *
+ * @method addPackage
+ * @private
+ * @param {Object} mediaPackage The package to add to pending packages
+ * @return {Boolean} true if the package is successfully to pending packages
+ * false if it has been added to queue
+ */
+function addPackage(mediaPackage){
+  var self = this;
+  this.logger.debug("Actually " + this.pendingPackages.length + " pending packages");
+
+  // Too much pending packages
+  if(this.pendingPackages.length >= maxConcurrentPublish){
+
+    // Add package to queue
+    this.queue.push(mediaPackage);
+    this.logger.debug("Add package " + mediaPackage.originalPackagePath + "(" + mediaPackage.id +") to queue");
+
+    return false;
+  }
+
+  // Process can deal with the package
+  else{
+    this.logger.debug("Add package " + mediaPackage.originalPackagePath +  "(" + mediaPackage.id +") to pending packages");
+
+    // Add package to the list of pending packages
+    this.pendingPackages.push(mediaPackage);
+
+    return true;
+  }
+};
+
+/**
+ * Tests if package is a valid one depending on the given type.
+ *
+ * @method isValidPackageType
+ * @private
+ * @param {String} type The package type
+ * @return {Boolean} true if the package is valid false otherwise
+ */
+function isValidPackageType(type){
+  return acceptedPackagesExtensions.indexOf(type) >= 0;
+}
+
+/**
+ * Removes a package from pending packages.
  *
  * @method removeFromPending
- * @async
+ * @private
  * @param {Number} packageId The package id to remove
  */
 function removeFromPending(packageId){
-  for(var i = 0 ; i < this.pendingVideos.length ; i++){
-    if(this.pendingVideos[i]["id"] === packageId)
-      this.pendingVideos.splice(i, 1);
+  for(var i = 0 ; i < this.pendingPackages.length ; i++){
+    if(this.pendingPackages[i]["id"] === packageId)
+      this.pendingPackages.splice(i, 1);
   }
-}
-
-/**
- * Saves the XML timecode file into a JSON equivalent.
- * This will check if the file exists first.
- *
- * 1. Test if timecode xml file exists
- * 2. Transcode XML file to a JSON equivalent 
- *    e.g.
- * 3. Format JSON
- *    e.g.
- *
- * @example
- *     // Transform XML timecodes into JSON
- *     // From : 
- *     {
- *       "player": {
- *         "synchro":
- *         [
- *           {
- *             "id": ["slide_00000.jpeg"],
- *             "timecode": ["0"]
- *           }, {
- *             "id": ["slide_00001.jpeg"],
- *             "timecode": ["1200"]
- *           }
- *         ]
- *       }
- *     }
- *
- *     // To :
- *     {
- *       "0": {
- *         "image": {
- *           "small": "slide_00000.jpeg",
- *           "large": "slide_00000.jpeg"
- *         }
- *       },
- *       "1200": {
- *         "image": {
- *           "small": "slide_00001.jpeg",
- *           "large": "slide_00001.jpeg"
- *         }
- *       }
- *     }
- *
- * @method saveTimecode
- * @private
- * @async
- * @param {String} xmlTimecodeFilePath The timecode file to save
- * @param {String} destinationFilePath The JSON timecode file path
- * @param {Function} callback The function to call when done
- *   - **Error** The error if an error occurred, null otherwise
- */
-function saveTimecode(xmlTimecodeFilePath, destinationFilePath, callback){
-
-  async.series([
-    function(callback){
-
-      // Check if XML file exists
-      fs.exists(xmlTimecodeFilePath, function(exists){
-
-        if(exists)
-          callback();
-        else
-          callback(new Error("Missing timecode file " + xmlTimecodeFilePath));
-
-      });
-    },
-    function(callback){
-
-      // Transcode XML to JSON
-      fs.readFile(xmlTimecodeFilePath, function(error, data){
-
-        if(error)
-          callback(error);
-        else{
-          xml2js.parseString(data, {mergeAttrs : true}, function(error, timecodes){
-
-            var formattedTimecodes = [];
-            
-            // Transform timecode format to
-            if(timecodes && timecodes.player && timecodes.player.synchro){
-              
-              // Iterate through the list of timecodes
-              // Change JSON organization to be more accessible
-              timecodes.player.synchro.forEach(function(timecodeInfo){
-                
-                if(timecodeInfo["timecode"] && timecodeInfo["timecode"].length){
-
-                  if(timecodeInfo["id"] && timecodeInfo["id"].length){
-                    formattedTimecodes.push({
-                      timecode: parseInt(timecodeInfo["timecode"][0]),
-                      image: timecodeInfo["id"][0]
-                    });
-                  }
-
-                }
-              });
-
-            }
-
-            callback(error, formattedTimecodes);
-          });
-        }
-
-      });
-
-    }
-  ], function(error, results){
-    if(error){
-      callback(error); 
-    }
-    else{
-      fs.writeFile(destinationFilePath, JSON.stringify(results[1]), {encoding : "utf8"}, function(error){
-          callback(error);
-        }
-      );
-    }
-  });
-
 }
 
 /**

@@ -100,7 +100,7 @@ describe("videoController", function(){
       };
       response.send = function(data){
         assert.isDefined(data);
-        assert.equal(data.state, VideoModel.SENT_STATE);
+        assert.equal(data.state, VideoModel.READY_STATE);
         done();
       };
 

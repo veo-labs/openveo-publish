@@ -4,16 +4,13 @@
  * @module publish-providers
  */
 
-/** 
- * Saves provider configuration.
- *
+/**
  * Defines a VideoPlatformProvider class to interface with video
  * platforms. Use getProvider method to get an instance of the
  * appropriate VideoPlatformProvider.
  *
  * @class VideoPlatformProvider
  * @constructor
- * @extends EntityProvider
  * @param {Object} providerConf A video platform configuration object
  * it's structure depend on the provider's type, see extended objects
  * for more information
@@ -69,11 +66,27 @@ VideoPlatformProvider.getProvider = function(type, providerConf){
  *
  * @method upload
  * @async
+ * @param {String} videoFilePath System path of the video to upload
  * @param {Function} callback The function to call when the upload
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.upload = function(callback){throw new Error("upload method not implemented for this video platform provider");}
+VideoPlatformProvider.prototype.upload = function(videoFilePath, callback){throw new Error("upload method not implemented for this video platform provider");}
+
+/**
+ * Configure video on the platform.
+ *
+ * Depending on the platform, some video properties must be set after the
+ * upload of the video.
+ *
+ * @method configure
+ * @async
+ * @param {String} mediaId The id of the video
+ * @param {Function} callback The function to call when the upload
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoPlatformProvider.prototype.configure = function(mediaId, callback){callback();}
 
 /**
  * Gets information about a video from video platform.

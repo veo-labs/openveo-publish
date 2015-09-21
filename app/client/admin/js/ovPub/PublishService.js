@@ -10,7 +10,7 @@
    */
   function PublishService($http, $q, entityService){
     var basePath = "/admin/";
-    var properties, videos, categories;
+    var properties, videos, categories, platforms;
     var videoChapter = {};
 
     /**
@@ -30,6 +30,16 @@
       }
 
       return $q.when({data : {entities : videos}});
+    };
+
+    /**
+     * Retries the given video.
+     * @param String id The id of the video to retry
+     * @return HttpPromise The HTTP promise
+     */
+    var retryVideo = function(id){
+      entityService.deleteCache("video");
+      return $http.get(basePath + "publish/retryVideo/" + id);
     };
 
     /**
@@ -110,6 +120,39 @@
       return properties;
     };
     
+    /**
+     * Loads the list of available media platforms from server.
+     * @return Promise The promise used to retrieve platforms from server
+     */
+    var loadPlatforms = function(){
+      if(!platforms){
+        return $http.get(basePath + "publish/getPlatforms").success(function(platformsObj){
+          platforms = platformsObj.platforms;
+        });
+      }
+
+      return $q.when({data : {platforms : platforms}});
+    };
+
+    /**
+     * Gets the list of available platforms.
+     * @return HttpPromise The HTTP promise
+     */
+    var getPlatforms = function(){
+      return platforms;
+    };
+
+    /**
+     * Asks server to start uploading the video.
+     * @param String id The id of the video to start uploading
+     * @param String platform The video platform to upload to
+     * @return HttpPromise The HTTP promise
+     */
+    var startVideoUpload = function(id, platform){
+      entityService.deleteCache("video");
+      return $http.get(basePath + "publish/startUpload/" + id + "/" + platform);
+    };
+
     var loadCategories = function(){
       if(!categories){
        
@@ -164,8 +207,10 @@
     return{
       loadVideos : loadVideos,
       getVideos : getVideos,
+      retryVideo : retryVideo,
       publishVideo : publishVideo,
       unpublishVideo : unpublishVideo,
+      startVideoUpload : startVideoUpload,
       
       loadProperties : loadProperties,
       getProperties : getProperties,
@@ -173,6 +218,9 @@
       loadCategories : loadCategories,
       getCategories : getCategories,
       
+      loadPlatforms : loadPlatforms,
+      getPlatforms : getPlatforms,
+
       getWatcherStatus : getWatcherStatus,
       startWatcher : startWatcher,
       stopWatcher : stopWatcher,

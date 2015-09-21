@@ -21,6 +21,8 @@ module.exports = {
   GET_VIDEO_MISSING_PARAMETERS: { code: 0x200, httpCode: 400, module: "publish" },
   PUBLISH_VIDEO_MISSING_PARAMETERS: { code: 0x201, httpCode: 400, module: "publish" },
   UNPUBLISH_VIDEO_MISSING_PARAMETERS: { code: 0x202, httpCode: 400, module: "publish" },
+  RETRY_VIDEO_MISSING_PARAMETERS: { code: 0x203, httpCode: 400, module: "publish" },
+  START_UPLOAD_VIDEO_MISSING_PARAMETERS: { code: 0x204, httpCode: 400, module: "publish" },
   
   // Other errors
   GET_VIDEO_ERROR: { code: 0x300, httpCode: 500, module: "publish" },

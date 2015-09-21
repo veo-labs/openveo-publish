@@ -8,8 +8,11 @@
       "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
       "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
       "get /startWatcher" : "app/server/controllers/watcherController.startAction",
+      "get /retryVideo/:ids" : "app/server/controllers/watcherController.retryVideoAction",
+      "get /startUpload/:ids/:platform" : "app/server/controllers/watcherController.startUploadAction",
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
-      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction"
+      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
+      "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction"
     }
   },
   "entities" : {

@@ -27,8 +27,6 @@ var databaseConf;
 for(var i = 0 ; i < process.argv.length ; i++){
 
   switch(process.argv[i]){
-    case "--root":
-      process.root = process.argv[i + 1] || null;
     case "--rootPublish":
       process.rootPublish = process.argv[i + 1] || null;
     break;
@@ -55,7 +53,6 @@ var openVeoAPI = require("@openveo/api");
 // Module files
 var watcherConf = process.requirePublish("config/watcherConf.json");
 var publishConf = process.requirePublish("config/publishConf.json");
-var videoPlatformConf = process.requirePublish("config/videoPlatformConf.json");
 var PublishManager = process.requirePublish("app/server/PublishManager.js");
 
 // Get a logger
@@ -85,16 +82,6 @@ if(typeof databaseConf !== "object"){
   return;
 }
 
-// If process is a child process
-if(process.connected){
-  
-  // Exit process if disconnected from its parent
-  process.on("disconnect", function(){
-    process.exit();
-  });
-
-}
-
 // Get a Database instance
 var db = openVeoAPI.Database.getDatabase(databaseConf);
 
@@ -122,14 +109,15 @@ db.connect(function(error){
         // File is considered complete
         if(lastStat && stat.mtime.getTime() === lastStat.mtime.getTime()){
 
-          // Only files with tar extension are accepted
-          if(path.extname(filePath) === ".tar"){
+          var fileExtension = path.extname(filePath).slice(1);
+
+          // Only files with tar or mp4 extensions are accepted
+          if(fileExtension === "tar" || fileExtension === "mp4"){
             logger.info("File " + filePath + " has been added to hot folder");
             var dirName = path.dirname(filePath);
             var packageInfo = null;
 
-            // Find the hot folder corresponding in which the file
-            // was added
+            // Find the hot folder in which the file was added
             watcherConf.hotFolders.forEach(function(hotFolder){
               if(path.normalize(hotFolder.path).indexOf(dirName) === 0){
                 packageInfo = JSON.parse(JSON.stringify(hotFolder));
@@ -140,6 +128,8 @@ db.connect(function(error){
             packageInfo["originalPackagePath"] = filePath;
             publishManager.publish(packageInfo);
           }
+          else
+            logger.warn("File " + filePath + " is not a valid package file (mp4 or tar)");
 
         }
 
@@ -158,8 +148,34 @@ db.connect(function(error){
   
   // Connection to database done
   else{
+    var publishManager = new PublishManager(db, logger);
     
-    // Retrieve the list of hot folders from configuration
+    // If process is a child process
+    if(process.connected){
+
+      // Exit process if disconnected from its parent
+      process.on("disconnect", function(){
+        process.exit();
+      });
+
+      // Handle messages from parent process
+      process.on("message", function(data){
+        if(!data)
+          return;
+
+        // Retry publication of a package
+        if(data.action === "retry" && data.id)
+          publishManager.retry(data.id);
+
+        // Force the upload of a package
+        else if(data.action === "upload" && data.id && data.platform)
+          publishManager.upload(data.id, data.platform);
+
+      });
+
+    }
+
+    // Retrieve the list of hot folders paths from configuration
     var hotFoldersPaths = [];
     watcherConf.hotFolders.forEach(function(hotFolder){
 
@@ -170,8 +186,6 @@ db.connect(function(error){
         hotFoldersPaths.push(path.normalize(hotFolder.path));
 
     });
-
-    var publishManager = new PublishManager(db, videoPlatformConf, logger);
 
     // Listen to errors dispatched by the publish manager
     publishManager.on("error", function(error){
@@ -209,7 +223,6 @@ db.connect(function(error){
         logger.error(error && error.message);
       });
     });
-    
   }
   
 });

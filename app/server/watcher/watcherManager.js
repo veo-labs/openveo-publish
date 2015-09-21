@@ -38,7 +38,6 @@ module.exports.start = function(){
     
     // Executes watcher as a child process
     watcher = child_process.fork(path.normalize(process.rootPublish + "/app/server/watcher/watcher.js"), [
-      "--root", process.root,
       "--rootPublish", process.rootPublish,
       "--databaseConf", path.normalize(process.root + "/config/databaseConf.json"),
     ]);
@@ -74,6 +73,29 @@ module.exports.stop = function(){
     status = this.STOPPING_STATUS;
     watcher.kill("SIGINT");
   }
+};
+
+/**
+ * Sends a message to the watcher to retry a package.
+ *
+ * @method retryPackage
+ * @param {String} id The id of the media to retry
+ */
+module.exports.retryPackage = function(id){
+  if(watcher && status === this.STARTED_STATUS)
+    watcher.send({action: "retry", id: id});
+};
+
+/**
+ * Sends a message to the watcher to force uploading a package.
+ *
+ * @method uploadPackage
+ * @param {String} id The id of the media to upload
+ * @param {String} platform The name of the platform to upload to
+ */
+module.exports.uploadPackage = function(id, platform){
+  if(watcher && status === this.STARTED_STATUS)
+    watcher.send({action: "upload", id: id, platform: platform});
 };
 
 /**

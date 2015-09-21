@@ -50,59 +50,19 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
  * TODO Find a way to avoid sending default preset request on Vimeo
  * for each upload.
  *
- * @example
- *     // videoPackage example
- *     {
- *       "id" : 1422731934859,
- *       "type" : "vimeo",
- *       "path" : "C:/Temp/",
- *       "originalPackagePath" : "C:/Temp/video-package.tar",
- *       "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar",
- *       "metadata" : {
- *         "profile": "2",
- *         "audio-input": "analog-top",
- *         "date": "13/01/1970 20:36:15",
- *         "format": "mix-pip",
- *         "rich-media": true,
- *         "profile-settings": {
- *           "video-bitrate": 1000000,
- *           "id": "2",
- *           "video-height": 720,
- *           "audio-bitrate": 128000,
- *           "name": "Haute définition"
- *         },
- *         "id": "1970-01-13_20-36-15",
- *         "format-settings": {
- *           "source": "mix-raw",
- *           "id": "mix-pip",
- *           "name": "Mélangé caméra incrustée",
- *           "template": "pip"
- *         },
- *         "date-epoch": 1107375,
- *         "storage-directory": "/data/1970-01-13_20-36-15",
- *         "filename": "video.mp4",
- *         "duration": 20
- *       }
- *     }
- *
  * @method upload
  * @async
- * @param {Object} videoPackage Video package to upload
+ * @param {String} videoFilePath System path of the video to upload
  * @param {Function} callback The function to call when the upload
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VimeoProvider.prototype.upload = function(videoPackage, callback){
+VimeoProvider.prototype.upload = function(videoFilePath, callback){
   var self = this;
   
   // Retrieve video tmp directory
   // e.g E:/openveo/node_modules/@openveo/publish/tmp/
-  var videoTmpDir = path.dirname(videoPackage.packagePath);
   var presetId, mediaId;
-  
-  // Get video file path
-  // e.g E:/openveo/node_modules/@openveo/publish/tmp/1422731934859/video.mp4
-  var videoFilePath = path.join(videoTmpDir, "/" + videoPackage.id, "/" + videoPackage.metadata.filename);
 
   async.series([
 
@@ -110,45 +70,23 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
     function(callback){
 
       self.vimeo.request({method : "GET", path : "/me"}, function(error, body, statusCode, headers){
+        if(error)
+          return callback(error);
 
-        if(!error){
+        // User does not have permission to upload
+        if(!body.upload_quota)
+          callback(new Error("User does not have permission to upload on Vimeo"));
 
-          if(!body.upload_quota){
+        // Checks the size of the video to upload
+        fs.stat(videoFilePath, function(error, stats){
+          if(error)
+            callback(error);
+          else if(stats.size >= body.upload_quota.space.free)
+            callback(new Error("No more space left in Vimeo account"));
+          else
+            callback();
+        });
 
-            // User does not have permission to upload
-            callback(new Error("User does not have permission to upload on Vimeo"));
-          }
-          
-          // Checks the size of the video to upload
-          fs.stat(videoFilePath, function(error, stats){
-            if(error)
-              callback(error);
-            else if(stats.size >= body.upload_quota.space.free)
-              callback(new Error("No more space left in Vimeo account"));
-            else
-              callback();
-          });
-
-        }
-
-      });
-      
-    },
-    
-    // Get default preset
-    function(callback){
-      
-      self.vimeo.request({
-        "method" : "GET",
-        "path" : "/me/presets"
-      }, function(error, body, statusCode, headers){
-        if(!error){
-
-          if(body.data.length)
-            presetId = /^.*\/(.*)$/.exec(body.data[0].uri)[1];
-        }
-        
-        callback(error);
       });
       
     },
@@ -178,46 +116,6 @@ VimeoProvider.prototype.upload = function(videoPackage, callback){
         mediaId = path.basename(headers.location);
         callback();
       });
-    },
-    
-    // Set video metadata and preset
-    function(callback){
-      
-      async.parallel([
-
-          // Update video metadata on Vimeo
-          // TODO Replace name and description when available in video package
-          function(callback){
-            self.vimeo.request({
-              "method" : "PATCH",
-              "path" : "/videos/" + mediaId,
-              "query" : {
-                "name" : "Video name",
-                "description" : "Video description",
-                "license" : "by",
-                "privacy.view" : "nobody",
-                "privacy.embed" : "private",
-                "review_link" : false
-              }
-            }, function(error, body, statusCode, headers){
-              callback(error);
-            });
-          },
-
-          // Add preset to the video
-          function(callback){
-            self.vimeo.request({
-              "method" : "PUT",
-              "path" : "/videos/" + mediaId + "/presets/" + presetId
-            }, function(error, body, statusCode, headers){
-              callback(error);
-            });
-          }
-
-        ], function(error, result){
-          callback(error);
-        });
-
     }
 
   ], function(error, results){
