@@ -506,6 +506,8 @@ VideoModel.prototype.getOne = function(id, callback){
         });
 
       }
+      else
+        callback();
     },
 
     // Retrieve video timecodes

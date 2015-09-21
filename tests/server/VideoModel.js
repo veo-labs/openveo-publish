@@ -71,12 +71,13 @@ describe("VideoModel", function(){
   // getOne method
   describe("getOne", function(){
     
-    it("Should be able to get a video and the list of timecodes", function(){
+    it("Should be able to get a video and the list of timecodes", function(done){
       
       process.rootPublish = path.join(__dirname);
       videoModel.getOne("1", function(error, video){
         process.rootPublish = path.join(__dirname, "../../");
-        assert.isUndefined(error);
+        assert.isNull(error);
+        done();
       });
       
     });
