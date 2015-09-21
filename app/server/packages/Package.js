@@ -245,7 +245,6 @@ Package.prototype.initPackage = function(){
   this.mediaPackage.state = VideoModel.PENDING_STATE;
   this.mediaPackage.link = null;
   this.mediaPackage.mediaId = null;
-  this.mediaPackage.published = false;
   this.mediaPackage.errorCode = -1;
   this.mediaPackage.properties = [];
   this.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;

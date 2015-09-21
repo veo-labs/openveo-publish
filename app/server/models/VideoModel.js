@@ -58,7 +58,6 @@ VideoModel.PUBLISHED_STATE = 12;
  *      "lastState" : "packageCopied",
  *      "lastTransition" : "initPackage",
  *      "properties" : [],
- *      "published" : false,
  *      "type" : "vimeo",
  *      "path" : "C:/Temp/",
  *      "originalPackagePath" : "C:/Temp/video-package.tar",
@@ -85,7 +84,6 @@ VideoModel.prototype.add = function(videoPackage, callback){
     metadata : videoPackage.metadata,
     type : videoPackage.type,
     errorCode : videoPackage.errorCode,
-    published : videoPackage.published,
     category : videoPackage.category,
     properties : videoPackage.properties,
     packageType : videoPackage.packageType,
@@ -415,10 +413,9 @@ VideoModel.prototype.getOnePublished = function(id, callback){
  *      },
  *      "type" : "vimeo", // The video platform
  *      "errorCode" : -1, // The error code if status = 0
- *      "published" : false, // true if video is published
  *      "category" : null, // Category the video belongs to
  *      "properties" : [], // A list of custom properties
- *      "state" : 7, // Actual state in publishing process (0 = Pending, 1 = Copying, 2 = Extracting, 3 = Validating, 4 = Preparing, 5 = Sending, 6 = Sent, 7 = Published, 8 = Error)
+ *      "state" : 7, // Actual state in publishing process
  *      "link" : "/publish/video/1439286245225", // Link to the openveo player
  *      "mediaId" : "135956519", // Platform id of the video
  *      "timecodes" : { // The list of slides with timecodes
