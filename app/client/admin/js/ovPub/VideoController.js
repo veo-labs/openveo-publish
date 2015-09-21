@@ -41,7 +41,7 @@
     
     scopeDataTable.init = {
       sortBy : 'date',
-      sortOrder : 'desc'
+      sortOrder : 'dsc'
     }
     scopeDataTable.filterBy = [
       {
@@ -83,7 +83,7 @@
         "class": ['col-xs-12 col-sm-5']
       },
       {
-        'key': "metadata.date",
+        'key': "date",
         'type': "date",
         'name': $filter('translate')('VIDEOS.DATE_COLUMN'),
         "class": ['hidden-xs col-sm-1']

@@ -165,40 +165,53 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
     return {
       TIME: function(duration){
         duration = duration*1000;
-        return [
-        { zoom: 0.9, step: tv(0, 1 ,0, duration), units: [
-          { value: tv(0,20,0, duration), labeller: function (n) { 
-              var time = vt(n,duration);
-              var label = time.hours!=0?time.hours+'h' : '';
-              return label+time.minutes+'m'; } },
-          { value: tv(0,5,0, duration) }
-        ] },
-        { zoom: 2, step: tv(0,0,10, duration), units: [
-          { value: tv(0,10,0, duration), labeller: function (n) { 
-              var time = vt(n,duration);
-              var label = time.hours!=0?time.hours+'h' : '';
-              return label+time.minutes+'m';
-            } },
-          { value: tv(0,2,0, duration) }
-        ] },
-        { zoom: 4, step: tv(0,0,1, duration), units: [
-          { value: tv(0,5,0, duration), labeller: function (n) { 
-               var time = vt(n,duration);
-              var label = time.hours!=0?time.hours+'h' : '';
-              return label+time.minutes+'m';
-            } },
-          { value: tv(0,1,0, duration) },
-        ] },
-        { zoom:8, step: tv(0,0,1, duration), units: [
-//          { value: tv(1,0,0, duration), labeller: function (n) { return vt(n,duration).hours+'h'} },
-          { value: tv(0,2,0, duration), labeller: function (n) { 
-               var time = vt(n,duration);
-              var label = time.hours!=0?time.hours+'h' : '';
-              return label+time.minutes+'m';
-            } },
-          { value: tv(0,0,30, duration) }
-        ] }
-      ];
+        var zoomArray = []
+        var level = 0;
+        if (duration > 3600000) {//1h
+                  level = 1;
+                } else if (duration > 1800000) { //30min
+                  level = 2;
+                } else if (duration > 600000) { //10min
+                  level = 3;
+                } else {
+                  level = 4;
+                }
+        var labeller = function(n) {
+                  var time = vt(n, duration);
+                  var label = time.hours != 0 ? time.hours + 'h' : '';
+                  return label + time.minutes + 'm';
+                }
+        var zoom = [0.9, 2, 4, 8];
+
+        for(level; level <= 4;level++) {
+                  if (level == 1) {
+                    zoomArray.push({zoom: zoom[zoomArray.length], step: tv(0, 1, 0, duration), units: [
+                        {value: tv(0, 20, 0, duration), labeller: labeller},
+                        {value: tv(0, 5, 0, duration)}
+                      ]});
+                  }
+                  if (level == 2) {
+                    zoomArray.push({zoom: zoom[zoomArray.length], step: tv(0, 0, 10, duration), units: [
+                        {value: tv(0, 10, 0, duration), labeller: labeller},
+                        {value: tv(0, 2, 0, duration)}
+                      ]});
+                  }
+                  if (level == 3) {
+                    zoomArray.push({zoom: zoom[zoomArray.length], step: tv(0, 0, 1, duration), units: [
+                        {value: tv(0, 5, 0, duration), labeller: labeller},
+                        {value: tv(0, 1, 0, duration)}
+                      ]});
+                  }
+                  if (level == 4) {
+                    zoomArray.push({zoom: zoom[zoomArray.length], step: tv(0, 0, 1, duration), units: [
+                        {value: tv(0, 2, 0, duration), labeller: labeller},
+                        {value: tv(0, 0, 30, duration)}
+                      ]});
+                  }
+                }
+          
+        
+        return zoomArray;
       }
     }
   }]);
@@ -272,14 +285,14 @@ angular.module('vds.multirange.lite', [])
               return (parseFloat(this.value) * this.multiplier) +'';
             },
             set: function(n) {
-              this.value = parseInt(n) / this.multiplier;
+              this.value = Math.ceil(n) / this.multiplier;
               scope.position = this.value;
             }
           });
         };
         scope.$watch('position', function (n) {
           if(typeof scope.rdh == 'undefined') {
-            scope.rdh = new RangeDataHelper(n, parseInt(attr.max) || 100);
+            scope.rdh = new RangeDataHelper(n, Math.ceil(attr.max) || 100);
           } else {
             // scope.rdh.multiplier = parseInt(attr.max) || 100;
             scope.rdh.value = n;
