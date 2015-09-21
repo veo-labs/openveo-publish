@@ -38,6 +38,11 @@
       console.log(row.state);
       return (row.state === 11 || row.state === 12);
     }
+    
+    scopeDataTable.init = {
+      sortBy : 'date',
+      sortOrder : 'desc'
+    }
     scopeDataTable.filterBy = [
       {
         'key': 'title',
@@ -48,7 +53,7 @@
         'value': '',
         'label': $filter('translate')('VIDEOS.DESCRIPTION_FILTER')
       }, {
-        'key': 'metadata.date',
+        'key': 'date',
         'type': 'date',
         'value': '',
         'label': $filter('translate')('VIDEOS.DATE_FILTER')
