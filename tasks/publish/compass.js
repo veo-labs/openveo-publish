@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   publishdev: {
     options: {
@@ -15,4 +17,4 @@ module.exports = {
       environment: 'production'
     }
   }
-}
+};

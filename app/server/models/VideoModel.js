@@ -1,20 +1,20 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-models
  */
 
 // Module dependencies
-var util = require("util");
-var path = require("path");
-var fs = require("fs");
-var async = require("async");
-var openVeoAPI = require("@openveo/api");
+var util = require('util');
+var path = require('path');
+var fs = require('fs');
+var async = require('async');
+var openVeoAPI = require('@openveo/api');
 
-var VideoProvider = process.requirePublish("app/server/providers/VideoProvider.js");
-var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
-var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
-var videoPlatformConf = process.requirePublish("config/videoPlatformConf.json");
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var videoPlatformConf = process.requirePublish('config/videoPlatformConf.json');
 
 /**
  * Defines a VideoModel class to manipulate videos.
@@ -23,9 +23,8 @@ var videoPlatformConf = process.requirePublish("config/videoPlatformConf.json");
  * @constructor
  * @extends EntityModel
  */
-function VideoModel(){
+function VideoModel() {
   openVeoAPI.EntityModel.prototype.init.call(this, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
-  this.pendingUpdateOperations;
   this.propertyProvider = new PropertyProvider(openVeoAPI.applicationStorage.getDatabase());
 }
 
@@ -46,6 +45,45 @@ VideoModel.SAVING_TIMECODES_STATE = 9;
 VideoModel.COPYING_IMAGES_STATE = 10;
 VideoModel.READY_STATE = 11;
 VideoModel.PUBLISHED_STATE = 12;
+
+
+/**
+ * Updates the property of a given video.
+ *
+ * Update operations are grouped by event loop and only one request
+ * is made to the database for each video id.
+ *
+ * @method updateVideoProperty
+ * @private
+ * @async
+ * @param {Number} mediaId The id of the media to update
+ * @param {String} propertyName The name of the property to update
+ * @param {String|Number|Boolean} propertyValue The value of the
+ * property
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+function updateVideoProperty(mediaId, propertyName, propertyValue, callback) {
+  var self = this;
+
+  // No pending update operations for now
+  if (!this.pendingUpdateOperations) {
+    this.pendingUpdateOperations = {};
+
+    process.nextTick(function() {
+      for (var mediaId in self.pendingUpdateOperations) {
+        self.provider.update(mediaId, self.pendingUpdateOperations[mediaId], callback);
+      }
+      self.pendingUpdateOperations = null;
+    });
+  }
+
+  // Add update opration to pending operations
+  if (!this.pendingUpdateOperations[mediaId])
+    this.pendingUpdateOperations[mediaId] = {};
+
+  this.pendingUpdateOperations[mediaId][propertyName] = propertyValue;
+}
 
 /**
  * Adds a new video.
@@ -76,24 +114,24 @@ VideoModel.PUBLISHED_STATE = 12;
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.add = function(videoPackage, callback){
+VideoModel.prototype.add = function(videoPackage, callback) {
   var data = {
-    id : videoPackage.id + "",
-    state : videoPackage.state,
-    date : videoPackage.date,
-    metadata : videoPackage.metadata,
-    type : videoPackage.type,
-    errorCode : videoPackage.errorCode,
-    category : videoPackage.category,
-    properties : videoPackage.properties,
-    packageType : videoPackage.packageType,
-    lastState : videoPackage.lastState,
-    lastTransition : videoPackage.lastTransition,
-    originalPackagePath : videoPackage.originalPackagePath
+    id: String(videoPackage.id),
+    state: videoPackage.state,
+    date: videoPackage.date,
+    metadata: videoPackage.metadata,
+    type: videoPackage.type,
+    errorCode: videoPackage.errorCode,
+    category: videoPackage.category,
+    properties: videoPackage.properties,
+    packageType: videoPackage.packageType,
+    lastState: videoPackage.lastState,
+    lastTransition: videoPackage.lastTransition,
+    originalPackagePath: videoPackage.originalPackagePath
   };
-  
-  this.provider.add(data, function(error){
-    if(callback)
+
+  this.provider.add(data, function(error) {
+    if (callback)
       callback(error, data);
   });
 };
@@ -108,8 +146,8 @@ VideoModel.prototype.add = function(videoPackage, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateState = function(id, state, callback){
-  updateVideoProperty.call(this, id, "state", state, callback);
+VideoModel.prototype.updateState = function(id, state, callback) {
+  updateVideoProperty.call(this, id, 'state', state, callback);
 };
 
 /**
@@ -122,8 +160,8 @@ VideoModel.prototype.updateState = function(id, state, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateLastState = function(id, state, callback){
-  updateVideoProperty.call(this, id, "lastState", state, callback);
+VideoModel.prototype.updateLastState = function(id, state, callback) {
+  updateVideoProperty.call(this, id, 'lastState', state, callback);
 };
 
 /**
@@ -136,8 +174,8 @@ VideoModel.prototype.updateLastState = function(id, state, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateLastTransition = function(id, state, callback){
-  updateVideoProperty.call(this, id, "lastTransition", state, callback);
+VideoModel.prototype.updateLastTransition = function(id, state, callback) {
+  updateVideoProperty.call(this, id, 'lastTransition', state, callback);
 };
 
 /**
@@ -150,8 +188,8 @@ VideoModel.prototype.updateLastTransition = function(id, state, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateErrorCode = function(id, errorCode, callback){
-  updateVideoProperty.call(this, id, "errorCode", errorCode, callback);
+VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
+  updateVideoProperty.call(this, id, 'errorCode', errorCode, callback);
 };
 
 /**
@@ -164,8 +202,8 @@ VideoModel.prototype.updateErrorCode = function(id, errorCode, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateLink = function(id, link, callback){
-  updateVideoProperty.call(this, id, "link", link, callback);
+VideoModel.prototype.updateLink = function(id, link, callback) {
+  updateVideoProperty.call(this, id, 'link', link, callback);
 };
 
 /**
@@ -178,8 +216,8 @@ VideoModel.prototype.updateLink = function(id, link, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback){
-  updateVideoProperty.call(this, id, "mediaId", idMediaPlatform, callback);
+VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
+  updateVideoProperty.call(this, id, 'mediaId', idMediaPlatform, callback);
 };
 
 /**
@@ -192,8 +230,8 @@ VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateMetadata = function(id, metadata, callback){
-  updateVideoProperty.call(this, id, "metadata", metadata, callback);
+VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
+  updateVideoProperty.call(this, id, 'metadata', metadata, callback);
 };
 
 /**
@@ -206,8 +244,8 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateDate = function(id, date, callback){
-  updateVideoProperty.call(this, id, "date", date, callback);
+VideoModel.prototype.updateDate = function(id, date, callback) {
+  updateVideoProperty.call(this, id, 'date', date, callback);
 };
 
 /**
@@ -220,8 +258,8 @@ VideoModel.prototype.updateDate = function(id, date, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateCategory = function(id, categoryId, callback){
-  updateVideoProperty.call(this, id, "category", categoryId, callback);
+VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
+  updateVideoProperty.call(this, id, 'category', categoryId, callback);
 };
 
 /**
@@ -234,8 +272,8 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.updateType = function(id, type, callback){
-  updateVideoProperty.call(this, id, "type", type, callback);
+VideoModel.prototype.updateType = function(id, type, callback) {
+  updateVideoProperty.call(this, id, 'type', type, callback);
 };
 
 /**
@@ -247,7 +285,7 @@ VideoModel.prototype.updateType = function(id, type, callback){
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Array** The list of videos
  */
-VideoModel.prototype.get = function(callback){
+VideoModel.prototype.get = function(callback) {
   var self = this;
   var videos = [];
   var properties = [];
@@ -255,71 +293,68 @@ VideoModel.prototype.get = function(callback){
   async.parallel([
 
     // Get the list of videos
-    function(callback){
-      self.provider.get(function(error, videoList){
+    function(callback) {
+      self.provider.get(function(error, videoList) {
         videos = videoList;
         callback(error);
       });
     },
 
     // Get the list of custom properties
-    function(callback){
-      self.propertyProvider.get(function(error, propertyList){
+    function(callback) {
+      self.propertyProvider.get(function(error, propertyList) {
         properties = propertyList;
         callback(error);
       });
     }
 
-  ], function(error, result){
-      if(error){
-        callback(error)
-      }
-      else{
-        if(videos && properties){
+  ], function(error) {
+    if (error) {
+      callback(error);
+    } else {
+      if (videos && properties) {
 
-          // Videos may not have custom properties or just some of them.
-          // Furthermore only the id and value of properties are stored
-          // with videos, not complete information about the properties
-          // (no name, no description and no type).
-          // Inject all custom properties information inside video objects
+        // Videos may not have custom properties or just some of them.
+        // Furthermore only the id and value of properties are stored
+        // with videos, not complete information about the properties
+        // (no name, no description and no type).
+        // Inject all custom properties information inside video objects
 
-          // Videos
-          for(var i in videos){
-            var videoProperties = videos[i].properties;
-            var videoPropertiesWithValues = [];
+        // Videos
+        for (var i in videos) {
+          var videoProperties = videos[i].properties;
+          var videoPropertiesWithValues = [];
 
-            // Custom properties
-            for(var j in properties){
-              var found = false;
+          // Custom properties
+          for (var j in properties) {
 
-              // Video properties
-              for(var propertyId in videoProperties){
+            // Video properties
+            for (var propertyId in videoProperties) {
 
-                // Video already has the property
-                // Add property information
-                if(properties[j].id === propertyId){
-                  found = true;
-                  properties[j].value = videoProperties[propertyId];
-                  break;
-                }
-
+              // Video already has the property
+              // Add property information
+              if (properties[j].id === propertyId) {
+                properties[j].value = videoProperties[propertyId];
+                break;
               }
-
-              videoPropertiesWithValues.push(properties[j]);
 
             }
 
-            videos[i].properties = videoPropertiesWithValues;
+            videoPropertiesWithValues.push(properties[j]);
+
           }
 
+          videos[i].properties = videoPropertiesWithValues;
         }
 
-        callback(null, videos);
       }
+
+      callback(null, videos);
+    }
   });
 };
 
-VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback){
+VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
   var self = this;
   var videos = [];
   var properties = [];
@@ -327,8 +362,8 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
   async.parallel([
 
     // Get the list of videos
-    function(callback){
-      self.provider.getPaginatedFilteredEntities(filter, count, page, sort, function(error, videoList, pageArray){
+    function(callback) {
+      self.provider.getPaginatedFilteredEntities(filter, count, page, sort, function(error, videoList, pageArray) {
         videos = videoList;
         pagination = pageArray;
         callback(error);
@@ -336,53 +371,57 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
     },
 
     // Get the list of custom properties
-    function(callback){
-      self.propertyProvider.get(function(error, propertyList){
+    function(callback) {
+      self.propertyProvider.get(function(error, propertyList) {
         properties = propertyList;
         callback(error);
       });
     }
 
-  ], function(error, result){
-      if(error){
-        callback(error);
-      }
-      else{
-        if(videos && properties){
+  ], function(error) {
+    if (error) {
+      callback(error);
+    } else {
+      if (videos && properties) {
 
-          // Videos may not have custom properties or just some of them.
-          // Furthermore only the id and value of properties are stored
-          // with videos, not complete information about the properties
-          // (no name, no description and no type).
-          // Inject all custom properties information inside video objects
+        // Videos may not have custom properties or just some of them.
+        // Furthermore only the id and value of properties are stored
+        // with videos, not complete information about the properties
+        // (no name, no description and no type).
+        // Inject all custom properties information inside video objects
 
-          // Videos
-          for(var i in videos){
-            var newVideoProperty = {};
-            // Custom properties
-            for(var j in properties){    
-              if(!videos[i].properties[''+properties[j].id]) newVideoProperty[''+properties[j].id] = "";
-              else newVideoProperty[''+properties[j].id] = videos[i].properties[''+properties[j].id];
-            }
-            videos[i].properties = newVideoProperty;             
+        // Videos
+        for (var i in videos) {
+          var newVideoProperty = {};
+
+          // Custom properties
+          for (var j in properties) {
+            if (!videos[i].properties[String(properties[j].id)])
+              newVideoProperty[String(properties[j].id)] = '';
+            else
+              newVideoProperty[String(properties[j].id)] = videos[i].properties[String(properties[j].id)];
           }
+          videos[i].properties = newVideoProperty;
         }
-        callback(null, videos, pagination);
       }
-  }); 
+      callback(null, videos, pagination);
+    }
+  });
 };
 
 
-VideoModel.prototype.getOnePublished = function(id, callback){
-  this.getOne(id, function(error, video){
-    if(error)
-      callback(error)
-    else 
-      if(video && video.state === VideoModel.PUBLISHED_STATE)
-        callback(null, video)
-      else callback(new Error())
+VideoModel.prototype.getOnePublished = function(id, callback) {
+  this.getOne(id, function(error, video) {
+    if (error)
+      callback(error);
+    else
+    if (video && video.state === VideoModel.PUBLISHED_STATE)
+      callback(null, video);
+    else
+      callback(new Error());
   });
-}
+};
+
 /**
  * Gets a video.
  *
@@ -455,25 +494,27 @@ VideoModel.prototype.getOnePublished = function(id, callback){
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** The video information (see example)
  */
-VideoModel.prototype.getOne = function(id, callback){
+VideoModel.prototype.getOne = function(id, callback) {
   var self = this;
-  var videoInfo, timecodesFilePath, timecodes;
-  
+  var videoInfo,
+    timecodesFilePath,
+    timecodes;
+
   async.series([
-    
+
     // Retrieve video information from database
-    function(callback){
-      self.provider.getOne(id, function(error, video){
-        if(error){
+    function(callback) {
+      self.provider.getOne(id, function(error, video) {
+        if (error) {
           callback(error);
           return;
-        }
-        else {
+        } else {
 
           // Retreive video timecode file
           videoInfo = video;
           videoInfo.timecodes = {};
-          timecodesFilePath = path.normalize(process.rootPublish + "/public/publish/videos/" + videoInfo.id + "/synchro.json");
+          timecodesFilePath = path.normalize(
+            process.rootPublish + '/public/publish/videos/' + videoInfo.id + '/synchro.json');
 
         }
 
@@ -483,16 +524,17 @@ VideoModel.prototype.getOne = function(id, callback){
     },
 
     // Retrieve video information from video platform
-    function(callback){
-      if(videoInfo && videoInfo.type){
+    function(callback) {
+      if (videoInfo && videoInfo.type) {
 
         // Video information already retrieved
-        if(videoInfo.files && videoInfo.files.length)
+        if (videoInfo.files && videoInfo.files.length)
           return callback();
 
-        var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type, videoPlatformConf[videoInfo.type]);
-        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, function(error, info){
-          if(error){
+        var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type,
+          videoPlatformConf[videoInfo.type]);
+        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, function(error, info) {
+          if (error) {
             callback(error);
             return;
           }
@@ -511,14 +553,13 @@ VideoModel.prototype.getOne = function(id, callback){
     },
 
     // Retrieve video timecodes
-    function(callback){
-      if(timecodesFilePath){
-        fs.exists(timecodesFilePath, function(exists){
-          if(exists){
-            try{
+    function(callback) {
+      if (timecodesFilePath) {
+        fs.exists(timecodesFilePath, function(exists) {
+          if (exists) {
+            try {
               timecodes = require(timecodesFilePath);
-            }
-            catch(e){
+            } catch (e) {
               callback(new Error(e.message));
               return;
             }
@@ -530,29 +571,28 @@ VideoModel.prototype.getOne = function(id, callback){
         callback();
     }
 
-  ], function(error){
-    if(error || !videoInfo){
+  ], function(error) {
+    if (error || !videoInfo) {
       callback(error);
-    }
-    else{
+    } else {
       videoInfo.timecodes = [];
-      
+
       // Got timecodes for this video
-      if(timecodes){
-        
-        for(var i = 0 ; i < timecodes.length ; i++){
+      if (timecodes) {
+
+        for (var i = 0; i < timecodes.length; i++) {
           videoInfo.timecodes.push({
             timecode: timecodes[i].timecode,
             image: {
-              small: "/" + videoInfo.id + "/" + timecodes[i].image + "?thumb=small",
-              large: "/" + videoInfo.id + "/" + timecodes[i].image
+              small: '/' + videoInfo.id + '/' + timecodes[i].image + '?thumb=small',
+              large: '/' + videoInfo.id + '/' + timecodes[i].image
             }
           });
         }
       }
       callback(null, videoInfo);
     }
-    
+
   });
 };
 
@@ -566,27 +606,27 @@ VideoModel.prototype.getOne = function(id, callback){
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of removed items
  */
-VideoModel.prototype.remove = function(id, callback){
+VideoModel.prototype.remove = function(id, callback) {
   var self = this;
   async.parallel([
 
     // Remove video from database
-    function(callback){
-      self.provider.remove(id, function(error){
+    function(callback) {
+      self.provider.remove(id, function(error) {
         callback(error);
       });
     },
 
     // Remove video's public directory
-    function(callback){
-      var videoPublicDirectory = path.normalize(process.rootPublish + "/public/publish/videos/" + id);
+    function(callback) {
+      var videoPublicDirectory = path.normalize(process.rootPublish + '/public/publish/videos/' + id);
 
       // Test if video public directory exist
-      fs.exists(videoPublicDirectory, function(exists){
-        if(exists){
+      fs.exists(videoPublicDirectory, function(exists) {
+        if (exists) {
 
           // Remove directory
-          openVeoAPI.fileSystem.rmdir(videoPublicDirectory, function(error){
+          openVeoAPI.fileSystem.rmdir(videoPublicDirectory, function(error) {
             callback(error);
           });
 
@@ -597,8 +637,8 @@ VideoModel.prototype.remove = function(id, callback){
 
     }
 
-  ], function(error, result){
-    if(error)
+  ], function(error) {
+    if (error)
       callback(error);
     else
       callback();
@@ -615,16 +655,23 @@ VideoModel.prototype.remove = function(id, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.update = function(id, data, callback){
+VideoModel.prototype.update = function(id, data, callback) {
   var info = {};
-  if(data.title) info["title"] = data.title;
-  if(data.description) info["description"] = data.description;
-  if(data.properties) info["properties"] = data.properties;
-  if(data.category) info["category"] = data.category;
-  else info["category"] = "";
-  if(data.cut) info["cut"] = data.cut;
-  if(data.chapter) info["chapter"] = data.chapter;
-  
+  if (data.title)
+    info['title'] = data.title;
+  if (data.description)
+    info['description'] = data.description;
+  if (data.properties)
+    info['properties'] = data.properties;
+  if (data.category)
+    info['category'] = data.category;
+  else
+    info['category'] = '';
+  if (data.cut)
+    info['cut'] = data.cut;
+  if (data.chapter)
+    info['chapter'] = data.chapter;
+
   this.provider.update(id, info, callback);
 };
 
@@ -640,7 +687,7 @@ VideoModel.prototype.update = function(id, data, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.publishVideo = function(id, callback){
+VideoModel.prototype.publishVideo = function(id, callback) {
   this.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
 };
 
@@ -656,66 +703,6 @@ VideoModel.prototype.publishVideo = function(id, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoModel.prototype.unpublishVideo = function(id, callback){
+VideoModel.prototype.unpublishVideo = function(id, callback) {
   this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
 };
-
-/**
- * Updates the property of a given video.
- *
- * Update operations are grouped by event loop and only one request 
- * is made to the database for each video id.
- *
- * @method updateVideoProperty
- * @private
- * @async
- * @param {Number} mediaId The id of the media to update
- * @param {String} propertyName The name of the property to update
- * @param {String|Number|Boolean} propertyValue The value of the
- * property
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- */
-function updateVideoProperty(mediaId, propertyName, propertyValue, callback){
-  var self = this;
-  
-  // No pending update operations for now
-  if(!this.pendingUpdateOperations){
-    this.pendingUpdateOperations = {};
-    
-    process.nextTick(function(){
-      for(var mediaId in self.pendingUpdateOperations){
-        self.provider.update(mediaId, self.pendingUpdateOperations[mediaId], callback);
-      }
-      self.pendingUpdateOperations = null;
-    });
-  }
-  
-  // Add update opration to pending operations
-  if(!this.pendingUpdateOperations[mediaId])
-    this.pendingUpdateOperations[mediaId] = {};
-
-  this.pendingUpdateOperations[mediaId][propertyName] = propertyValue;
-}
-
-/**
- * Updates a list of properties for the given video.
- *
- * @example
- *     updateVideoProperties("13545", {
- *       "link" : "/publish/video/13545",
- *       "errorCode" : 2
- *     });
- *
- * @method updateVideoProperties
- * @private
- * @async
- * @param {Number} id The id of the video to update
- * @param {Object} properties A key value of properties to update
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- */
-function updateVideoProperties(id, properties, callback){
-  if(properties && typeof properties === "object")
-    self.provider.update(id, properties, callback);
-}

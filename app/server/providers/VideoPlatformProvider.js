@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-providers
@@ -15,11 +15,11 @@
  * it's structure depend on the provider's type, see extended objects
  * for more information
  */
-function VideoPlatformProvider(providerConf){
+function VideoPlatformProvider(providerConf) {
   this.conf = providerConf;
 
-  if(!this.conf)
-    throw new Error("No provider configuration");
+  if (!this.conf)
+    throw new Error('No provider configuration');
 }
 
 module.exports = VideoPlatformProvider;
@@ -30,7 +30,7 @@ VideoPlatformProvider.SD_QUALITY = 1;
 VideoPlatformProvider.HD_QUALITY = 2;
 
 /**
- * Gets an instance of a VideoPlatformProvider giving a type and a 
+ * Gets an instance of a VideoPlatformProvider giving a type and a
  * configuration object.
  *
  * @method getProvider
@@ -42,19 +42,18 @@ VideoPlatformProvider.HD_QUALITY = 2;
  * @return {VideoPlatformProvider} An instance of a
  * VideoPlatformProvider sub class
  */
-VideoPlatformProvider.getProvider = function(type, providerConf){
+VideoPlatformProvider.getProvider = function(type, providerConf) {
 
-  if(type && providerConf){
+  if (type && providerConf) {
 
-    switch(type){
-        
-      case "vimeo":
-        var VimeoProvider = process.requirePublish("app/server/providers/videoPlatforms/VimeoProvider.js");
+    switch (type) {
+
+      case 'vimeo':
+        var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
-      break;
-        
-      default: 
-        throw new Error("Unknown video plateform type");
+
+      default:
+        throw new Error('Unknown video plateform type');
     }
 
   }
@@ -71,7 +70,9 @@ VideoPlatformProvider.getProvider = function(type, providerConf){
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.upload = function(videoFilePath, callback){throw new Error("upload method not implemented for this video platform provider");}
+VideoPlatformProvider.prototype.upload = function() {
+  throw new Error('upload method not implemented for this video platform provider');
+};
 
 /**
  * Configure video on the platform.
@@ -86,7 +87,9 @@ VideoPlatformProvider.prototype.upload = function(videoFilePath, callback){throw
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.configure = function(mediaId, callback){callback();}
+VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
+  callback();
+};
 
 /**
  * Gets information about a video from video platform.
@@ -121,4 +124,6 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback){callback
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-VideoPlatformProvider.prototype.getVideoInfo = function(callback){throw new Error("getVideoInfo method not implemented for this video platform provider");}
+VideoPlatformProvider.prototype.getVideoInfo = function() {
+  throw new Error('getVideoInfo method not implemented for this video platform provider');
+};

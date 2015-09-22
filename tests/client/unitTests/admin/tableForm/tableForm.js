@@ -1,25 +1,24 @@
-(function (angular) {
+'use strict';
 
-  'use strict';
+(function(angular) {
 
-  var app = angular.module("ov.tableForm", []);
-  
-  app.factory("tableReloadEventService", TableReloadEventService);
-
-
-  // Service to reload a displayed table
-  TableReloadEventService.$inject = ["$rootScope"];
- 
-/**
- * 
- * Service reload Table
- */
- function TableReloadEventService($rootScope) {
+  /**
+   * Service reload Table
+   */
+  function TableReloadEventService($rootScope) {
     var sharedService = {};
-    sharedService.broadcast = function () {
+    sharedService.broadcast = function() {
       $rootScope.$broadcast('reloadDataTable');
     };
     return sharedService;
-  };
-  
+  }
+
+  var app = angular.module('ov.tableForm', []);
+
+  app.factory('tableReloadEventService', TableReloadEventService);
+
+
+  // Service to reload a displayed table
+  TableReloadEventService.$inject = ['$rootScope'];
+
 })(angular);

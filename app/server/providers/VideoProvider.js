@@ -1,12 +1,12 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-providers
  */
 
 // Module dependencies
-var util = require("util");
-var openVeoAPI = require("@openveo/api");
+var util = require('util');
+var openVeoAPI = require('@openveo/api');
 
 /**
  * Defines a VideoProvider class to get and save videos.
@@ -16,8 +16,8 @@ var openVeoAPI = require("@openveo/api");
  * @extends EntityProvider
  * @param {Database} database The database to interact with
  */
-function VideoProvider(database){
-  openVeoAPI.EntityProvider.prototype.init.call(this, database, "videos");
+function VideoProvider(database) {
+  openVeoAPI.EntityProvider.prototype.init.call(this, database, 'videos');
 }
 
 module.exports = VideoProvider;
@@ -34,9 +34,19 @@ util.inherits(VideoProvider, openVeoAPI.EntityProvider);
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoProvider.prototype.updateVideoState = function(id, oldState, newState, callback){
-  this.database.update(this.collection, {id : {$in : id}, state : oldState}, {state : newState}, function(error){
-    if(callback)
-      callback(error);
-  });
+VideoProvider.prototype.updateVideoState = function(id, oldState, newState, callback) {
+  this.database.update(this.collection,
+    {
+      id: {
+        $in: id
+      },
+      state: oldState
+    },
+    {
+      state: newState
+    },
+    function(error) {
+      if (callback)
+        callback(error);
+    });
 };

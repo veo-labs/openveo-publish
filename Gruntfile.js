@@ -1,12 +1,11 @@
-"use strict";
+'use strict';
 
 // Module dependencies
-var path = require("path");
-var util = require("util");
+var path = require('path');
 
 process.rootPublish = __dirname;
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.rootPublish + "/" + filePath));
+process.requirePublish = function(filePath) {
+  return require(path.normalize(process.rootPublish + '/' + filePath));
 };
 
 /**
@@ -20,43 +19,46 @@ process.requirePublish = function(filePath){
  * @return Object The list of configurations indexed by filename without
  * the extension
  */
-function loadConfig(path){
-  var glob = require("glob");
+function loadConfig(path) {
+  var glob = require('glob');
   var object = {};
   var key;
 
-  glob.sync("*", {cwd: path}).forEach(function(option){
-    key = option.replace(/\.js$/, "");
-    object[key] = require(path + "/" + option);
+  glob.sync('*', {
+    cwd: path
+  }).forEach(function(option) {
+    key = option.replace(/\.js$/, '');
+    object[key] = require(path + '/' + option);
   });
 
   return object;
 }
 
-module.exports = function(grunt){
+module.exports = function(grunt) {
 
   var config = {
-    pkg: grunt.file.readJSON("package.json"),
-    env: process.env,
+    pkg: grunt.file.readJSON('package.json'),
+    env: process.env
   };
 
   grunt.initConfig(config);
-  grunt.config.merge(loadConfig("./tasks/publish"));
+  grunt.config.merge(loadConfig('./tasks/publish'));
 
-  grunt.loadNpmTasks("grunt-contrib-compass");
-  grunt.loadNpmTasks("grunt-contrib-watch");
-  grunt.loadNpmTasks("grunt-contrib-uglify");
-  grunt.loadNpmTasks("grunt-contrib-concat");
-  grunt.loadNpmTasks("grunt-contrib-yuidoc");
-  grunt.loadNpmTasks("grunt-mocha-test");
-  grunt.loadNpmTasks("grunt-karma");
+  grunt.loadNpmTasks('grunt-contrib-compass');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-yuidoc');
+  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-eslint');
 
   // only watch core scss
-  grunt.registerTask("default", ["compass:publishdev", "watch"]);
-  
+  grunt.registerTask('default', ['compass:publishdev', 'watch']);
+
   // uglify and concat publish JavaScript files
-  grunt.registerTask("concatpublish", ["uglify", "concat"]);
-  
+  grunt.registerTask('concatpublish', ['uglify', 'concat']);
+
   // core Prod process (CSS+JS)
-  grunt.registerTask("prod", ["compass:publishdist", "concatpublish"]);
+  grunt.registerTask('prod', ['compass:publishdist', 'concatpublish']);
 };

@@ -1,12 +1,12 @@
-"use strict"
+'use strict';
 
 // Module dependencies
-var path = require("path");
+var path = require('path');
 
 // Set module root directory
 process.rootPublish = __dirname;
-process.requirePublish = function(filePath){
-  return require(path.normalize(process.rootPublish + "/" + filePath));
+process.requirePublish = function(filePath) {
+  return require(path.normalize(process.rootPublish + '/' + filePath));
 };
 
-module.exports = process.requirePublish("app/server/PublishPlugin.js");
+module.exports = process.requirePublish('app/server/PublishPlugin.js');

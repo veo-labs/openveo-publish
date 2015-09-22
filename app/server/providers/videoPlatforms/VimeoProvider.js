@@ -1,16 +1,16 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-providers
  */
 
 // Module dependencies
-var path = require("path");
-var util = require("util");
-var fs = require("fs");
-var vimeoAPI = require("vimeo");
-var async = require("async");
-var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPlatformProvider.js");
+var path = require('path');
+var util = require('util');
+var fs = require('fs');
+var vimeoAPI = require('vimeo');
+var async = require('async');
+var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 
 /**
  * Defines a VimeoProvider class to interact with vimeo platform
@@ -29,15 +29,15 @@ var VideoPlatformProvider = process.requirePublish("app/server/providers/VideoPl
  * @extends VideoPlatformProvider
  * @param {Object} providerConf A vimeo configuration object
  */
-function VimeoProvider(providerConf){
+function VimeoProvider(providerConf) {
   VideoPlatformProvider.call(this, providerConf);
-  
+
   this.vimeo = new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken);
 
   this.qualitiesMap = {
-    sd : VideoPlatformProvider.SD_QUALITY,
-    mobile : VideoPlatformProvider.MOBILE_QUALITY,
-    hd : VideoPlatformProvider.HD_QUALITY
+    sd: VideoPlatformProvider.SD_QUALITY,
+    mobile: VideoPlatformProvider.MOBILE_QUALITY,
+    hd: VideoPlatformProvider.HD_QUALITY
   };
 }
 
@@ -57,45 +57,49 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VimeoProvider.prototype.upload = function(videoFilePath, callback){
+VimeoProvider.prototype.upload = function(videoFilePath, callback) {
   var self = this;
-  
+
   // Retrieve video tmp directory
   // e.g E:/openveo/node_modules/@openveo/publish/tmp/
-  var presetId, mediaId;
+  var mediaId;
 
   async.series([
 
     // Checks user quota
-    function(callback){
+    function(callback) {
 
-      self.vimeo.request({method : "GET", path : "/me"}, function(error, body, statusCode, headers){
-        if(error)
+      self.vimeo.request({
+        method: 'GET',
+        path: '/me'
+      },
+      function(error, body) {
+        if (error)
           return callback(error);
 
         // User does not have permission to upload
-        if(!body.upload_quota)
-          callback(new Error("User does not have permission to upload on Vimeo"));
+        if (!body.upload_quota)
+          callback(new Error('User does not have permission to upload on Vimeo'));
 
         // Checks the size of the video to upload
-        fs.stat(videoFilePath, function(error, stats){
-          if(error)
+        fs.stat(videoFilePath, function(error, stats) {
+          if (error)
             callback(error);
-          else if(stats.size >= body.upload_quota.space.free)
-            callback(new Error("No more space left in Vimeo account"));
+          else if (stats.size >= body.upload_quota.space.free)
+            callback(new Error('No more space left in Vimeo account'));
           else
             callback();
         });
 
       });
-      
-    },
-    
-    // Upload video
-    function(callback){
-      self.vimeo.streamingUpload(videoFilePath, function(error, body, statusCode, headers){
 
-        if(error){
+    },
+
+    // Upload video
+    function(callback) {
+      self.vimeo.streamingUpload(videoFilePath, function(error, body, statusCode, headers) {
+
+        if (error) {
           callback(error);
           return;
         }
@@ -118,10 +122,10 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback){
       });
     }
 
-  ], function(error, results){
+  ], function(error) {
     callback(error, mediaId);
   });
-  
+
 };
 
 /**
@@ -157,49 +161,55 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback){
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-VimeoProvider.prototype.getVideoInfo = function(mediaId, callback){
-  if(mediaId){
+VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
+  if (mediaId) {
     var self = this;
 
     // Ask Vimeo for video information
-    this.vimeo.request({method : "GET", path : "/videos/" + mediaId}, function(error, body, statusCode, headers){
+    this.vimeo.request({
+      method: 'GET',
+      path: '/videos/' + mediaId
+    },
+    function(error, body) {
       var info = null;
 
-      if(!error){
-        info = { available : (body.status === "available") };
+      if (!error) {
+        info = {
+          available: (body.status === 'available')
+        };
 
         // Got video thumbnail in several formats
         // Keep only essential information (width, height and url)
-        if(body.pictures && body.pictures.sizes){
+        if (body.pictures && body.pictures.sizes) {
           var pictures = [];
-          for(var i = 0 ; i < body.pictures.sizes.length ; i++){
+          for (var i = 0; i < body.pictures.sizes.length; i++) {
             var picture = body.pictures.sizes[i];
             pictures.push({
-              width : picture.width,
-              height : picture.height,
-              link : picture.link
+              width: picture.width,
+              height: picture.height,
+              link: picture.link
             });
           }
-          info["pictures"] = pictures;
+          info['pictures'] = pictures;
         }
 
         // Got direct access to video files and formats
         // Keep only files with supported quality (see qualitiesMap)
-        if(body.files){
+        if (body.files) {
           var files = [];
-          for(var i = 0 ; i < body.files.length ; i++){
-            var file = body.files[i];
+          for (var j = 0; j < body.files.length; j++) {
+            var file = body.files[j];
 
-            if(self.qualitiesMap[file.quality] != undefined){
+            if (self.qualitiesMap[file.quality] != undefined) {
               files.push({
-                quality : self.qualitiesMap[file.quality],
-                width : file.width,
-                height : file.height,
-                link : file.link_secure
+                quality: self.qualitiesMap[file.quality],
+                width: file.width,
+                height: file.height,
+                link: file.link_secure
               });
             }
           }
-          info["files"] = files;
+          info['files'] = files;
         }
       }
 

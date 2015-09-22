@@ -1,7 +1,7 @@
-(function(angular){
+'use strict';
 
-  "use strict"
-  
-  var app = angular.module("ov.player", []);
-  
+(function(angular) {
+
+  angular.module('ov.player', []);
+
 })(angular);

@@ -1,5 +1,9 @@
-"use strict"
+'use strict';
 
-process.stdin.setEncoding("utf8");
-process.stdin.on("data", function(){});
-process.send({"status" : "started"});
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', function() {
+});
+
+process.send({
+  status: 'started'
+});

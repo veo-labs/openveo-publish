@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 /**
  * Defines the Publish Plugin that will be loaded by the core application.
@@ -7,10 +7,10 @@
  */
 
 // Module dependencies
-var util = require("util");
-var express = require("express");
-var openVeoAPI = require("@openveo/api");
-var watcherManager = process.requirePublish("app/server/watcher/watcherManager.js");
+var util = require('util');
+var express = require('express');
+var openVeoAPI = require('@openveo/api');
+var watcherManager = process.requirePublish('app/server/watcher/watcherManager.js');
 
 /**
  * Creates a PublishPlugin.
@@ -19,15 +19,15 @@ var watcherManager = process.requirePublish("app/server/watcher/watcherManager.j
  * @constructor
  * @extends Plugin
  */
-function PublishPlugin(){
+function PublishPlugin() {
 
   // Creates admin and front new routers
   this.router = express.Router();
   this.adminRouter = express.Router();
   this.webServiceRouter = express.Router();
-  
+
   // Define routes directly here or in the configuration file
-  
+
 }
 
 module.exports = PublishPlugin;
@@ -41,6 +41,6 @@ util.inherits(PublishPlugin, openVeoAPI.Plugin);
  *
  * @method start
  */
-PublishPlugin.prototype.start = function(){
+PublishPlugin.prototype.start = function() {
   watcherManager.start();
 };

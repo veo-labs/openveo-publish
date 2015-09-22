@@ -1,22 +1,22 @@
-(function(angular){
+'use strict';
 
-  "use strict"
+(function(angular) {
 
-  var app = angular.module("ov.i18n", ["ngCookies", "ngRoute"]);
-
-  app.factory("i18nService", I18nService);
-  app.filter("translate", TranslateFilter);
-  I18nService.$inject = ["$http", "$route", "$cookies"];
-  TranslateFilter.$inject = ["i18nService"];
-  
-  function I18nService($http, $route, $cookies){
+  function I18nService() {
     return {};
   }
-  
-  function TranslateFilter(i18nService){
-    return function(id, dictionaryName){
-      
-    }
+
+  function TranslateFilter() {
+    return function() {
+
+    };
   }
-  
+
+  var app = angular.module('ov.i18n', ['ngCookies', 'ngRoute']);
+
+  app.factory('i18nService', I18nService);
+  app.filter('translate', TranslateFilter);
+  I18nService.$inject = [];
+  TranslateFilter.$inject = ['i18nService'];
+
 })(angular);

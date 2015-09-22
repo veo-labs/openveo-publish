@@ -1,14 +1,14 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-models
  */
 
 // Module dependencies
-var util = require("util");
-var openVeoAPI = require("@openveo/api");
+var util = require('util');
+var openVeoAPI = require('@openveo/api');
 
-var PropertyProvider = process.requirePublish("app/server/providers/PropertyProvider.js");
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 
 /**
  * Defines a PropertyModel class to manipulate custom properties.
@@ -17,7 +17,7 @@ var PropertyProvider = process.requirePublish("app/server/providers/PropertyProv
  * @constructor
  * @extends EntityModel
  */
-function PropertyModel(){
+function PropertyModel() {
   openVeoAPI.EntityModel.prototype.init.call(this, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
 }
 
@@ -41,21 +41,21 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-PropertyModel.prototype.add = function(data, callback){
-  if(!data.name || !data.description || !data.type){
-    callback(new Error("Requires name, description or type to add a property"));
+PropertyModel.prototype.add = function(data, callback) {
+  if (!data.name || !data.description || !data.type) {
+    callback(new Error('Requires name, description or type to add a property'));
     return;
   }
 
   var property = {
-    id : Date.now().toString(),
-    name : data.name,
-    description : data.description,
-    type : data.type
+    id: Date.now().toString(),
+    name: data.name,
+    description: data.description,
+    type: data.type
   };
-  
-  this.provider.add(property, function(error){
-    if(callback)
+
+  this.provider.add(property, function(error) {
+    if (callback)
       callback(error, property);
   });
 };
@@ -76,10 +76,13 @@ PropertyModel.prototype.add = function(data, callback){
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-PropertyModel.prototype.update = function(id, data, callback){
+PropertyModel.prototype.update = function(id, data, callback) {
   var property = {};
-  if(data.name) property["name"] = data.name;
-  if(data.description) property["description"] = data.description;    
-  if(data.type) property["type"] = data.type;  
+  if (data.name)
+    property['name'] = data.name;
+  if (data.description)
+    property['description'] = data.description;
+  if (data.type)
+    property['type'] = data.type;
   this.provider.update(id, property, callback);
 };

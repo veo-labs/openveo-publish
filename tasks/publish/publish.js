@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   basePath: ['.'],
   app: ['<%= publish.basePath %>/app'],
@@ -10,4 +12,4 @@ module.exports = {
   css: ['<%= publish.public %>/publish/css'],
   js: ['<%= publish.public %>/publish/js'],
   uglify: ['<%= publish.basePath %>/build/uglify']
-}
+};

@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 /**
  * @module publish-controllers
@@ -11,19 +11,15 @@
  */
 
 // Module dependencies
-var winston = require("winston");
-var openVeoAPI = require("@openveo/api");
-var errors = process.requirePublish("app/server/httpErrors.js");
-var platforms = process.requirePublish("config/videoPlatformConf.json");
+var openVeoAPI = require('@openveo/api');
+var errors = process.requirePublish('app/server/httpErrors.js');
+var platforms = process.requirePublish('config/videoPlatformConf.json');
 
-var VideoModel = process.requirePublish("app/server/models/VideoModel.js");
+var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var videoModel = new VideoModel();
 var applicationStorage = openVeoAPI.applicationStorage;
 
-// Retrieve logger
-var logger = winston.loggers.get("openveo");
-
-var env = ( process.env.NODE_ENV === "production") ? "prod" : "dev";
+var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
 
 /**
  * Displays video player template.
@@ -34,7 +30,7 @@ var env = ( process.env.NODE_ENV === "production") ? "prod" : "dev";
  * @method displayVideoAction
  * @static
  */
-module.exports.displayVideoAction = function(request, response, next){
+module.exports.displayVideoAction = function(request, response, next) {
   response.locals.scripts = [];
   response.locals.css = [];
 
@@ -42,25 +38,25 @@ module.exports.displayVideoAction = function(request, response, next){
   var plugins = applicationStorage.getPlugins();
 
   // Got sub plugins
-  if(plugins){
-    var player = false;
-    plugins.forEach(function(subPlugin){
-      if(subPlugin.name === "publish"){
-        if(subPlugin.custom){
+  if (plugins) {
+    plugins.forEach(function(subPlugin) {
+      if (subPlugin.name === 'publish') {
+        if (subPlugin.custom) {
           var customScripts = subPlugin.custom.scriptFiles;
+          var playerScripts = customScripts['publishPlayer'];
           response.locals.scripts = response.locals.scripts.concat(
-            (customScripts["base"] || []),
-            ((customScripts["player"] && customScripts["player"][env]) ? customScripts["player"][env] : []),
-            ((customScripts["publishPlayer"] && customScripts["publishPlayer"][env]) ? customScripts["publishPlayer"][env] : [])
+            (customScripts['base'] || []),
+            ((customScripts['player'] && customScripts['player'][env]) ? customScripts['player'][env] : []),
+            ((playerScripts && playerScripts[env]) ? playerScripts[env] : [])
           );
           response.locals.css = response.locals.css.concat(subPlugin.custom.cssFiles || []);
         }
       }
     });
 
-    response.render("player", response.locals);
+    response.render('player', response.locals);
   }
-  
+
   // No sub plugins
   else
     next();
@@ -77,8 +73,10 @@ module.exports.displayVideoAction = function(request, response, next){
  * @method getPlatformsAction
  * @static
  */
-module.exports.getPlatformsAction = function(request, response, next){
-  response.send({ platforms: Object.keys(platforms) || [] });
+module.exports.getPlatformsAction = function(request, response) {
+  response.send({
+    platforms: Object.keys(platforms) || []
+  });
 };
 
 /**
@@ -98,13 +96,15 @@ module.exports.getPlatformsAction = function(request, response, next){
  * @method getVideoAction
  * @static
  */
-module.exports.getVideoAction = function(request, response, next){
-  if(request.params.id){
-    videoModel.getOnePublished(request.params.id, function(error, video){
-      if(error)
+module.exports.getVideoAction = function(request, response, next) {
+  if (request.params.id) {
+    videoModel.getOnePublished(request.params.id, function(error, video) {
+      if (error)
         next(errors.GET_VIDEO_ERROR);
       else
-        response.send({ video : video });
+        response.send({
+          video: video
+        });
     });
   }
 
@@ -129,14 +129,16 @@ module.exports.getVideoAction = function(request, response, next){
  * @method publishVideoAction
  * @static
  */
-module.exports.publishVideoAction = function(request, response, next){
-  if(request.params.id){
+module.exports.publishVideoAction = function(request, response, next) {
+  if (request.params.id) {
     var arrayId = request.params.id.split(',');
-    videoModel.publishVideo(arrayId, function(error){
-      if(error)
+    videoModel.publishVideo(arrayId, function(error) {
+      if (error)
         next(errors.PUBLISH_VIDEO_ERROR);
       else
-        response.send({state : VideoModel.PUBLISHED_STATE});
+        response.send({
+          state: VideoModel.PUBLISHED_STATE
+        });
     });
   }
 
@@ -161,14 +163,16 @@ module.exports.publishVideoAction = function(request, response, next){
  * @method unpublishVideoAction
  * @static
  */
-module.exports.unpublishVideoAction = function(request, response, next){
-  if(request.params.id){
+module.exports.unpublishVideoAction = function(request, response, next) {
+  if (request.params.id) {
     var arrayId = request.params.id.split(',');
-    videoModel.unpublishVideo(arrayId, function(error){
-      if(error)
+    videoModel.unpublishVideo(arrayId, function(error) {
+      if (error)
         next(errors.UNPUBLISH_VIDEO_ERROR);
       else
-        response.send({state : VideoModel.READY_STATE});
+        response.send({
+          state: VideoModel.READY_STATE
+        });
     });
   }
 

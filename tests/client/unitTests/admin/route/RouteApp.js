@@ -1,15 +1,16 @@
-(function(angular){
+'use strict';
 
-  "use strict"
+(function(angular) {
 
-  var app = angular.module("ov.route", ["ngRoute"]);
-  
-  app.provider("ovRoute", OvRouteProvider);
-  OvRouteProvider.$inject = ["$routeProvider"];             
-
-  function OvRouteProvider($routeProvider){
+  function OvRouteProvider($routeProvider) {
     this.when = $routeProvider.when;
-    this.$get = function(){};
-  };
-  
+    this.$get = function() {
+    };
+  }
+
+  var app = angular.module('ov.route', ['ngRoute']);
+
+  app.provider('ovRoute', OvRouteProvider);
+  OvRouteProvider.$inject = ['$routeProvider'];
+
 })(angular);

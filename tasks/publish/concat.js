@@ -1,7 +1,6 @@
-"use strict"
+'use strict';
 
-var path = require("path");
-var applicationConf = process.requirePublish("conf.json");
+var applicationConf = process.requirePublish('conf.json');
 
 /**
  * Gets the list of minified JavaScript files from the given list of files.
@@ -11,31 +10,31 @@ var applicationConf = process.requirePublish("conf.json");
  * @param Array files The list of files
  * @return Array The list of minified files
  */
-function getMinifiedJSFiles(files){
+function getMinifiedJSFiles(files) {
   var minifiedFiles = [];
-  files.forEach(function(path){
-    minifiedFiles.push("<%= publish.uglify %>/" + path.replace(".js", ".min.js"));
+  files.forEach(function(path) {
+    minifiedFiles.push('<%= publish.uglify %>/' + path.replace('.js', '.min.js'));
   });
   return minifiedFiles;
 }
 
 module.exports = {
-  publishjs : {
+  publishjs: {
 
     // Concatenate all back office JavaScript files
-    src : getMinifiedJSFiles(applicationConf["backOffice"]["scriptFiles"]["dev"]),
+    src: getMinifiedJSFiles(applicationConf['backOffice']['scriptFiles']['dev']),
 
     // Concatenate all files into openveoPublish.js
-    dest : "<%= publish.js %>/openveoPublish.js"
+    dest: '<%= publish.js %>/openveoPublish.js'
 
   },
-  frontJS : {
+  frontJS: {
 
     // Concatenate all front JavaScript files
-    src : getMinifiedJSFiles(applicationConf["custom"]["scriptFiles"]["publishPlayer"]["dev"]),
+    src: getMinifiedJSFiles(applicationConf['custom']['scriptFiles']['publishPlayer']['dev']),
 
     // Concatenate all files into openveoPublishPlayer.js
-    dest : "<%= publish.js %>/openveoPublishPlayer.js"
+    dest: '<%= publish.js %>/openveoPublishPlayer.js'
 
   }
-}
+};
