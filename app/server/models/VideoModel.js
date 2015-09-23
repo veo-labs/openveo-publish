@@ -46,7 +46,6 @@ VideoModel.COPYING_IMAGES_STATE = 10;
 VideoModel.READY_STATE = 11;
 VideoModel.PUBLISHED_STATE = 12;
 
-
 /**
  * Updates the property of a given video.
  *
@@ -354,6 +353,20 @@ VideoModel.prototype.get = function(callback) {
   });
 };
 
+/**
+ * Gets an ordered list of videos by page.
+ *
+ * @method getPaginatedFilteredEntities
+ * @async
+ * @param {Object} filter A MongoDB filter object
+ * @param {Number} count The expected number of results
+ * @param {Number} page The page number
+ * @param {Object} sort A MongoDB sort object
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Array** The list of videos
+ *   - **Object** Pagination information
+ */
 VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
   var self = this;
   var videos = [];
@@ -409,7 +422,16 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
   });
 };
 
-
+/**
+ * Gets a video and verify that it is published.
+ *
+ * @method getOnePublished
+ * @async
+ * @param {String} id The id of the video
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The video
+ */
 VideoModel.prototype.getOnePublished = function(id, callback) {
   this.getOne(id, function(error, video) {
     if (error)

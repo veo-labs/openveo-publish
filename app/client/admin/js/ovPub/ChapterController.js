@@ -17,13 +17,22 @@
 
     var orderBy = $filter('orderBy');
 
-    var updateRange = function() {
+    /**
+     * Reconstructs ranges with chapters and cut array.
+     */
+    function updateRange() {
       $scope.ranges = $scope.video.chapters.concat($scope.video.cut);
       orderBy($scope.ranges, '+value', false);
-    };
+    }
 
-    // Search a value, by time or value and return or delete it
-    var search = function(value, type, action) {
+    /**
+     * Search a value, by time or value and return or delete it.
+     * @param {Number} value Value to search in the list of chapters or null to search in cuts
+     * @param {String} type Cut type (e.g. begin or end) to search in the list of cuts
+     * @param {Boolean} action true to delete or false to get it
+     * @return {Boolean|Object} false if not found, true if found / deleted and an object if found
+     */
+    function search(value, type, action) {
       var searchObj = [];
       if (value === parseFloat(value))
         searchObj = $filter('filter')($scope.video.chapters, {
@@ -45,24 +54,21 @@
 
           // Or Delete
           if (value)
-            $scope.video.chapters.splice(
-              $scope.video.chapters.indexOf(
-                searchObj[0]),
-              1);
+            $scope.video.chapters.splice($scope.video.chapters.indexOf(searchObj[0]), 1);
           else if (type)
-            $scope.video.cut.splice(
-              $scope.video.cut.indexOf(
-                searchObj[0]),
-              1);
+            $scope.video.cut.splice($scope.video.cut.indexOf(searchObj[0]), 1);
           updateRange();
           return true;
         }
       }
       else
         return false;
-    };
+    }
 
-    var init = function() {
+    /**
+     * Initializes chapters and start / end cuts.
+     */
+    function init() {
 
       // If no chapter, add timecodes with empty values and sort them
       if (!$scope.video.chapters) {
@@ -127,7 +133,7 @@
         views: vdsMultirangeViews.TIME($scope.duration),
         view: 0
       };
-    };
+    }
 
     var myPlayer = document.getElementById('chapterPlayer');
     var playerController;
@@ -207,7 +213,8 @@
 
     // on cancel Edit Form
     $scope.cancel = function() {
-      // copy backup
+
+      // Copy backup
       angular.copy($scope.backUpRow, $scope.selectRow);
       $scope.isCollapsed = true;
     };
@@ -246,7 +253,7 @@
       }
     };
 
-    /**
+    /*
      * Slider
      */
 
@@ -265,7 +272,7 @@
       $scope.saveChapter();
     };
 
-    /**
+    /*
      * CUT
      */
 
@@ -349,7 +356,7 @@
       $window.history.back();
     };
 
-    /**
+    /*
      *
      *  Time
      */

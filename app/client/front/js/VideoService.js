@@ -8,9 +8,9 @@
   function VideoService($http) {
 
     /**
-     * Gets information about a video.
-     * @param String mediaId The media id
-     * @param Function callback The function to call when its done
+     * Gets information about a media.
+     * @param {String} mediaId The media id
+     * @param {Function} callback The function to call when its done
      */
     var getVideo = function(mediaId, callback) {
       return $http.get('/publish/getVideo/' + mediaId).then(function(response) {

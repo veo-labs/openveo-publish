@@ -8,10 +8,11 @@
   function PropertiesController($scope, $filter, entityService, publishService) {
 
     /**
-     * Removes the property.
-     * @param Object property The property to remove
+     * Removes a list of properties.
+     * @param {Array} selected The list of property ids to remove
+     * @param {Function} reload The reload Function to force reloading the table
      */
-    var removeRows = function(selected, reload) {
+    function removeRows(selected, reload) {
       entityService.removeEntity('property', selected.join(','))
         .success(function() {
           publishService.cacheClear('properties');
@@ -23,14 +24,16 @@
           if (status === 401)
             $scope.$parent.logout();
         });
-    };
+    }
 
     /**
      * Adds a property.
-     * @param Object form The angular form controller
+     * @param {Object} property Property data
+     * @param {Function} successCb Function to call in case of success
+     * @param {Function} errorCb Function to call in case of error
      */
-    var addProperty = function(model, successCb, errorCb) {
-      entityService.addEntity('property', model)
+    function addProperty(property, successCb, errorCb) {
+      entityService.addEntity('property', property)
         .success(function() {
           publishService.cacheClear('properties');
           successCb();
@@ -40,14 +43,15 @@
           if (status === 401)
             $scope.$parent.logout();
         });
-    };
+    }
 
     /**
      * Saves property.
-     * @param Object form The angular edition form controller
-     * @param Object property The property associated to the form
+     * @param Object property Property data
+     * @param {Function} successCb Function to call in case of success
+     * @param {Function} errorCb Function to call in case of error
      */
-    var saveProperty = function(property, successCb, errorCb) {
+    function saveProperty(property, successCb, errorCb) {
       entityService.updateEntity('property', property.id, {
         name: property.name,
         description: property.description,
@@ -60,9 +64,9 @@
         if (status === 401)
           $scope.$parent.logout();
       });
-    };
+    }
 
-    /**
+    /*
      *
      * RIGHTS
      *
@@ -72,7 +76,7 @@
     $scope.rights.edit = $scope.checkAccess('update-property');
     $scope.rights.delete = $scope.checkAccess('delete-property');
 
-    /**
+    /*
      *
      * DATATABLE
      */
@@ -115,7 +119,7 @@
       }
     }];
 
-    /**
+    /*
      * FORM
      */
     var scopeEditForm = $scope.editFormContainer = {};
@@ -167,7 +171,7 @@
       saveProperty(model, successCb, errorCb);
     };
 
-    /**
+    /*
      *  FORM Add Property
      *
      */

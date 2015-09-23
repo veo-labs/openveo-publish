@@ -15,11 +15,10 @@
 
     /**
      * Loads the list of videos from server.
-     * @return Promise The promise used to retrieve properties
-     * from server
-     * @param Boolean force true to force reloading the list of videos
+     * @param {Boolean} force true to force reloading the list of videos
+     * @return {Promise} The promise used to retrieve videos from server
      */
-    var loadVideos = function(force) {
+    function loadVideos(force) {
       if (!videos || force) {
 
         // Get videos from server
@@ -34,78 +33,76 @@
           entities: videos
         }
       });
-    };
+    }
 
     /**
      * Retries the given video.
-     * @param String id The id of the video to retry
-     * @return HttpPromise The HTTP promise
+     * @param {String} id The id of the video to retry
+     * @return {Promise} The HTTP promise
      */
-    var retryVideo = function(id) {
+    function retryVideo(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/retryVideo/' + id);
-    };
+    }
 
     /**
      * Publishes the given video.
-     * @param String id The id of the video to publish
-     * @return HttpPromise The HTTP promise
+     * @param {String} id The id of the video to publish
+     * @return {Promise} The HTTP promise
      */
-    var publishVideo = function(id) {
+    function publishVideo(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/publishVideo/' + id);
-    };
+    }
 
     /**
      * Unpublishes the given video.
-     * @param String id The id of the video to unpublish
-     * @return HttpPromise The HTTP promise
+     * @param {String} id The id of the video to unpublish
+     * @return {Promise} The HTTP promise
      */
-    var unpublishVideo = function(id) {
+    function unpublishVideo(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/unpublishVideo/' + id);
-    };
-
+    }
 
     /**
      * Gets the list of videos.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var getVideos = function() {
+    function getVideos() {
       return videos;
-    };
-
+    }
 
     /**
      * Gets watcher status.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var getWatcherStatus = function() {
+    function getWatcherStatus() {
       return $http.get(basePath + 'publish/watcherStatus');
-    };
+    }
 
     /**
      * Starts the watcher.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var startWatcher = function() {
+    function startWatcher() {
       return $http.get(basePath + 'publish/startWatcher');
-    };
+    }
 
     /**
      * Stops the watcher.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var stopWatcher = function() {
+    function stopWatcher() {
       return $http.get(basePath + 'publish/stopWatcher');
-    };
+    }
 
     /**
      * Loads the list of properties from server.
-     * @return Promise The promise used to retrieve properties
+     * @return {Promise} The promise used to retrieve properties
      * from server
      */
-    var loadProperties = function() {
+    function loadProperties() {
       if (!properties) {
         return entityService.getAllEntities('property').success(function(propertiesObj) {
           properties = propertiesObj.entities;
@@ -118,21 +115,21 @@
           entities: properties
         }
       });
-    };
+    }
 
     /**
      * Gets list of properties.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var getProperties = function() {
+    function getProperties() {
       return properties;
-    };
+    }
 
     /**
      * Loads the list of available media platforms from server.
-     * @return Promise The promise used to retrieve platforms from server
+     * @return {Promise} The promise used to retrieve platforms from server
      */
-    var loadPlatforms = function() {
+    function loadPlatforms() {
       if (!platforms) {
         return $http.get(basePath + 'publish/getPlatforms').success(function(platformsObj) {
           platforms = platformsObj.platforms;
@@ -144,28 +141,32 @@
           platforms: platforms
         }
       });
-    };
+    }
 
     /**
      * Gets the list of available platforms.
-     * @return HttpPromise The HTTP promise
+     * @return {Promise} The HTTP promise
      */
-    var getPlatforms = function() {
+    function getPlatforms() {
       return platforms;
-    };
+    }
 
     /**
      * Asks server to start uploading the video.
-     * @param String id The id of the video to start uploading
-     * @param String platform The video platform to upload to
-     * @return HttpPromise The HTTP promise
+     * @param {String} id The id of the video to start uploading
+     * @param {String} platform The video platform to upload to
+     * @return {Promise} The HTTP promise
      */
-    var startVideoUpload = function(id, platform) {
+    function startVideoUpload(id, platform) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/startUpload/' + id + '/' + platform);
-    };
+    }
 
-    var loadCategories = function() {
+    /**
+     * Loads the list of media categories.
+     * @return {Promise} The HTTP promise
+     */
+    function loadCategories() {
       if (!categories) {
 
         // Get categories from server
@@ -178,17 +179,22 @@
       return $q.when({
         data: categories
       });
-    };
+    }
 
     /**
      * Gets list of properties.
-     * @return HttpPromise The HTTP promise
+     * @return {Array} The list of categories
      */
-    var getCategories = function() {
+    function getCategories() {
       return categories;
-    };
+    }
 
-    var getVideoChapter = function(id) {
+    /**
+     * Loads a video by its id.
+     * @param {String} id The video id
+     * @return {Promise} The HTTP promise
+     */
+    function loadVideo(id) {
       if (!videoChapter[id]) {
         return entityService.getEntity('video', id).success(function(obj) {
           videoChapter[id] = obj;
@@ -197,9 +203,13 @@
       return $q.when({
         data: videoChapter[id]
       });
-    };
+    }
 
-    var cacheClear = function(type) {
+    /**
+     * Deletes cache for the given entity.
+     * @param {String} type The entity type
+     */
+    function cacheClear(type) {
       if (!type) {
         properties = videos = categories = null;
         videoChapter = {};
@@ -221,7 +231,7 @@
           default:
             return;
         }
-    };
+    }
 
     return {
       loadVideos: loadVideos,
@@ -239,7 +249,7 @@
       getWatcherStatus: getWatcherStatus,
       startWatcher: startWatcher,
       stopWatcher: stopWatcher,
-      getVideoChapter: getVideoChapter,
+      loadVideo: loadVideo,
       cacheClear: cacheClear
     };
 

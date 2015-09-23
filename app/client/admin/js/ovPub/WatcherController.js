@@ -20,7 +20,7 @@
      * Updates watcher status, if the status is in transition
      * state (starting or stopping) poll the server until the status
      * is stable.
-     * @param Number status The watcher status to set
+     * @param {Number} status The watcher status to set
      */
     function updateWatcherStatus(status) {
       $scope.watcherStatus = status;
@@ -49,7 +49,7 @@
 
     updateWatcherStatus(watcherStatus.data.status);
 
-    /**
+    /*
      *
      * RIGHTS
      *

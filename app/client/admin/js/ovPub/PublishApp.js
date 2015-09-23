@@ -37,9 +37,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
   }
 
   /**
-   *
-   * Filter to print Category in cells
-   *
+   * Filter to print Category in cells.
    */
   function CategoryFilter(jsonPath) {
     return function(input, rubrics) {
@@ -68,7 +66,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     });
   }]);
 
-  /**
+  /*
    * Configures the ov.publish application by adding new routes.
    */
   app.config(['ovRouteProvider', function(ovRouteProvider) {
@@ -108,7 +106,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       resolve: {
         video: ['publishService', '$route', function(publishService, $route) {
           var videoId = $route.current.params.videoId;
-          return publishService.getVideoChapter(videoId);
+          return publishService.loadVideo(videoId);
         }]
       }
     });

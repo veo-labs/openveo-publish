@@ -202,26 +202,14 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
           if (level == 1) {
             zoomArray.push({
               zoom: zoom[zoomArray.length],
-              step: tv(
-                0,
-                1,
-                0,
-                duration),
+              step: tv(0, 1, 0, duration),
               units: [
                 {
-                  value: tv(
-                    0,
-                    20,
-                    0,
-                    duration),
+                  value: tv(0, 20, 0, duration),
                   labeller: labeller
                 },
                 {
-                  value: tv(
-                    0,
-                    5,
-                    0,
-                    duration)
+                  value: tv(0, 5, 0, duration)
                 }
               ]
             });
@@ -229,26 +217,14 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
           if (level == 2) {
             zoomArray.push({
               zoom: zoom[zoomArray.length],
-              step: tv(
-                0,
-                0,
-                10,
-                duration),
+              step: tv(0, 0, 10, duration),
               units: [
                 {
-                  value: tv(
-                    0,
-                    10,
-                    0,
-                    duration),
+                  value: tv(0, 10, 0, duration),
                   labeller: labeller
                 },
                 {
-                  value: tv(
-                    0,
-                    2,
-                    0,
-                    duration)
+                  value: tv(0, 2, 0, duration)
                 }
               ]
             });
@@ -256,26 +232,14 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
           if (level == 3) {
             zoomArray.push({
               zoom: zoom[zoomArray.length],
-              step: tv(
-                0,
-                0,
-                1,
-                duration),
+              step: tv(0, 0, 1, duration),
               units: [
                 {
-                  value: tv(
-                    0,
-                    5,
-                    0,
-                    duration),
+                  value: tv(0, 5, 0, duration),
                   labeller: labeller
                 },
                 {
-                  value: tv(
-                    0,
-                    1,
-                    0,
-                    duration)
+                  value: tv(0, 1, 0, duration)
                 }
               ]
             });
@@ -283,32 +247,19 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
           if (level == 4) {
             zoomArray.push({
               zoom: zoom[zoomArray.length],
-              step: tv(
-                0,
-                0,
-                1,
-                duration),
+              step: tv(0, 0, 1, duration),
               units: [
                 {
-                  value: tv(
-                    0,
-                    2,
-                    0,
-                    duration),
+                  value: tv(0, 2, 0, duration),
                   labeller: labeller
                 },
                 {
-                  value: tv(
-                    0,
-                    0,
-                    30,
-                    duration)
+                  value: tv(0, 0, 30, duration)
                 }
               ]
             });
           }
         }
-
 
         return zoomArray;
       }
@@ -381,7 +332,13 @@ angular.module('vds.multirange.lite', [])
           event.stopPropagation();
         });
 
-        var RangeDataHelper = function(value, multiplier) {
+        /**
+         * TODO
+         * Defines getter and setter on range data object.
+         * @param {Number} value
+         * @param {Number} multiplier
+         */
+        function RangeDataHelper(value, multiplier) {
           this.value = isNaN(value) ? 0 : value;
           this.multiplier = multiplier;
           Object.defineProperty(this, 'mulValue', {
@@ -393,7 +350,7 @@ angular.module('vds.multirange.lite', [])
               scope.position = this.value;
             }
           });
-        };
+        }
         scope.$watch('position', function(n) {
           if (typeof scope.rdh == 'undefined') {
             scope.rdh = new RangeDataHelper(n, Math.ceil(attr.max) || 100);

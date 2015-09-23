@@ -18,6 +18,8 @@
 
     /**
      * Handles error when a category is added or updated.
+     * @param {Object} data Response data
+     * @param {Number} status HTTP code
      */
     function errorCb(data, status) {
       $scope.saveIsDisabled = $scope.list.length == 0;
