@@ -1,6 +1,28 @@
 'use strict';
 
 module.exports = {
+  lib: {
+    files: [
+      {
+
+        // Enable the following options
+        expand: true,
+
+        // Base path for patterns
+        cwd: '<%= publish.srcjs %>/',
+
+        // Match all JavaScript library files
+        src: ['multirange/*.js'],
+
+        // Set destination directory
+        dest: '<%= publish.uglify %>/',
+
+        // Generated files extension
+        ext: '.min.js'
+
+      }
+    ]
+  },
   publishprod: {
     files: [
       {

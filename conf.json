@@ -85,7 +85,7 @@
       "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
       "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
     }
-    
+
   ],
   "backOffice": {
     "menu" : [
@@ -122,7 +122,7 @@
         "multirange/multirange.js"
       ],
       "prod" : [
-        "/js/libOpenveoPublish.js"
+        "publish/js/libOpenveoPublish.js"
       ]
     },
     "scriptFiles" : {
