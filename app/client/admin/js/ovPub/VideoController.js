@@ -97,7 +97,9 @@
       $scope.$emit('setAlert', 'info', [
         $filter('translate')('VIDEOS.SHARECODE'),
         '<br><br><div class="well well-sm"><code>',
-        '&lt;iframe width="480" height="270" src=' + video.link + '?fullscreen"frameborder="0"&gt;&lt;/iframe&gt;',
+        '&lt;iframe width="480" height="270" ',
+        'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + video.link + '?fullscreen" ',
+        'frameborder="0"&gt;&lt;/iframe&gt;',
         '</div>'
       ].join(''), 0);
     }
