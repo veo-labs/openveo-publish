@@ -39,13 +39,11 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
   /**
    * Filter to print Category in cells.
    */
-  function CategoryFilter(jsonPath) {
-    return function(input, rubrics) {
-
-      // Get title of elements in rubrics where id is "input"
-      var name = jsonPath(rubrics, '$..*[?(@.id=="' + input + '")].title');
-      if (name && name.length > 0)
-        return name[0];
+  function CategoryFilter(publishService) {
+    var rubrics = publishService.getCategoriesByKey();
+    return function(input) {
+      if (input && rubrics[input])
+        return rubrics[input];
       else
         return '';
     };
@@ -163,6 +161,6 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
   // Filter to display content in the table (cf. dataTable.html)
   StatusFilter.$inject = ['$filter'];
-  CategoryFilter.$inject = ['jsonPath'];
+  CategoryFilter.$inject = ['publishService'];
 
 })(angular);

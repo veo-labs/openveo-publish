@@ -11,10 +11,10 @@ describe('VideoController', function() {
 
   // Load module publish, entity and ngJSONPath
   beforeEach(function() {
+    module('ngJSONPath');
     module('ov.publish');
     module('ov.entity');
     module('ov.tableForm');
-    module('ngJSONPath');
   });
 
   // Dependencies injections

@@ -10,7 +10,10 @@ describe('WatcherController', function() {
     scope;
 
   // Load module publish
-  beforeEach(module('ov.publish'));
+  beforeEach(function() {
+    module('ngJSONPath');
+    module('ov.publish');
+  });
 
   // Dependencies injections
   beforeEach(inject(function(_$rootScope_, _$controller_, _$httpBackend_) {

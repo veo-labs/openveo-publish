@@ -5,11 +5,12 @@
   /**
    * Defines a publish service to get publish information.
    */
-  function PublishService($http, $q, entityService) {
+  function PublishService($http, $q, entityService, jsonPath) {
     var basePath = '/admin/';
     var properties,
       videos,
       categories,
+      categoriesByKey,
       platforms;
     var videoChapter = {};
 
@@ -173,20 +174,34 @@
         return $http.get(basePath + 'gettaxonomy/categories').success(function(taxonomyObj) {
           categories = taxonomyObj;
         });
-
       }
-
       return $q.when({
         data: categories
       });
     }
 
     /**
-     * Gets list of properties.
+     * Gets list of Categories.
      * @return {Array} The list of categories
      */
     function getCategories() {
       return categories;
+    }
+
+    /**
+     * Gets list of Categories by key.
+     * @return {Object} The list of categories by key:value
+     */
+    function getCategoriesByKey() {
+      if (!categoriesByKey) {
+        categoriesByKey = {};
+        var categoriestmp = jsonPath(categories, '$..*[?(@.id)]');
+        categoriestmp.map(function(obj) {
+          categoriesByKey[obj.id] = obj.title;
+          return obj;
+        });
+      }
+      return categoriesByKey;
     }
 
     /**
@@ -221,6 +236,7 @@
             break;
           case 'categories':
             categories = null;
+            categoriesByKey = null;
             break;
           case 'videos':
             videos = null;
@@ -244,6 +260,7 @@
       getProperties: getProperties,
       loadCategories: loadCategories,
       getCategories: getCategories,
+      getCategoriesByKey: getCategoriesByKey,
       loadPlatforms: loadPlatforms,
       getPlatforms: getPlatforms,
       getWatcherStatus: getWatcherStatus,
@@ -256,6 +273,6 @@
   }
 
   app.factory('publishService', PublishService);
-  PublishService.$inject = ['$http', '$q', 'entityService'];
+  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath'];
 
 })(angular.module('ov.publish'));

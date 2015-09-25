@@ -67,6 +67,7 @@
       });
       return options;
     }
+    var categoryArray = categoryOptions();
 
     /**
      * Gets all categories and add a value for "none".
@@ -74,11 +75,10 @@
      * @return {Array} The list of categories
      */
     function getSelectableCategories(label) {
-      var catArray = categoryOptions();
       return [{
         value: '',
         name: $filter('translate')(label)
-      }].concat(catArray);
+      }].concat(categoryArray);
     }
 
     /**
@@ -256,7 +256,7 @@
       else
         return id;
     }
-
+    var categoriesfield = getSelectableCategories('UI.NONE');
     scopeEditForm.fieldsBase = [
       {
         key: 'title',
@@ -279,7 +279,7 @@
         type: 'horizontalExtendSelect',
         templateOptions: {
           label: $filter('translate')('VIDEOS.ATTR_CATEGORY'),
-          options: getSelectableCategories('UI.NONE')
+          options: categoriesfield
         }
       }
     ];
@@ -298,6 +298,7 @@
       sortBy: 'date',
       sortOrder: 'dsc'
     };
+    var categoriesFilter = getSelectableCategories('UI.ALL');
     scopeDataTable.filterBy = [
       {
         key: 'title',
@@ -327,7 +328,7 @@
          ...
          ];
          */
-        options: getSelectableCategories('UI.ALL'),
+        options: categoriesFilter,
 
         // if enable filter will filter with the selectId AND additionnal id set in the "children" key of each options
         filterWithChildren: true

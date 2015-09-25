@@ -8,7 +8,10 @@ describe('PublishService', function() {
     publishService;
 
   // Load module publish
-  beforeEach(module('ov.publish'));
+  beforeEach(function() {
+    module('ngJSONPath');
+    module('ov.publish');
+  });
 
   // Dependencies injections
   beforeEach(inject(function(_$httpBackend_, _publishService_) {
