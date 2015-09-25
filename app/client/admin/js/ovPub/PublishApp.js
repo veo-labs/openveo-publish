@@ -43,7 +43,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     var rubrics = publishService.getCategoriesByKey();
     return function(input) {
       if (input && rubrics[input])
-        return rubrics[input];
+        return rubrics[input].name;
       else
         return '';
     };

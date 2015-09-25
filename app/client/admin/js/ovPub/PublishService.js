@@ -10,6 +10,7 @@
     var properties,
       videos,
       categories,
+      categoriesOptions,
       categoriesByKey,
       platforms;
     var videoChapter = {};
@@ -169,10 +170,24 @@
      */
     function loadCategories() {
       if (!categories) {
-
         // Get categories from server
         return $http.get(basePath + 'gettaxonomy/categories').success(function(taxonomyObj) {
           categories = taxonomyObj;
+          categoriesByKey = {};
+          categoriesOptions = [];
+          var categoriestmp = jsonPath(taxonomyObj, '$..*[?(@.id)]');
+          if (categoriestmp)
+            categoriestmp.map(function(obj) {
+              var children = jsonPath(obj, '$..*[?(@.id)].id');
+              var rubric = {
+                value: obj.id,
+                name: obj.title,
+                children: children ? children.join(',') : ''
+              };
+              categoriesByKey[obj.id] = rubric;
+              categoriesOptions.push(rubric);
+              return obj;
+            });
         });
       }
       return $q.when({
@@ -189,18 +204,18 @@
     }
 
     /**
+     * Gets list of Categories formatted for select options.
+     * @return {Array} The list of categories
+     */
+    function getCategoriesOptions() {
+      return categoriesOptions;
+    }
+
+    /**
      * Gets list of Categories by key.
      * @return {Object} The list of categories by key:value
      */
     function getCategoriesByKey() {
-      if (!categoriesByKey) {
-        categoriesByKey = {};
-        var categoriestmp = jsonPath(categories, '$..*[?(@.id)]');
-        categoriestmp.map(function(obj) {
-          categoriesByKey[obj.id] = obj.title;
-          return obj;
-        });
-      }
       return categoriesByKey;
     }
 
@@ -236,6 +251,7 @@
             break;
           case 'categories':
             categories = null;
+            categoriesOptions = null;
             categoriesByKey = null;
             break;
           case 'videos':
@@ -260,6 +276,7 @@
       getProperties: getProperties,
       loadCategories: loadCategories,
       getCategories: getCategories,
+      getCategoriesOptions: getCategoriesOptions,
       getCategoriesByKey: getCategoriesByKey,
       loadPlatforms: loadPlatforms,
       getPlatforms: getPlatforms,

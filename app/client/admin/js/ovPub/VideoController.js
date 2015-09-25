@@ -51,25 +51,6 @@
     var scopeDataTable = $scope.tableContainer = {};
 
     /**
-     * Gets all categories.
-     * @return {Array} The list of categories
-     */
-    function categoryOptions() {
-      var categories = jsonPath($scope.categories, '$..*[?(@.id)]');
-      var options = [];
-      angular.forEach(categories, function(value) {
-        var children = jsonPath($scope.categories, '$..[?(@.id==' + value.id + ')]..*[?(@.id)].id');
-        options.push({
-          value: value.id,
-          name: value.title,
-          children: children ? children.join(',') : ''
-        });
-      });
-      return options;
-    }
-    var categoryArray = categoryOptions();
-
-    /**
      * Gets all categories and add a value for "none".
      * @param {String} label The label for "no categories"
      * @return {Array} The list of categories
@@ -78,7 +59,7 @@
       return [{
         value: '',
         name: $filter('translate')(label)
-      }].concat(categoryArray);
+      }].concat(publishService.getCategoriesOptions());
     }
 
     /**
