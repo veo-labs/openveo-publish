@@ -4,6 +4,7 @@
     "VIDEOS" : "Catalogue",
     "WATCHER" : "Watcher",
     "PROPERTIES" : "Propriétés personnalisées",
+    "CONFIGURATION" : "Configuration",
     "CATEGORIES" : "Rubriques"
   },
   "WS_SCOPES" : {
@@ -140,5 +141,9 @@
     "ADD_BEGIN": "Couper le début",
     "REMOVE_BEGIN": "Enlever la coupe de début",
     "SAVE_ERROR": "Une erreur est survenue. Vos modifications n'ont pas pu être sauvegardées."
+  },
+  "CONFIGURATION": {
+    "PAGE_TITLE": "Publish - Configuration",
+    "TITLE": "Configuration"
   }
 }

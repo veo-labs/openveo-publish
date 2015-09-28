@@ -1,0 +1,5 @@
+<h2>{{CONFIGURATION.TITLE | translate}}</h2>
+<div>
+    <a ng-if="!viewModel.oAuthInfos.hasToken" href="{{viewModel.oAuthInfos.authUrl}}">Associate to google</a>
+    <p ng-if="viewModel.oAuthInfos.hasToken">Correctly associated to google<br /><a href="{{viewModel.oAuthInfos.authUrl}}">Edit the association</a></p>
+</div>

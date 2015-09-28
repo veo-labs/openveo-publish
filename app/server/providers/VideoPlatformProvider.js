@@ -1,5 +1,8 @@
 'use strict';
 
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
+
 /**
  * @module publish-providers
  */
@@ -10,12 +13,15 @@
  * appropriate VideoPlatformProvider.
  *
  * @class VideoPlatformProvider
+ * @extends EventEmitter
  * @constructor
  * @param {Object} providerConf A video platform configuration object
  * it's structure depend on the provider's type, see extended objects
  * for more information
  */
 function VideoPlatformProvider(providerConf) {
+  EventEmitter.call(this);
+
   this.conf = providerConf;
 
   if (!this.conf)
@@ -23,6 +29,7 @@ function VideoPlatformProvider(providerConf) {
 }
 
 module.exports = VideoPlatformProvider;
+util.inherits(VideoPlatformProvider, EventEmitter);
 
 // Video qualities
 VideoPlatformProvider.MOBILE_QUALITY = 0;
@@ -51,6 +58,9 @@ VideoPlatformProvider.getProvider = function(type, providerConf) {
       case 'vimeo':
         var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
+      case "youtube":
+        var YoutubeProvider = process.requirePublish("app/server/providers/videoPlatforms/YoutubeProvider.js");
+        return new YoutubeProvider(providerConf);
 
       default:
         throw new Error('Unknown video plateform type');

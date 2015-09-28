@@ -12,7 +12,9 @@
       "get /startUpload/:ids/:platform" : "app/server/controllers/watcherController.startUploadAction",
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
       "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
-      "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction"
+      "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction",
+      "get /configuration/oAuthInformations" : "app/server/controllers/configurationController.getOAuthInformationsAction",
+      "get /configuration/googleOAuthAssosiation" : "app/server/controllers/configurationController.handleGoogleOAuthCodeAction"
     },
     "ws": {
       "get /video/:id" : "app/server/controllers/videoController.getVideoAction",
@@ -64,9 +66,9 @@
       ]
     },
     {
-      "label": "PERMISSIONS.GROUP_VIDEO",
-      "permissions": [
-        {
+        "label": "PERMISSIONS.GROUP_VIDEO",
+        "permissions": [
+            {
           "id" : "publish-video",
           "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
           "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
@@ -90,7 +92,7 @@
           "name" : "PERMISSIONS.UPLOAD_VIDEO_NAME",
           "description" : "PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION"
         }
-      ]
+    ]
     }
   ],
   "backOffice": {
@@ -118,6 +120,11 @@
             "label" : "MENU.WATCHER",
             "path" : "publish/watcher",
             "permission" : "access-watcher-page"
+          },
+          {
+            "label" : "MENU.CONFIGURATION",
+            "path" : "publish/configuration";
+            "permission" : "access-conf-page"
           }
         ]
       }

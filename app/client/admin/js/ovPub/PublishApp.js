@@ -105,27 +105,27 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       resolve: {
         video: ['$q', 'publishService', 'alertService', '$route', '$filter',
           function($q, publishService, alertService, $route, $filter) {
-            var deferred = $q.defer();
-            var videoId = $route.current.params.videoId;
+          var deferred = $q.defer();
+          var videoId = $route.current.params.videoId;
 
-            publishService.loadVideo(videoId).then(function(result) {
+          publishService.loadVideo(videoId).then(function(result) {
               if (result.data.entity) {
                 if (result.data.entity.files && result.data.entity.files.length)
-                  deferred.resolve.apply(deferred, arguments);
+              deferred.resolve.apply(deferred, arguments);
                 else {
                   publishService.cacheClear('chapter');
                   alertService.add('danger', $filter('translate')('VIDEOS.NOT_READY'), 8000);
                   deferred.reject({redirect: '/publish/videos'});
                 }
               }
-              else
-                deferred.reject();
-            }, function() {
+            else
               deferred.reject();
-            });
+          }, function() {
+            deferred.reject();
+          });
 
-            return deferred.promise;
-          }]
+          return deferred.promise;
+        }]
       }
     });
 
@@ -166,6 +166,25 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
+    $routeProvider.when('/publish/configuration', {
+      templateUrl: '/publish/be/views/configuration.html',
+      title: 'CONFIGURATION.PAGE_TITLE',
+      access: 'access-categories-page',
+      controller: (function() {
+        function ctrl(oAuthInfos) {
+          debugger;
+          this.oAuthInfos = oAuthInfos.data.authInfos;
+        }
+        ctrl.$inject = ['oAuthInfos'];
+        return ctrl;
+      })(),
+      controllerAs: 'viewModel',
+      resolve: {
+        oAuthInfos: ['publishService', function(publishService) {
+          return publishService.getOAuthInfos();
+        }]
+      }
+    });
   }]);
 
   app.filter('status', StatusFilter);

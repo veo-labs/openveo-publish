@@ -270,6 +270,15 @@
         }
     }
 
+    /**
+     * Retrieve oAuth informations
+     * 
+     * @return {Promise} The HTTP promise
+     */
+    function getOAuthInfos() {
+      return $http.get(basePath + "publish/configuration/oAuthInformations");
+    };
+
     return {
       retryVideo: retryVideo,
       publishVideo: publishVideo,
@@ -287,6 +296,7 @@
       startWatcher: startWatcher,
       stopWatcher: stopWatcher,
       loadVideo: loadVideo,
+      getOAuthInfos: getOAuthInfos,
       cacheClear: cacheClear
     };
 
@@ -296,3 +306,4 @@
   PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath'];
 
 })(angular.module('ov.publish'));
+>>>>>>> youtube alpha stage

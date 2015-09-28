@@ -4,7 +4,8 @@
     "VIDEOS" : "Catalog",
     "WATCHER" : "Watcher",
     "PROPERTIES" : "Custom properties",
-    "CATEGORIES" : "Categories"
+    "CATEGORIES" : "Categories",
+    "CONFIGURATION" : "Configuration"
   },
   "WS_SCOPES" : {
     "GET_VIDEO_NAME" : "Get videos",
@@ -139,5 +140,9 @@
     "ADD_BEGIN": "Add begin cut",
     "REMOVE_BEGIN": "Remove begin cut",
     "SAVE_ERROR": "An error occured. Your changes could not be saved."
+  },
+  "CONFIGURATION" : {
+    "PAGE_TITLE" : "Publish - Configuration",
+    "TITLE" : "Configuration"
   }
 }
