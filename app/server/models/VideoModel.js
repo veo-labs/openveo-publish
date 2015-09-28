@@ -691,8 +691,8 @@ VideoModel.prototype.update = function(id, data, callback) {
     info['category'] = '';
   if (data.cut)
     info['cut'] = data.cut;
-  if (data.chapter)
-    info['chapter'] = data.chapter;
+  if (data.chapters)
+    info['chapters'] = data.chapters;
 
   this.provider.update(id, info, callback);
 };
