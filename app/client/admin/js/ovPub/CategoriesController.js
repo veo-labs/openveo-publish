@@ -54,6 +54,10 @@
       $scope.$emit('setAlert', 'info', $filter('translate')('CATEGORIES.RESET'), 4000);
     };
 
+    $scope.$watchCollection('list', function() {
+      $scope.saveIsEmpty = $scope.list.length == 0;
+    });
+
     $scope.saveCategory = function() {
       $scope.saveIsDisabled = true;
 
