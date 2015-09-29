@@ -23,7 +23,7 @@ function PublishPlugin() {
 
   // Creates admin and front new routers
   this.router = express.Router();
-  this.adminRouter = express.Router();
+  this.privateRouter = express.Router();
   this.webServiceRouter = express.Router();
 
   // Define routes directly here or in the configuration file

@@ -4,7 +4,7 @@
       "get /video/*" : "app/server/controllers/videoController.displayVideoAction",
       "get /getVideo/:id" : "app/server/controllers/videoController.getVideoAction"
     },
-    "admin" : {
+    "private" : {
       "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
       "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
       "get /startWatcher" : "app/server/controllers/watcherController.startAction",
@@ -34,29 +34,17 @@
     {
       "id" : "access-videos-page",
       "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_VIDEO_PAGE_DESCRIPTION",
-      "paths" : [
-        "get /admin/publish/be/videos",
-        "get /admin/crud/property",
-        "get /admin/gettaxonomy/categories"
-      ]
+      "description" : "PERMISSIONS.ACCESS_VIDEO_PAGE_DESCRIPTION"
     },
     {
       "id" : "access-properties-page",
       "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_DESCRIPTION",
-      "paths" : [
-        "get /admin/publish/be/properties"
-      ]
+      "description" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_DESCRIPTION"
     },
     {
       "id" : "access-categories-page",
       "name" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_DESCRIPTION",
-      "paths" : [
-        "get /admin/publish/be/categories",
-        "get /admin/gettaxonomy/categories"
-      ]
+      "description" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_DESCRIPTION"
     },
     {
       "id" : "access-watcher-page",
@@ -65,27 +53,18 @@
     {
       "id" : "manage-watcher",
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
-      "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
-      "paths" : [
-        "get /stopWatcher",
-        "get /startWatcher"
-      ]
+      "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION"
     },
     {
       "id" : "publish-video",
       "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
-      "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
-      "paths" : [
-        "get /publishVideo",
-        "get /unpublishVideo"
-      ]
+      "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION"
     },
     {
       "id" : "chapter-video",
       "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
       "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
     }
-
   ],
   "backOffice": {
     "menu" : [
@@ -95,22 +74,22 @@
         "subMenu" : [
           {
             "label" : "MENU.VIDEOS",
-            "path" : "/admin/publish/be/videos",
+            "path" : "publish/videos",
             "permission" : "access-videos-page"
           },
           {
             "label" : "MENU.CATEGORIES",
-            "path" : "/admin/publish/be/categories",
+            "path" : "publish/categories",
             "permission" : "access-categories-page"
           },
           {
             "label" : "MENU.PROPERTIES",
-            "path" : "/admin/publish/be/properties",
+            "path" : "publish/properties",
             "permission" : "access-properties-page"
           },
           {
             "label" : "MENU.WATCHER",
-            "path" : "/admin/publish/be/watcher",
+            "path" : "publish/watcher",
             "permission" : "access-watcher-page"
           }
         ]
@@ -119,10 +98,10 @@
     "scriptLibFiles" : {
       "base" : [ ],
       "dev" : [
-        "multirange/multirange.js"
+        "/publish/multirange/multirange.js"
       ],
       "prod" : [
-        "publish/js/libOpenveoPublish.js"
+        "/publish/be/js/libOpenveoPublish.js"
       ]
     },
     "scriptFiles" : {
@@ -130,22 +109,22 @@
         "/publish/lib/openveo-player/dist/openveo-player.js"
       ],
       "dev": [
-        "ovPub/PublishApp.js",
-        "ovPub/VideoController.js",
-        "ovPub/WatcherController.js",
-        "ovPub/PropertiesController.js",
-        "ovPub/CategoriesController.js",
-        "ovPub/ChapterController.js",
-        "ovPub/PublishService.js"
+        "/publish/ovPub/PublishApp.js",
+        "/publish/ovPub/VideoController.js",
+        "/publish/ovPub/WatcherController.js",
+        "/publish/ovPub/PropertiesController.js",
+        "/publish/ovPub/CategoriesController.js",
+        "/publish/ovPub/ChapterController.js",
+        "/publish/ovPub/PublishService.js"
       ],
       "prod" : [
-        "publish/js/openveoPublish.js"
+        "/publish/be/js/openveoPublish.js"
       ]
     },
     "cssFiles" : [
-      "publish/css/publish.css",
-      "publish/lib/openveo-player/dist/openveo-player.css"
-      ]
+      "/publish/be/css/publish.css",
+      "/publish/lib/openveo-player/dist/openveo-player.css"
+    ]
   },
   "custom" : {
     "scriptFiles" : {
@@ -174,12 +153,12 @@
       },
       "publishPlayer" : {
         "dev" : [
-          "/PublishPlayerApp.js",
-          "/VideoService.js",
-          "/PlayerController.js"
+          "/publish/PublishPlayerApp.js",
+          "/publish/VideoService.js",
+          "/publish/PlayerController.js"
         ],
         "prod" : [
-          "/publish/js/openveoPublishPlayer.js"
+          "/publish/player/js/openveoPublishPlayer.js"
         ]
       }
     },
@@ -191,7 +170,7 @@
     "app/client/front/views"
   ],
   "imageProcessing": {
-    "imagesFolders": ["public/publish/videos"],
+    "imagesFolders": ["assets/player/videos"],
     "imagesStyle": {
       "small": 200
     }

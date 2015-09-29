@@ -9,7 +9,7 @@ module.exports = {
         expand: true,
 
         // Base path for patterns
-        cwd: '<%= publish.srcjs %>/',
+        cwd: '<%= publish.beJS %>/',
 
         // Match all JavaScript library files
         src: ['multirange/*.js'],
@@ -26,12 +26,24 @@ module.exports = {
   publishprod: {
     files: [
       {
-        expand: true, // Enable dynamic expansion.
-        cwd: '<%= publish.srcjs %>/', // Src matches are relative to this path.
-        src: ['ovPub/*.js'], // Actual pattern(s) to match.
-        dest: '<%= publish.uglify %>/', // Destination path prefix.
-        ext: '.min.js', // Dest filepaths will have this extension.
-        extDot: 'first' // Extensions in filenames begin after the first dot
+
+        // Enable dynamic expansion
+        expand: true,
+
+        // Src matches are relative to this path
+        cwd: '<%= publish.beJS %>/',
+
+        // Actual pattern(s) to match
+        src: ['ovPub/*.js'],
+
+        // Destination path prefix
+        dest: '<%= publish.uglify %>/',
+
+        // Dest filepaths will have this extension
+        ext: '.min.js',
+
+        // Extensions in filenames begin after the first dot
+        extDot: 'first'
       }
     ]
   },

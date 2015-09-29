@@ -18,7 +18,7 @@ describe('VideoModel', function() {
     ut.generateSuccessDatabase();
     videoModel = new VideoModel();
 
-    var videosDirectoryPath = path.normalize(path.join(__dirname, '/public/publish/videos/5'));
+    var videosDirectoryPath = path.normalize(path.join(__dirname, '/assets/player/videos/5'));
 
     fs.exists(videosDirectoryPath, function(exists) {
       if (!exists)
@@ -89,12 +89,12 @@ describe('VideoModel', function() {
   // remove method
   describe('remove', function() {
 
-    it('Should be able to remove a video from database and its public directory', function(done) {
+    it('Should be able to remove a video from database and its assets directory', function(done) {
 
       process.rootPublish = __dirname;
       videoModel.remove('5', function(error) {
         assert.isUndefined(error);
-        var videosDirectoryPath = path.normalize(process.rootPublish + '/public/publish/videos/5');
+        var videosDirectoryPath = path.normalize(process.rootPublish + '/assets/player/videos/5');
 
         process.rootPublish = path.join(__dirname, '../../');
 

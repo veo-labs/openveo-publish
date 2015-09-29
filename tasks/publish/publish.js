@@ -3,13 +3,15 @@
 module.exports = {
   basePath: ['.'],
   app: ['<%= publish.basePath %>/app'],
-  admin: ['<%= publish.app %>/client/admin'],
-  front: ['<%= publish.app %>/client/front'],
-  srcjs: ['<%= publish.admin %>/js/'],
-  playerJS: ['<%= publish.front %>/js/'],
-  sass: ['<%= publish.admin %>/compass/sass'],
-  public: ['<%= publish.basePath %>/public'],
-  css: ['<%= publish.public %>/publish/css'],
-  js: ['<%= publish.public %>/publish/js'],
+  be: ['<%= publish.app %>/client/admin'],
+  player: ['<%= publish.app %>/client/front'],
+  beJS: ['<%= publish.be %>/js/'],
+  playerJS: ['<%= publish.player %>/js/'],
+  sass: ['<%= publish.be %>/compass/sass'],
+  playerAssets: ['<%= publish.basePath %>/assets/player'],
+  beAssets: ['<%= publish.basePath %>/assets/be'],
+  beCSSAssets: ['<%= publish.beAssets %>/css'],
+  beJSAssets: ['<%= publish.beAssets %>/js'],
+  playerJSAssets: ['<%= publish.playerAssets %>/js'],
   uglify: ['<%= publish.basePath %>/build/uglify']
 };

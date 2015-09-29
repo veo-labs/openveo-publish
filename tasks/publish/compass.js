@@ -5,7 +5,7 @@ module.exports = {
     options: {
       sourcemap: true,
       sassDir: '<%= publish.sass %>',
-      cssDir: '<%= publish.css %>',
+      cssDir: '<%= publish.beCSSAssets %>',
       environment: 'development'
     }
   },
@@ -13,7 +13,7 @@ module.exports = {
     options: {
       sourcemap: false,
       sassDir: '<%= publish.sass %>',
-      cssDir: '<%= publish.css %>',
+      cssDir: '<%= publish.beCSSAssets %>',
       environment: 'production'
     }
   }

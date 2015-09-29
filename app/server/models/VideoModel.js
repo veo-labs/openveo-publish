@@ -536,7 +536,7 @@ VideoModel.prototype.getOne = function(id, callback) {
           videoInfo = video;
           videoInfo.timecodes = {};
           timecodesFilePath = path.normalize(
-            process.rootPublish + '/public/publish/videos/' + videoInfo.id + '/synchro.json');
+            process.rootPublish + '/assets/player/videos/' + videoInfo.id + '/synchro.json');
 
         }
 
@@ -641,7 +641,7 @@ VideoModel.prototype.remove = function(id, callback) {
 
     // Remove video's public directory
     function(callback) {
-      var videoPublicDirectory = path.normalize(process.rootPublish + '/public/publish/videos/' + id);
+      var videoPublicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + id);
 
       // Test if video public directory exist
       fs.exists(videoPublicDirectory, function(exists) {

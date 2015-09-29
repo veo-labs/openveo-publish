@@ -214,7 +214,7 @@
      * @param {Object} video The video to edit
      */
     function editChapter(video) {
-      $location.path('admin/publish/be/video/' + video.id);
+      $location.path('/publish/video/' + video.id);
     }
 
     /**
@@ -270,7 +270,7 @@
      * DATATABLE
      */
     scopeDataTable.entityType = 'video';
-    scopeDataTable.cellTheme = 'publish/admin/views/partial/publishCells.html';
+    scopeDataTable.cellTheme = '/publish/be/views/partial/publishCells.html';
     scopeDataTable.conditionTogleDetail = function(row) {
       return (row.state === 11 || row.state === 12);
     };

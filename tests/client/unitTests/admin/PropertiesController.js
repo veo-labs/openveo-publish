@@ -63,8 +63,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/admin/crud/property/1').respond(200);
-      $httpBackend.expectDELETE('/admin/crud/property/1');
+      $httpBackend.when('DELETE', '/be/crud/property/1').respond(200);
+      $httpBackend.expectDELETE('/be/crud/property/1');
 
       scope.tableContainer.actions[0].callback(scope.test.rows[0], done);
 
@@ -75,8 +75,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/admin/crud/property/1,2').respond(200);
-      $httpBackend.expectDELETE('/admin/crud/property/1,2');
+      $httpBackend.when('DELETE', '/be/crud/property/1,2').respond(200);
+      $httpBackend.expectDELETE('/be/crud/property/1,2');
 
       scope.tableContainer.actions[0].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
@@ -87,8 +87,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/admin/crud/property/1').respond(401);
-      $httpBackend.expectDELETE('/admin/crud/property/1');
+      $httpBackend.when('DELETE', '/be/crud/property/1').respond(401);
+      $httpBackend.expectDELETE('/be/crud/property/1');
 
       $rootScope.logout = function() {
         done();
@@ -109,8 +109,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('POST', '/admin/crud/property/1').respond(200);
-      $httpBackend.expectPOST('/admin/crud/property/1');
+      $httpBackend.when('POST', '/be/crud/property/1').respond(200);
+      $httpBackend.expectPOST('/be/crud/property/1');
 
       scope.editFormContainer.onSubmit(scope.test.rows[0], done, function() {
         assert.notOk(true);
@@ -123,8 +123,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('POST', '/admin/crud/property/1').respond(401);
-      $httpBackend.expectPOST('/admin/crud/property/1');
+      $httpBackend.when('POST', '/be/crud/property/1').respond(401);
+      $httpBackend.expectPOST('/be/crud/property/1');
 
       $rootScope.logout = function() {
         done();
@@ -147,10 +147,10 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('PUT', '/admin/crud/property').respond(200, {
+      $httpBackend.when('PUT', '/be/crud/property').respond(200, {
         entity: {}
       });
-      $httpBackend.expectPUT('/admin/crud/property');
+      $httpBackend.expectPUT('/be/crud/property');
 
       scope.addFormContainer.onSubmit({},
         done,
@@ -165,8 +165,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('PUT', '/admin/crud/property').respond(401);
-      $httpBackend.expectPUT('/admin/crud/property');
+      $httpBackend.when('PUT', '/be/crud/property').respond(401);
+      $httpBackend.expectPUT('/be/crud/property');
 
       $rootScope.logout = function() {
         done();

@@ -6,13 +6,13 @@
    * Defines a publish service to get publish information.
    */
   function PublishService($http, $q, entityService, jsonPath) {
-    var basePath = '/admin/';
-    var properties,
-      videos,
-      categories,
-      categoriesOptions,
-      categoriesByKey,
-      platforms;
+    var basePath = '/be/';
+    var properties;
+    var videos;
+    var categories;
+    var categoriesOptions;
+    var categoriesByKey;
+    var platforms;
     var videoChapter = {};
 
     /**

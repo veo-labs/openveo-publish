@@ -11,13 +11,13 @@ module.exports = function(config) {
 
     // List of files / patterns to load in the browser
     files: [
-      'public/publish/lib/angular/angular.js',
-      'public/publish/lib/angular-route/angular-route.js',
-      'public/publish/lib/angular-animate/angular-animate.js',
-      'public/publish/lib/angular-cookies/angular-cookies.js',
-      'public/publish/lib/angular-animate/angular-animate.js',
-      'public/publish/lib/angular-mocks/angular-mocks.js',
-      'public/publish/lib/ng-jsonpath/dist/ng-jsonpath.js',
+      'assets/lib/angular/angular.js',
+      'assets/lib/angular-route/angular-route.js',
+      'assets/lib/angular-animate/angular-animate.js',
+      'assets/lib/angular-cookies/angular-cookies.js',
+      'assets/lib/angular-animate/angular-animate.js',
+      'assets/lib/angular-mocks/angular-mocks.js',
+      'assets/lib/ng-jsonpath/dist/ng-jsonpath.js',
       'tests/client/unitTests/front/player/playerApp.js',
       'tests/client/unitTests/admin/tableForm/tableForm.js',
       'tests/client/unitTests/admin/route/RouteApp.js',

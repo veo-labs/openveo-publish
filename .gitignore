@@ -23,19 +23,18 @@ ehthumbs.db
 /node_modules
 
 # Published video packages
-/public/publish/videos
+/assets/player/videos
 
 # Bower libraries
-/public/publish/lib
+/assets/lib
 
-# Temporary directory for video packages
-/tmp
-
-#Compiled files
+# Compiled files
 .sass-cache
 /build
-/public/publish/js
-/public/publish/css
+/assets/be/js
+/assets/be/css
+/assets/player/js
+/assets/player/css
 
 #IDE
 nbproject

@@ -5,21 +5,16 @@
   </h2>
   <div class="well well-lg" ng-bind="'CHAPTER.INFO' | translate"></div>
   <div class="row video-viewer">
-    
-    <div class='col-sm-8 col-sm-push-4'>
 
-       <ov-player 
-         ov-player-type="vimeo" 
+    <div class='col-sm-8 col-sm-push-4'>
+       <ov-player
+         ov-player-type="vimeo"
          ov-data="videoPlayer"
          id="chapterPlayer"
          ></ov-player>
-
-      <!--<input type="number" ng-model="view" placeholder="View index">-->
     </div>
     <div class='col-sm-4 col-sm-pull-8'>
-      <!--<div tasty-table class="chapter-table" bind-resource="resource" bind-watch-resource="collection">-->
       <table class="table table-striped table-condensed chapter-table">
-        <!--<thead tasty-thead bind-not-sort-by="notSortBy"></thead>-->
         <thead>
           <tr><th class='col-sm-3 active'>{{ 'CHAPTER.HEAD_TIME' | translate}}</th>
             <th class='col-sm-9 active'>{{ 'CHAPTER.HEAD_TITLE' | translate}}</th>
@@ -44,7 +39,7 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 
   <div class="editform" collapse="isCollapsed">
@@ -72,24 +67,23 @@
       </div>
       </form>
     </div>
-    <!--<input type="number" ng-model="view" placeholder="View index">-->
   </div>
- 
+
    <div class="multirange-container" ng-click="select(-1);" ng-swipe-disable-mouse>
-     <div class="pull-left" style="margin-bottom: 5px"> 
-       <button  popover="{{!beginIsInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginIsInArray"  ng-click="toggleBegin()" btn-checkbox> 
-         <i class="glyphicon glyphicon-log-out"></i> 
+     <div class="pull-left" style="margin-bottom: 5px">
+       <button  popover="{{!beginIsInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginIsInArray"  ng-click="toggleBegin()" btn-checkbox>
+         <i class="glyphicon glyphicon-log-out"></i>
        </button>
-       <button  popover="{{!endIsInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate}}" popover-trigger="mouseenter" class="btn btn-default"ng-model="endIsInArray" ng-click="toggleEnd()" btn-checkbox> 
-         <i class="glyphicon glyphicon-log-in"></i> </button> 
+       <button  popover="{{!endIsInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate}}" popover-trigger="mouseenter" class="btn btn-default"ng-model="endIsInArray" ng-click="toggleEnd()" btn-checkbox>
+         <i class="glyphicon glyphicon-log-in"></i> </button>
      </div>
-     <div class="pull-right" style="margin-bottom: 5px"> 
-       <span class="ng-binding">Zoom x<span ng-bind="slider.view+1"></span></span> 
-       <button class="btn btn-default" ng-disabled="slider.view == slider.views.length-1" ng-click="changeSliderView($event, 1)"> 
-         <i class="glyphicon glyphicon-zoom-in"></i> 
+     <div class="pull-right" style="margin-bottom: 5px">
+       <span class="ng-binding">Zoom x<span ng-bind="slider.view+1"></span></span>
+       <button class="btn btn-default" ng-disabled="slider.view == slider.views.length-1" ng-click="changeSliderView($event, 1)">
+         <i class="glyphicon glyphicon-zoom-in"></i>
        </button>
-       <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)"> 
-         <i class="glyphicon glyphicon-zoom-out"></i> </button> 
+       <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)">
+         <i class="glyphicon glyphicon-zoom-out"></i> </button>
      </div>
      <vds-multirange class="row" ng-model="ranges" on-select="select" on-mouserelease="releaseRange" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></vds-multirange>
    </div>

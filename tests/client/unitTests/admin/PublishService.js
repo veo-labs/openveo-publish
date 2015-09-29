@@ -28,43 +28,43 @@ describe('PublishService', function() {
   });
 
   it('Should be able to ask server for the list of videos', function() {
-    $httpBackend.expectGET('/admin/crud/video');
+    $httpBackend.expectGET('/be/crud/video');
     publishService.loadVideos();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server for watcher status', function() {
-    $httpBackend.expectGET('/admin/publish/watcherStatus');
+    $httpBackend.expectGET('/be/publish/watcherStatus');
     publishService.getWatcherStatus();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to start watcher', function() {
-    $httpBackend.expectGET('/admin/publish/startWatcher');
+    $httpBackend.expectGET('/be/publish/startWatcher');
     publishService.startWatcher();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to stop watcher', function() {
-    $httpBackend.expectGET('/admin/publish/stopWatcher');
+    $httpBackend.expectGET('/be/publish/stopWatcher');
     publishService.stopWatcher();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to publish a video', function() {
-    $httpBackend.expectGET('/admin/publish/publishVideo/5');
+    $httpBackend.expectGET('/be/publish/publishVideo/5');
     publishService.publishVideo(5);
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to unpublish a video', function() {
-    $httpBackend.expectGET('/admin/publish/unpublishVideo/5');
+    $httpBackend.expectGET('/be/publish/unpublishVideo/5');
     publishService.unpublishVideo(5);
     $httpBackend.flush();
   });
 
   it('Should be able to ask server for the list of properties', function() {
-    $httpBackend.expectGET('/admin/crud/property');
+    $httpBackend.expectGET('/be/crud/property');
     publishService.loadProperties();
     $httpBackend.flush();
   });

@@ -52,8 +52,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
   app.run(['$rootScope', function($rootScope) {
     $rootScope.$on('$locationChangeStart', function(event, next, current) {
       // url slug : shortening the url to stuff that follows after "#"
-      current = current.slice(current.lastIndexOf('/publish/be/') + 12, current.length);
-      next = next.slice(next.lastIndexOf('/publish/be/') + 12, next.length);
+      current = current.slice(current.lastIndexOf('/publish/') + 9, current.length);
+      next = next.slice(next.lastIndexOf('/publish/') + 9, next.length);
       if (current == 'videos' && next.lastIndexOf('video/') >= 0) {
         $rootScope.newAnimation = 'RL';
       } else if (current.lastIndexOf('video/') >= 0 && next == 'videos') {
@@ -69,12 +69,10 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
    */
   app.config(['ovRouteProvider', function(ovRouteProvider) {
 
-    // Add route /publish/be/videos with authentication
-    // (will be automatically mapped to /admin/publish/be/videos
-    // instead of /publish/be/videos).
+    // Add route /publish/videos with authentication.
     // Also retrieve the list of videos
-    ovRouteProvider.when('/publish/be/videos', {
-      templateUrl: 'publish/admin/views/videos.html',
+    ovRouteProvider.when('/publish/videos', {
+      templateUrl: '/publish/be/views/videos.html',
       controller: 'VideoController',
       title: 'VIDEOS.PAGE_TITLE',
       access: 'access-videos-page',
@@ -91,13 +89,10 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
-    // Add route /publish/be/videos/videosId with authentication
-    // (will be automatically mapped
-    // to /admin/publish/be/videos/videosId instead
-    // of /publish/be/videos/videosId).
-    // Also retrieve the list of properties
-    ovRouteProvider.when('/publish/be/video/:videoId', {
-      templateUrl: 'publish/admin/views/chapter.html',
+    // Add route /publish/videos/videosId with authentication.
+    // Also retrieve the list of videos
+    ovRouteProvider.when('/publish/video/:videoId', {
+      templateUrl: '/publish/be/views/chapter.html',
       controller: 'ChapterController',
       title: 'CHAPTER.PAGE_TITLE',
       access: 'chapter-video',
@@ -109,12 +104,10 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
-    // Add route /publish/be/watcher with authentication
-    // (will be automatically mapped to /admin/publish/be/watcher instead
-    // of /publish/be/watcher).
+    // Add route /publish/watcher with authentication.
     // Also retrieve the watcher status
-    ovRouteProvider.when('/publish/be/watcher', {
-      templateUrl: 'publish/admin/views/watcher.html',
+    ovRouteProvider.when('/publish/watcher', {
+      templateUrl: '/publish/be/views/watcher.html',
       controller: 'WatcherController',
       title: 'WATCHER.PAGE_TITLE',
       access: 'access-watcher-page',
@@ -125,25 +118,19 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
-    // Add route /publish/be/properties with authentication
-    // (will be automatically mapped
-    // to /admin/publish/be/properties instead
-    // of /publish/be/properties).
+    // Add route /publish/properties with authentication.
     // Also retrieve the list of properties
-    ovRouteProvider.when('/publish/be/properties', {
-      templateUrl: 'publish/admin/views/properties.html',
+    ovRouteProvider.when('/publish/properties', {
+      templateUrl: '/publish/be/views/properties.html',
       controller: 'PropertiesController',
       title: 'PROPERTIES.PAGE_TITLE',
       access: 'access-properties-page'
     });
 
-    // Add route /publish/be/categories with authentication
-    // (will be automatically mapped
-    // to /admin/publish/be/categories instead
-    // of /publish/be/categories).
-    // Also retrieve the list of properties
-    ovRouteProvider.when('/publish/be/categories', {
-      templateUrl: 'publish/admin/views/categories.html',
+    // Add route /publish/categories with authentication.
+    // Also retrieve the list of categories
+    ovRouteProvider.when('/publish/categories', {
+      templateUrl: '/publish/be/views/categories.html',
       controller: 'CategoriesController',
       title: 'CATEGORIES.PAGE_TITLE',
       access: 'access-categories-page',

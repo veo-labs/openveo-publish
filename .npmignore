@@ -22,7 +22,7 @@ ehthumbs.db
 /node_modules
 
 # Bower libraries
-/public/publish/lib
+/assets/lib
 
 # IDE
 nbproject
@@ -48,7 +48,7 @@ nbproject
 /tasks
 
 # Published video packages
-/public/publish/videos/*
+/assets/videos/*
 
 # Temporary directory for video packages
 /tmp

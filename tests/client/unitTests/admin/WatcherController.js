@@ -48,10 +48,10 @@ describe('WatcherController', function() {
   describe('startWatcher', function() {
 
     it('Should be able to ask the server to start the watcher', function() {
-      $httpBackend.when('GET', '/admin/publish/startWatcher').respond(200, {
+      $httpBackend.when('GET', '/be/publish/startWatcher').respond(200, {
         status: 1
       });
-      $httpBackend.expectGET('/admin/publish/startWatcher');
+      $httpBackend.expectGET('/be/publish/startWatcher');
       scope.watcherStatus = 0;
       scope.startWatcher();
       $httpBackend.flush();
@@ -64,17 +64,17 @@ describe('WatcherController', function() {
         done();
       };
 
-      $httpBackend.when('GET', '/admin/publish/startWatcher').respond(401);
-      $httpBackend.expectGET('/admin/publish/startWatcher');
+      $httpBackend.when('GET', '/be/publish/startWatcher').respond(401);
+      $httpBackend.expectGET('/be/publish/startWatcher');
       scope.startWatcher();
       $httpBackend.flush();
     });
 
     it('Should be able to ask the server to stop the watcher', function() {
-      $httpBackend.when('GET', '/admin/publish/stopWatcher').respond(200, {
+      $httpBackend.when('GET', '/be/publish/stopWatcher').respond(200, {
         status: 3
       });
-      $httpBackend.expectGET('/admin/publish/stopWatcher');
+      $httpBackend.expectGET('/be/publish/stopWatcher');
       scope.watcherStatus = 1;
       scope.stopWatcher();
       $httpBackend.flush();
@@ -87,8 +87,8 @@ describe('WatcherController', function() {
         done();
       };
 
-      $httpBackend.when('GET', '/admin/publish/stopWatcher').respond(401);
-      $httpBackend.expectGET('/admin/publish/stopWatcher');
+      $httpBackend.when('GET', '/be/publish/stopWatcher').respond(401);
+      $httpBackend.expectGET('/be/publish/stopWatcher');
       scope.stopWatcher();
       $httpBackend.flush();
     });

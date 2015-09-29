@@ -3,7 +3,7 @@
 (function(angular) {
 
   function EntityService($http) {
-    var basePath = '/admin/';
+    var basePath = '/be/';
     var entityCache = {};
 
     var addEntity = function(entityType, data) {

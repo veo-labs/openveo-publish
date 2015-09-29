@@ -442,12 +442,12 @@ TarPackage.prototype.validatePackage = function() {
  */
 TarPackage.prototype.preparePublicDirectory = function() {
   var self = this;
-  var publicDirectory = path.normalize(process.rootPublish + '/public/publish/videos/' + this.mediaPackage.id);
+  var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.PREPARING_STATE);
 
   this.logger.debug('Prepare package public directory ' + publicDirectory);
 
-  openVeoAPI.fileSystem.mkdir(path.normalize(process.rootPublish + '/public/publish/videos/' + this.mediaPackage.id),
+  openVeoAPI.fileSystem.mkdir(path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id),
     function(error) {
       if (error && error.code !== 'EEXIST')
         self.setError(new TarPackageError(error.message, errors.CREATE_VIDEO_PUBLIC_DIR_ERROR));
@@ -467,7 +467,7 @@ TarPackage.prototype.preparePublicDirectory = function() {
 TarPackage.prototype.saveTimecodes = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  var videoFinalDir = path.normalize(process.rootPublish + '/public/publish/videos/' + this.mediaPackage.id);
+  var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
   this.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
@@ -492,7 +492,7 @@ TarPackage.prototype.saveTimecodes = function() {
 TarPackage.prototype.copyImages = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  var videoFinalDir = path.normalize(process.rootPublish + '/public/publish/videos/' + this.mediaPackage.id);
+  var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
   this.logger.debug('Copy images to ' + videoFinalDir);
 

@@ -27,37 +27,49 @@ describe('PublishApp', function() {
     $httpBackend.when('POST', /.*/).respond(200, '');
   });
 
-  it('Should register routes to pages videos and watcher', function() {
-    assert.isDefined($route.routes['/publish/be/videos']);
-    assert.isDefined($route.routes['/publish/be/watcher']);
+  it('Should register routes to videos, watcher, video, properties and categories', function() {
+    assert.isDefined($route.routes['/publish/videos']);
+    assert.isDefined($route.routes['/publish/watcher']);
+    assert.isDefined($route.routes['/publish/video/:videoId']);
+    assert.isDefined($route.routes['/publish/properties']);
+    assert.isDefined($route.routes['/publish/categories']);
   });
 
   it('Should be able to route to videos page after retrieving the list of videos', function() {
+    $httpBackend.expectGET('/be/gettaxonomy/categories');
+    $httpBackend.expectGET('/be/crud/property');
+    $httpBackend.expectGET('/be/publish/getPlatforms');
+    $httpBackend.expectGET('/publish/be/views/videos.html');
 
-    $httpBackend.expectGET('/admin/gettaxonomy/categories');
-    $httpBackend.expectGET('/admin/crud/property');
-    $httpBackend.expectGET('publish/admin/views/videos.html');
-
-    $location.path('/publish/be/videos');
+    $location.path('/publish/videos');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/be/videos');
+    assert.equal($location.path(), '/publish/videos');
   });
 
   it('Should be able to route to watcher page after retrieving the watcher status', function() {
-    $httpBackend.expectGET('/admin/publish/watcherStatus');
-    $httpBackend.expectGET('publish/admin/views/watcher.html');
+    $httpBackend.expectGET('/be/publish/watcherStatus');
+    $httpBackend.expectGET('/publish/be/views/watcher.html');
 
-    $location.path('/publish/be/watcher');
+    $location.path('/publish/watcher');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/be/watcher');
+    assert.equal($location.path(), '/publish/watcher');
   });
 
-  it('Should be able to route to properties page after retrieving the list of properties', function() {
-    $httpBackend.expectGET('publish/admin/views/properties.html');
+  it('Should be able to route to properties page', function() {
+    $httpBackend.expectGET('/publish/be/views/properties.html');
 
-    $location.path('/publish/be/properties');
+    $location.path('/publish/properties');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/be/properties');
+    assert.equal($location.path(), '/publish/properties');
+  });
+
+  it('Should be able to route to categories page after retrieving the list of categories', function() {
+    $httpBackend.expectGET('/be/gettaxonomy/categories');
+    $httpBackend.expectGET('/publish/be/views/categories.html');
+
+    $location.path('/publish/categories');
+    $httpBackend.flush();
+    assert.equal($location.path(), '/publish/categories');
   });
 
 });

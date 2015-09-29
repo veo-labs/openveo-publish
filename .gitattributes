@@ -1,5 +1,3 @@
 tmp export-ignore export-ignore
-public/publish/lib export-ignore
-public/publish/logs export-ignore
-public/publish/node_modules export-ignore
-public/publish/videos/* export-ignore
+assets/lib export-ignore
+assets/videos/* export-ignore
