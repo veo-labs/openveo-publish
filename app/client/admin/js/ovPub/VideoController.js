@@ -39,7 +39,7 @@
     $scope.rights.chapter = $scope.checkAccess('chapter-video');
 
     /*
-     * FORM
+     * FORM EDIT
      */
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
@@ -237,6 +237,12 @@
       else
         return id;
     }
+
+    /*
+     * FORM EDIT
+     */
+    scopeEditForm.entityType = 'video';
+
     var categoriesfield = getSelectableCategories('UI.NONE');
     scopeEditForm.fieldsBase = [
       {

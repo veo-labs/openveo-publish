@@ -124,6 +124,7 @@
      */
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
+    scopeEditForm.entityType = 'property';
     var supportedTypes = [
       {
         value: 'text',
