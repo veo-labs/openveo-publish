@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="row in ranges| orderBy:'+value'" ng-click="select(row.value)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
+          <tr ng-repeat="row in ranges| orderBy:'+value'" ng-click="select(row)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
             <td class="col-sm-3">{{ (row.value*duration)*1000 | date:'H:mm:ss':'+0000'}}</td>
             <td class="col-sm-9">{{ row.name }}</td>
           </tr>
@@ -69,13 +69,14 @@
     </div>
   </div>
 
-   <div class="multirange-container" ng-click="select(-1);" ng-swipe-disable-mouse>
+   <div class="multirange-container" ng-swipe-disable-mouse>
      <div class="pull-left" style="margin-bottom: 5px">
-       <button  popover="{{!beginIsInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginIsInArray"  ng-click="toggleBegin()" btn-checkbox>
+       <button popover="{{!beginCut.isInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" btn-checkbox>
          <i class="glyphicon glyphicon-log-out"></i>
        </button>
-       <button  popover="{{!endIsInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate}}" popover-trigger="mouseenter" class="btn btn-default"ng-model="endIsInArray" ng-click="toggleEnd()" btn-checkbox>
-         <i class="glyphicon glyphicon-log-in"></i> </button>
+       <button popover="{{!endCut.isInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate}}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" btn-checkbox>
+         <i class="glyphicon glyphicon-log-in"></i>
+       </button>
      </div>
      <div class="pull-right" style="margin-bottom: 5px">
        <span class="ng-binding">Zoom x<span ng-bind="slider.view+1"></span></span>

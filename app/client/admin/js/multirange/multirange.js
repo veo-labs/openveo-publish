@@ -118,8 +118,7 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
         };
         scope.mouseover = function(range, select, condition) {
           if (!range.select && condition)
-            select(
-              range.value);
+            select(range);
         };
       }
     };
@@ -295,12 +294,11 @@ angular.module('vds.multirange.lite', [])
           mousex = (evt.pageX - bound.left) / bound.width;
         };
         scope.mouserelease = function(release) {
-          release();
+            release();
         };
         scope.mouseover = function(range, select, condition) {
           if (!range.select && condition)
-            select(
-              range.value);
+            select(range);
         };
         scope.computeDepth = function(range) {
           range._depth = 100 - Math.round(Math.abs(mousex - range.value) * 100);

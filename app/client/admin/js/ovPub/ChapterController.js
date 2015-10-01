@@ -6,14 +6,14 @@
    * Defines the categories controller for the categories page.
    */
   function ChapterController(
-  $window,
-  $scope,
-  $filter,
-  entityService,
-  publishService,
-  vdsMultirangeViews,
-  vdsUtils,
-  video) {
+          $window,
+          $scope,
+          $filter,
+          entityService,
+          publishService,
+          vdsMultirangeViews,
+          vdsUtils,
+          video) {
 
     var orderBy = $filter('orderBy');
 
@@ -23,46 +23,6 @@
     function updateRange() {
       $scope.ranges = $scope.video.chapters.concat($scope.video.cut);
       orderBy($scope.ranges, '+value', false);
-    }
-
-    /**
-     * Search a value, by time or value and return or delete it.
-     * @param {Number} value Value to search in the list of chapters or null to search in cuts
-     * @param {String} type Cut type (e.g. begin or end) to search in the list of cuts
-     * @param {Boolean} action true to delete or false to get it
-     * @return {Boolean|Object} false if not found, true if found / deleted and an object if found
-     */
-    function search(value, type, action) {
-      var searchObj = [];
-      if (value === parseFloat(value))
-        searchObj = $filter('filter')($scope.video.chapters, {
-          value: value
-        },
-        true);
-      else if (type)
-        searchObj = $filter('filter')($scope.video.cut, {
-          type: type
-        },
-        true);
-
-      if (searchObj.length > 0) {
-
-        // Return
-        if (!action)
-          return searchObj[0];
-        else {
-
-          // Or Delete
-          if (value)
-            $scope.video.chapters.splice($scope.video.chapters.indexOf(searchObj[0]), 1);
-          else if (type)
-            $scope.video.cut.splice($scope.video.cut.indexOf(searchObj[0]), 1);
-          updateRange();
-          return true;
-        }
-      }
-      else
-        return false;
     }
 
     /**
@@ -84,49 +44,9 @@
         });
       }
 
-      $scope.video.chapters = orderBy($scope.video.chapters, '+value', false);
-
       // If no cut add it
-      if (!$scope.video.cut)
+      if (!$scope.video.cut) {
         $scope.video.cut = [];
-
-      updateRange();
-
-      // Init begin
-      var begin;
-
-      // At start, if begin exist, init with it, else init to 0
-      begin = search(null, 'begin');
-      if (begin) {
-        $scope.beginRange = begin;
-        $scope.beginIsInArray = true;
-      } else {
-        $scope.beginRange = {
-          value: 0,
-          name: $filter('translate')('UI.BEGIN'),
-          description: '',
-          type: 'begin'
-        };
-        $scope.beginIsInArray = false;
-      }
-
-      // Init end
-      var end;
-
-      // At start, if end exist, init with it, else init to 1
-      end = search(null, 'end');
-      if (end) {
-        $scope.endRange = end;
-        $scope.endIsInArray = true;
-      } else {
-        $scope.endRange = {
-          value: 1,
-          name: $filter('translate')(
-            'UI.END'),
-          description: '',
-          type: 'end'
-        };
-        $scope.endIsInArray = false;
       }
 
       $scope.slider = {
@@ -137,15 +57,39 @@
 
     var myPlayer = document.getElementById('chapterPlayer');
     var playerController;
+
+    /**
+     * Gather some parameters before calling init
+     * @param {type} duration a parameter needed before init
+     */
+    function preinit(duration) {
+      $scope.$apply(function() {
+
+        // only gets called once
+        if (!playerController || duration) {
+          playerController = angular.element(myPlayer).controller('ovPlayer');
+
+          // Set Duration
+          $scope.duration = duration / 1000 || $scope.video.metadata.duration;
+          init();
+        }
+      });
+    }
+
+    /**
+     * Calling preinit with a duration chnage on the player, it sometimes fail so...
+     */
     angular.element(myPlayer).on('durationChange', function(event, duration) {
-
-      playerController = angular.element(myPlayer).controller('ovPlayer');
-
-      // Set Duration
-      $scope.duration = duration / 1000 || $scope.video.metadata.duration;
-      init();
-
+      preinit(duration);
     });
+
+    /**
+     * ... we also use a timer for initition, we consider 2 sec to be long enougth
+     */
+    var timer = setTimeout(function() {
+      preinit(null);
+      clearTimeout(timer);
+    }, 2000);
 
     // Init
     $scope.video = video.data.entity;
@@ -163,6 +107,26 @@
     $scope.videoPlayer = angular.copy($scope.video);
     delete $scope.videoPlayer.chapters;
     delete $scope.videoPlayer.cut;
+
+    // Init default cuts
+    $scope.beginCut = {
+      isInArray: undefined,
+      range: {
+        value: 0,
+        name: $filter('translate')('UI.BEGIN'),
+        description: '',
+        type: 'begin'
+      }
+    };
+    $scope.endCut = {
+      isInArray: undefined,
+      range: {
+        value: 1,
+        name: $filter('translate')('UI.END'),
+        description: '',
+        type: 'end'
+      }
+    };
 
     // Open a new value
     $scope.openNew = function() {
@@ -190,7 +154,6 @@
 
         // Close edit on toggle
         $scope.cancel();
-
       }
     };
 
@@ -202,9 +165,9 @@
 
         // ADD the new model
         $scope.video.chapters.push($scope.modelToEdit);
-        updateRange();
       } else {
         $scope.selectRow.select = false;
+        $scope.selectRow = null;
       }
 
       // Save
@@ -220,15 +183,8 @@
     };
 
     $scope.remove = function() {
-      var searchObj = search($scope.selectRow.value, null, true);
-
-      if (searchObj) {
-
-        // If remove a cut by clicking the remove button, set th state button cut manually
-        if ($scope.selectRow.type == 'begin')
-          $scope.beginIsInArray = false;
-        if ($scope.selectRow.type == 'end')
-          $scope.endIsInArray = false;
+      if ($scope.selectRow) {
+        $scope.video.chapters.splice($scope.video.chapters.indexOf($scope.selectRow), 1);
         $scope.selectRow.select = false;
         $scope.selectRow = null;
         $scope.saveChapter();
@@ -236,11 +192,11 @@
     };
 
     // Select or deselect a line by clicking
-    $scope.select = function(value) {
+    $scope.select = function(object) {
       if ($scope.isCollapsed) {
         $scope.selectRow = null;
         for (var i = 0; i < $scope.ranges.length; i++) {
-          if ($scope.ranges[i].value == value && !$scope.ranges[i].select && !$scope.selectRow) {
+          if ($scope.ranges[i] === object && !$scope.ranges[i].select && !$scope.selectRow) {
             $scope.ranges[i].select = true;
             $scope.selectRow = $scope.ranges[i];
           } else {
@@ -249,7 +205,7 @@
         }
       } else {// if close by toggle, close edit form
         $scope.cancel();
-        $scope.select(value);
+        $scope.select(object);
       }
     };
 
@@ -269,82 +225,80 @@
 
     $scope.releaseRange = function() {
       playerController.setTime(parseInt($scope.selectRow.value * $scope.duration) * 1000);
-      $scope.saveChapter();
+
+      // we only save the chnage if the time of the selected row has changed
+      if ($scope.selectRow.value !== $scope.selectRowInitialValue) {
+        $scope.saveChapter();
+        $scope.selectRowInitialValue = $scope.selectRow.value;
+      }
     };
 
     /*
      * CUT
      */
 
-    // Toggle Begin
-    $scope.toggleBegin = function() {
-      if (!$scope.beginIsInArray) {
+    /**
+     * Selects and unselect a provided cut
+     * @param {Object} cut the cut to toggle
+     * @param {Boolean} addOrRemove forces the addition or removal of the cut
+     */
+    function toggleCut(cut, addOrRemove) {
+      var index = $scope.video.cut.indexOf(cut);
 
-        // Add begin Object to range array
-        $scope.video.cut.push($scope.beginRange);
-        updateRange();
-      } else {
-
-        // Search and delete
-        search(null, 'begin', true);
-
+      // cuts will be updated by the watchCollection
+      if (index === -1 && addOrRemove !== false) {
+        $scope.video.cut.push(cut);
+      } else if (index !== -1 && addOrRemove !== true) {
+        $scope.video.cut.splice(index, 1);
       }
 
-      // Save
-      $scope.saveChapter();
-    };
+    }
 
+    /**
+     * Selects or unselect the begin cut
+     * @param {Boolean} addOrRemove forces the addition or removal of the cut
+     */
+    function toggleBegin(addOrRemove) {
+      toggleCut($scope.beginCut.range, addOrRemove);
+    }
 
-    // Toggle End
-    $scope.toggleEnd = function() {
-      if (!$scope.endIsInArray) {
-        $scope.video.cut.push($scope.endRange);
-        updateRange();
-      } else {
-
-        // search and delete
-        search(null, 'end', true);
-
-      }
-      $scope.saveChapter();
-    };
+    /**
+     * Selects or unselect the ending cut
+     * @param {Boolean} addOrRemove foreces the addition or removal of the cut
+     */
+    function toggleEnd(addOrRemove) {
+      toggleCut($scope.endCut.range, addOrRemove);
+    }
 
     // Save chapter and cut
     $scope.saveChapter = function() {
-
       // Validate if end is after begin
-      if ($scope.endIsInArray && $scope.beginIsInArray && $scope.endRange.value <= $scope.beginRange.value) {
-
-        // Else delete end in range
-        search(null, 'end', true);
-
-        // And reset end
-        $scope.endRange.value = 1;
-        $scope.endIsInArray = false;
+      if ($scope.endCut.isInArray && $scope.beginCut.isInArray &&
+              $scope.endCut.range.value <= $scope.beginCut.range.value) {
+        // Reset end
+        $scope.endCut.range.value = 1;
         $scope.$emit('setAlert', 'warning', $filter('translate')('CHAPTER.DELETE_END_CUT'), 8000);
-      }
+        toggleEnd(false);
 
-      $scope.video.chapters = orderBy($scope.video.chapters, '+value', false);
-      $scope.video.cut = orderBy($scope.video.cut, '+value', false);
+        // we return because the toggleEnd will remove the cut, then the watchCollection for video.cut will
+        // set isInArray to false, then the watch for isInArray will save everything
+        return;
+      }
 
       // CALL SAVE HTTP
-      var chapter = [];
-      for (var i = 0; i < $scope.video.chapters.length; i++) {
-        chapter[i] = angular.copy($scope.video.chapters[i]);
-        delete chapter[i]['_depth'];
-        delete chapter[i]['select'];
+      var objToSave = {chapters: [], cut: []};
+      for (var collectionName in objToSave) {
+        if ($scope.video.hasOwnProperty(collectionName)) {
+          for (var i = 0; i < $scope.video[collectionName].length; i++) {
+            var element = angular.copy($scope.video[collectionName][i]);
+            delete element['_depth'];
+            delete element['select'];
+            objToSave[collectionName].push(element);
+          }
+          orderBy(objToSave[collectionName], '+value', false);
+        }
       }
-      var cut = [];
-      for (var j = 0; j < $scope.video.cut.length; j++) {
-        cut[j] = angular.copy($scope.video.cut[j]);
-        delete cut[j]['_depth'];
-        delete cut[j]['select'];
-      }
-
-      entityService.updateEntity('video', $scope.video.id, {
-        chapters: chapter,
-        cut: cut
-      }).success(function() {
+      entityService.updateEntity('video', $scope.video.id, objToSave).success(function() {
 
       }).error(function(data, status) {
         $scope.$emit('setAlert', 'danger', $filter('translate')('CHAPTER.SAVE_ERROR'), 4000);
@@ -381,8 +335,55 @@
     $scope.$watch('modelToEdit.value', function() {
       $scope.updateTime();
     });
-    $scope.editTime = new Date(Date.UTC(1970, 0, 1, 0, 0, 0));
 
+    // watching ref to the selected row to keep its initial time value
+    $scope.$watch('selectRow', function(newVal) {
+      if (newVal)
+        $scope.selectRowInitialValue = newVal.value;
+    });
+
+    // watching the button to toggle begin in and out of the cut array
+    // we do the same for end
+    // we do not toggle if previous value was undefined cause it means we are still initiating the controller
+    $scope.$watch('beginCut.isInArray', function(newVal, oldVal) {
+      if (newVal !== oldVal && oldVal !== undefined) {
+        toggleBegin(newVal);
+        $scope.saveChapter();
+      }
+    });
+    $scope.$watch('endCut.isInArray', function(newVal, oldVal) {
+      if (newVal !== oldVal && oldVal !== undefined) {
+        toggleEnd(newVal);
+        $scope.saveChapter();
+      }
+    });
+
+    // range depends on chapters and cut
+    $scope.$watchCollection('video.chapters', updateRange);
+    $scope.$watchCollection('video.cut', updateRange);
+
+    // maintain the data consistency when cuts are moved/deleted and during initition of the controller
+    $scope.$watchCollection('video.cut', function() {
+      $scope.beginCut.isInArray = false;
+      $scope.endCut.isInArray = false;
+      if (!$scope.video.cut) {
+        return;
+      }
+
+      // we use angular.extend to keep the same object reference
+      for (var i = 0; i < $scope.video.cut.length; i++) {
+        if ($scope.video.cut[i].type === 'begin') {
+          $scope.video.cut[i] = angular.extend($scope.beginCut.range, $scope.video.cut[i]);
+          $scope.beginCut.isInArray = true;
+        }
+        if ($scope.video.cut[i].type === 'end') {
+          $scope.video.cut[i] = angular.extend($scope.endCut.range, $scope.video.cut[i]);
+          $scope.endCut.isInArray = true;
+        }
+      }
+    });
+
+    $scope.editTime = new Date(Date.UTC(1970, 0, 1, 0, 0, 0));
   }
 
   app.controller('ChapterController', ChapterController);
