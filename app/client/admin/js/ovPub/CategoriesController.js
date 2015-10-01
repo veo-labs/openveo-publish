@@ -10,7 +10,8 @@
     /**
      * Handles success when a category is added or updated.
      */
-    function successCb() {
+    function successCb(data) {
+      categories.data.taxonomy.id = data.entity.id;
       $scope.saveIsDisabled = $scope.list.length == 0;
       $scope.listback = angular.copy($scope.list);
       $scope.$emit('setAlert', 'success', $filter('translate')('CATEGORIES.SAVE_SUCCESS'), 4000);
@@ -66,13 +67,17 @@
         entityService.addEntity('taxonomy', {
           name: 'categories',
           tree: $scope.list
-        }).success(successCb).error(errorCb);
+        }).success(function(data) {
+          successCb(data);
+        }).error(errorCb);
       } else {
 
         // Else : Do update
         entityService.updateEntity('taxonomy', categories.data.taxonomy.id, {
           tree: $scope.list
-        }).success(successCb).error(errorCb);
+        }).success(function(data) {
+          successCb(data);
+        }).error(errorCb);
       }
     };
 
