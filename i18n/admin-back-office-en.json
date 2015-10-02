@@ -121,7 +121,8 @@
     "ADD_ELEMENT" : "Add a new category",
     "RESET": "All categories changes canceled.",
     "SAVE_SUCCESS" : "Category successfully saved.",
-    "SAVE_FAIL" : "An error occured. Failed to save category."
+    "SAVE_FAIL" : "An error occured. Failed to save category.",
+    "EMPTY" : "An empty category could not be added."
   },
   "CHAPTER" : {
     "PAGE_TITLE" : "Publish - Chapter",
