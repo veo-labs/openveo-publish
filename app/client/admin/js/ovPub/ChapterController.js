@@ -35,13 +35,12 @@
       if (!$scope.video.chapters) {
         $scope.video.chapters = [];
         var indexTimecodes = $scope.video.timecodes;
-        angular.forEach(indexTimecodes, function(value, key) {
-          if (key != 0)
-            $scope.video.chapters.push({
-              value: parseInt(key) / ($scope.duration * 1000),
-              name: '',
-              description: ''
-            });
+        angular.forEach(indexTimecodes, function(obj) {
+          $scope.video.chapters.push({
+            value: obj.timecode / ($scope.duration * 1000),
+            name: '',
+            description: ''
+          });
         });
       }
 
