@@ -21,7 +21,8 @@
      * Reconstructs ranges with chapters and cut array.
      */
     function updateRange() {
-      $scope.ranges = $scope.video.chapters.concat($scope.video.cut);
+      $scope.ranges = ($scope.video.chapters ? $scope.video.chapters : [])
+              .concat(($scope.video.cut ? $scope.video.cut : []));
       orderBy($scope.ranges, '+value', false);
     }
 
@@ -278,10 +279,9 @@
         // Reset end
         $scope.endCut.range.value = 1;
         $scope.$emit('setAlert', 'warning', $filter('translate')('CHAPTER.DELETE_END_CUT'), 8000);
-        toggleEnd(false);
 
-        // we return because the toggleEnd will remove the cut, then the watchCollection for video.cut will
-        // set isInArray to false, then the watch for isInArray will save everything
+        // the watch for endCut.isInArray will save everything
+        $scope.endCut.isInArray = false;
         return;
       }
 
