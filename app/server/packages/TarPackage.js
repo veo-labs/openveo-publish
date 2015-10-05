@@ -53,7 +53,7 @@ function TarPackageError(message, code) {
  * @example
  *     // ".session" file example contained in a tar package
  *     {
- *       "date": 1425916390, // Timestamp of the video record
+ *       "date": 1425916390, // Unix epoch time of the video record
  *       "rich-media": true, // true if package contains presentation images
  *       "filename": "video.mp4", // The name of the video file in the package
  *       "duration": 30 // Duration of the video in seconds
@@ -426,7 +426,7 @@ TarPackage.prototype.validatePackage = function() {
       self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
 
       if (self.mediaPackage.metadata.date)
-        self.videoModel.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date);
+        self.videoModel.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000);
       self.fsm.transition();
     }
   });
