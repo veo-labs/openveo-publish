@@ -294,7 +294,7 @@ angular.module('vds.multirange.lite', [])
           mousex = (evt.pageX - bound.left) / bound.width;
         };
         scope.mouserelease = function(release) {
-            release();
+          release();
         };
         scope.mouseover = function(range, select, condition) {
           if (!range.select && condition)

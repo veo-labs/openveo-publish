@@ -6,7 +6,7 @@
    * Defines the categories controller for the categories page.
    */
   function CategoriesController($scope, $filter, entityService, categories) {
-    
+
     /**
      * Handles success when a category is added or updated.
      */
@@ -28,16 +28,19 @@
       if (status === 401)
         $scope.$parent.logout();
     }
-    
+
+    /**
+     * Check that category name field is not empty.
+     */
     function isAddFieldEmpty() {
-        if($scope.newitem.title == undefined){
-            return true;
-        }else if ($scope.newitem.title.length == 0){
-             return true;
-        }else{
-            return false;
-        }
-    }  
+      if ($scope.newitem.title == undefined) {
+        return true;
+      } else if ($scope.newitem.title.length == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
     $scope.newitem = {
       items: []
     };
@@ -52,18 +55,16 @@
     };
 
     $scope.newSubItem = function() {
-      if(isAddFieldEmpty ()){
-          $scope.$emit('setAlert', 'warning', $filter('translate')('CATEGORIES.EMPTY'), 4000);
-      }
-      else
-      {         
+      if (isAddFieldEmpty()) {
+        $scope.$emit('setAlert', 'warning', $filter('translate')('CATEGORIES.EMPTY'), 4000);
+      } else {
         $scope.newitem.id = String(Date.now());
         $scope.list.push(angular.copy($scope.newitem));
         $scope.newitem = {
           items: []
         };
         $scope.saveIsDisabled = $scope.list.length == 0;
-        }
+      }
     };
     $scope.resetCategory = function() {
       $scope.list = angular.copy($scope.listback);
