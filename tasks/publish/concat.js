@@ -13,7 +13,7 @@ var applicationConf = process.requirePublish('conf.json');
 function getMinifiedJSFiles(files) {
   var minifiedFiles = [];
   files.forEach(function(path) {
-    minifiedFiles.push('<%= publish.uglify %>/' + path.replace('.js', '.min.js'));
+    minifiedFiles.push('<%= publish.uglify %>/' + path.replace('.js', '.min.js').replace('/publish/', ''));
   });
   return minifiedFiles;
 }
