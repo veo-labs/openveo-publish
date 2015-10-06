@@ -106,7 +106,7 @@
     },
     "scriptFiles" : {
       "base": [
-        "/publish/lib/openveo-player/dist/openveo-player.js"
+        "/publish/lib/openveo-player/dist/openveo-player.min.js"
       ],
       "dev": [
         "/publish/ovPub/PublishApp.js",
