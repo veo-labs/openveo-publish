@@ -56,14 +56,19 @@
       "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION"
     },
     {
-      "id" : "publish-video",
-      "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
-      "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION"
-    },
-    {
-      "id" : "chapter-video",
-      "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
-      "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
+        "label": "PERMISSIONS.GROUP_VIDEO",
+        "permissions": [
+            {
+          "id" : "publish-video",
+          "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
+          "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION"
+        },
+        {
+          "id" : "chapter-video",
+          "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
+          "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
+        }
+    ]
     }
   ],
   "backOffice": {
