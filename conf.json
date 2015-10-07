@@ -13,6 +13,10 @@
       "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
       "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
       "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction"
+    },
+    "ws": {
+      "get /video/:id" : "app/server/controllers/videoController.getVideoAction",
+      "get /videos" : "app/server/controllers/videoController.getVideoByPropertiesAction"
     }
   },
   "entities" : {
@@ -25,8 +29,8 @@
       "name" : "WS_SCOPES.GET_VIDEO_NAME",
       "description" : "WS_SCOPES.GET_VIDEO_DESCRIPTON",
       "paths" : [
-        "get /video",
-        "get /video/*"
+        "get /publish/video/*",
+        "get /publish/videos*"
       ]
     }
   ],

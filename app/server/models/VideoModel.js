@@ -362,12 +362,13 @@ VideoModel.prototype.get = function(callback) {
  * @param {Number} count The expected number of results
  * @param {Number} page The page number
  * @param {Object} sort A MongoDB sort object
+ * @param {Boolean} populate Parameter to know if the entities must return populated dependencies
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Array** The list of videos
  *   - **Object** Pagination information
  */
-VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
+VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, populate, callback) {
   var self = this;
   var videos = [];
   var properties = [];
@@ -408,11 +409,23 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
           var newVideoProperty = {};
 
           // Custom properties
-          for (var j in properties) {
-            if (!videos[i].properties[String(properties[j].id)])
-              newVideoProperty[String(properties[j].id)] = '';
-            else
-              newVideoProperty[String(properties[j].id)] = videos[i].properties[String(properties[j].id)];
+          if (!populate) {
+            for (var j in properties) {
+              if (!videos[i].properties[String(properties[j].id)])
+                newVideoProperty[String(properties[j].id)] = '';
+              else
+                newVideoProperty[String(properties[j].id)] = videos[i].properties[String(properties[j].id)];
+            }
+          } else {
+            for (var k in properties) {
+
+              // make a copy of propertie object to add value
+              newVideoProperty[String(properties[k].id)] = JSON.parse(JSON.stringify(properties[k]));
+              if (!videos[i].properties[String(properties[k].id)])
+                newVideoProperty[String(properties[k].id)]['value'] = '';
+              else
+                newVideoProperty[String(properties[k].id)]['value'] = videos[i].properties[String(properties[k].id)];
+            }
           }
           videos[i].properties = newVideoProperty;
         }

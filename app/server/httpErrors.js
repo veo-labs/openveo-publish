@@ -63,6 +63,12 @@ module.exports = {
     code: 0x302,
     httpCode: 500,
     module: 'publish'
-  }
+  },
 
+  // Webservices
+  UNKNOWN_PROPERTY_ERROR: {
+    code: 0x400,
+    httpCode: 500,
+    module: 'publish'
+  }
 };

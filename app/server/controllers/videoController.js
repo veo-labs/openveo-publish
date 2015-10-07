@@ -17,6 +17,10 @@ var platforms = process.requirePublish('config/videoPlatformConf.json');
 
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var videoModel = new VideoModel();
+var async = require('async');
+
+var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var propertyModel = new PropertyModel();
 var applicationStorage = openVeoAPI.applicationStorage;
 
 var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
@@ -114,6 +118,75 @@ module.exports.getVideoAction = function(request, response, next) {
 };
 
 /**
+ * Gets information about a video.
+ *
+ * Expects one GET parameter :
+ *  - **id** The id of the video
+ *
+ * @example
+ *     {
+ *       video : {
+ *         id : 123456789,
+ *         ...
+ *       }
+ *     }
+ *
+ * @method getVideoAction
+ * @static
+ */
+module.exports.getVideoByPropertiesAction = function(request, response, next) {
+
+  var query = request.query;
+  var sortBy = query.sortBy || 'date';
+  var sortOrder = query.sortOrder == 'asc' ? -1 : 1;
+  var sort = {};
+  sort[sortBy] = sortOrder;
+  var page = query.page || 1;
+  if (page < 1) page = 1;
+  var limit = parseInt(query.limit) || 10;
+  if (limit < 1) limit = 10;
+  var wsSearch = query.properties;
+  var searchParam = {};
+
+  var series = [];
+
+  // Construct MongoDb search query with parameters
+  Object.keys(wsSearch).forEach(function(key) {
+    series.push(function(callback) {
+
+      // get property which name corresponding to parameter
+      propertyModel.getByFilter({name: key}, function(error, prop) {
+        if (error) return callback(error);
+
+        // Error if no property corresponding
+        if (!prop || prop.length == 0) return callback(errors.UNKNOWN_PROPERTY_ERROR);
+        var val = wsSearch[key];
+
+        // Build search for each existing property
+        searchParam['properties.' + prop.id] = {$in: [].concat(val)};
+        callback();
+      });
+    });
+  });
+
+  // Do series call function and execute final search
+  async.series(series, function(err) {
+    if (err) next(err);
+
+    // find in mongoDb
+    else videoModel.getPaginatedFilteredEntities(searchParam, limit, page, sort, true, function(error, entities) {
+      if (error) {
+        response.status(500).send(error);
+      } else {
+        response.send({
+          entities: entities
+        });
+      }
+    });
+  });
+};
+
+/**
  * Publishes a video.
  *
  * Expects one GET parameter :
@@ -180,3 +253,5 @@ module.exports.unpublishVideoAction = function(request, response, next) {
   else
     next(errors.UNPUBLISH_VIDEO_MISSING_PARAMETERS);
 };
+
+
