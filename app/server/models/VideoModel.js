@@ -527,7 +527,7 @@ VideoModel.prototype.getOne = function(id, callback) {
     // Retrieve video information from database
     function(callback) {
       self.provider.getOne(id, function(error, video) {
-        if (error) {
+        if (error || !video) {
           callback(error);
           return;
         } else {
