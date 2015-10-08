@@ -58,18 +58,6 @@ describe('WatcherController', function() {
       assert.equal(scope.watcherStatus, 1);
     });
 
-    it('Should logout user if not authenticated anymore on watcher start', function(done) {
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      $httpBackend.when('GET', '/be/publish/startWatcher').respond(401);
-      $httpBackend.expectGET('/be/publish/startWatcher');
-      scope.startWatcher();
-      $httpBackend.flush();
-    });
-
     it('Should be able to ask the server to stop the watcher', function() {
       $httpBackend.when('GET', '/be/publish/stopWatcher').respond(200, {
         status: 3
@@ -79,18 +67,6 @@ describe('WatcherController', function() {
       scope.stopWatcher();
       $httpBackend.flush();
       assert.equal(scope.watcherStatus, 3);
-    });
-
-    it('Should logout user if not authenticated anymore on watcher stop', function(done) {
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      $httpBackend.when('GET', '/be/publish/stopWatcher').respond(401);
-      $httpBackend.expectGET('/be/publish/stopWatcher');
-      scope.stopWatcher();
-      $httpBackend.flush();
     });
 
   });

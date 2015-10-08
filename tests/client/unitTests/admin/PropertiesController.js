@@ -83,23 +83,6 @@ describe('PropertiesController', function() {
       $httpBackend.flush();
     });
 
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('GET', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/be/crud/property/1').respond(401);
-      $httpBackend.expectDELETE('/be/crud/property/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[0].callback(scope.test.rows[0], function() {
-        assert.notOk('everything');
-      });
-      $httpBackend.flush();
-    });
-
   });
 
   // saveProperty method
@@ -116,25 +99,6 @@ describe('PropertiesController', function() {
         assert.notOk(true);
       });
 
-      $httpBackend.flush();
-    });
-
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('GET', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('POST', '/be/crud/property/1').respond(401);
-      $httpBackend.expectPOST('/be/crud/property/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.editFormContainer.onSubmit(scope.test.rows[0], function() {
-        assert.notOk(true);
-      }, function() {
-        assert.ok(true);
-      });
       $httpBackend.flush();
     });
 
@@ -158,26 +122,6 @@ describe('PropertiesController', function() {
           assert.notOk(true);
         }
       );
-      $httpBackend.flush();
-    });
-
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('GET', /.*/).respond(200, '');
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('PUT', '/be/crud/property').respond(401);
-      $httpBackend.expectPUT('/be/crud/property');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.addFormContainer.onSubmit({}, function() {
-        assert.notOk(true);
-      }, function() {
-        assert.ok(true);
-      });
-
       $httpBackend.flush();
     });
 

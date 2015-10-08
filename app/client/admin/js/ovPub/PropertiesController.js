@@ -18,11 +18,6 @@
           publishService.cacheClear('properties');
           $scope.$emit('setAlert', 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('PROPERTIES.REMOVE_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -37,11 +32,6 @@
         .success(function() {
           publishService.cacheClear('properties');
           successCb();
-        })
-        .error(function(data, status) {
-          errorCb();
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -59,10 +49,6 @@
       }).success(function() {
         publishService.cacheClear('properties');
         successCb();
-      }).error(function(data, status) {
-        errorCb();
-        if (status === 401)
-          $scope.$parent.logout();
       });
     }
 
@@ -168,8 +154,8 @@
       return $scope.rights.edit && !row.locked;
     };
 
-    scopeEditForm.onSubmit = function(model, successCb, errorCb) {
-      saveProperty(model, successCb, errorCb);
+    scopeEditForm.onSubmit = function(model, successCb) {
+      saveProperty(model, successCb);
     };
 
     /*
@@ -218,8 +204,8 @@
       }
     ];
 
-    scopeAddForm.onSubmit = function(model, successCb, errorCb) {
-      addProperty(model, successCb, errorCb);
+    scopeAddForm.onSubmit = function(model, successCb) {
+      addProperty(model, successCb);
     };
 
   }

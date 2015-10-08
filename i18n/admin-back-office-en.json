@@ -66,15 +66,10 @@
     "STATE_11" : "Ready",
     "STATE_12" : "Published",
     "REMOVE_SUCCESS" : "Video successfully removed.",
-    "REMOVE_FAIL" : "An error occured. Failed to remove video.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",
-    "RETRY_FAIL" : "Video can't be processed now, please retry later.",
     "UPLOAD_START_SUCCESS" : "Video will be uploaded soon.",
-    "UPLOAD_START_FAIL" : "Video can't be uploaded now, please retry later.",
     "PUBLISHED_SUCCESS" : "Application successfully published.",
-    "PUBLISHED_FAIL" : "An error occured. Video publish failed.",
     "UNPUBLISHED_SUCCESS" : "Video unpublished.",
-    "UNPUBLISHED_FAIL" : "An error occured. Video unpublish failed.",
 	"TITLE_FILTER": "Video's name",
     "DESCRIPTION_FILTER": "Description",
     "DATE_FILTER": "Date",
@@ -108,7 +103,6 @@
     "FORM_ADD_DESCRIPTION_DESC" : "A short description of the property",
     "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",
     "REMOVE_SUCCESS" : "Property successfully removed.",
-    "REMOVE_FAIL" : "An error occured. Failed to remove property.",
     "TITLE_FILTER": "Name",
     "DESCRIPTION_FILTER": "Description"
   },
@@ -121,7 +115,6 @@
     "ADD_ELEMENT" : "Add a new category",
     "RESET": "All categories changes canceled.",
     "SAVE_SUCCESS" : "Category successfully saved.",
-    "SAVE_FAIL" : "An error occured. Failed to save category.",
     "EMPTY" : "An empty category could not be added."
   },
   "CHAPTER" : {

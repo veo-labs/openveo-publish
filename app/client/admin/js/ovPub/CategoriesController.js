@@ -24,9 +24,6 @@
      */
     function errorCb(data, status) {
       $scope.saveIsDisabled = $scope.list.length == 0;
-      $scope.$emit('setAlert', 'danger', $filter('translate')('CATEGORIES.SAVE_FAIL'), 4000);
-      if (status === 401)
-        $scope.$parent.logout();
     }
 
     /**

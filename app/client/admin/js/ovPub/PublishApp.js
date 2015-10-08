@@ -3,7 +3,7 @@
 window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 (function(angular) {
 
-  var app = angular.module('ov.publish', ['ov.route', 'ov.i18n', 'ov.entity', 'ov.player', 'vds.multirange']);
+  var app = angular.module('ov.publish', ['ov.i18n', 'ov.entity', 'ov.player', 'vds.multirange']);
 
   /**
    * Defines a filter to print status in cells.
@@ -67,11 +67,11 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
   /*
    * Configures the ov.publish application by adding new routes.
    */
-  app.config(['ovRouteProvider', function(ovRouteProvider) {
+  app.config(['$routeProvider', function($routeProvider) {
 
     // Add route /publish/videos with authentication.
     // Also retrieve the list of videos
-    ovRouteProvider.when('/publish/videos', {
+    $routeProvider.when('/publish/videos', {
       templateUrl: '/publish/be/views/videos.html',
       controller: 'VideoController',
       title: 'VIDEOS.PAGE_TITLE',
@@ -91,7 +91,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/videos/videosId with authentication.
     // Also retrieve the list of videos
-    ovRouteProvider.when('/publish/video/:videoId', {
+    $routeProvider.when('/publish/video/:videoId', {
       templateUrl: '/publish/be/views/chapter.html',
       controller: 'ChapterController',
       title: 'CHAPTER.PAGE_TITLE',
@@ -106,7 +106,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/watcher with authentication.
     // Also retrieve the watcher status
-    ovRouteProvider.when('/publish/watcher', {
+    $routeProvider.when('/publish/watcher', {
       templateUrl: '/publish/be/views/watcher.html',
       controller: 'WatcherController',
       title: 'WATCHER.PAGE_TITLE',
@@ -120,7 +120,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/properties with authentication.
     // Also retrieve the list of properties
-    ovRouteProvider.when('/publish/properties', {
+    $routeProvider.when('/publish/properties', {
       templateUrl: '/publish/be/views/properties.html',
       controller: 'PropertiesController',
       title: 'PROPERTIES.PAGE_TITLE',
@@ -129,7 +129,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/categories with authentication.
     // Also retrieve the list of categories
-    ovRouteProvider.when('/publish/categories', {
+    $routeProvider.when('/publish/categories', {
       templateUrl: '/publish/be/views/categories.html',
       controller: 'CategoriesController',
       title: 'CATEGORIES.PAGE_TITLE',

@@ -106,11 +106,6 @@
         .success(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.RETRY_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('VIDEOS.RETRY_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -125,11 +120,6 @@
         .success(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UPLOAD_START_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('VIDEOS.UPLOAD_START_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -143,11 +133,6 @@
         .success(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('VIDEOS.PUBLISHED_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -161,11 +146,6 @@
         .success(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('VIDEOS.UNPUBLISHED_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -179,11 +159,6 @@
         .success(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.REMOVE_SUCCESS'), 4000);
           reload();
-        })
-        .error(function(data, status) {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('VIDEOS.REMOVE_FAIL'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
         });
     }
 
@@ -191,9 +166,8 @@
      * Saves video information.
      * @param {Object} video Video data
      * @param {Function} successCb Function to call in case of success
-     * @param {Function} errorCb Function to call in case of error
      */
-    function saveVideo(video, successCb, errorCb) {
+    function saveVideo(video, successCb) {
       entityService.updateEntity('video', video.id, {
         title: video.title,
         description: video.description,
@@ -202,10 +176,6 @@
       }).success(function() {
         scopeEditForm.pendingEdition = false;
         successCb();
-      }).error(function(data, status) {
-        errorCb();
-        if (status === 401)
-          $scope.$parent.logout();
       });
     }
 
@@ -466,8 +436,8 @@
     scopeEditForm.conditionEditDetail = function(row) {
       return $scope.rights.edit && !row.locked && row.state !== 0;
     };
-    scopeEditForm.onSubmit = function(model, successCb, errorCb) {
-      saveVideo(model, successCb, errorCb);
+    scopeEditForm.onSubmit = function(model, successCb) {
+      saveVideo(model, successCb);
     };
 
     // Listen to destroy event on the view to update

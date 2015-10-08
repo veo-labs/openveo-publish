@@ -85,24 +85,6 @@ describe('VideoController', function() {
       $httpBackend.flush();
     });
 
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/startUpload/1/vimeo').respond(401);
-      $httpBackend.expectGET('/be/publish/startUpload/1/vimeo');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[7].callback(scope.test.rows[0], function() {
-        assert.ok(false);
-      });
-
-      $httpBackend.flush();
-    });
-
   });
 
   // publishVideo method
@@ -129,24 +111,6 @@ describe('VideoController', function() {
       $httpBackend.expectGET('/be/publish/publishVideo/1,2');
 
       scope.tableContainer.actions[2].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
-
-      $httpBackend.flush();
-    });
-
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/publishVideo/1').respond(401);
-      $httpBackend.expectGET('/be/publish/publishVideo/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[2].callback(scope.test.rows[0], function() {
-        assert.notOk('everything');
-      });
 
       $httpBackend.flush();
     });
@@ -181,24 +145,6 @@ describe('VideoController', function() {
       $httpBackend.flush();
     });
 
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/unpublishVideo/1').respond(401);
-      $httpBackend.expectGET('/be/publish/unpublishVideo/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[3].callback(scope.test.rows[0], function() {
-        assert.notOk('everything');
-      });
-
-      $httpBackend.flush();
-    });
-
   });
 
   // retryVideo method
@@ -213,23 +159,6 @@ describe('VideoController', function() {
 
       scope.tableContainer.actions[5].callback(scope.test.rows[0], done);
 
-      $httpBackend.flush();
-    });
-
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/retryVideo/1').respond(401);
-      $httpBackend.expectGET('/be/publish/retryVideo/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[5].callback(scope.test.rows[0], function() {
-        assert.ok(false);
-      });
       $httpBackend.flush();
     });
 
@@ -262,23 +191,6 @@ describe('VideoController', function() {
       $httpBackend.flush();
     });
 
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('GET', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/be/crud/video/1').respond(401);
-      $httpBackend.expectDELETE('/be/crud/video/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.tableContainer.actions[6].callback(scope.test.rows[0], function() {
-        assert.notOk('everything');
-      });
-      $httpBackend.flush();
-    });
-
   });
 
 // saveVideo method
@@ -295,25 +207,6 @@ describe('VideoController', function() {
         assert.notOk(true);
       });
 
-      $httpBackend.flush();
-    });
-
-    it('Should logout user if a 401 is returned by the server', function(done) {
-      $httpBackend.when('DELETE', /.*/).respond(200, '');
-      $httpBackend.when('GET', /.*/).respond(200, '');
-      $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('POST', '/be/crud/video/1').respond(401);
-      $httpBackend.expectPOST('/be/crud/video/1');
-
-      $rootScope.logout = function() {
-        done();
-      };
-
-      scope.editFormContainer.onSubmit(scope.test.rows[0], function() {
-        assert.notOk(true);
-      }, function() {
-        assert.ok(true);
-      });
       $httpBackend.flush();
     });
 

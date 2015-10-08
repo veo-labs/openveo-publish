@@ -64,9 +64,6 @@
       $scope.disableWatcher = true;
       publishService.startWatcher().success(function(data) {
         updateWatcherStatus(data.status);
-      }).error(function(data, status) {
-        if (status === 401)
-          $scope.$parent.logout();
       });
     };
 
@@ -77,9 +74,6 @@
       $scope.disableWatcher = true;
       publishService.stopWatcher().success(function(data) {
         updateWatcherStatus(data.status);
-      }).error(function(data, status) {
-        if (status === 401)
-          $scope.$parent.logout();
       });
     };
 
