@@ -3,7 +3,13 @@
 window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 (function(angular) {
 
-  var app = angular.module('ov.publish', ['ov.i18n', 'ov.entity', 'ov.player', 'vds.multirange', 'angular-time-polyfill']);
+  var app = angular.module('ov.publish', [
+    'ov.i18n',
+    'ov.entity',
+    'ov.player',
+    'vds.multirange',
+    'angular-time-polyfill'
+  ]);
 
   /**
    * Defines a filter to print status in cells.
@@ -97,9 +103,20 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       title: 'CHAPTER.PAGE_TITLE',
       access: 'chapter-video',
       resolve: {
-        video: ['publishService', '$route', function(publishService, $route) {
+        video: ['$q', 'publishService', '$route', function($q, publishService, $route) {
+          var deferred = $q.defer();
           var videoId = $route.current.params.videoId;
-          return publishService.loadVideo(videoId);
+
+          publishService.loadVideo(videoId).then(function(result) {
+            if (result.data.entity)
+              deferred.resolve.apply(deferred, arguments);
+            else
+              deferred.reject();
+          }, function() {
+            deferred.reject();
+          });
+
+          return deferred.promise;
         }]
       }
     });
