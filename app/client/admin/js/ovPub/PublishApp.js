@@ -3,7 +3,7 @@
 window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 (function(angular) {
 
-  var app = angular.module('ov.publish', ['ov.i18n', 'ov.entity', 'ov.player', 'vds.multirange']);
+  var app = angular.module('ov.publish', ['ov.i18n', 'ov.entity', 'ov.player', 'vds.multirange', 'angular-time-polyfill']);
 
   /**
    * Defines a filter to print status in cells.

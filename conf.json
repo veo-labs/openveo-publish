@@ -103,7 +103,8 @@
     "scriptLibFiles" : {
       "base" : [ ],
       "dev" : [
-        "/publish/multirange/multirange.js"
+        "/publish/multirange/multirange.js",
+        "/publish/timePolyfill/time-polyfill.js"
       ],
       "prod" : [
         "/publish/be/js/libOpenveoPublish.js"
