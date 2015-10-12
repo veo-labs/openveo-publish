@@ -11,6 +11,7 @@
           $filter,
           entityService,
           publishService,
+          i18nService,
           vdsMultirangeViews,
           vdsUtils,
           video) {
@@ -107,6 +108,9 @@
     $scope.videoPlayer = angular.copy($scope.video);
     delete $scope.videoPlayer.chapters;
     delete $scope.videoPlayer.cut;
+
+    // Set player language
+    $scope.playerLanguage = i18nService.getLanguage();
 
     // Init default cuts
     $scope.beginCut = {
@@ -392,6 +396,7 @@
     '$filter',
     'entityService',
     'publishService',
+    'i18nService',
     'vdsMultirangeViews',
     'vdsUtils',
     'video'

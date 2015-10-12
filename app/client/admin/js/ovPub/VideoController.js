@@ -18,7 +18,8 @@
   categories,
   platforms,
   jsonPath,
-  tableReloadEventService) {
+  tableReloadEventService,
+  i18nService) {
 
     $scope.properties = properties.data.entities;
 
@@ -79,8 +80,9 @@
         $filter('translate')('VIDEOS.SHARECODE'),
         '<br><br><div class="well well-sm"><code>',
         '&lt;iframe width="480" height="270" ',
-        'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + video.link + '?fullscreen" ',
-        'frameborder="0"&gt;&lt;/iframe&gt;',
+        'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + video.link,
+        '?fullscreen&lang=' + i18nService.getLanguage() + '"',
+        ' frameborder="0"&gt;&lt;/iframe&gt;',
         '</div>'
       ].join(''), 0);
     }
@@ -460,7 +462,8 @@
     'categories',
     'platforms',
     'jsonPath',
-    'tableReloadEventService'
+    'tableReloadEventService',
+    'i18nService'
   ];
 
 })(angular.module('ov.publish'));

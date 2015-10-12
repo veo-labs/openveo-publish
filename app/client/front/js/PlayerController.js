@@ -22,6 +22,7 @@
 
           $scope.isFullViewport = urlParams['fullscreen'] || false;
           $scope.playerType = urlParams['type'] || 'html';
+          $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
           $scope.data = video;
           $scope.ready = true;
         }

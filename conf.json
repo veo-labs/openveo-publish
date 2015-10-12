@@ -145,6 +145,8 @@
       "player" : {
         "dev" : [
           "/publish/lib/openveo-player/js/PlayerApp.js",
+          "/publish/lib/openveo-player/js/i18n/I18nService.js",
+          "/publish/lib/openveo-player/js/i18n/I18nFilter.js",
           "/publish/lib/openveo-player/js/PlayerService.js",
           "/publish/lib/openveo-player/js/PlayerDirective.js",
           "/publish/lib/openveo-player/js/TabsDirective.js",
