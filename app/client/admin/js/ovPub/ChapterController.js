@@ -71,7 +71,7 @@
           playerController = angular.element(myPlayer).controller('ovPlayer');
 
           // Set Duration
-          $scope.duration = duration / 1000 || $scope.video.metadata.duration;
+          $scope.duration = duration / 1000 || ($scope.video.metadata && $scope.video.metadata.duration);
           init();
         }
       });
