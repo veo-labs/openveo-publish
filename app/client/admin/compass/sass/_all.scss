@@ -4,7 +4,7 @@
 
 
 /* List details */
-.pu-detail { 
+.pu-detail {
   line-height: initial;
   padding-bottom: 10px;
   width:100%;
@@ -12,7 +12,7 @@
   border: 1px solid #ddd;
   border-top:0 none;
 
-  ul { 
+  ul {
     list-style: none;
     padding-left: 35px;
   }
@@ -54,6 +54,7 @@
       max-height: 358px;
       overflow-y: auto;
       display: inline-block;
+      width: 100%;
       @include mobile(){
         height:auto;
       }
