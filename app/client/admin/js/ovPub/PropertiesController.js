@@ -14,7 +14,7 @@
      */
     function removeRows(selected, reload) {
       entityService.removeEntity('property', selected.join(','))
-        .success(function() {
+        .then(function() {
           publishService.cacheClear('properties');
           $scope.$emit('setAlert', 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
           reload();
@@ -24,31 +24,25 @@
     /**
      * Adds a property.
      * @param {Object} property Property data
-     * @param {Function} successCb Function to call in case of success
-     * @param {Function} errorCb Function to call in case of error
      */
-    function addProperty(property, successCb, errorCb) {
-      entityService.addEntity('property', property)
-        .success(function() {
+    function addProperty(property) {
+      return entityService.addEntity('property', property)
+        .then(function() {
           publishService.cacheClear('properties');
-          successCb();
         });
     }
 
     /**
      * Saves property.
      * @param Object property Property data
-     * @param {Function} successCb Function to call in case of success
-     * @param {Function} errorCb Function to call in case of error
      */
-    function saveProperty(property, successCb, errorCb) {
-      entityService.updateEntity('property', property.id, {
+    function saveProperty(property) {
+      return entityService.updateEntity('property', property.id, {
         name: property.name,
         description: property.description,
         type: property.type
-      }).success(function() {
+      }).then(function() {
         publishService.cacheClear('properties');
-        successCb();
       });
     }
 
@@ -154,8 +148,8 @@
       return $scope.rights.edit && !row.locked;
     };
 
-    scopeEditForm.onSubmit = function(model, successCb) {
-      saveProperty(model, successCb);
+    scopeEditForm.onSubmit = function(model) {
+      return saveProperty(model);
     };
 
     /*
@@ -204,8 +198,8 @@
       }
     ];
 
-    scopeAddForm.onSubmit = function(model, successCb) {
-      addProperty(model, successCb);
+    scopeAddForm.onSubmit = function(model) {
+      return addProperty(model);
     };
 
   }

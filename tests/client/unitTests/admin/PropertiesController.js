@@ -95,7 +95,7 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', '/be/crud/property/1').respond(200);
       $httpBackend.expectPOST('/be/crud/property/1');
 
-      scope.editFormContainer.onSubmit(scope.test.rows[0], done, function() {
+      scope.editFormContainer.onSubmit(scope.test.rows[0]).then(done(), function() {
         assert.notOk(true);
       });
 
@@ -116,8 +116,8 @@ describe('PropertiesController', function() {
       });
       $httpBackend.expectPUT('/be/crud/property');
 
-      scope.addFormContainer.onSubmit({},
-        done,
+      scope.addFormContainer.onSubmit({}).then(
+        done(),
         function() {
           assert.notOk(true);
         }

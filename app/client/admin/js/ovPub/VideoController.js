@@ -105,7 +105,7 @@
      */
     function retryVideo(videos, reload) {
       publishService.retryVideo(videos.join(','))
-        .success(function() {
+        .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.RETRY_SUCCESS'), 4000);
           reload();
         });
@@ -119,7 +119,7 @@
      */
     function startVideoUpload(videos, platformName, reload) {
       publishService.startVideoUpload(videos.join(','), platformName)
-        .success(function() {
+        .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UPLOAD_START_SUCCESS'), 4000);
           reload();
         });
@@ -132,7 +132,7 @@
      */
     function publishVideo(videos, reload) {
       publishService.publishVideo(videos.join(','))
-        .success(function() {
+        .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
           reload();
         });
@@ -145,7 +145,7 @@
      */
     function unpublishVideo(videos, reload) {
       publishService.unpublishVideo(videos.join(','))
-        .success(function() {
+        .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
           reload();
         });
@@ -158,7 +158,7 @@
      */
     function removeRows(selected, reload) {
       entityService.removeEntity('video', selected.join(','))
-        .success(function() {
+        .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.REMOVE_SUCCESS'), 4000);
           reload();
         });
@@ -167,17 +167,15 @@
     /**
      * Saves video information.
      * @param {Object} video Video data
-     * @param {Function} successCb Function to call in case of success
      */
-    function saveVideo(video, successCb) {
-      entityService.updateEntity('video', video.id, {
+    function saveVideo(video) {
+      return entityService.updateEntity('video', video.id, {
         title: video.title,
         description: video.description,
         properties: video.properties,
         category: video.category
-      }).success(function() {
+      }).then(function() {
         scopeEditForm.pendingEdition = false;
-        successCb();
       });
     }
 
@@ -438,8 +436,8 @@
     scopeEditForm.conditionEditDetail = function(row) {
       return $scope.rights.edit && !row.locked && row.state !== 0;
     };
-    scopeEditForm.onSubmit = function(model, successCb) {
-      saveVideo(model, successCb);
+    scopeEditForm.onSubmit = function(model) {
+      return saveVideo(model);
     };
 
     // Listen to destroy event on the view to update
