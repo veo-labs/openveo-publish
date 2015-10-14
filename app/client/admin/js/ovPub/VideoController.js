@@ -58,7 +58,7 @@
      */
     function getSelectableCategories(label) {
       return [{
-        value: '',
+        value: null,
         name: $filter('translate')(label)
       }].concat(publishService.getCategoriesOptions());
     }
@@ -273,7 +273,7 @@
       }, {
         key: 'category',
         type: 'select',
-        value: '',
+        value: null,
         label: $filter('translate')('VIDEOS.CATEGORY_FILTER'),
 
         /*
