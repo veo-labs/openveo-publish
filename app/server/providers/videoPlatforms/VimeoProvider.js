@@ -162,58 +162,56 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
  *   - **Object** Information about the video
  */
 VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
-  if (mediaId) {
-    var self = this;
+  if (!mediaId) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var self = this;
 
-    // Ask Vimeo for video information
-    this.vimeo.request({
-      method: 'GET',
-      path: '/videos/' + mediaId
-    },
-    function(error, body) {
-      var info = null;
+  // Ask Vimeo for video information
+  this.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
+    var info = null;
 
-      if (!error) {
-        info = {
-          available: (body.status === 'available')
-        };
+    if (!error) {
+      info = {
+        available: (body.status === 'available')
+      };
 
-        // Got video thumbnail in several formats
-        // Keep only essential information (width, height and url)
-        if (body.pictures && body.pictures.sizes) {
-          var pictures = [];
-          for (var i = 0; i < body.pictures.sizes.length; i++) {
-            var picture = body.pictures.sizes[i];
-            pictures.push({
-              width: picture.width,
-              height: picture.height,
-              link: picture.link
-            });
-          }
-          info['pictures'] = pictures;
+      // Got video thumbnail in several formats
+      // Keep only essential information (width, height and url)
+      if (body.pictures && body.pictures.sizes) {
+        var pictures = [];
+        for (var i = 0; i < body.pictures.sizes.length; i++) {
+          var picture = body.pictures.sizes[i];
+          pictures.push({
+            width: picture.width,
+            height: picture.height,
+            link: picture.link
+          });
         }
-
-        // Got direct access to video files and formats
-        // Keep only files with supported quality (see qualitiesMap)
-        if (body.files) {
-          var files = [];
-          for (var j = 0; j < body.files.length; j++) {
-            var file = body.files[j];
-
-            if (self.qualitiesMap[file.quality] != undefined) {
-              files.push({
-                quality: self.qualitiesMap[file.quality],
-                width: file.width,
-                height: file.height,
-                link: file.link_secure
-              });
-            }
-          }
-          info['files'] = files;
-        }
+        info['pictures'] = pictures;
       }
 
-      callback(error, info);
-    });
-  }
+      // Got direct access to video files and formats
+      // Keep only files with supported quality (see qualitiesMap)
+      if (body.files) {
+        var files = [];
+        for (var j = 0; j < body.files.length; j++) {
+          var file = body.files[j];
+
+          if (self.qualitiesMap[file.quality] != undefined) {
+            files.push({
+              quality: self.qualitiesMap[file.quality],
+              width: file.width,
+              height: file.height,
+              link: file.link_secure
+            });
+          }
+        }
+        info['files'] = files;
+      }
+    }
+
+    callback(error, info);
+  });
 };
