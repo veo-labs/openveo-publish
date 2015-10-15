@@ -89,6 +89,7 @@
         entityService.updateEntity('taxonomy', categories.data.taxonomy.id, {
           tree: $scope.list
         }).success(function(data) {
+          data.entity = {id: categories.data.taxonomy.id};
           successCb(data);
         }).error(errorCb);
       }
