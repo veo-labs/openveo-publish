@@ -27,12 +27,6 @@ describe('PublishService', function() {
     $httpBackend.when('PUT', /.*/).respond(200, '');
   });
 
-  it('Should be able to ask server for the list of videos', function() {
-    $httpBackend.expectGET('/be/crud/video');
-    publishService.loadVideos();
-    $httpBackend.flush();
-  });
-
   it('Should be able to ask server for watcher status', function() {
     $httpBackend.expectGET('/be/publish/watcherStatus');
     publishService.getWatcherStatus();

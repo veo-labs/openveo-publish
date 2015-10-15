@@ -8,34 +8,11 @@
   function PublishService($http, $q, entityService, jsonPath) {
     var basePath = '/be/';
     var properties;
-    var videos;
     var categories;
     var categoriesOptions;
     var categoriesByKey;
     var platforms;
     var videoChapter = {};
-
-    /**
-     * Loads the list of videos from server.
-     * @param {Boolean} force true to force reloading the list of videos
-     * @return {Promise} The promise used to retrieve videos from server
-     */
-    function loadVideos(force) {
-      if (!videos || force) {
-
-        // Get videos from server
-        return entityService.getAllEntities('video').success(function(videosObj) {
-          videos = videosObj.entities;
-        });
-
-      }
-
-      return $q.when({
-        data: {
-          entities: videos
-        }
-      });
-    }
 
     /**
      * Retries the given video.
@@ -65,14 +42,6 @@
     function unpublishVideo(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/unpublishVideo/' + id);
-    }
-
-    /**
-     * Gets the list of videos.
-     * @return {Promise} The HTTP promise
-     */
-    function getVideos() {
-      return videos;
     }
 
     /**
@@ -241,7 +210,7 @@
      */
     function cacheClear(type) {
       if (!type) {
-        properties = videos = categories = null;
+        properties = categories = null;
         videoChapter = {};
       }
       else
@@ -254,9 +223,6 @@
             categoriesOptions = null;
             categoriesByKey = null;
             break;
-          case 'videos':
-            videos = null;
-            break;
           case 'chapter':
             videoChapter = {};
             break;
@@ -266,8 +232,6 @@
     }
 
     return {
-      loadVideos: loadVideos,
-      getVideos: getVideos,
       retryVideo: retryVideo,
       publishVideo: publishVideo,
       unpublishVideo: unpublishVideo,
