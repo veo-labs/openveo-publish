@@ -11,7 +11,7 @@
           $filter,
           entityService,
           i18nService,
-          vdsMultirangeViews,
+          ovMultirangeViews,
           video) {
 
     var orderBy = $filter('orderBy');
@@ -49,7 +49,7 @@
       }
 
       $scope.slider = {
-        views: vdsMultirangeViews.TIME($scope.duration),
+        views: ovMultirangeViews.TIME($scope.duration),
         view: 0
       };
     }
@@ -394,7 +394,7 @@
     '$filter',
     'entityService',
     'i18nService',
-    'vdsMultirangeViews',
+    'ovMultirangeViews',
     'video'
   ];
 

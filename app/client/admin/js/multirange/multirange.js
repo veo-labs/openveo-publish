@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
-  .directive('vdsMultirange', ['vdsMultirangeViews', function(vdsMultirangeViews) {
+angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
+  .directive('ovMultirange', ['ovMultirangeViews', function(ovMultirangeViews) {
     return {
       required: 'ngModel',
       scope: {
@@ -13,12 +13,12 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
         onEnablemouseover: '='
       },
       template:
-        '<div class="vds-multirange-mk2-container">' +
-        '<vds-multirange-labels render="renderedStyle" on-enablemouseover="onEnablemouseover" ' +
-        'on-select="onSelect" ng-model="ngModel"></vds-multirange-labels>' +
-        '<vds-multirange-lite ng-model="ngModel" on-select="onSelect" on-enablemouseover="onEnablemouseover" ' +
-        'on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step"></vds-multirange-lite>' +
-        '<vds-multirange-hairlines render="renderedStyle" ng-model="units"></vds-multirange-hairlines>' +
+        '<div class="ov-multirange-mk2-container">' +
+        '<ov-multirange-labels render="renderedStyle" on-enablemouseover="onEnablemouseover" ' +
+        'on-select="onSelect" ng-model="ngModel"></ov-multirange-labels>' +
+        '<ov-multirange-lite ng-model="ngModel" on-select="onSelect" on-enablemouseover="onEnablemouseover" ' +
+        'on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step"></ov-multirange-lite>' +
+        '<ov-multirange-hairlines render="renderedStyle" ng-model="units"></ov-multirange-hairlines>' +
         '</div>',
       link: function(scope) {
         scope.getPercent = function(value) {
@@ -77,7 +77,7 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
 
         // set default view config
         if (typeof scope.views == 'undefined') {
-          scope.views = vdsMultirangeViews.DEFAULT;
+          scope.views = ovMultirangeViews.DEFAULT;
           scope.view = 0;
           scope.changeView(0);
         }
@@ -85,7 +85,7 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
       }
     };
   }])
-  .directive('vdsMultirangeLabels', function() {
+  .directive('ovMultirangeLabels', function() {
     return {
       restrict: 'E',
       scope: {
@@ -95,9 +95,9 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
         onEnablemouseover: '='
       },
       template:
-        '<div class="vds-multirange-mk2-labels-container" ng-style="render.container">' +
-        '<ul class="vds-multirange-mk2-labels" ng-style="render.content">' +
-        '<li class="vds-multirange-mk2-label" ng-class="{\'active\':range.select}" ng-repeat="range in ngModel" ' +
+        '<div class="ov-multirange-mk2-labels-container" ng-style="render.container">' +
+        '<ul class="ov-multirange-mk2-labels" ng-style="render.content">' +
+        '<li class="ov-multirange-mk2-label" ng-class="{\'active\':range.select}" ng-repeat="range in ngModel" ' +
         'ng-style="renderRange(range)" ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
         '<span ng-if="range.name && !range.type">{{ range.name }}</span>' +
         '<span ng-if="!range.name && !range.type"><div class="glyphicon glyphicon-map-marker"></div></span>' +
@@ -123,7 +123,7 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
       }
     };
   })
-  .directive('vdsMultirangeHairlines', function() {
+  .directive('ovMultirangeHairlines', function() {
     return {
       restrict: 'E',
       scope: {
@@ -131,9 +131,9 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
         render: '='
       },
       template:
-        '<div class="vds-multirange-mk2-hairlines-container" ng-style="render.container">' +
-        '<ul class="vds-multirange-mk2-hairlines" ng-style="render.content">' +
-        '<li class="vds-multirange-mk2-hairline" ng-repeat="hairline in hairlines" ng-style="hairline.render">' +
+        '<div class="ov-multirange-mk2-hairlines-container" ng-style="render.container">' +
+        '<ul class="ov-multirange-mk2-hairlines" ng-style="render.content">' +
+        '<li class="ov-multirange-mk2-hairline" ng-repeat="hairline in hairlines" ng-style="hairline.render">' +
         '<span>{{ hairline.label }}</span>' +
         '</li>' +
         '</ul>' +
@@ -172,9 +172,9 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
       }
     };
   })
-  .factory('vdsMultirangeViews', ['vdsUtils', function(vdsUtils) {
-    var tv = vdsUtils.time.fromTimeToValue,
-      vt = vdsUtils.time.fromValueToTime;
+  .factory('ovMultirangeViews', ['ovUtils', function(ovUtils) {
+    var tv = ovUtils.time.fromTimeToValue,
+      vt = ovUtils.time.fromValueToTime;
 
     return {
       TIME: function(duration) {
@@ -265,8 +265,8 @@ angular.module('vds.multirange', ['vds.multirange.lite', 'vds.utils'])
     };
   }]);
 
-angular.module('vds.multirange.lite', [])
-  .directive('vdsMultirangeLite', function() {
+angular.module('ov.multirange.lite', [])
+  .directive('ovMultirangeLite', function() {
     return {
       required: 'ngModel',
       scope: {
@@ -277,11 +277,11 @@ angular.module('vds.multirange.lite', [])
         onEnablemouseover: '='
       },
       template:
-        '<div class="vds-multirange-container" ng-mousemove="onMouseMove($event)">' +
-        '<div class="vds-multirange-track"></div>' +
-        '<div class="vds-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ' +
+        '<div class="ov-multirange-container" ng-mousemove="onMouseMove($event)">' +
+        '<div class="ov-multirange-track"></div>' +
+        '<div class="ov-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ' +
         'ng-mouseup="mouserelease(onMouserelease)"  ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
-        '<vds-range class="vds-multirange" ng-class="{\'active\':range.select}" position="range.value" min="0" ' +
+        '<ov-range class="ov-multirange" ng-class="{\'active\':range.select}" position="range.value" min="0" ' +
         'max="{{ precision }}" step="{{ preciseStep }}">' +
         '</div>' +
         '</div>',
@@ -316,7 +316,7 @@ angular.module('vds.multirange.lite', [])
       }
     };
   })
-  .directive('vdsRange', function() {
+  .directive('ovRange', function() {
     return {
       template: '<input type="range" ng-model="rdh.mulValue">',
       restrict: 'E',
@@ -361,8 +361,8 @@ angular.module('vds.multirange.lite', [])
     };
   });
 
-angular.module('vds.utils', [])
-  .factory('vdsUtils', function() {
+angular.module('ov.utils', [])
+  .factory('ovUtils', function() {
     return {
       time: {
         fromTimeToValue: function(hours, minutes, second, dayConst) {

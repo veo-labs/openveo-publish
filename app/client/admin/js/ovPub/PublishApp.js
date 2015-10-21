@@ -7,7 +7,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     'ov.i18n',
     'ov.entity',
     'ov.player',
-    'vds.multirange',
+    'ov.multirange',
     'angular-time-polyfill'
   ]);
 

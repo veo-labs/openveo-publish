@@ -1,4 +1,4 @@
-.vds-multirange-mk2-container {
+.ov-multirange-mk2-container {
   position: relative;
   width: 100%;
   height: 140px;
@@ -6,11 +6,11 @@
   overflow-y: hidden;
 }
 
-.vds-multirange-mk2-labels-container {
+.ov-multirange-mk2-labels-container {
   margin-left: 5px;
 }
 
-.vds-multirange-mk2-labels {
+.ov-multirange-mk2-labels {
   position: relative;
   width: 100%;
   height: 50px;
@@ -20,12 +20,12 @@
   cursor:pointer;
 }
 
-.vds-multirange-mk2-label {
+.ov-multirange-mk2-label {
   position: absolute;
   bottom: 0px;
 }
 
-.vds-multirange-mk2-label span {
+.ov-multirange-mk2-label span {
   display: inline-block;
   margin-left: -50%;
   font-size: 11px;
@@ -46,7 +46,7 @@
     background-color: $brand-success;
   }
 }
-.vds-multirange-mk2-label.active span{
+.ov-multirange-mk2-label.active span{
   background-color: #1FBBEB;
   color:#fff;
   top:-25px;
@@ -62,16 +62,16 @@
   }
 }
 
-.vds-multirange-mk2-hairline {
+.ov-multirange-mk2-hairline {
   position: absolute;
   border-left: 1px solid black;
 }
 
-.vds-multirange-mk2-hairlines-container {
+.ov-multirange-mk2-hairlines-container {
   margin-left: 5px;
 }
 
-.vds-multirange-mk2-hairlines {
+.ov-multirange-mk2-hairlines {
   position: relative;
   width: 100%;
   height: 25px;
@@ -80,12 +80,12 @@
   list-style: none;
 }
 
-.vds-multirange-mk2-hairline {
+.ov-multirange-mk2-hairline {
   position: absolute;
   border-left: 1px solid rgba(0,0,0,0.6);
 }
 
-.vds-multirange-mk2-hairline span {
+.ov-multirange-mk2-hairline span {
   display: inline-block;
   margin-left: -50%;
   margin-top: 14px;
@@ -94,21 +94,21 @@
   font-family: 'Arial', sans-serif;
 }
 
-.vds-multirange-container {
+.ov-multirange-container {
   position: relative;
   width: 100%;
   height: 20px;
   /* DO NOT MODIFY MARGIN */
 }
 
-.vds-multirange-wrapper {
+.ov-multirange-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
 }
 
-.vds-multirange-track {
+.ov-multirange-track {
   position: absolute;
   top: 8px;
   left: 0;
@@ -119,7 +119,7 @@
   background-color: rgba(210,210,210,0.8);
 }
 
-.vds-multirange {
+.ov-multirange {
   -webkit-appearance: none;
   width: 100%;
   margin: 1px 0 0 0;
@@ -128,11 +128,11 @@
   box-shadow: 0 0 0 transparent;
 }
 
-.vds-multirange:focus {
+.ov-multirange:focus {
   outline: none;
 }
 
-.vds-multirange::-webkit-slider-thumb {
+.ov-multirange::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: none;
   height: 20px;
@@ -141,14 +141,14 @@
   background: rgba(66,139,202,0.75);
 }
 
-.vds-multirange::-webkit-slider-runnable-track {
+.ov-multirange::-webkit-slider-runnable-track {
   height: 1px;
   border: none;
   background: transparent;
   margin-top: -1px;
 }
 
-.vds-multirange::-moz-range-thumb {
+.ov-multirange::-moz-range-thumb {
   border: none;
   height: 20px;
   width: 10px;
@@ -156,18 +156,18 @@
   background: rgba(66,139,202,0.75);
 }
 
-.vds-multirange::-moz-range-track {
+.ov-multirange::-moz-range-track {
   height: 1px;
   border: none;
   background: transparent;
   margin-top: -1px;
 }
 
-.vds-multirange::-ms-tooltip {
+.ov-multirange::-ms-tooltip {
   display: none;
 }
 
-.vds-multirange::-ms-thumb {
+.ov-multirange::-ms-thumb {
   border: none;
   height: 20px;
   width: 10px;
@@ -175,19 +175,19 @@
   background: rgba(66,139,202,0.75);
 }
 
-.vds-multirange::-ms-track {
+.ov-multirange::-ms-track {
   background: transparent;
   color: transparent;
   border-color: transparent;
   border-width: 6px 0;
 }
 
-.vds-multirange::-ms-fill-lower {
+.ov-multirange::-ms-fill-lower {
   height: 1px;
   background-color: transparent;
 }
 
-.vds-multirange::-ms-fill-upper {
+.ov-multirange::-ms-fill-upper {
   height: 1px;
   background-color: transparent;
 }
