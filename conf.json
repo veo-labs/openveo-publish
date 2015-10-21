@@ -183,6 +183,7 @@
       }
     },
     "cssFiles" : [
+      "/publish/be/css/player_page.css",
       "/publish/lib/openveo-player/dist/openveo-player.css"
     ]
   },
