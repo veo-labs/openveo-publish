@@ -247,9 +247,6 @@
      */
     scopeDataTable.entityType = 'video';
     scopeDataTable.cellTheme = '/publish/be/views/partial/publishCells.html';
-    scopeDataTable.conditionTogleDetail = function(row) {
-      return (row.state === 11 || row.state === 12);
-    };
 
     scopeDataTable.init = {
       sortBy: 'date',
