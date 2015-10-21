@@ -13,16 +13,12 @@
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Créer des propriétés",
     "CREATE_PROPERTY_DESCRIPTION" : "Créer des propriétés personnalisées",
-    "READ_PROPERTY_NAME" : "Voir les propriétés",
-    "READ_PROPERTY_DESCRIPTION" : "Lister les propriétés personnalisées",
     "UPDATE_PROPERTY_NAME" : "Editer les propriétés",
     "UPDATE_PROPERTY_DESCRIPTION" : "Editer les propriétés personnalisées",
     "DELETE_PROPERTY_NAME" : "Supprimer les propriétés",
     "DELETE_PROPERTY_DESCRIPTION" : "Supprimer les propriétés personnalisées",
     "CREATE_VIDEO_NAME" : "Créer des vidéos",
     "CREATE_VIDEO_DESCRIPTION" : "Créer des vidéos",
-    "READ_VIDEO_NAME" : "Voir les vidéos",
-    "READ_VIDEO_DESCRIPTION" : "Lister les vidéos",
     "UPDATE_VIDEO_NAME" : "Editer les vidéos",
     "UPDATE_VIDEO_DESCRIPTION" : "Editer les vidéos",
     "DELETE_VIDEO_NAME" : "Supprimer les vidéos",
@@ -36,7 +32,11 @@
     "ACCESS_PROPERTY_PAGE_NAME" : "Accès à la page des propriétés",
     "ACCESS_CATEGORIES_PAGE_NAME" : "Accès à la page des catégories",
     "EDIT_CHAPTER_NAME": "Editer les chapitres",
-    "EDIT_CHAPTER_DESCRIPTION": "Editer les chapitres personnalisés"
+    "EDIT_CHAPTER_DESCRIPTION": "Editer les chapitres personnalisés",
+    "RETRY_VIDEO_NAME": "Relancer le processus d'enregistrement de la vidéo",
+    "RETRY_VIDEO_DESCRIPTION": "Relancer manuellement le processus d'enregistrement de la vidéo",
+    "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
+    "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Vidéos",

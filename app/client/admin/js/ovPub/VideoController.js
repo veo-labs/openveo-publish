@@ -38,6 +38,8 @@
     $scope.rights.delete = $scope.checkAccess('delete-video');
     $scope.rights.publish = $scope.checkAccess('publish-video');
     $scope.rights.chapter = $scope.checkAccess('chapter-video');
+    $scope.rights.retry = $scope.checkAccess('retry-video');
+    $scope.rights.upload = $scope.checkAccess('upload-video');
 
     /*
      * FORM EDIT
@@ -372,7 +374,7 @@
       {
         label: $filter('translate')('VIDEOS.RETRY'),
         condition: function(row) {
-          return row.state == 0 && !row.saving;
+          return $scope.rights.retry && row.state == 0 && !row.saving;
         },
         callback: function(row, reload) {
           retryVideo([row.id], reload);
@@ -402,7 +404,7 @@
       scopeDataTable.actions.push({
         label: $filter('translate')('VIDEOS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
-          return row.state == 6 && !row.saving;
+          return $scope.rights.upload && row.state == 6 && !row.saving;
         },
         callback: function(row, reload) {
           startVideoUpload([row.id], this.platform, reload);

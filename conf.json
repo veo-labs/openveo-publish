@@ -79,6 +79,16 @@
           "id" : "chapter-video",
           "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
           "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
+        },
+        {
+          "id" : "retry-video",
+          "name" : "PERMISSIONS.RETRY_VIDEO_NAME",
+          "description" : "PERMISSIONS.RETRY_VIDEO_DESCRIPTION"
+        },
+        {
+          "id" : "upload-video",
+          "name" : "PERMISSIONS.UPLOAD_VIDEO_NAME",
+          "description" : "PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION"
         }
       ]
     }

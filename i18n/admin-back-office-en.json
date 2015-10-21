@@ -32,7 +32,11 @@
     "ACCESS_PROPERTY_PAGE_NAME" : "Access properties page",
     "ACCESS_CATEGORIES_PAGE_NAME" : "Access categories page",
     "EDIT_CHAPTER_NAME": "Edit chapters",
-    "EDIT_CHAPTER_DESCRIPTION": "Edit custom chapters"
+    "EDIT_CHAPTER_DESCRIPTION": "Edit custom chapters",
+    "RETRY_VIDEO_NAME": "Retry to launch video saving process",
+    "RETRY_VIDEO_DESCRIPTION": "Retry to launch manually the video saving process",
+    "UPLOAD_VIDEO_NAME": "Launch video upload",
+    "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload"
   },
   "VIDEOS" : {
     "PAGE_TITLE" : "Publish - Videos",
