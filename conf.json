@@ -57,22 +57,30 @@
     {
       "id" : "manage-watcher",
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
-      "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION"
+      "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
+      "paths" : [
+        "get /stopWatcher*",
+        "get /startWatcher*"
+      ]
     },
     {
-        "label": "PERMISSIONS.GROUP_VIDEO",
-        "permissions": [
-            {
+      "label": "PERMISSIONS.GROUP_VIDEO",
+      "permissions": [
+        {
           "id" : "publish-video",
           "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
-          "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION"
+          "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
+          "paths" : [
+            "get /publishVideo*",
+            "get /unpublishVideo*"
+          ]
         },
         {
           "id" : "chapter-video",
           "name" : "PERMISSIONS.EDIT_CHAPTER_NAME",
           "description" : "PERMISSIONS.EDIT_CHAPTER_DESCRIPTION"
         }
-    ]
+      ]
     }
   ],
   "backOffice": {
