@@ -20,14 +20,15 @@
   </head>
 
   <body>
-
-    <ov-player
-      ov-player-type="{{playerType}}"
-      ov-full-viewport="isFullViewport"
-      ov-data="data"
-      ov-language="language"
-      ng-show="ready"
-    ></ov-player>
+    <div class="container">
+      <ov-player
+        ov-player-type="{{playerType}}"
+        ov-full-viewport="isFullViewport"
+        ov-data="data"
+        ov-language="language"
+        ng-show="ready"
+      ></ov-player>
+    </div>
 
     [[#scripts]]
       <script type="text/javascript" src="[[.]]"></script>

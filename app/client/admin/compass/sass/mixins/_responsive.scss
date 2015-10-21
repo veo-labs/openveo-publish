@@ -35,10 +35,18 @@
 
 // specific css for desktop mode
 @mixin desktop () {
-   @include mq($from: desktop){
+   @include mq(desktop, wide){
 		@content;
 	}
 }
+
+// specific css for desktop mode
+@mixin desktop-wide () {
+   @include mq($from: wide){
+		@content;
+	}
+}
+
 
 // specific css for print display
 @mixin print {

@@ -1,0 +1,26 @@
+@import "bootstrap/override";
+
+// add support responsive
+@import "base/on-responsive";
+@import "base/browser-support";
+
+/**
+ * Mixins / Helper / Function
+ */
+@import "mixins/responsive";
+@import "mixins/animation";
+@import "mixins/retina";
+
+.container{
+  margin: 0 auto;
+
+  @include tablet(){
+    width: $screen-sm;
+  }
+  @include desktop(){
+    width: $screen-md;
+  }
+  @include desktop-wide(){
+     width: $screen-lg;
+  }
+}
