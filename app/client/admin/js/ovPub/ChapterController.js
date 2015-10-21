@@ -10,10 +10,8 @@
           $scope,
           $filter,
           entityService,
-          publishService,
           i18nService,
           vdsMultirangeViews,
-          vdsUtils,
           video) {
 
     var orderBy = $filter('orderBy');
@@ -395,10 +393,8 @@
     '$scope',
     '$filter',
     'entityService',
-    'publishService',
     'i18nService',
     'vdsMultirangeViews',
-    'vdsUtils',
     'video'
   ];
 

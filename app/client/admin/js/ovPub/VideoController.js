@@ -11,13 +11,11 @@
   $location,
   $window,
   $interval,
-  $timeout,
   entityService,
   publishService,
   properties,
   categories,
   platforms,
-  jsonPath,
   tableReloadEventService,
   i18nService) {
 
@@ -452,13 +450,11 @@
     '$location',
     '$window',
     '$interval',
-    '$timeout',
     'entityService',
     'publishService',
     'properties',
     'categories',
     'platforms',
-    'jsonPath',
     'tableReloadEventService',
     'i18nService'
   ];
