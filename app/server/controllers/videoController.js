@@ -174,15 +174,18 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     if (err) next(err);
 
     // find in mongoDb
-    else videoModel.getPaginatedFilteredEntities(searchParam, limit, page, sort, true, function(error, entities) {
-      if (error) {
-        response.status(500).send(error);
-      } else {
-        response.send({
-          entities: entities
-        });
+    else videoModel.getPaginatedFilteredEntities(searchParam, limit, page, sort, true,
+      function(error, entities, pagination) {
+        if (error) {
+          response.status(500).send(error);
+        } else {
+          response.send({
+            videos: entities,
+            pagination: pagination
+          });
+        }
       }
-    });
+    );
   });
 };
 
