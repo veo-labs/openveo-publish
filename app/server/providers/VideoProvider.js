@@ -79,3 +79,32 @@ VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, count, p
     lastTransition: 0
   }, count, page, sort, callback);
 };
+
+/**
+ * Gets an entity.
+ *
+ * @method getOne
+ * @async
+ * @param {String} id The entity id
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The entity
+ */
+VideoProvider.prototype.getOne = function(id, callback) {
+  this.database.get(this.collection, {
+    id: id
+  },
+    {
+      _id: 0,
+      originalPackagePath: 0,
+      packageType: 0,
+      lastState: 0,
+      lastTransition: 0
+    },
+  1, function(error, entities) {
+    if (entities && entities.length)
+      callback(error, entities[0]);
+    else
+      callback(error);
+  });
+};
