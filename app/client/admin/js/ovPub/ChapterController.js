@@ -115,7 +115,7 @@
       isInArray: undefined,
       range: {
         value: 0,
-        name: $filter('translate')('UI.BEGIN'),
+        name: 'UI.BEGIN',
         description: '',
         type: 'begin'
       }
@@ -124,7 +124,7 @@
       isInArray: undefined,
       range: {
         value: 1,
-        name: $filter('translate')('UI.END'),
+        name: 'UI.END',
         description: '',
         type: 'end'
       }

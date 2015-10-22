@@ -21,8 +21,8 @@
         </thead>
         <tbody>
           <tr ng-repeat="row in ranges| orderBy:'+value'" ng-click="select(row)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
-            <td class="col-sm-3">{{ (row.value*duration)*1000 | date:'H:mm:ss':'+0000'}}</td>
-            <td class="col-sm-9">{{ row.name }}</td>
+            <td class="col-sm-3">{{ duration?((row.value*duration)*1000 | date:'H:mm:ss':'+0000'):'-:--:--' }}</td>
+            <td class="col-sm-9" ng-bind=" row.name | translate"></td>
           </tr>
         </tbody>
       </table>
