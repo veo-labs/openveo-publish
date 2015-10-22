@@ -3,7 +3,10 @@
 (function(app) {
 
   /**
-   * Defines a publish service to get publish information.
+   * Defines a publish service to manage videos, watcher, categories and properties.
+   *
+   * @module ov.publish
+   * @class publishService
    */
   function PublishService($http, $q, entityService, jsonPath) {
     var basePath = '/be/';
@@ -15,9 +18,13 @@
     var videoChapter = {};
 
     /**
-     * Retries the given video.
+     * Retries a video.
+     *
+     * If a video is on error, the upload / publication process has stopped and can be retried.
+     *
      * @param {String} id The id of the video to retry
      * @return {Promise} The HTTP promise
+     * @method retryVideo
      */
     function retryVideo(id) {
       entityService.deleteCache('video');
@@ -26,8 +33,10 @@
 
     /**
      * Publishes the given video.
+     *
      * @param {String} id The id of the video to publish
      * @return {Promise} The HTTP promise
+     * @method publishVideo
      */
     function publishVideo(id) {
       entityService.deleteCache('video');
@@ -36,8 +45,10 @@
 
     /**
      * Unpublishes the given video.
+     *
      * @param {String} id The id of the video to unpublish
      * @return {Promise} The HTTP promise
+     * @method unpublishVideo
      */
     function unpublishVideo(id) {
       entityService.deleteCache('video');
@@ -46,7 +57,9 @@
 
     /**
      * Gets watcher status.
+     *
      * @return {Promise} The HTTP promise
+     * @method getWatcherStatus
      */
     function getWatcherStatus() {
       return $http.get(basePath + 'publish/watcherStatus');
@@ -54,7 +67,9 @@
 
     /**
      * Starts the watcher.
+     *
      * @return {Promise} The HTTP promise
+     * @method startWatcher
      */
     function startWatcher() {
       return $http.get(basePath + 'publish/startWatcher');
@@ -62,16 +77,19 @@
 
     /**
      * Stops the watcher.
+     *
      * @return {Promise} The HTTP promise
+     * @method stopWatcher
      */
     function stopWatcher() {
       return $http.get(basePath + 'publish/stopWatcher');
     }
 
     /**
-     * Loads the list of properties from server.
-     * @return {Promise} The promise used to retrieve properties
-     * from server
+     * Loads all properties from server.
+     *
+     * @return {Promise} The HTTP promise
+     * @method loadProperties
      */
     function loadProperties() {
       if (!properties) {
@@ -90,7 +108,9 @@
 
     /**
      * Gets list of properties.
+     *
      * @return {Promise} The HTTP promise
+     * @method getProperties
      */
     function getProperties() {
       return properties;
@@ -98,7 +118,9 @@
 
     /**
      * Loads the list of available media platforms from server.
+     *
      * @return {Promise} The promise used to retrieve platforms from server
+     * @method loadPlatforms
      */
     function loadPlatforms() {
       if (!platforms) {
@@ -116,17 +138,21 @@
 
     /**
      * Gets the list of available platforms.
+     *
      * @return {Promise} The HTTP promise
+     * @method getPlatforms
      */
     function getPlatforms() {
       return platforms;
     }
 
     /**
-     * Asks server to start uploading the video.
+     * Asks server to start uploading a video waiting for manual upload.
+     *
      * @param {String} id The id of the video to start uploading
      * @param {String} platform The video platform to upload to
      * @return {Promise} The HTTP promise
+     * @method startVideoUpload
      */
     function startVideoUpload(id, platform) {
       entityService.deleteCache('video');
@@ -135,7 +161,9 @@
 
     /**
      * Loads the list of media categories.
+     *
      * @return {Promise} The HTTP promise
+     * @method loadCategories
      */
     function loadCategories() {
       if (!categories) {
@@ -165,24 +193,30 @@
     }
 
     /**
-     * Gets list of Categories.
+     * Gets the list of categories.
+     *
      * @return {Array} The list of categories
+     * @method getCategories
      */
     function getCategories() {
       return categories;
     }
 
     /**
-     * Gets list of Categories formatted for select options.
+     * Gets the list of categories formatted for an HTMLSelect element.
+     *
      * @return {Array} The list of categories
+     * @method getCategoriesOptions
      */
     function getCategoriesOptions() {
       return categoriesOptions;
     }
 
     /**
-     * Gets list of Categories by key.
-     * @return {Object} The list of categories by key:value
+     * Gets list of categories indexed by keys.
+     *
+     * @return {Object} The list of categories
+     * @method getCategoriesByKey
      */
     function getCategoriesByKey() {
       return categoriesByKey;
@@ -190,8 +224,10 @@
 
     /**
      * Loads a video by its id.
+     *
      * @param {String} id The video id
      * @return {Promise} The HTTP promise
+     * @method loadVideo
      */
     function loadVideo(id) {
       if (!videoChapter[id]) {
@@ -205,8 +241,11 @@
     }
 
     /**
-     * Deletes cache for the given entity.
-     * @param {String} type The entity type
+     * Clears a publish service cache.
+     *
+     * @param {String} [type] The cache element to clear (**properties**, **categories** or **chapter**), null to
+     * clear all caches
+     * @method cacheClear
      */
     function cacheClear(type) {
       if (!type) {

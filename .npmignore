@@ -40,8 +40,10 @@ nbproject
 /app/client/admin
 /app/client/front/js
 
-# Documentation (yuidoc)
-/doc
+# Documentation
+/docs
+/site
+/.grunt
 
 # Grunt files
 /Gruntfile.js

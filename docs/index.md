@@ -1,4 +1,4 @@
-# OpenVeo Publish
+# What's OpenVeo Publish ?
 
 OpenVeo Publish is an [OpenVeo](https://github.com/veo-labs/openveo-core) plugin.
 
@@ -13,14 +13,22 @@ OpenVeo Publish adds the following features :
     - A page to add chapters on a video or cut a video (begin / end)
 - A public page to play a video with images synchronization and chapters
 
-# Documentation
+## Screenshots
 
-TODO
+### Back end catalogue
+![Back end catalogue](images/screenshots/back-end-catalogue.jpg)
 
-# Contributors
+### Back end chapters
+![Back end chapters](images/screenshots/back-end-chapters.jpg)
 
-Maintainer : [Veo-Labs](http://www.veo-labs.com/)
+### Back end categories
+![Back end categories](images/screenshots/back-end-categories.jpg)
 
-# License
+### Back end video properties
+![Back end properties](images/screenshots/back-end-properties.jpg)
 
-[AGPL](http://www.gnu.org/licenses/agpl-3.0.en.html)
+### Back end watcher
+![Back end watcher](images/screenshots/back-end-watcher.jpg)
+
+### Public video with images synchronization
+![Player video](images/screenshots/player.jpg)

@@ -52,13 +52,24 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-mkdocs');
+  grunt.loadNpmTasks('grunt-gh-pages');
+  grunt.loadNpmTasks('grunt-rename');
+  grunt.loadNpmTasks('grunt-remove');
 
-  // only watch core scss
+  // Listen to changes on SCSS files and generate CSS files
   grunt.registerTask('default', ['compass:publishdev', 'watch']);
 
-  // uglify and concat publish JavaScript files
+  // Minify and concat back end AngularJS Javascript files
   grunt.registerTask('concatpublish', ['uglify', 'concat']);
 
-  // core Prod process (CSS+JS)
-  grunt.registerTask('prod', ['compass:publishdist', 'concatpublish']);
+  // Prepare project for production
+  grunt.registerTask('prod', ['compass:publishdist', 'concatpublish', 'doc']);
+
+  // Generate documentation
+  grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);
+
+  // Deploy documentation to github pages
+  grunt.registerTask('deploy-doc', ['doc', 'gh-pages:doc']);
+
 };

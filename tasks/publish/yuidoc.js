@@ -2,23 +2,16 @@
 
 module.exports = {
 
-  // Publish doc
-  publish: {
-    name: '<%= pkg.name %>',
-    description: '<%= pkg.description %>',
+  // Back end doc
+  backEnd: {
+    name: 'OpenVeo Publish AngularJS back end',
+    description: 'AngularJS OpenVeo Publish plugin back end documentation',
     version: '<%= pkg.version %>',
     options: {
-      paths: 'app/server',
-      outdir: './doc/openveo-publish',
+      paths: 'app/client/admin/js',
+      outdir: './site/version/api/back-end',
       linkNatives: true,
-      external: {
-        data: [
-          {
-            base: '../../doc/openveo-api/',
-            json: '../../doc/openveo-api/data.json'
-          }
-        ]
-      }
+      themedir: 'node_modules/yuidoc-theme-blue'
     }
   }
 

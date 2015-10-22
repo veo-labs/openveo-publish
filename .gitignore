@@ -39,5 +39,6 @@ ehthumbs.db
 #IDE
 nbproject
 
-# Documentation (yuidoc)
-/doc
+# Documentation
+/site
+/.grunt

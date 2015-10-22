@@ -1,0 +1,19 @@
+site_name: Openveo Publish
+repo_url: https://github.com/veo-labs/openveo-publish
+theme: readthedocs
+site_dir: site/version
+markdown_extensions:
+  - fenced_code
+  - tables
+pages:
+- 'INTRODUCTION': 'index.md'
+- 'USERS':
+  - 'Getting started': 'getting-started.md'
+  - 'Watcher': 'watcher.md'
+  - 'Web Service': 'web-service.md'
+- 'DEVELOPERS':
+  - 'Basics': 'developers/basics.md'
+  - 'Installation': 'developers/installation.md'
+  - 'Back end AngularJS': 'developers/back-end.md'
+  - 'CSS / SASS / JS compilation': 'developers/compilation.md'
+  - 'Unit tests': 'developers/unit-tests.md'
