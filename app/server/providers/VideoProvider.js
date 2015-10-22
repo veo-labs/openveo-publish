@@ -50,3 +50,32 @@ VideoProvider.prototype.updateVideoState = function(id, oldState, newState, call
         callback(error);
     });
 };
+
+/**
+ * *
+ * @param {type} options
+ *
+ * sort is a collection of key to sort with the order value (-1 : desc, 1 asc)
+ * example ( {"name":-1, age:"1"}  specifies a descending sort by the name field and then an ascending sort by
+ * the age field
+ *
+ * filter is a collection of filter
+ * example {"name": {$regex : ".*sam.*}, "age": {$lt:20}} specifies all document witch the name field contains
+ * "sam" aged less than 20
+ *
+ * @param {type} filter
+ * @param {type} count
+ * @param {type} page
+ * @param {type} sort
+ * @param {type} callback
+ * @returns {undefined}
+ */
+VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
+  this.database.search(this.collection, filter, {
+    _id: 0,
+    originalPackagePath: 0,
+    packageType: 0,
+    lastState: 0,
+    lastTransition: 0
+  }, count, page, sort, callback);
+};
