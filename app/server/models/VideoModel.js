@@ -11,10 +11,11 @@ var fs = require('fs');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
 
+var configDir = openVeoAPI.fileSystem.getConfDir();
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
-var videoPlatformConf = process.requirePublish('config/videoPlatformConf.json');
+var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 
 /**
  * Defines a VideoModel class to manipulate videos.

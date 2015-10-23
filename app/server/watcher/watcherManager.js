@@ -11,6 +11,8 @@
 var path = require('path');
 var childProcess = require('child_process');
 var winston = require('winston');
+var openVeoAPI = require('@openveo/api');
+var configDir = openVeoAPI.fileSystem.getConfDir();
 
 // Retrieve logger
 var logger = winston.loggers.get('openveo');
@@ -40,7 +42,7 @@ module.exports.start = function() {
     // Executes watcher as a child process
     watcher = childProcess.fork(path.normalize(process.rootPublish + '/app/server/watcher/watcher.js'), [
       '--rootPublish', process.rootPublish,
-      '--databaseConf', path.normalize(process.root + '/config/databaseConf.json')
+      '--databaseConf', path.normalize(path.join(configDir, 'core/databaseConf.json'))
     ]);
 
     // Listen to messages from child process

@@ -11,10 +11,11 @@ var events = require('events');
 var path = require('path');
 var StateMachine = require('javascript-state-machine');
 var openVeoAPI = require('@openveo/api');
+var configDir = openVeoAPI.fileSystem.getConfDir();
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
-var publishConf = process.requirePublish('config/publishConf.json');
-var videoPlatformConf = process.requirePublish('config/videoPlatformConf.json');
+var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
+var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var errors = process.requirePublish('app/server/packages/errors.js');
 
 /**

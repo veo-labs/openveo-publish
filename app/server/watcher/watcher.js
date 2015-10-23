@@ -12,7 +12,7 @@
  *
  * node watcher.js --root ""/home/veo-labs/openveo" --rootPublish
  * "/home/veo-labs/openveo/node_modules/@openveo/publish" --databaseConf
- * "/home/veo-labs/openveo/config/databaseConf.json"
+ * "~/.openveo/publish/databaseConf.json"
  *
  * @module publish-watcher
  * @class watcher.js
@@ -23,6 +23,8 @@ var path = require('path');
 var fs = require('fs');
 var util = require('util');
 var chokidar = require('chokidar');
+var openVeoAPI = require('@openveo/api');
+var configDir = openVeoAPI.fileSystem.getConfDir();
 var databaseConf;
 
 // Process script arguments
@@ -52,15 +54,14 @@ process.requirePublish = function(filePath) {
 };
 
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
 
 // Module files
-var watcherConf = process.requirePublish('config/watcherConf.json');
-var publishConf = process.requirePublish('config/publishConf.json');
+var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
+var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 
 // Get a logger
-var logger = openVeoAPI.logger.get('watcher', process.requirePublish('config/loggerConf.json').watcher);
+var logger = openVeoAPI.logger.get('watcher', require(path.join(configDir, 'publish/loggerConf.json')).watcher);
 
 // hotFolders and videoTmpDir must be defined
 if (!watcherConf.hotFolders || !publishConf.videoTmpDir) {

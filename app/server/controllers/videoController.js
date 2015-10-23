@@ -11,9 +11,11 @@
  */
 
 // Module dependencies
+var path = require('path');
 var openVeoAPI = require('@openveo/api');
+var configDir = openVeoAPI.fileSystem.getConfDir();
 var errors = process.requirePublish('app/server/httpErrors.js');
-var platforms = process.requirePublish('config/videoPlatformConf.json');
+var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var videoModel = new VideoModel();
