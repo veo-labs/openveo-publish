@@ -8,7 +8,7 @@ module.exports = {
     options: {
       base: 'site',
       message: 'Auto-generated documentation for version <%= pkg.version %>',
-      push: false,
+      push: true,
       add: true
     },
     src: '**/*'

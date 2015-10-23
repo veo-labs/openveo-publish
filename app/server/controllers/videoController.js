@@ -256,5 +256,3 @@ module.exports.unpublishVideoAction = function(request, response, next) {
   else
     next(errors.UNPUBLISH_VIDEO_MISSING_PARAMETERS);
 };
-
-
