@@ -321,7 +321,7 @@
       {
         label: $filter('translate')('UI.VIEW'),
         condition: function(row) {
-          return row.state == 12;
+          return row.state == 11 || row.state == 12;
         },
         callback: function(row) {
           goToPath(row.link + '?lang=' + i18nService.getLanguage());

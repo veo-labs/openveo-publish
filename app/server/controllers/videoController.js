@@ -102,8 +102,8 @@ module.exports.getPlatformsAction = function(request, response) {
  */
 module.exports.getVideoAction = function(request, response, next) {
   if (request.params.id) {
-    videoModel.getOnePublished(request.params.id, function(error, video) {
-      if (error)
+    videoModel.getOneReady(request.params.id, function(error, video) {
+      if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
         next(errors.GET_VIDEO_ERROR);
       else
         response.send({

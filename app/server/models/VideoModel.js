@@ -438,19 +438,18 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
 /**
  * Gets a video and verify that it is published.
  *
- * @method getOnePublished
+ * @method getOneReady
  * @async
  * @param {String} id The id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** The video
  */
-VideoModel.prototype.getOnePublished = function(id, callback) {
+VideoModel.prototype.getOneReady = function(id, callback) {
   this.getOne(id, function(error, video) {
     if (error)
       callback(error);
-    else
-    if (video && video.state === VideoModel.PUBLISHED_STATE)
+    else if (video && (video.state === VideoModel.PUBLISHED_STATE || video.state === VideoModel.READY_STATE))
       callback(null, video);
     else
       callback(new Error());
