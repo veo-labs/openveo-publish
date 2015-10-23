@@ -324,7 +324,7 @@
           return row.state == 12;
         },
         callback: function(row) {
-          goToPath(row.link);
+          goToPath(row.link + '?lang=' + i18nService.getLanguage());
         }
       },
       {
