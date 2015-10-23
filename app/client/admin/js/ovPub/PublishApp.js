@@ -110,7 +110,6 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
             publishService.loadVideo(videoId).then(function(result) {
               if (result.data.entity) {
-                result.data.entity.files = [];
                 if (result.data.entity.files && result.data.entity.files.length)
                   deferred.resolve.apply(deferred, arguments);
                 else {
