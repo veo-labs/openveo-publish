@@ -560,9 +560,8 @@ VideoModel.prototype.getOne = function(id, callback) {
     // Retrieve video information from video platform
     function(callback) {
       if (videoInfo && videoInfo.type) {
-
         // Video information already retrieved
-        if (videoInfo.files && videoInfo.files.length)
+        if (videoInfo.files && videoInfo.files.length && videoInfo.available)
           return callback();
 
         var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type,

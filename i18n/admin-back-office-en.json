@@ -74,11 +74,12 @@
     "UPLOAD_START_SUCCESS" : "Video will be uploaded soon.",
     "PUBLISHED_SUCCESS" : "Application successfully published.",
     "UNPUBLISHED_SUCCESS" : "Video unpublished.",
-	"TITLE_FILTER": "Video's name",
+    "TITLE_FILTER": "Video's name",
     "DESCRIPTION_FILTER": "Description",
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Category",
-    "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s."
+    "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s.",
+    "NOT_READY": "This video need to be formated to be streamed. The process is currently running.<br><br>Please, try again in few minutes."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",

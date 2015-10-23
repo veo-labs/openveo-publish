@@ -78,7 +78,8 @@
     "DESCRIPTION_FILTER": "Description",
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Rubrique",
-    "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s."
+    "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s.",
+    "NOT_READY": "Cette vidéo nécessite un réencodage pour etre visionné. Cette tâche est en cours.<br><br>Merci de réessayer dans quelques instant."
   },
   "WATCHER" : {
     "PAGE_TITLE" : "Publish - Watcher",

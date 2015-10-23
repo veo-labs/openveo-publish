@@ -103,21 +103,30 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       title: 'CHAPTER.PAGE_TITLE',
       access: 'chapter-video',
       resolve: {
-        video: ['$q', 'publishService', '$route', function($q, publishService, $route) {
-          var deferred = $q.defer();
-          var videoId = $route.current.params.videoId;
+        video: ['$q', 'publishService', 'alertService', '$route', '$filter',
+          function($q, publishService, alertService, $route, $filter) {
+            var deferred = $q.defer();
+            var videoId = $route.current.params.videoId;
 
-          publishService.loadVideo(videoId).then(function(result) {
-            if (result.data.entity)
-              deferred.resolve.apply(deferred, arguments);
-            else
+            publishService.loadVideo(videoId).then(function(result) {
+              if (result.data.entity) {
+                result.data.entity.files = [];
+                if (result.data.entity.files && result.data.entity.files.length)
+                  deferred.resolve.apply(deferred, arguments);
+                else {
+                  publishService.cacheClear('chapter');
+                  alertService.add('danger', $filter('translate')('VIDEOS.NOT_READY'), 8000);
+                  deferred.reject({redirect: '/publish/videos'});
+                }
+              }
+              else
+                deferred.reject();
+            }, function() {
               deferred.reject();
-          }, function() {
-            deferred.reject();
-          });
+            });
 
-          return deferred.promise;
-        }]
+            return deferred.promise;
+          }]
       }
     });
 
