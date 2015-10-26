@@ -63,7 +63,7 @@
     "@openveo/core": ">=0.0.2"
   },
   "scripts": {
-    "postinstall": "bower install",
+    "postinstall": "bower install && node install.js",
     "eslint": "grunt eslint",
     "mocha": "grunt mochaTest",
     "karma": "grunt karma"

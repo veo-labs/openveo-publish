@@ -11,6 +11,7 @@ pages:
   - 'Getting started': 'getting-started.md'
   - 'Watcher': 'watcher.md'
   - 'Web Service': 'web-service.md'
+  - 'Advanced configuration': 'advanced-configuration.md'
 - 'DEVELOPERS':
   - 'Basics': 'developers/basics.md'
   - 'Installation': 'developers/installation.md'
