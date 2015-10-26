@@ -50,8 +50,8 @@ ehthumbs.db
 /Gruntfile.js
 /tasks
 
-# Player assets
-/assets/player
+# Published video packages
+/assets/player/videos
 
 # Temporary directory for video packages
 /tmp

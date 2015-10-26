@@ -1,3 +1,7 @@
+# 1.0.1 / 2015-10-26
+
+Correct bug on video player view, the player wasn't displayed at all.
+
 # 1.0.0 / 2015-10-26
 
 Firt stable version of [OpenVeo](https://github.com/veo-labs/openveo-core) Publish plugin.
