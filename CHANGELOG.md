@@ -1,14 +1,14 @@
-# 0.0.2 / 2015-04-15
-This version includes major corrections.
+# 1.0.0 / 2015-10-26
 
-- Correct copy errors while publishing a video package
-- Correct disappearance of modifications after a certain lapse of time, in the list of videos
+Firt stable version of [OpenVeo](https://github.com/veo-labs/openveo-core) Publish plugin.
 
-# 0.0.1 / 2015-04-13
-First version of the OpenVeo Publish plugin including the following features :
+Adds the following features :
 
-- A publisher to publish a video package, from a hot folder, to Vimeo platform
-- A backend page to manage the list of videos
-- A backend page to manage the hot folder watcher
-- A frontend page to play the published videos using a custom player with
-slides synchronization
+- The possibility to upload videos, on [Vimeo](https://vimeo.com), with synchronized images. ([Watcher](/watcher))
+- Back end pages :
+    - A page to manage the list of videos
+    - A page to create and organize video categories
+    - A page to create new video properties
+    - A page to start / stop the watcher
+    - A page to add chapters on a video or cut a video (begin / end)
+- A public page to play a video with images synchronization and chapters

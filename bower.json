@@ -1,11 +1,11 @@
 {
   "name": "openveo-publish",
-  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "angular": "1.4.1",
     "html5shiv": "~3.7.2",
-    "angular-animate": "1.4.1"
+    "angular-animate": "1.4.1",
+    "openveo-player": "~1.0.0"
   },
   "devDependencies": {
     "angular-route": "1.4.1",
