@@ -67,7 +67,7 @@ HTTP Status Code | Details
       "link" : "/publish/video/1444396683105", // Path to play the video
       "mediaId" : "141902178", // Video id on Vimeo
       "available" : 1, // Video id on Vimeo
-      "thumbnail" : "/publish/videos/1444396683105/thumbnail.jpg",
+      "thumbnail" : "/1444396683105/thumbnail.jpg",
       "files" : [ // Video files in different format
         {
           "quality" : 100, // Video file quality
@@ -142,7 +142,7 @@ HTTP Status Code | Details
     "link" : "/publish/video/1444396683105", // Path to play the video
     "mediaId" : "141902178", // Video id on Vimeo
     "available" : 1, // Video id on Vimeo
-    "thumbnail" : "/publish/videos/1444396683105/thumbnail.jpg",
+    "thumbnail" : "/1444396683105/thumbnail.jpg",
     "files" : [ // Video files in different format
       {
         "quality" : 100, // Video file quality

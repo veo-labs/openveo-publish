@@ -517,7 +517,7 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  *        ...
  *      },
  *      available : true,
- *      thumbnail : "/publish/videos/1439286245225/thumbnail.jpg",
+ *      thumbnail : "/1439286245225/thumbnail.jpg",
  *      files : [ // Video original files
  *        {
  *          quality : 0, // 0 = mobile, 1 = sd, 2 = hd
