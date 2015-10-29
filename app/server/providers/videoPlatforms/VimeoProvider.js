@@ -135,14 +135,6 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
  *     // Returned data example
  *     {
  *       available : true,
- *       pictures : [
- *         {
- *           width : 100,
- *           height : 75,
- *           link : "https://i.vimeocdn.com/video/530303243_100x75.jpg"
- *         },
- *         ...
- *       ],
  *       files : [
  *         {
  *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd
@@ -176,21 +168,6 @@ VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
       info = {
         available: (body.status === 'available')
       };
-
-      // Got video thumbnail in several formats
-      // Keep only essential information (width, height and url)
-      if (body.pictures && body.pictures.sizes) {
-        var pictures = [];
-        for (var i = 0; i < body.pictures.sizes.length; i++) {
-          var picture = body.pictures.sizes[i];
-          pictures.push({
-            width: picture.width,
-            height: picture.height,
-            link: picture.link
-          });
-        }
-        info['pictures'] = pictures;
-      }
 
       // Got direct access to video files and formats
       // Keep only files with supported quality (see qualitiesMap)

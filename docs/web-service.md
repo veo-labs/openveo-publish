@@ -17,6 +17,7 @@ Videos can be in different states :
 - **10** : The video synchronized images are being saved
 - **11** : The video is uploaded and ready but unpublished
 - **12** : The video is uploaded and ready and published
+- **13** : The video thumbnail is generated
 
 # Endpoints
 
@@ -66,14 +67,7 @@ HTTP Status Code | Details
       "link" : "/publish/video/1444396683105", // Path to play the video
       "mediaId" : "141902178", // Video id on Vimeo
       "available" : 1, // Video id on Vimeo
-      "pictures" : [ // Video first frame in different format
-        {
-          "width" : 100, // Image width
-          "height" : 75, // Image height
-          "link" : "https://i.vimeocdn.com/video/539037514_100x75.jpg" // Image link
-        }
-        ...
-      ],
+      "thumbnail" : "/publish/videos/1444396683105/thumbnail.jpg",
       "files" : [ // Video files in different format
         {
           "quality" : 100, // Video file quality
@@ -148,14 +142,7 @@ HTTP Status Code | Details
     "link" : "/publish/video/1444396683105", // Path to play the video
     "mediaId" : "141902178", // Video id on Vimeo
     "available" : 1, // Video id on Vimeo
-    "pictures" : [ // Video first frame in different format
-      {
-        "width" : 100, // Image width
-        "height" : 75, // Image height
-        "link" : "https://i.vimeocdn.com/video/539037514_100x75.jpg" // Image link
-      }
-      ...
-    ],
+    "thumbnail" : "/publish/videos/1444396683105/thumbnail.jpg",
     "files" : [ // Video files in different format
       {
         "quality" : 100, // Video file quality

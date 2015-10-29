@@ -69,6 +69,7 @@
     "STATE_10" : "Copie des images",
     "STATE_11" : "Prêt",
     "STATE_12" : "Publié",
+    "STATE_13" : "Generation de miniature",
     "REMOVE_SUCCESS" : "La vidéo a été supprimée.",
     "RETRY_SUCCESS" : "Le traitement de la vidéo va être relancé.",
     "UPLOAD_START_SUCCESS" : "L'envoi de la vidéo va démarrer.",

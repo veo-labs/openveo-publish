@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "chai": "^1.10.0",
+    "fluent-ffmpeg": "^2.0.1",
     "glob": "^5.0.12",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",

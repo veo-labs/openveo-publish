@@ -98,14 +98,6 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
  *     // Returned data example
  *     {
  *       available : true,
- *       pictures : [
- *         {
- *           width : 100,
- *           height : 75,
- *           link : "https://i.vimeocdn.com/video/530303243_100x75.jpg"
- *         },
- *         ...
- *       ],
  *       files : [
  *         {
  *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd

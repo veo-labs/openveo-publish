@@ -77,7 +77,7 @@ Package.PACKAGE_COPIED_STATE = 'packageCopied';
 Package.ORIGINAL_PACKAGE_REMOVED_STATE = 'originalPackageRemoved';
 Package.MEDIA_UPLOADED_STATE = 'mediaUploaded';
 Package.MEDIA_CONFIGURED_STATE = 'mediaConfigured';
-Package.FILE_CLEANED_STATE = 'fileCleaned';
+Package.DIRECTORY_CLEANED_STATE = 'direcotyCleaned';
 
 // Package transitions (from one state to another)
 Package.INIT_TRANSITION = 'initPackage';
@@ -85,7 +85,7 @@ Package.COPY_PACKAGE_TRANSITION = 'copyPackage';
 Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION = 'removeOriginalPackage';
 Package.UPLOAD_MEDIA_TRANSITION = 'uploadMedia';
 Package.CONFIGURE_MEDIA_TRANSITION = 'configureMedia';
-Package.CLEAN_FILE_TRANSITION = 'cleanFile';
+Package.CLEAN_DIRECTORY_TRANSITION = 'cleanDirectory';
 
 // Define the order in which transitions will be executed for a Package
 Package.stateTransitions = [
@@ -94,7 +94,7 @@ Package.stateTransitions = [
   Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
   Package.UPLOAD_MEDIA_TRANSITION,
   Package.CONFIGURE_MEDIA_TRANSITION,
-  Package.CLEAN_FILE_TRANSITION
+  Package.CLEAN_DIRECTORY_TRANSITION
 ];
 
 // Define machine state authorized transitions depending on previous and
@@ -126,9 +126,9 @@ Package.stateMachine = [
     to: Package.MEDIA_CONFIGURED_STATE
   },
   {
-    name: Package.CLEAN_FILE_TRANSITION,
+    name: Package.CLEAN_DIRECTORY_TRANSITION,
     from: Package.MEDIA_CONFIGURED_STATE,
-    to: Package.FILE_CLEANED_STATE
+    to: Package.DIRECTORY_CLEANED_STATE
   }
 ];
 
@@ -289,7 +289,7 @@ Package.prototype.copyPackage = function() {
   var self = this;
 
   // Destination of the copy
-  var destinationFilePath = path.join(this.publishConf.videoTmpDir,
+  var destinationFilePath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id),
     this.mediaPackage.id + '.' + this.mediaPackage.packageType);
 
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.COPYING_STATE);
@@ -382,23 +382,22 @@ Package.prototype.configureMedia = function() {
 };
 
 /**
- * Removes package from temporary directory.
+ * Removes extracted tar files from temporary directory.
  *
  * This is a transition.
  *
- * @method cleanFile
+ * @method copyImages
  * @private
  */
-Package.prototype.cleanFile = function() {
+Package.prototype.cleanDirectory = function() {
   var self = this;
-  var fileToRemove = path.join(this.publishConf.videoTmpDir,
-    '/' + this.mediaPackage.id + '.' + this.mediaPackage.packageType);
+  var directoryToRemove = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
-  // Remove package temporary file
-  this.logger.debug('Remove temporary file ' + fileToRemove);
-  fs.unlink(fileToRemove, function(error) {
+  // Remove package temporary directory
+  this.logger.debug('Remove temporary directory ' + directoryToRemove);
+  openVeoAPI.fileSystem.rmdir(directoryToRemove, function(error) {
     if (error)
-      self.setError(new PackageError(error.message, errors.CLEAN_FILE_ERROR));
+      self.setError(new PackageError(error.message, errors.CLEAN_DIRECTORY_ERROR));
     else
       self.fsm.transition();
   });
@@ -434,7 +433,10 @@ Package.prototype.getStateMachine = function() {
  * @method getMediaFilePath
  */
 Package.prototype.getMediaFilePath = function() {
-  return path.join(this.publishConf.videoTmpDir, '/' + this.mediaPackage.id + '.' + this.mediaPackage.packageType);
+  return path.join(this.publishConf.videoTmpDir,
+    String(this.mediaPackage.id),
+    this.mediaPackage.id + '.' + this.mediaPackage.packageType
+  );
 };
 
 /**

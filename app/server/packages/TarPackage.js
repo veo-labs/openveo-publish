@@ -12,11 +12,9 @@ var async = require('async');
 var xml2js = require('xml2js');
 var openVeoAPI = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
+var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
 var errors = process.requirePublish('app/server/packages/errors.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-
-// Accepted images files extensions in the package
-var acceptedImagesExtensions = ['jpeg', 'jpg', 'gif', 'bmp'];
 
 /**
  * Defines a custom error with an error code.
@@ -87,23 +85,19 @@ function TarPackage(mediaPackage, logger) {
 }
 
 module.exports = TarPackage;
-util.inherits(TarPackage, Package);
+util.inherits(TarPackage, VideoPackage);
 
 // TarPackage states
 TarPackage.PACKAGE_EXTRACTED_STATE = 'packageExtracted';
 TarPackage.PACKAGE_VALIDATED_STATE = 'packageValidated';
 TarPackage.PUBLIC_DIR_PREPARED_STATE = 'publicDirectoryPrepared';
 TarPackage.TIMECODES_SAVED_STATE = 'timecodesSaved';
-TarPackage.COPIED_IMAGES_STATE = 'copiedImages';
-TarPackage.DIRECTORY_CLEANED_STATE = 'directoryCleaned';
 
 // TarPackage transitions
 TarPackage.EXTRACT_PACKAGE_TRANSITION = 'extractPackage';
 TarPackage.VALIDATE_PACKAGE_TRANSITION = 'validatePackage';
 TarPackage.PREPARE_PACKAGE_TRANSITION = 'preparePublicDirectory';
 TarPackage.SAVE_TIMECODES_TRANSITION = 'saveTimecodes';
-TarPackage.COPY_IMAGES_TRANSITION = 'copyImages';
-TarPackage.CLEAN_DIRECTORY_TRANSITION = 'cleanDirectory';
 
 // Define the order in which transitions will be executed for a TarPackage
 TarPackage.stateTransitions = [
@@ -112,22 +106,32 @@ TarPackage.stateTransitions = [
   Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
   TarPackage.EXTRACT_PACKAGE_TRANSITION,
   TarPackage.VALIDATE_PACKAGE_TRANSITION,
+  VideoPackage.GENERATE_THUMB_TRANSITION,
   TarPackage.PREPARE_PACKAGE_TRANSITION,
   Package.UPLOAD_MEDIA_TRANSITION,
   Package.CONFIGURE_MEDIA_TRANSITION,
   TarPackage.SAVE_TIMECODES_TRANSITION,
-  TarPackage.COPY_IMAGES_TRANSITION,
-  Package.CLEAN_FILE_TRANSITION,
-  TarPackage.CLEAN_DIRECTORY_TRANSITION
+  VideoPackage.COPY_IMAGES_TRANSITION,
+  Package.CLEAN_DIRECTORY_TRANSITION
 ];
 
 // Define machine state authorized transitions depending on previous and
 // next states
-TarPackage.stateMachine = Package.stateMachine.concat([
+TarPackage.stateMachine = VideoPackage.stateMachine.concat([
   {
     name: TarPackage.EXTRACT_PACKAGE_TRANSITION,
     from: TarPackage.ORIGINAL_PACKAGE_REMOVED_STATE,
     to: TarPackage.PACKAGE_EXTRACTED_STATE
+  },
+  {
+    name: VideoPackage.GENERATE_THUMB_TRANSITION,
+    from: TarPackage.PACKAGE_VALIDATED_STATE,
+    to: VideoPackage.THUMB_GENERATED_STATE
+  },
+  {
+    name: TarPackage.PREPARE_PACKAGE_TRANSITION,
+    from: VideoPackage.THUMB_GENERATED_STATE,
+    to: TarPackage.PUBLIC_DIR_PREPARED_STATE
   },
   {
     name: TarPackage.VALIDATE_PACKAGE_TRANSITION,
@@ -150,19 +154,9 @@ TarPackage.stateMachine = Package.stateMachine.concat([
     to: TarPackage.TIMECODES_SAVED_STATE
   },
   {
-    name: TarPackage.COPY_IMAGES_TRANSITION,
+    name: VideoPackage.COPY_IMAGES_TRANSITION,
     from: TarPackage.TIMECODES_SAVED_STATE,
-    to: TarPackage.COPIED_IMAGES_STATE
-  },
-  {
-    name: Package.CLEAN_FILE_TRANSITION,
-    from: TarPackage.COPIED_IMAGES_STATE,
-    to: Package.FILE_CLEANED_STATE
-  },
-  {
-    name: TarPackage.CLEAN_DIRECTORY_TRANSITION,
-    from: TarPackage.FILE_CLEANED_STATE,
-    to: TarPackage.DIRECTORY_CLEANED_STATE
+    to: VideoPackage.COPIED_IMAGES_STATE
   }
 ]);
 
@@ -202,7 +196,7 @@ function validatePackage(callback) {
 
         // Got the name of the video file
         // Test if video file really exists in package
-        fs.exists(path.join(extractDirectory, '/' + packageInformation.filename), function(exists) {
+        fs.exists(path.join(extractDirectory, packageInformation.filename), function(exists) {
 
           if (exists)
             callback(null, packageInformation);
@@ -381,13 +375,13 @@ TarPackage.prototype.getStateMachine = function() {
  */
 TarPackage.prototype.extractPackage = function() {
   var self = this;
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, '/' + this.mediaPackage.id);
+  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
   // Extract package
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.EXTRACTING_STATE);
 
   // Copy destination
-  var packagePath = path.join(this.publishConf.videoTmpDir, this.mediaPackage.id + '.tar');
+  var packagePath = path.join(extractDirectory, this.mediaPackage.id + '.tar');
 
   this.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
   openVeoAPI.fileSystem.extract(packagePath, extractDirectory, function(error) {
@@ -433,30 +427,6 @@ TarPackage.prototype.validatePackage = function() {
 };
 
 /**
- * Prepares public directory where the media associated files will be deployed.
- *
- * This is a transition.
- *
- * @method preparePublicDirectory
- * @private
- */
-TarPackage.prototype.preparePublicDirectory = function() {
-  var self = this;
-  var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.PREPARING_STATE);
-
-  this.logger.debug('Prepare package public directory ' + publicDirectory);
-
-  openVeoAPI.fileSystem.mkdir(path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id),
-    function(error) {
-      if (error && error.code !== 'EEXIST')
-        self.setError(new TarPackageError(error.message, errors.CREATE_VIDEO_PUBLIC_DIR_ERROR));
-      else
-        self.fsm.transition();
-    });
-};
-
-/**
  * Saves package timecodes into a JSON file.
  *
  * This is a transition.
@@ -481,79 +451,6 @@ TarPackage.prototype.saveTimecodes = function() {
     });
 };
 
-/**
- * Copies presentation images from temporary directory to the public directory.
- *
- * This is a transition.
- *
- * @method copyImages
- * @private
- */
-TarPackage.prototype.copyImages = function() {
-  var self = this;
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-
-  this.logger.debug('Copy images to ' + videoFinalDir);
-
-  fs.readdir(extractDirectory, function(error, files) {
-    if (error)
-      self.setError(new TarPackageError(error.message, errors.SCAN_FOR_IMAGES_ERROR));
-    else {
-
-      var filesToCopy = [];
-      files.forEach(function(file) {
-
-        // File extension is part of the accepted extensions
-        if (acceptedImagesExtensions.indexOf(path.extname(file).slice(1)) >= 0)
-          filesToCopy.push(file);
-
-      });
-
-      var filesLeftToCopy = filesToCopy.length;
-      filesToCopy.forEach(function(file) {
-
-        openVeoAPI.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
-
-          if (error)
-            self.logger.warn(error.message, {
-              action: 'copyImages',
-              mediaId: self.mediaPackage.id
-            });
-
-          filesLeftToCopy--;
-
-          if (filesLeftToCopy === 0)
-            self.fsm.transition();
-
-        });
-
-      });
-    }
-  });
-};
-
-/**
- * Removes extracted tar files from temporary directory.
- *
- * This is a transition.
- *
- * @method copyImages
- * @private
- */
-TarPackage.prototype.cleanDirectory = function() {
-  var self = this;
-  var directoryToRemove = path.join(this.publishConf.videoTmpDir, '/' + this.mediaPackage.id);
-
-  // Remove package temporary directory
-  this.logger.debug('Remove temporary directory ' + directoryToRemove);
-  openVeoAPI.fileSystem.rmdir(directoryToRemove, function(error) {
-    if (error)
-      self.setError(new TarPackageError(error.message, errors.CLEAN_DIRECTORY_ERROR));
-    else
-      self.fsm.transition();
-  });
-};
 
 /**
  * Gets the media file path of the package.
@@ -563,5 +460,5 @@ TarPackage.prototype.cleanDirectory = function() {
  */
 TarPackage.prototype.getMediaFilePath = function() {
   return path.join(this.publishConf.videoTmpDir,
-    '/' + this.mediaPackage.id + '/' + this.mediaPackage.metadata.filename);
+     String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
 };

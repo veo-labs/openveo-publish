@@ -46,6 +46,7 @@ VideoModel.SAVING_TIMECODES_STATE = 9;
 VideoModel.COPYING_IMAGES_STATE = 10;
 VideoModel.READY_STATE = 11;
 VideoModel.PUBLISHED_STATE = 12;
+VideoModel.GENERATE_THUMB_STATE = 13;
 
 /**
  * Updates the property of a given video.
@@ -277,6 +278,20 @@ VideoModel.prototype.updateType = function(id, type, callback) {
 };
 
 /**
+ * Updates video platform type.
+ *
+ * @method updateType
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} type The type of the video platform
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoModel.prototype.updateThumbnail = function(id, path, callback) {
+  updateVideoProperty.call(this, id, 'thumbnail', path, callback);
+};
+
+/**
  * Gets the list of videos.
  *
  * @method get
@@ -502,14 +517,7 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  *        ...
  *      },
  *      available : true,
- *      pictures : [ // Video thumbnails
- *        {
- *          width : 100,
- *          height : 75,
- *          link : "https://i.vimeocdn.com/video/530303243_100x75.jpg"
- *        },
- *        ...
- *      ],
+ *      thumbnail : "/publish/videos/1439286245225/thumbnail.jpg",
  *      files : [ // Video original files
  *        {
  *          quality : 0, // 0 = mobile, 1 = sd, 2 = hd
@@ -550,7 +558,6 @@ VideoModel.prototype.getOne = function(id, callback) {
           videoInfo.timecodes = {};
           timecodesFilePath = path.normalize(
             process.rootPublish + '/assets/player/videos/' + videoInfo.id + '/synchro.json');
-
         }
 
         callback();
@@ -575,7 +582,6 @@ VideoModel.prototype.getOne = function(id, callback) {
 
           videoInfo.available = info.available;
           videoInfo.files = info.files;
-          videoInfo.pictures = info.pictures;
 
           self.provider.update(videoInfo.id, info);
           callback();
