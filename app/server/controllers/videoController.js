@@ -143,10 +143,20 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
   var sortOrder = query.sortOrder == 'asc' ? -1 : 1;
   var sort = {};
   sort[sortBy] = sortOrder;
-  var page = query.page || 1;
-  if (page < 1) page = 1;
-  var limit = parseInt(query.limit) || 10;
-  if (limit < 1) limit = 10;
+
+  // authorized unlimited query
+  var limit = null;
+  if (query.limit) {
+    limit = parseInt(query.limit) || 10;
+    if (limit < 1) limit = null;
+  }
+
+  var page = null;
+  if (limit) {
+    page = query.page || 1;
+    if (page < 1) page = 1;
+  }
+
   var wsSearch = query.properties;
   var searchParam = {};
 
