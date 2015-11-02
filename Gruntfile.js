@@ -64,7 +64,7 @@ module.exports = function(grunt) {
   grunt.registerTask('concatpublish', ['uglify', 'concat']);
 
   // Prepare project for production
-  grunt.registerTask('prod', ['compass:publishdist', 'concatpublish', 'doc']);
+  grunt.registerTask('prod', ['compass:publishdist', 'concatpublish']);
 
   // Generate documentation
   grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);
