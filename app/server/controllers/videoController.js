@@ -120,24 +120,27 @@ module.exports.getVideoAction = function(request, response, next) {
 };
 
 /**
- * Gets information about a video.
+ * Gets published videos by properties.
  *
- * Expects one GET parameter :
- *  - **id** The id of the video
+ * Optional GET parameters :
+ *  - **sortBy** Sort videos by either title, description, date or published
+ *  - **sortOrder** Sort order (either asc or desc)
+ *  - **limit** Limit number of videos per page
+ *  - **page** The expected page
+ *  - **properties** A list of properties with the property name as the key and the expected property
+ *    value as the value. (e.g. properties[property1Name]=property1Value)
  *
  * @example
  *     {
- *       video : {
- *         id : 123456789,
+ *       "videos" : [
  *         ...
- *       }
+ *       ]
  *     }
  *
- * @method getVideoAction
+ * @method getVideoByPropertiesAction
  * @static
  */
 module.exports.getVideoByPropertiesAction = function(request, response, next) {
-
   var query = request.query;
   var sortBy = query.sortBy || 'date';
   var sortOrder = query.sortOrder == 'asc' ? -1 : 1;
@@ -158,7 +161,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
   }
 
   var wsSearch = query.properties;
-  var searchParam = {};
+  var searchParam = {state: 12};
 
   var series = [];
 
