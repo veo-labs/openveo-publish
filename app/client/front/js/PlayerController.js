@@ -16,15 +16,20 @@
 
       videoService.getVideo(mediaId, function(video) {
         if (video) {
+          if (video.available) {
 
-          // Retrieve url parameters
-          var urlParams = $location.search();
+            // Retrieve url parameters
+            var urlParams = $location.search();
 
-          $scope.isFullViewport = urlParams['fullscreen'] || false;
-          $scope.playerType = urlParams['type'] || 'html';
-          $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
-          $scope.data = video;
-          $scope.ready = true;
+            $scope.isFullViewport = urlParams['fullscreen'] || false;
+            $scope.playerType = urlParams['type'] || 'html';
+            $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
+            $scope.data = video;
+            $scope.ready = true;
+          } else {
+            $scope.ready = false;
+            $scope.data = video;
+          }
         }
         else
           $window.location.href = '/notFound';

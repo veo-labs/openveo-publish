@@ -20,7 +20,7 @@
   </head>
 
   <body>
-    <div class="container">
+    <div class="container" ng-cloak>
       <ov-player
         ov-player-type="{{playerType}}"
         ov-full-viewport="isFullViewport"
@@ -28,6 +28,11 @@
         ov-language="language"
         ng-show="ready"
       ></ov-player>
+      <div class="disclaimer" ng-if="!ready && data">
+        <span>This video is not yet available on the streaming platform.<br>
+        Please retry later.
+        </span>
+      </div>
     </div>
 
     [[#scripts]]

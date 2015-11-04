@@ -13,6 +13,7 @@
 
 .container{
   margin: 0 auto;
+  position: relative;
 
   @include tablet(){
     width: $screen-sm;
@@ -22,5 +23,27 @@
   }
   @include desktop-wide(){
      width: $screen-lg;
+  }
+}
+
+.disclaimer {
+  
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 500px;
+  
+  background-color: $gray-lighter;
+  
+  color: $brand-primary;
+  text-align: center;
+  line-height: 580px;
+  font-family: arial;
+  
+  span{
+    display: inline-block;
+    font-size: 42px;
+    line-height: 60px; 
   }
 }
