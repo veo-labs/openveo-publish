@@ -7,8 +7,10 @@
 // Module dependencies
 var util = require('util');
 var openVeoAPI = require('@openveo/api');
+var async = require('async');
 
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 
 /**
  * Defines a PropertyModel class to manipulate custom properties.
@@ -19,6 +21,7 @@ var PropertyProvider = process.requirePublish('app/server/providers/PropertyProv
  */
 function PropertyModel() {
   openVeoAPI.EntityModel.prototype.init.call(this, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
+  this.videoProvider = new VideoProvider(openVeoAPI.applicationStorage.getDatabase());
 }
 
 module.exports = PropertyModel;
@@ -85,4 +88,48 @@ PropertyModel.prototype.update = function(id, data, callback) {
   if (data.type)
     property['type'] = data.type;
   this.provider.update(id, property, callback);
+};
+
+
+/**
+ * Removes a property.
+ *
+ * @method remove
+ * @async
+ * @param {String} ids The ids of the property
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of removed items
+ */
+PropertyModel.prototype.remove = function(ids, callback) {
+  var self = this;
+  var series = [];
+
+  // Remove property from database
+  series.push(
+    function(callback) {
+      self.provider.remove(ids, function(error) {
+        callback(error);
+      });
+    }
+  );
+
+  // Remove property on video
+  ids.forEach(function(value) {
+    series.push(
+      function(callback) {
+        var prop = 'properties.' + value;
+        self.videoProvider.removeProp(prop, function(error) {
+          callback(error);
+        });
+      }
+    );
+  });
+
+  async.series(series, function(error) {
+    if (error)
+      callback(error);
+    else
+      callback();
+  });
 };
