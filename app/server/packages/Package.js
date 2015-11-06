@@ -77,7 +77,7 @@ Package.PACKAGE_COPIED_STATE = 'packageCopied';
 Package.ORIGINAL_PACKAGE_REMOVED_STATE = 'originalPackageRemoved';
 Package.MEDIA_UPLOADED_STATE = 'mediaUploaded';
 Package.MEDIA_CONFIGURED_STATE = 'mediaConfigured';
-Package.DIRECTORY_CLEANED_STATE = 'direcotyCleaned';
+Package.DIRECTORY_CLEANED_STATE = 'directoryCleaned';
 
 // Package transitions (from one state to another)
 Package.INIT_TRANSITION = 'initPackage';
