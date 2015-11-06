@@ -106,8 +106,7 @@ VideoPackage.prototype.generateThumb = function() {
   }).on('error', function(error) {
     self.setError(new VideoPackageError(error.message, errors.GENERATE_THUMB_ERROR));
   }).on('end', function() {
-    var publicDirectoryPath = path.normalize('/' + self.mediaPackage.id);
-    self.videoModel.updateThumbnail(self.mediaPackage.id, path.join(publicDirectoryPath, 'thumbnail.jpg'));
+    self.videoModel.updateThumbnail(self.mediaPackage.id, '/' + self.mediaPackage.id + '/thumbnail.jpg');
     self.fsm.transition();
   });
 };
