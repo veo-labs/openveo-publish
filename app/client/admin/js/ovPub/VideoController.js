@@ -292,13 +292,13 @@
       {
         key: 'title',
         name: $filter('translate')('VIDEOS.NAME_COLUMN'),
-        class: ['col-xs-12 col-sm-5']
+        class: ['col-xs-8 col-sm-5']
       },
       {
         key: 'date',
         type: 'date',
         name: $filter('translate')('VIDEOS.DATE_COLUMN'),
-        class: ['hidden-xs col-sm-1']
+        class: ['col-xs-1']
       },
       {
         key: 'category',
@@ -310,12 +310,12 @@
         key: 'state',
         type: 'status',
         name: $filter('translate')('VIDEOS.STATUS_COLUMN'),
-        class: ['hidden-xs col-sm-2']
+        class: ['col-xs-2']
       },
       {
         key: 'action',
         name: $filter('translate')('UI.ACTIONS_COLUMN'),
-        class: [' hidden-xs col-sm-1']
+        class: ['col-xs-1 col-sm-1']
       }];
     scopeDataTable.actions = [
       {

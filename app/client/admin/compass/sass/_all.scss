@@ -1,5 +1,8 @@
 .pu-videos{
   padding-bottom: 150px;
+  @include mobile(){
+    padding-bottom:20px;
+  }
 }
 
 
