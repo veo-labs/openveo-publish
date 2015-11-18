@@ -158,29 +158,9 @@
     "scriptFiles" : {
       "base" : [
         "/publish/lib/angular/angular.min.js",
-        "/publish/lib/angular-animate/angular-animate.min.js"
+        "/publish/lib/angular-animate/angular-animate.min.js",
+        "/publish/lib/openveo-player/dist/openveo-player.min.js"
       ],
-      "player" : {
-        "dev" : [
-          "/publish/lib/openveo-player/js/PlayerApp.js",
-          "/publish/lib/openveo-player/js/i18n/I18nService.js",
-          "/publish/lib/openveo-player/js/i18n/I18nFilter.js",
-          "/publish/lib/openveo-player/js/PlayerService.js",
-          "/publish/lib/openveo-player/js/PlayerDirective.js",
-          "/publish/lib/openveo-player/js/TabsDirective.js",
-          "/publish/lib/openveo-player/js/ViewDirective.js",
-          "/publish/lib/openveo-player/js/Player.js",
-          "/publish/lib/openveo-player/js/IndexDirective.js",
-          "/publish/lib/openveo-player/js/TimeFilter.js",
-          "/publish/lib/openveo-player/js/ChaptersDirective.js",
-          "/publish/lib/openveo-player/js/players/HTMLPlayer.js",
-          "/publish/lib/openveo-player/js/players/VimeoPlayer.js",
-          "/publish/lib/openveo-player/js/players/FlowPlayer.js"
-        ],
-        "prod" : [
-          "/publish/lib/openveo-player/dist/openveo-player.min.js"
-        ]
-      },
       "publishPlayer" : {
         "dev" : [
           "/publish/PublishPlayerApp.js",

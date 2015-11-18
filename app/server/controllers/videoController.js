@@ -52,7 +52,6 @@ module.exports.displayVideoAction = function(request, response, next) {
           var playerScripts = customScripts['publishPlayer'];
           response.locals.scripts = response.locals.scripts.concat(
             (customScripts['base'] || []),
-            ((customScripts['player'] && customScripts['player'][env]) ? customScripts['player'][env] : []),
             ((playerScripts && playerScripts[env]) ? playerScripts[env] : [])
           );
           response.locals.css = response.locals.css.concat(subPlugin.custom.cssFiles || []);
