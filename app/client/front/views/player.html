@@ -20,7 +20,7 @@
   </head>
 
   <body>
-    <div class="container" ng-cloak>
+    <div class="container" ng-class="{'full':isFullViewport}" ng-cloak>
       <ov-player
         ov-player-type="{{playerType}}"
         ov-full-viewport="isFullViewport"
