@@ -603,7 +603,8 @@ VideoModel.prototype.getOne = function(id, callback) {
 
     // Retrieve video information from video platform
     function(callback) {
-      if (videoInfo && videoInfo.type) {
+      if (videoInfo && videoInfo.type && videoInfo.mediaId) {
+
         // Video information already retrieved
         if (videoInfo.files && videoInfo.files.length && videoInfo.available)
           return callback();
