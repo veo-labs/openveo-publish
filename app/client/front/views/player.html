@@ -25,12 +25,11 @@
         ov-player-type="{{playerType}}"
         ov-full-viewport="isFullViewport"
         ov-data="data"
-        ov-language="language"
+        ov-language="{{language}}"
         ng-if="ready"
       ></ov-player>
       <div class="disclaimer" ng-if="!ready && data">
-        <span>This video is not yet available on the streaming platform.<br>
-        Please retry later.
+        <span ng-bind-html="availabilityMessage">
         </span>
       </div>
     </div>
