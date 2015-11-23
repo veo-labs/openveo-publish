@@ -9,6 +9,7 @@
           $window,
           $scope,
           $filter,
+          $timeout,
           entityService,
           i18nService,
           ovMultirangeViews,
@@ -58,11 +59,32 @@
     var playerController;
 
     /**
+     * Executes, safely, the given function in AngularJS process.
+     *
+     * @param Function functionToExecute The function to execute as part of
+     * the angular digest process.
+     */
+    function safeApply(functionToExecute) {
+
+      // Execute each apply on a different loop
+      $timeout(function() {
+
+        // Make sure we're not on a digestion cycle
+        var phase = $scope.$root.$$phase;
+
+        if (phase === '$apply' || phase === '$digest')
+          functionToExecute();
+        else
+          $scope.$apply(functionToExecute);
+      }, 1);
+    }
+
+    /**
      * Gather some parameters before calling init
      * @param {type} duration a parameter needed before init
      */
     function preinit(duration) {
-      $scope.$apply(function() {
+      safeApply(function() {
 
         // only gets called once
         if (!playerController || duration) {
@@ -392,6 +414,7 @@
     '$window',
     '$scope',
     '$filter',
+    '$timeout',
     'entityService',
     'i18nService',
     'ovMultirangeViews',
