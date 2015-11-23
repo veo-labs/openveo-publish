@@ -16,6 +16,7 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
+var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 
 /**
  * Defines a VideoModel class to manipulate videos.
@@ -84,6 +85,41 @@ function updateVideoProperty(mediaId, propertyName, propertyValue, callback) {
     this.pendingUpdateOperations[mediaId] = {};
 
   this.pendingUpdateOperations[mediaId][propertyName] = propertyValue;
+}
+
+/**
+ * Removes a list of directories.
+ *
+ * @method removeDirectories
+ * @private
+ * @async
+ * @param {Array} directories The list of directory paths
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+function removeDirectories(directories, callback) {
+
+  /**
+   * Gets the closure to remove the given directory.
+   *
+   * @param {String} directory The path of the directory to remove
+   * @return {Function} A dedicated function to remove the directory
+   */
+  function removeDirClosure(directory) {
+    return function(callback) {
+      openVeoAPI.fileSystem.rmdir(directory, function(error) {
+        callback(error);
+      });
+    };
+  }
+
+  var actions = [];
+  for (var i = 0; i < directories.length; i++)
+    actions.push(removeDirClosure(directories[i]));
+
+  async.parallel(actions, function(error) {
+    callback(error);
+  });
 }
 
 /**
@@ -637,44 +673,47 @@ VideoModel.prototype.getOne = function(id, callback) {
 };
 
 /**
- * Removes a video.
+ * Removes a list of videos.
  *
  * @method remove
  * @async
- * @param {String} id The id of the video
+ * @param {Array} ids The list of video ids
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed items
  */
-VideoModel.prototype.remove = function(id, callback) {
+VideoModel.prototype.remove = function(ids, callback) {
   var self = this;
   async.parallel([
 
-    // Remove video from database
+    // Remove videos from database
     function(callback) {
-      self.provider.remove(id, function(error) {
+      self.provider.remove(ids, function(error) {
         callback(error);
       });
     },
 
-    // Remove video's public directory
+    // Remove videos public directories
     function(callback) {
-      var videoPublicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + id);
+      var directories = [];
 
-      // Test if video public directory exist
-      fs.exists(videoPublicDirectory, function(exists) {
-        if (exists) {
+      for (var i = 0; i < ids.length; i++)
+        directories.push(path.normalize(process.rootPublish + '/assets/player/videos/' + ids[i]));
 
-          // Remove directory
-          openVeoAPI.fileSystem.rmdir(videoPublicDirectory, function(error) {
-            callback(error);
-          });
-
-        }
-        else
-          return callback();
+      removeDirectories(directories, function(error) {
+        callback(error);
       });
+    },
 
+    // Remove videos temporary directories
+    function(callback) {
+      var directories = [];
+
+      for (var i = 0; i < ids.length; i++)
+        directories.push(path.join(publishConf.videoTmpDir, ids[i]));
+
+      removeDirectories(directories, function(error) {
+        callback(error);
+      });
     }
 
   ], function(error) {
