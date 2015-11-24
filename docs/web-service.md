@@ -23,7 +23,7 @@ Videos can be in different states :
 
 ## Videos
 
-Get videos.
+Get published videos.
 
     GET WEB_SERVICE_URL/publish/videos
 
@@ -31,8 +31,8 @@ Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
 sortBy | String | No | date | Sort videos by either **title**, **description**, **date** or **published**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
-limit | Number | No | 10 | Limit number of videos per page
 page | Number | No | 1 | The expected page
+limit | Number | No | - | Limit number of videos per page. If not specified get all videos
 properties | Array | No | - | A list of properties with the property name as the key and the expected property value as the value. (e.g. **properties[property1Name]=property1Value**)
 
 HTTP Status Code | Details
