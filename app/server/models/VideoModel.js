@@ -314,12 +314,12 @@ VideoModel.prototype.updateType = function(id, type, callback) {
 };
 
 /**
- * Updates video platform type.
+ * Updates video thumbnail.
  *
- * @method updateType
+ * @method updateThumbnail
  * @async
  * @param {Number} id The id of the video to update
- * @param {String} type The type of the video platform
+ * @param {String} path The path of the thumbnail file
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
