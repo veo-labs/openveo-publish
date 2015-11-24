@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -59,7 +59,8 @@
     "yuidoc-theme-blue": ">=0.1.9"
   },
   "peerDependencies": {
-    "@openveo/core": "~1.0.0"
+    "@openveo/core": "~1.0.0",
+    "@openveo/api": "~1.1.0"
   },
   "scripts": {
     "prepublish": "grunt prod",

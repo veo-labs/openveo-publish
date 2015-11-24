@@ -1,3 +1,10 @@
+# 1.1.0 / 2015-11-24
+
+- Enhanced mobile back-end display
+- Update video webservice
+- Generate video thumb once video is well uploaded
+- Verify that video is available before viewing th video
+
 # 1.0.1 / 2015-10-26
 
 Correct bug on video player view, the player wasn't displayed at all.
