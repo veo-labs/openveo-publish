@@ -1,3 +1,7 @@
+# 1.1.2 / 2015-11-25
+
+Update openveo-player dependency to authorize all minor versions from 1.1.0
+
 # 1.1.1 / 2015-11-25
 
 Update dependency versions to authorize all minor versions of @openveo/test, @openveo/core and @openveo/api

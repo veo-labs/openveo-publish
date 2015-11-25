@@ -15,7 +15,7 @@ OpenVeo Publish adds the following features :
 
 # Documentation
 
-Documentation is available on [Github pages](http://veo-labs.github.io/openveo-publish/1.1.1).
+Documentation is available on [Github pages](http://veo-labs.github.io/openveo-publish/1.1.2).
 
 # Contributors
 
