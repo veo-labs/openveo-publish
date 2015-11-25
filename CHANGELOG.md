@@ -1,3 +1,7 @@
+# 1.1.1 / 2015-11-25
+
+Update dependency versions to authorize all minor versions of @openveo/test, @openveo/core and @openveo/api
+
 # 1.1.0 / 2015-11-24
 
 - Enhanced mobile back-end display
