@@ -28,7 +28,7 @@
     "fluent-ffmpeg": "2.0.1"
   },
   "devDependencies": {
-    "@openveo/test": "~1.0.0",
+    "@openveo/test": "1.*",
     "chai": ">=1.10.0",
     "glob": ">=5.0.12",
     "grunt": ">=0.4.5",
@@ -59,8 +59,8 @@
     "yuidoc-theme-blue": ">=0.1.9"
   },
   "peerDependencies": {
-    "@openveo/core": "~1.0.0",
-    "@openveo/api": "~1.1.0"
+    "@openveo/core": "1.*",
+    "@openveo/api": "1.* >=1.1.0"
   },
   "scripts": {
     "prepublish": "grunt prod",
