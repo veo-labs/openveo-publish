@@ -18,6 +18,7 @@ Videos can be in different states :
 - **11** : The video is uploaded and ready but unpublished
 - **12** : The video is uploaded and ready and published
 - **13** : The video thumbnail is generated
+- **14** : The video metadatas are being retrieved
 
 # Endpoints
 

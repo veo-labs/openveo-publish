@@ -51,15 +51,18 @@ util.inherits(VideoPackage, Package);
 // VideoPackage states
 VideoPackage.THUMB_GENERATED_STATE = 'thumbGenerated';
 VideoPackage.COPIED_IMAGES_STATE = 'copiedImages';
+VideoPackage.METADATA_RETRIEVED_STATE = 'metadataRetrieved';
 
 // VideoPackage transitions
 VideoPackage.GENERATE_THUMB_TRANSITION = 'generateThumb';
 VideoPackage.COPY_IMAGES_TRANSITION = 'copyImages';
+VideoPackage.GET_METADATA_TRANSITION = 'getMetadata';
 
 VideoPackage.stateTransitions = [
   Package.INIT_TRANSITION,
   Package.COPY_PACKAGE_TRANSITION,
   VideoPackage.GENERATE_THUMB_TRANSITION,
+  VideoPackage.GET_METADATA_TRANSITION,
   Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
   Package.UPLOAD_MEDIA_TRANSITION,
   Package.CONFIGURE_MEDIA_TRANSITION,
@@ -74,8 +77,13 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
     to: VideoPackage.THUMB_GENERATED_STATE
   },
   {
+    name: VideoPackage.GET_METADATA_TRANSITION,
+    from: Package.THUMB_GENERATED_STATE,
+    to: VideoPackage.METADATA_RETRIEVED_STATE
+  },
+  {
     name: Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-    from: VideoPackage.THUMB_GENERATED_STATE,
+    from: VideoPackage.METADATA_RETRIEVED_STATE,
     to: Package.ORIGINAL_PACKAGE_REMOVED_STATE
   },
   {
@@ -135,6 +143,46 @@ VideoPackage.prototype.preparePublicDirectory = function() {
     });
 };
 
+/**
+ * Retrieves video height from video metadatas.
+ *
+ * This is a transition.
+ *
+ * @method getMetadata
+ * @private
+ */
+VideoPackage.prototype.getMetadata = function() {
+  var self = this;
+  var filePath = this.getMediaFilePath();
+  this.videoModel.updateState(this.mediaPackage.id, VideoModel.GET_METADATA_STATE);
+  this.mediaPackage.metadata['profile-settings'] = this.mediaPackage.metadata['profile-settings'] || {};
+
+  if (this.mediaPackage.metadata['profile-settings']['video-height'])
+    this.fsm.transition();
+  else {
+    ffmpeg.ffprobe(filePath, function(error, metadata) {
+      if (error || !metadata.streams)
+        self.setError(new VideoPackageError(error.message, errors.GET_METADATA_ERROR));
+      else {
+
+        // Find video stream
+        var videoStream;
+        for (var i = 0; i < metadata.streams.length; i++) {
+          if (metadata.streams[i]['codec_type'] === 'video')
+            videoStream = metadata.streams[i];
+        }
+
+        // Got video stream associated to the video file
+        if (videoStream) {
+          self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
+          self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
+          self.fsm.transition();
+        } else
+          self.setError(new VideoPackageError('No video stream found', errors.GET_METADATA_ERROR));
+      }
+    });
+  }
+};
 
 /**
  * Copies presentation images from temporary directory to the public directory.

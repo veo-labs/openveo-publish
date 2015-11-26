@@ -48,6 +48,7 @@ VideoModel.COPYING_IMAGES_STATE = 10;
 VideoModel.READY_STATE = 11;
 VideoModel.PUBLISHED_STATE = 12;
 VideoModel.GENERATE_THUMB_STATE = 13;
+VideoModel.GET_METADATA_STATE = 14;
 
 /**
  * Updates the property of a given video.
@@ -606,12 +607,15 @@ VideoModel.prototype.getOne = function(id, callback) {
       if (videoInfo && videoInfo.type && videoInfo.mediaId) {
 
         // Video information already retrieved
-        if (videoInfo.files && videoInfo.files.length && videoInfo.available)
+        if (videoInfo.available)
           return callback();
 
         var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type,
           videoPlatformConf[videoInfo.type]);
-        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, function(error, info) {
+        var expectedDefinition = videoInfo.metadata['profile-settings']['video-height'];
+
+        // Get video availability and files
+        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, expectedDefinition, function(error, info) {
           if (error) {
             callback(error);
             return;

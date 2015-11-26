@@ -70,6 +70,7 @@
     "STATE_11" : "Ready",
     "STATE_12" : "Published",
     "STATE_13" : "Generating thumbnail",
+    "STATE_14" : "Retrieving metadatas",
     "REMOVE_SUCCESS" : "Video successfully removed.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",
     "UPLOAD_START_SUCCESS" : "Video will be uploaded soon.",

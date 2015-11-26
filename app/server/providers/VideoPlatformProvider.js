@@ -94,6 +94,8 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
 /**
  * Gets information about a video from video platform.
  *
+ * Video is considered available if the expected video definition has been transcoded by the video platform.
+ *
  * @example
  *     // Returned data example
  *     {
@@ -112,6 +114,7 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
  * @method getVideoInfo
  * @async
  * @param {String} mediaId The platform id of the video
+ * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080)
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video

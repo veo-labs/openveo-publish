@@ -131,6 +131,8 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
 /**
  * Gets information about a video hosted by Vimeo.
  *
+ * Video is considered available if the expected video definition has been transcoded by the video platform.
+ *
  * @example
  *     // Returned data example
  *     {
@@ -149,11 +151,12 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
  * @method getVideoInfo
  * @async
  * @param {String} mediaId The Vimeo id of the video
+ * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080)
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
+VimeoProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, callback) {
   if (!mediaId) {
     callback(new Error('media id should be defined'), null);
     return;
@@ -163,11 +166,10 @@ VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
   // Ask Vimeo for video information
   this.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
     var info = null;
+    var available = !expectedDefinition ? true : false;
 
     if (!error) {
-      info = {
-        available: (body.status === 'available')
-      };
+      info = {};
 
       // Got direct access to video files and formats
       // Keep only files with supported quality (see qualitiesMap)
@@ -183,10 +185,18 @@ VimeoProvider.prototype.getVideoInfo = function(mediaId, callback) {
               height: file.height,
               link: file.link_secure
             });
+
+            // Vimeo set the video as "available" as soon as any definition has been transcoded not when all
+            // definitions have been transcoded
+            // Set the video as "available" as soon as the expected definition has been transcoded
+            if (file.height >= expectedDefinition)
+              available = true;
           }
         }
         info['files'] = files;
       }
+
+      info.available = (body.status === 'available') && available;
     }
 
     callback(error, info);

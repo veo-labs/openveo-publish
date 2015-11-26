@@ -264,6 +264,7 @@ Package.prototype.initPackage = function() {
   this.mediaPackage.mediaId = null;
   this.mediaPackage.errorCode = -1;
   this.mediaPackage.properties = [];
+  this.mediaPackage.metadata = this.mediaPackage.metadata || {};
   this.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
   this.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
   this.mediaPackage.date = Date.now();

@@ -107,6 +107,7 @@ TarPackage.stateTransitions = [
   TarPackage.EXTRACT_PACKAGE_TRANSITION,
   TarPackage.VALIDATE_PACKAGE_TRANSITION,
   VideoPackage.GENERATE_THUMB_TRANSITION,
+  VideoPackage.GET_METADATA_TRANSITION,
   TarPackage.PREPARE_PACKAGE_TRANSITION,
   Package.UPLOAD_MEDIA_TRANSITION,
   Package.CONFIGURE_MEDIA_TRANSITION,
@@ -130,7 +131,7 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
   },
   {
     name: TarPackage.PREPARE_PACKAGE_TRANSITION,
-    from: VideoPackage.THUMB_GENERATED_STATE,
+    from: VideoPackage.METADATA_RETRIEVED_STATE,
     to: TarPackage.PUBLIC_DIR_PREPARED_STATE
   },
   {
