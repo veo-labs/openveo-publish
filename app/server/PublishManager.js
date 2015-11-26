@@ -118,6 +118,10 @@ function onError(error, mediaPackage) {
   if (this.queue.length)
     this.publish(this.queue.shift(0));
 
+  // Add package id to the error message
+  if (error)
+    error.message += ' (' + mediaPackage.id + ')';
+
   this.emit('error', error, error.code);
 }
 
