@@ -1,3 +1,7 @@
+# 1.1.3 / 2015-11-27
+
+Correct bug on video resolution cache for Vimeo platform
+
 # 1.1.2 / 2015-11-25
 
 Update openveo-player dependency to authorize all minor versions from 1.1.0
