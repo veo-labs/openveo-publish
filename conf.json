@@ -159,6 +159,7 @@
       "base" : [
         "/publish/lib/angular/angular.min.js",
         "/publish/lib/angular-animate/angular-animate.min.js",
+        "/publish/lib/angular-cookies/angular-cookies.min.js",
         "/publish/lib/openveo-player/dist/openveo-player.min.js"
       ],
       "publishPlayer" : {

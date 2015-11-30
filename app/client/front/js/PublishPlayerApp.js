@@ -2,7 +2,7 @@
 
 (function(angular) {
 
-  var app = angular.module('ov.publish.player', ['ngAnimate', 'ov.player']);
+  var app = angular.module('ov.publish.player', ['ngAnimate', 'ngCookies', 'ov.player']);
 
   /**
    * Configures the ov.publish application by adding new routes.
