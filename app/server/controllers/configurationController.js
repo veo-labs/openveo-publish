@@ -5,7 +5,7 @@
  */
 
 // Module dependencies
-var googleOAuthHelper = process.requirePublish('app/server/googleOAuthHelper.js');
+var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
 var logger = require('winston').loggers.get('publish');
 
 /**
@@ -17,10 +17,10 @@ var logger = require('winston').loggers.get('publish');
  * @param {type} response express response
  */
 module.exports.getOAuthInformationsAction = function(request, response) {
-  console.log('toto');
+
   var infos = {};
   googleOAuthHelper.hasToken(function(hasToken) {
-    console.log('tata');
+
     infos.hasToken = hasToken;
     infos.authUrl = googleOAuthHelper.getAuthUrl(
             {scope: ['https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload']}

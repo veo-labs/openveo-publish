@@ -272,12 +272,12 @@
 
     /**
      * Retrieve oAuth informations
-     * 
+     *
      * @return {Promise} The HTTP promise
      */
     function getOAuthInfos() {
-      return $http.get(basePath + "publish/configuration/oAuthInformations");
-    };
+      return $http.get(basePath + 'publish/configuration/oAuthInformations');
+    }
 
     return {
       retryVideo: retryVideo,
@@ -306,4 +306,3 @@
   PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath'];
 
 })(angular.module('ov.publish'));
->>>>>>> youtube alpha stage
