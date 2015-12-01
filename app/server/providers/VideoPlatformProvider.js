@@ -58,8 +58,8 @@ VideoPlatformProvider.getProvider = function(type, providerConf) {
       case 'vimeo':
         var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
-      case "youtube":
-        var YoutubeProvider = process.requirePublish("app/server/providers/videoPlatforms/YoutubeProvider.js");
+      case 'youtube':
+        var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/YoutubeProvider.js');
         return new YoutubeProvider(providerConf);
 
       default:

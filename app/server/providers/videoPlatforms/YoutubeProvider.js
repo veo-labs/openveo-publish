@@ -6,7 +6,6 @@
 
 // Module dependencies
 var fs = require('fs');
-var path = require('path');
 
 var util = require('util');
 var mime = require('mime');
@@ -14,10 +13,11 @@ var async = require('async');
 
 var google = require('googleapis');
 var youtube = google.youtube('v3');
-var YoutubeResumableUpload = require('node-youtube-resumable-upload');
+var YoutubeResumableUpload = process.requirePublish('app/server/helper/youtubeResumableUpload.js');
 
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
-var googleOAuthHelper = process.requirePublish('app/server/googleOAuthHelper.js');
+var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
+
 var logger = require('winston').loggers.get('publish');
 
 var uploadMethods = ['uploadClassic', 'uploadResumable'];
@@ -86,14 +86,7 @@ util.inherits(YoutubeProvider, VideoPlatformProvider);
  * is done
  *   - **Error** The error if an error occurred, null otherwise
  */
-YoutubeProvider.prototype.upload = function(videoPackage, callback) {
-  // Retrieve video tmp directory
-  // e.g E:/openveo/node_modules/openveo-publish/tmp/
-  var videoTmpDir = path.dirname(videoPackage.packagePath);
-
-  // Get video file path
-  // e.g E:/openveo/node_modules/openveo-publish/tmp/1422731934859/video.mp4
-  var videoFilePath = path.join(videoTmpDir, '/' + videoPackage.id, '/' + videoPackage.metadata.filename);
+YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
 
   /* list of possible upload params :
    * {
@@ -201,6 +194,7 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
  */
 YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams, callback) {
   var mediaId;
+  var stats;
 
   async.series([
 
@@ -216,6 +210,18 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
       });
     },
 
+    // Get file size
+    function(callback) {
+      fs.stat(videoFilePath, function(error, st) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        stats = st;
+        callback();
+      });
+    },
+
     // Upload video
     function(callback) {
       if (!uploadParams.hasOwnProperty('auth') || !uploadParams.auth) {
@@ -223,11 +229,13 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
         return;
       }
       var resumableUpload = new YoutubeResumableUpload();
+
       resumableUpload.tokens = uploadParams.auth;
       resumableUpload.filepath = videoFilePath;
+      resumableUpload.stats = stats;
       resumableUpload.metadata = uploadParams.resource;
       resumableUpload.retry = 3; // Maximum retries when upload failed.
-      resumableUpload.upload();
+
       resumableUpload.on('progress', function(progress) {
         logger.debug('Upload progress', progress);
       });
@@ -241,6 +249,7 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
         mediaId = video.id;
         callback();
       });
+      resumableUpload.upload();
     }
   ], function(error) {
     callback(error, mediaId);

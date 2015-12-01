@@ -1,8 +1,14 @@
 'use strict';
+
 var google = require('googleapis');
 var merge = require('merge');
+var path = require('path');
+var async = require('async');
 var OAuth2 = google.auth.OAuth2;
-var config = process.requirePublish('config/publishConf.json').googleOAuth;
+var openVeoAPI = require('@openveo/api');
+var configDir = openVeoAPI.fileSystem.getConfDir();
+var publishConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
+var config = publishConf.youtube.googleOAuth;
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 var logger = require('winston').loggers.get('publish');
@@ -24,16 +30,46 @@ function GoogleOAuthHelper() {
  * @param {function} callback Optional callback function
  */
 GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
-  this.confModel.add({googleOAuthTokens: tokens}, function(err, data) {
-    if (err) {
-      logger.error('Error while saving configuration data', err);
-    } else {
-      logger.debug('Configuration data has been saved : ', data);
+  var configuration;
+  var self = this;
+  async.series([
+
+    // Retrieve video information from database
+    function(callback) {
+      self.confModel.get(function(error, result) {
+        if (error || !result || result.length < 1) {
+          callback(error);
+          return;
+        } else {
+          configuration = result[0];
+        }
+        callback();
+      });
+    }],
+
+    function(error) {
+      if (error) {
+        callback(error);
+        return;
+      } else {
+        var cb = function(err, data) {
+          if (err) {
+            logger.error('Error while saving configuration data', err);
+          } else {
+            logger.debug('Configuration data has been saved : ', data);
+          }
+          if (callback) {
+            callback(null, data);
+          }
+        };
+
+        if (configuration && configuration.id)
+          self.confModel.update(configuration.id, {googleOAuthTokens: tokens}, cb);
+        else
+          self.confModel.add({googleOAuthTokens: tokens}, cb);
+      }
     }
-    if (callback) {
-      callback(null, data);
-    }
-  });
+  );
 };
 
 /**
@@ -42,15 +78,19 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
  * @param {function} callback function
  */
 GoogleOAuthHelper.prototype.fetchToken = function(callback) {
-  this.confModel.getPaginatedFilteredEntities(null, null, null, {id: -1}, false, function(err, result) {
-    if (err) {
-      logger.error('Error while retrieving configuration data', err);
+  this.confModel.get(function(error, result) {
+
+    if (error || !result || result.length < 1) {
+      logger.error('Error while retrieving configuration data', error);
+      callback(error);
+      return;
+    } else {
+      var conf = result[0];
+      logger.debug('Configuration id retrieved', result && conf && conf.id);
+      var tokens = conf && conf.hasOwnProperty('googleOAuthTokens') ? conf.googleOAuthTokens : null;
+      logger.debug('Token retrieved from DB', tokens);
+      callback(null, tokens);
     }
-    var conf = result && result.shift();
-    logger.debug('Configuration id retrieved', result && conf && conf.id);
-    var tokens = conf && conf.hasOwnProperty('googleOAuthTokens') ? conf.googleOAuthTokens : null;
-    logger.debug('Token retrieved from DB', tokens);
-    callback(null, tokens);
   });
 };
 

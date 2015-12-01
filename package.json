@@ -25,12 +25,13 @@
     "javascript-state-machine": "2.3.5",
     "vimeo": "1.1.4",
     "googleapis": "^2.1.5",
-    "node-youtube-resumable-upload": "0.2.0",
+    "google-auth-cli": "0.0.1",
     "util": "0.10.3",
     "merge": "1.2.0",
     "mime": "1.3.4",
     "xml2js": "0.4.4 - 0.4.13",
-    "fluent-ffmpeg": "2.0.1"
+    "fluent-ffmpeg": "2.0.1",
+    "request": "2.44.0"
   },
   "devDependencies": {
     "@openveo/test": "1.*",

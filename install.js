@@ -8,6 +8,7 @@ var os = require('os');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
 var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
+
 var exit = process.exit;
 
 // Set module root directory
@@ -43,7 +44,7 @@ function createVideoTmpDir(callback) {
 function createHotFolder(callback) {
   var conf = require(path.join(confDir, 'watcherConf.json'));
 
-  for(var i = 0 ; i < conf.hotFolders.length ; i++)
+  for (var i = 0; i < conf.hotFolders.length; i++)
     openVeoAPI.fileSystem.mkdir(conf.hotFolders[i].path, callback);
 }
 
@@ -61,10 +62,10 @@ function createConf(callback) {
       var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'videos');
       rl.question('Enter video temporary directory path (default: ' + defaultPath + ') :\n', function(answer) {
         var conf = {
-          videoTmpDir : (answer || defaultPath).replace(/\\/g, '/'),
-          maxConcurrentPublish : 3,
-          timecodeFileName : 'synchro.xml',
-          metadataFileName : '.session'
+          videoTmpDir: (answer || defaultPath).replace(/\\/g, '/'),
+          maxConcurrentPublish: 3,
+          timecodeFileName: 'synchro.xml',
+          metadataFileName: '.session'
         };
 
         fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
@@ -86,11 +87,11 @@ function createLoggerConf(callback) {
       maxFileSize: 1048576,
       maxFiles: 2
     },
-    publish : {
-      fileName : path.join(defaultPath, 'openveo-publish.log').replace(/\\/g, '/'),
-      level : 'info',
-      maxFileSize : 1048576,
-      maxFiles : 2
+    publish: {
+      fileName: path.join(defaultPath, 'openveo-publish.log').replace(/\\/g, '/'),
+      level: 'info',
+      maxFileSize: 1048576,
+      maxFiles: 2
     }
   };
 
@@ -107,9 +108,19 @@ function createLoggerConf(callback) {
 /**
  * Creates video platform configuration file if it does not exist.
  */
-function createVideoPlatformConf(callback){
+function createVideoPlatformConf(callback) {
   var confFile = path.join(confDir, 'videoPlatformConf.json');
-  var conf = {vimeo: {}};
+  var conf = {
+    vimeo: {},
+    youtube: {
+      uploadMethod: 'uploadResumable',
+      googleOAuth: {
+        clientId: '',
+        clientSecret: '',
+        redirectUrl: 'http://localhost:3000/be/publish/configuration/googleOAuthAssosiation'
+      }
+    }
+  };
 
   async.series([
     function(callback) {
@@ -137,6 +148,25 @@ function createVideoPlatformConf(callback){
         conf.vimeo.accessToken = answer;
         callback();
       });
+    },
+    function(callback) {
+      rl.question('Enter Youtube API client Id (available in your Google Developper Console ) :\n', function(answer) {
+        conf.youtube.googleOAuth.clientId = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      rl.question('Enter Youtube API client secret (available in your Google Developper Console )  :\n',
+      function(answer) {
+        conf.youtube.googleOAuth.clientSecret = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      rl.question('Do you want to overwrite Youtube resumable upload by classic upload (y/N) :\n', function(answer) {
+        if (answer === 'y') conf.youtube.uploadMethod = 'uploadClassic';
+        callback();
+      });
     }
   ], function(error, results) {
     if (error) {
@@ -151,7 +181,7 @@ function createVideoPlatformConf(callback){
 /**
  * Creates watcher configuration file if it does not exist.
  */
-function createWatcherConf(callback){
+function createWatcherConf(callback) {
   var confFile = path.join(confDir, 'watcherConf.json');
   var conf = {hotFolders: []};
 
@@ -165,10 +195,20 @@ function createWatcherConf(callback){
       });
     },
     function(callback) {
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder');
-      rl.question('Enter hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'vimeo');
+      rl.question('Enter Vimeo hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
           type: 'vimeo',
+          path: (answer || defaultPath).replace(/\\/g, '/')
+        });
+        callback();
+      });
+    },
+    function(callback) {
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'youtube');
+      rl.question('Enter Youtube hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
+        conf.hotFolders.push({
+          type: 'youtube',
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();

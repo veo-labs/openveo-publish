@@ -66,9 +66,13 @@
       ]
     },
     {
-        "label": "PERMISSIONS.GROUP_VIDEO",
-        "permissions": [
-            {
+      "id" : "access-conf-page",
+      "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE"
+    },
+    {
+      "label": "PERMISSIONS.GROUP_VIDEO",
+      "permissions": [
+        {
           "id" : "publish-video",
           "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
           "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
@@ -92,7 +96,7 @@
           "name" : "PERMISSIONS.UPLOAD_VIDEO_NAME",
           "description" : "PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION"
         }
-    ]
+      ]
     }
   ],
   "backOffice": {
@@ -123,7 +127,7 @@
           },
           {
             "label" : "MENU.CONFIGURATION",
-            "path" : "publish/configuration";
+            "path" : "publish/configuration",
             "permission" : "access-conf-page"
           }
         ]
