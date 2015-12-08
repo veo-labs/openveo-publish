@@ -114,6 +114,7 @@
 
     // Init
     $scope.video = video.data.entity;
+    $scope.playerType = $scope.video.type == 'youtube' ? 'youtube' : 'html';
 
     $scope.isCollapsed = true;
     $scope.selectRow = null;

@@ -26,9 +26,9 @@
           var dictionary = ovPublishTranslations[$scope.publishLanguage];
           $scope.availabilityMessage = $sce.trustAsHtml(dictionary['AVAILABILITY_MESSAGE']);
 
-          if (video.available) {
+          if (video.available || $scope.data.type == 'youtube') {
             $scope.isFullViewport = urlParams['fullscreen'] || false;
-            $scope.playerType = urlParams['type'] || 'html';
+            $scope.playerType = $scope.data.type == 'youtube' ? 'youtube' : urlParams['type'] || 'html';
             $scope.ready = true;
           }
         }

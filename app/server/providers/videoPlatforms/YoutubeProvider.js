@@ -290,32 +290,10 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-YoutubeProvider.prototype.getVideoInfo = function(mediaId, callback) {
+YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback) {
   if (!mediaId) {
+    callback(new Error('media id should be defined'), null);
     return;
   }
-
-  // Ask Youtube for video information
-  youtube.videos.list({id: mediaId, part: 'snippet'}, function(error, response) {
-    var info = {pictures: []};
-    if (!error && response.items && response.items.length > 0) {
-      var video = response.items.shift();
-
-      // Got video thumbnail in several formats
-      // Keep only essential information (width, height and url)
-      if (video.snippet && video.snippet.thumbnails) {
-
-        // thumnails is an object, not an array
-        for (var key in video.snippet.thumbnails) {
-          var picture = video.snippet.thumbnails[key];
-          info.pictures.push({
-            width: picture.width,
-            height: picture.height,
-            link: picture.url
-          });
-        }
-      }
-    }
-    callback(error, info);
-  });
+  callback(null, {available: true, files: [], pictures: [], mediaId: mediaId});
 };
