@@ -34,6 +34,14 @@ Open **~/.openveo/publish/videoPlatformConf.json**
     "clientId" : "vimeo client id (available on vimeo application page https://developer.vimeo.com/apps)",
     "clientSecret" : "vimeo client secret (available on vimeo application page https://developer.vimeo.com/apps)",
     "accessToken" : "vimeo access token (available on vimeo application page https://developer.vimeo.com/apps)"
+  },
+  "youtube": {
+    "uploadMethod": "uploadResumable", //(uploadResumable or uploadClassic; default: uploadResumable)
+    "googleOAuth": {
+       "clientId": "Youtube API client Id (available in your Google Developper Console )",
+       "clientSecret":  "Youtube API client secret (available in your Google Developper Console )",
+       "redirectUrl": "http://SERVER_HOST_NAME:SERVER_PORT/be/publish/configuration/googleOAuthAssosiation"
+     }
   }
 }
 ```
@@ -67,15 +75,15 @@ Open **~/.openveo/publish/watcherConf.json**
 {
   "hotFolders" : [ // List of folders to watch
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo is supported)
+      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
       "path" : "/user/box/hot1" // Path to the hot folder
     },
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo is supported)
+      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
       "path" : "/user/box/hot2" // Path to the hot folder
     },
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo is supported)
+      "type" : "youtube", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
       "path" : "/user/box/hot3" // Path to the hot folder
     }
     ...
