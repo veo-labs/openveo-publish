@@ -181,7 +181,7 @@ angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
         duration = duration * 1000;
         var zoomArray = [];
         var level = 0;
-        if (duration > 3600000) {// 1h
+        if (duration > 3600000) { // 1h
           level = 1;
         } else if (duration > 1800000) { // 30min
           level = 2;

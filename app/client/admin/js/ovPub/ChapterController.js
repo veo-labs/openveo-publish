@@ -227,7 +227,7 @@
             $scope.ranges[i].select = false;
           }
         }
-      } else {// if close by toggle, close edit form
+      } else { // if close by toggle, close edit form
         $scope.cancel();
         $scope.select(object);
       }

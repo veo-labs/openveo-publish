@@ -30,9 +30,10 @@
     margin-bottom: 30px;
   }
   .add.btn{
-    padding: 6px 12px 7px;
+    padding: 6px 12px;
     color: $brand-primary;
     background-color: white;
+    line-height: 1.45;
     &:hover{
       color: white;
       background-color: $brand-primary;

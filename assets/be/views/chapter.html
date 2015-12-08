@@ -41,7 +41,7 @@
 
   </div>
 
-  <div class="editform" collapse="isCollapsed">
+  <div class="editform" uib-collapse="isCollapsed">
     <div class='well container-fluid'>
       <form name="myForm">
       <div class="col-sm-4">
@@ -70,10 +70,10 @@
 
    <div class="multirange-container" ng-swipe-disable-mouse>
      <div class="pull-left" style="margin-bottom: 5px">
-       <button popover="{{!beginCut.isInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" btn-checkbox>
+       <button uib-popover="{{!beginCut.isInArray?'CHAPTER.ADD_BEGIN':'CHAPTER.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-out"></i>
        </button>
-       <button popover="{{!endCut.isInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" btn-checkbox>
+       <button uib-popover="{{!endCut.isInArray?'CHAPTER.ADD_END':'CHAPTER.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-in"></i>
        </button>
      </div>

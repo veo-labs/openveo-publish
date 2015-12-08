@@ -3,10 +3,13 @@
   <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
     <div class="input-group" ng-if="rights.add || rights.edit">
-      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" popover="{{'CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
-      <span class="input-group-btn" popover="{{'CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
-        <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
-      </span>
+      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" uib-popover="{{'CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
+      <div class="input-group-btn">
+        <div  uib-popover="{{'CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
+          <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
+        </div>
+      </div>
+    
     </div>
     
     <!-- Nested list template -->
