@@ -246,6 +246,7 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
         }
       });
       resumableUpload.on('success', function(video) {
+        video = JSON.parse(video);
         mediaId = video.id;
         callback();
       });
@@ -295,5 +296,7 @@ YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback)
     callback(new Error('media id should be defined'), null);
     return;
   }
+
+  // Files and pictures are not necessary: youtube player manage its own data
   callback(null, {available: true, files: [], pictures: [], mediaId: mediaId});
 };
