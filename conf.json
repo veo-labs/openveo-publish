@@ -107,7 +107,7 @@
         "subMenu" : [
           {
             "label" : "MENU.VIDEOS",
-            "path" : "publish/videos",
+            "path" : "publish/medias",
             "permission" : "access-videos-page"
           },
           {
@@ -149,7 +149,7 @@
       ],
       "dev": [
         "/publish/ovPub/PublishApp.js",
-        "/publish/ovPub/VideoController.js",
+        "/publish/ovPub/MediaController.js",
         "/publish/ovPub/WatcherController.js",
         "/publish/ovPub/PropertiesController.js",
         "/publish/ovPub/CategoriesController.js",
@@ -176,7 +176,7 @@
       "publishPlayer" : {
         "dev" : [
           "/publish/PublishPlayerApp.js",
-          "/publish/VideoService.js",
+          "/publish/MediaService.js",
           "/publish/PlayerController.js"
         ],
         "prod" : [

@@ -2,8 +2,8 @@
 
 window.assert = chai.assert;
 
-// VideoController.js
-describe('VideoController', function() {
+// MediaController.js
+describe('MediaController', function() {
   var $rootScope,
     $controller,
     $httpBackend,
@@ -43,7 +43,7 @@ describe('VideoController', function() {
         properties: []
       }
     ];
-    $controller('VideoController', {
+    $controller('MediaController', {
       $scope: scope,
       categories: {
         data: {
@@ -70,10 +70,10 @@ describe('VideoController', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  // startVideoUpload method
-  describe('startVideoUpload', function() {
+  // startMediaUpload method
+  describe('startMediaUpload', function() {
 
-    it('Should be able to start uploading a video if not saving', function(done) {
+    it('Should be able to start uploading a media if not saving', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -87,10 +87,10 @@ describe('VideoController', function() {
 
   });
 
-  // publishVideo method
-  describe('publishVideo', function() {
+  // publishMedia method
+  describe('publishMedia', function() {
 
-    it('Should be able to publish a video if not saving', function(done) {
+    it('Should be able to publish a media if not saving', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -117,10 +117,10 @@ describe('VideoController', function() {
 
   });
 
-  // unpublishVideo method
-  describe('unpublishVideo', function() {
+  // unpublishMedia method
+  describe('unpublishMedia', function() {
 
-    it('Should be able to unpublish a video if not saving', function(done) {
+    it('Should be able to unpublish a media if not saving', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -147,10 +147,10 @@ describe('VideoController', function() {
 
   });
 
-  // retryVideo method
-  describe('retryVideo', function() {
+  // retryMedia method
+  describe('retryMedia', function() {
 
-    it('Should be able to retry a video if not saving', function(done) {
+    it('Should be able to retry a media if not saving', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -164,10 +164,10 @@ describe('VideoController', function() {
 
   });
 
-// removeVideo method
-  describe('removeVideo', function() {
+// removeMedia method
+  describe('removeMedia', function() {
 
-    it('Should be able to remove a video if not saving', function(done) {
+    it('Should be able to remove a media if not saving', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -179,7 +179,7 @@ describe('VideoController', function() {
       $httpBackend.flush();
     });
 
-    it('Should be able to remove many videos ', function(done) {
+    it('Should be able to remove many medias ', function(done) {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
@@ -193,10 +193,10 @@ describe('VideoController', function() {
 
   });
 
-// saveVideo method
-  describe('saveVideo', function() {
+// saveMedia method
+  describe('saveMedia', function() {
 
-    it('Should be able to save a video if not already saving', function(done) {
+    it('Should be able to save a media if not already saving', function(done) {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');

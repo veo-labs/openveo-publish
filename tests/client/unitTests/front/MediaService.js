@@ -2,16 +2,16 @@
 
 window.assert = chai.assert;
 
-describe('VideoService', function() {
+describe('MediaService', function() {
 
   beforeEach(module('ov.publish.player'));
 
   var $httpBackend,
-    videoService;
+    mediaService;
 
-  beforeEach(inject(function(_$httpBackend_, _videoService_) {
+  beforeEach(inject(function(_$httpBackend_, _mediaService_) {
     $httpBackend = _$httpBackend_;
-    videoService = _videoService_;
+    mediaService = _mediaService_;
   }));
 
   it('Should be able to ask server for a video by its id', function(done) {
@@ -19,7 +19,7 @@ describe('VideoService', function() {
       video: {}
     });
     $httpBackend.expectGET('/publish/getVideo/5');
-    videoService.getVideo('5', function(video) {
+    mediaService.getMedia('5', function(video) {
       assert.isDefined(video);
       done();
     });
@@ -29,7 +29,7 @@ describe('VideoService', function() {
   it('Should be able to ask server for a video and return null if no video is found', function(done) {
     $httpBackend.when('GET', '/publish/getVideo/6').respond(404);
     $httpBackend.expectGET('/publish/getVideo/6');
-    videoService.getVideo('6', function(video) {
+    mediaService.getMedia('6', function(video) {
       assert.isUndefined(video);
       done();
     });

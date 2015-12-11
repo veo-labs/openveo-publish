@@ -14,7 +14,7 @@
   // Translations
   app.constant('ovPublishTranslations', {
     en: {
-      AVAILABILITY_MESSAGE: 'This video is not yet available on the streaming platform.<br/>Please retry later.'
+      AVAILABILITY_MESSAGE: 'This media is not yet available on the streaming platform.<br/>Please retry later.'
     },
     fr: {
       AVAILABILITY_MESSAGE: 'Cette vidéo n\'est pas encore disponible sur la plateforme vidéo.<br/>' +

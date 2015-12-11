@@ -45,15 +45,15 @@ describe('PublishService', function() {
     $httpBackend.flush();
   });
 
-  it('Should be able to ask server to publish a video', function() {
+  it('Should be able to ask server to publish a media', function() {
     $httpBackend.expectGET('/be/publish/publishVideo/5');
-    publishService.publishVideo(5);
+    publishService.publishMedia(5);
     $httpBackend.flush();
   });
 
-  it('Should be able to ask server to unpublish a video', function() {
+  it('Should be able to ask server to unpublish a media', function() {
     $httpBackend.expectGET('/be/publish/unpublishVideo/5');
-    publishService.unpublishVideo(5);
+    publishService.unpublishMedia(5);
     $httpBackend.flush();
   });
 

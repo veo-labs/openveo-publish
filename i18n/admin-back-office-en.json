@@ -39,7 +39,7 @@
     "UPLOAD_VIDEO_NAME": "Launch video upload",
     "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload"
   },
-  "VIDEOS" : {
+  "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Videos",
     "TITLE" : "Catalog",
     "INFO" : "The catalog displays all uploaded videos and their status. Each video can be published, unpublished, viewed or deleted.",

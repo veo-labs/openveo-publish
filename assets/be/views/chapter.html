@@ -3,11 +3,11 @@
     <div class='btn btn-default back-button' ng-click='back()'><span class='glyphicon glyphicon-chevron-left'></span>{{'UI.BACK'| translate}}</div>
   </h2>
   <div class="well well-lg" ng-bind="'CHAPTER.INFO' | translate"></div>
-  <div class="row video-viewer">
+  <div class="row media-viewer">
     <div class='col-sm-8 col-sm-push-4'>
        <ov-player
          ov-player-type="{{playerType}}"
-         ov-data="videoPlayer"
+         ov-data="mediaPlayer"
          ov-language="playerLanguage"
          id="chapterPlayer"
          ></ov-player>

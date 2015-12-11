@@ -3,7 +3,7 @@
 (function(app) {
 
   /**
-   * Defines a publish service to manage videos, watcher, categories and properties.
+   * Defines a publish service to manage medias, watcher, categories and properties.
    *
    * @module ov.publish
    * @class publishService
@@ -15,42 +15,42 @@
     var categoriesOptions;
     var categoriesByKey;
     var platforms;
-    var videoChapter = {};
+    var mediaChapter = {};
 
     /**
-     * Retries a video.
+     * Retries a media.
      *
-     * If a video is on error, the upload / publication process has stopped and can be retried.
+     * If a media is on error, the upload / publication process has stopped and can be retried.
      *
-     * @param {String} id The id of the video to retry
+     * @param {String} id The id of the media to retry
      * @return {Promise} The HTTP promise
-     * @method retryVideo
+     * @method retryMedia
      */
-    function retryVideo(id) {
+    function retryMedia(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/retryVideo/' + id);
     }
 
     /**
-     * Publishes the given video.
+     * Publishes the given media.
      *
-     * @param {String} id The id of the video to publish
+     * @param {String} id The id of the media to publish
      * @return {Promise} The HTTP promise
-     * @method publishVideo
+     * @method publishMedia
      */
-    function publishVideo(id) {
+    function publishMedia(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/publishVideo/' + id);
     }
 
     /**
-     * Unpublishes the given video.
+     * Unpublishes the given media.
      *
-     * @param {String} id The id of the video to unpublish
+     * @param {String} id The id of the media to unpublish
      * @return {Promise} The HTTP promise
-     * @method unpublishVideo
+     * @method unpublishMedia
      */
-    function unpublishVideo(id) {
+    function unpublishMedia(id) {
       entityService.deleteCache('video');
       return $http.get(basePath + 'publish/unpublishVideo/' + id);
     }
@@ -147,15 +147,15 @@
     }
 
     /**
-     * Asks server to start uploading a video waiting for manual upload.
+     * Asks server to start uploading a media waiting for manual upload.
      *
-     * @param {String} id The id of the video to start uploading
-     * @param {String} platform The video platform to upload to
+     * @param {String} id The id of the media to start uploading
+     * @param {String} platform The media platform to upload to
      * @return {Promise} The HTTP promise
-     * @method startVideoUpload
+     * @method startMediaUpload
      */
-    function startVideoUpload(id, platform) {
-      entityService.deleteCache('video');
+    function startMediaUpload(id, platform) {
+      entityService.deleteCache('media');
       return $http.get(basePath + 'publish/startUpload/' + id + '/' + platform);
     }
 
@@ -223,20 +223,20 @@
     }
 
     /**
-     * Loads a video by its id.
+     * Loads a media by its id.
      *
-     * @param {String} id The video id
+     * @param {String} id The media id
      * @return {Promise} The HTTP promise
-     * @method loadVideo
+     * @method loadMedia
      */
-    function loadVideo(id) {
-      if (!videoChapter[id]) {
+    function loadMedia(id) {
+      if (!mediaChapter[id]) {
         return entityService.getEntity('video', id).success(function(obj) {
-          videoChapter[id] = obj;
+          mediaChapter[id] = obj;
         });
       }
       return $q.when({
-        data: videoChapter[id]
+        data: mediaChapter[id]
       });
     }
 
@@ -250,7 +250,7 @@
     function cacheClear(type) {
       if (!type) {
         properties = categories = null;
-        videoChapter = {};
+        mediaChapter = {};
       }
       else
         switch (type) {
@@ -263,7 +263,7 @@
             categoriesByKey = null;
             break;
           case 'chapter':
-            videoChapter = {};
+            mediaChapter = {};
             break;
           default:
             return;
@@ -280,10 +280,10 @@
     }
 
     return {
-      retryVideo: retryVideo,
-      publishVideo: publishVideo,
-      unpublishVideo: unpublishVideo,
-      startVideoUpload: startVideoUpload,
+      retryMedia: retryMedia,
+      publishMedia: publishMedia,
+      unpublishMedia: unpublishMedia,
+      startMediaUpload: startMediaUpload,
       loadProperties: loadProperties,
       getProperties: getProperties,
       loadCategories: loadCategories,
@@ -295,7 +295,7 @@
       getWatcherStatus: getWatcherStatus,
       startWatcher: startWatcher,
       stopWatcher: stopWatcher,
-      loadVideo: loadVideo,
+      loadMedia: loadMedia,
       getOAuthInfos: getOAuthInfos,
       cacheClear: cacheClear
     };

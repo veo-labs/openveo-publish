@@ -13,7 +13,7 @@
           entityService,
           i18nService,
           ovMultirangeViews,
-          video) {
+          media) {
 
     var orderBy = $filter('orderBy');
 
@@ -21,8 +21,8 @@
      * Reconstructs ranges with chapters and cut array.
      */
     function updateRange() {
-      $scope.ranges = ($scope.video.chapters ? $scope.video.chapters : [])
-              .concat(($scope.video.cut ? $scope.video.cut : []));
+      $scope.ranges = ($scope.media.chapters ? $scope.media.chapters : [])
+              .concat(($scope.media.cut ? $scope.media.cut : []));
       orderBy($scope.ranges, '+value', false);
     }
 
@@ -32,11 +32,11 @@
     function init() {
 
       // If no chapter, add timecodes with empty values and sort them
-      if (!$scope.video.chapters) {
-        $scope.video.chapters = [];
-        var indexTimecodes = $scope.video.timecodes;
+      if (!$scope.media.chapters) {
+        $scope.media.chapters = [];
+        var indexTimecodes = $scope.media.timecodes;
         angular.forEach(indexTimecodes, function(obj) {
-          $scope.video.chapters.push({
+          $scope.media.chapters.push({
             value: obj.timecode / ($scope.duration * 1000),
             name: '',
             description: ''
@@ -45,8 +45,8 @@
       }
 
       // If no cut add it
-      if (!$scope.video.cut) {
-        $scope.video.cut = [];
+      if (!$scope.media.cut) {
+        $scope.media.cut = [];
       }
 
       $scope.slider = {
@@ -91,7 +91,7 @@
           playerController = angular.element(myPlayer).controller('ovPlayer');
 
           // Set Duration
-          $scope.duration = duration / 1000 || ($scope.video.metadata && $scope.video.metadata.duration);
+          $scope.duration = duration / 1000 || ($scope.media.metadata && $scope.media.metadata.duration);
           init();
         }
       });
@@ -113,8 +113,8 @@
     }, 2000);
 
     // Init
-    $scope.video = video.data.entity;
-    $scope.playerType = $scope.video.type == 'youtube' ? 'youtube' : 'html';
+    $scope.media = media.data.entity;
+    $scope.playerType = $scope.media.type == 'youtube' ? 'youtube' : 'html';
 
     $scope.isCollapsed = true;
     $scope.selectRow = null;
@@ -126,9 +126,9 @@
     $scope.backUpRow = {};
 
     // Init object for player
-    $scope.videoPlayer = angular.copy($scope.video);
-    delete $scope.videoPlayer.chapters;
-    delete $scope.videoPlayer.cut;
+    $scope.mediaPlayer = angular.copy($scope.media);
+    delete $scope.mediaPlayer.chapters;
+    delete $scope.mediaPlayer.cut;
 
     // Set player language
     $scope.playerLanguage = i18nService.getLanguage();
@@ -189,7 +189,7 @@
       if (!$scope.selectRow) {
 
         // ADD the new model
-        $scope.video.chapters.push($scope.modelToEdit);
+        $scope.media.chapters.push($scope.modelToEdit);
       } else {
         $scope.selectRow.select = false;
         $scope.selectRow = null;
@@ -209,7 +209,7 @@
 
     $scope.remove = function() {
       if ($scope.selectRow) {
-        $scope.video.chapters.splice($scope.video.chapters.indexOf($scope.selectRow), 1);
+        $scope.media.chapters.splice($scope.media.chapters.indexOf($scope.selectRow), 1);
         $scope.selectRow.select = false;
         $scope.selectRow = null;
         $scope.saveChapter();
@@ -268,13 +268,13 @@
      * @param {Boolean} addOrRemove forces the addition or removal of the cut
      */
     function toggleCut(cut, addOrRemove) {
-      var index = $scope.video.cut.indexOf(cut);
+      var index = $scope.media.cut.indexOf(cut);
 
       // cuts will be updated by the watchCollection
       if (index === -1 && addOrRemove !== false) {
-        $scope.video.cut.push(cut);
+        $scope.media.cut.push(cut);
       } else if (index !== -1 && addOrRemove !== true) {
-        $scope.video.cut.splice(index, 1);
+        $scope.media.cut.splice(index, 1);
       }
 
     }
@@ -312,9 +312,9 @@
       // CALL SAVE HTTP
       var objToSave = {chapters: [], cut: []};
       for (var collectionName in objToSave) {
-        if ($scope.video.hasOwnProperty(collectionName)) {
-          for (var i = 0; i < $scope.video[collectionName].length; i++) {
-            var element = angular.copy($scope.video[collectionName][i]);
+        if ($scope.media.hasOwnProperty(collectionName)) {
+          for (var i = 0; i < $scope.media[collectionName].length; i++) {
+            var element = angular.copy($scope.media[collectionName][i]);
             delete element['_depth'];
             delete element['select'];
             objToSave[collectionName].push(element);
@@ -322,7 +322,7 @@
           orderBy(objToSave[collectionName], '+value', false);
         }
       }
-      entityService.updateEntity('video', $scope.video.id, objToSave).success(function() {
+      entityService.updateEntity('video', $scope.media.id, objToSave).success(function() {
 
       }).error(function(data, status) {
         $scope.$emit('setAlert', 'danger', $filter('translate')('CHAPTER.SAVE_ERROR'), 4000);
@@ -383,25 +383,25 @@
     });
 
     // range depends on chapters and cut
-    $scope.$watchCollection('video.chapters', updateRange);
-    $scope.$watchCollection('video.cut', updateRange);
+    $scope.$watchCollection('media.chapters', updateRange);
+    $scope.$watchCollection('media.cut', updateRange);
 
     // maintain the data consistency when cuts are moved/deleted and during initition of the controller
-    $scope.$watchCollection('video.cut', function() {
+    $scope.$watchCollection('media.cut', function() {
       $scope.beginCut.isInArray = false;
       $scope.endCut.isInArray = false;
-      if (!$scope.video.cut) {
+      if (!$scope.media.cut) {
         return;
       }
 
       // we use angular.extend to keep the same object reference
-      for (var i = 0; i < $scope.video.cut.length; i++) {
-        if ($scope.video.cut[i].type === 'begin') {
-          $scope.video.cut[i] = angular.extend($scope.beginCut.range, $scope.video.cut[i]);
+      for (var i = 0; i < $scope.media.cut.length; i++) {
+        if ($scope.media.cut[i].type === 'begin') {
+          $scope.media.cut[i] = angular.extend($scope.beginCut.range, $scope.media.cut[i]);
           $scope.beginCut.isInArray = true;
         }
-        if ($scope.video.cut[i].type === 'end') {
-          $scope.video.cut[i] = angular.extend($scope.endCut.range, $scope.video.cut[i]);
+        if ($scope.media.cut[i].type === 'end') {
+          $scope.media.cut[i] = angular.extend($scope.endCut.range, $scope.media.cut[i]);
           $scope.endCut.isInArray = true;
         }
       }
@@ -419,7 +419,7 @@
     'entityService',
     'i18nService',
     'ovMultirangeViews',
-    'video'
+    'media'
   ];
 
 })(angular.module('ov.publish'));

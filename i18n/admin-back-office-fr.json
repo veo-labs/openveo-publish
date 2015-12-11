@@ -39,7 +39,7 @@
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
     "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo"
   },
-  "VIDEOS" : {
+  "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Vidéos",
     "TITLE" : "Catalogue",
     "INFO" : "Le catalogue affiche toutes les vidéos uploadées ainsi que leurs statuts. Chaque vidéo peut ainsi être publiée, dépubliée, visualisée ou supprimée.",

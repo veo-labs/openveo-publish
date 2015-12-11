@@ -19,22 +19,22 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
    */
   function StatusFilter($filter) {
     return function(input, errorCode) {
-      var label = $filter('translate')('VIDEOS.STATE_' + input);
+      var label = $filter('translate')('MEDIAS.STATE_' + input);
       var type = 'label-danger';
 
-      // Video is published
+      // Media is published
       if (input == 12)
         type = 'label-success';
 
-      // Video is sent
+      // Media is sent
       else if (input == 11)
         type = 'label-warning';
 
-      // All other video states
+      // All other media states
       else if (input !== 0)
         type = 'label-info';
 
-      // Video is on error
+      // Media is on error
       if (input === 0)
         label = label + '(' + errorCode + ')';
 
@@ -60,9 +60,9 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       // url slug : shortening the url to stuff that follows after "#"
       current = current.slice(current.lastIndexOf('/publish/') + 9, current.length);
       next = next.slice(next.lastIndexOf('/publish/') + 9, next.length);
-      if (current == 'videos' && next.lastIndexOf('video/') >= 0) {
+      if (current == 'medias' && next.lastIndexOf('media/') >= 0) {
         $rootScope.newAnimation = 'RL';
-      } else if (current.lastIndexOf('video/') >= 0 && next == 'videos') {
+      } else if (current.lastIndexOf('media/') >= 0 && next == 'medias') {
         $rootScope.newAnimation = 'LR';
       } else {
         $rootScope.newAnimation = '';
@@ -75,12 +75,12 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
    */
   app.config(['$routeProvider', function($routeProvider) {
 
-    // Add route /publish/videos with authentication.
-    // Also retrieve the list of videos
-    $routeProvider.when('/publish/videos', {
-      templateUrl: '/publish/be/views/videos.html',
-      controller: 'VideoController',
-      title: 'VIDEOS.PAGE_TITLE',
+    // Add route /publish/medias with authentication.
+    // Also retrieve the list of medias
+    $routeProvider.when('/publish/medias', {
+      templateUrl: '/publish/be/views/medias.html',
+      controller: 'MediaController',
+      title: 'MEDIAS.PAGE_TITLE',
       access: 'access-videos-page',
       resolve: {
         categories: ['publishService', function(publishService) {
@@ -95,27 +95,27 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
-    // Add route /publish/videos/videosId with authentication.
-    // Also retrieve the list of videos
-    $routeProvider.when('/publish/video/:videoId', {
+    // Add route /publish/medias/mediasId with authentication.
+    // Also retrieve the list of medias
+    $routeProvider.when('/publish/media/:mediaId', {
       templateUrl: '/publish/be/views/chapter.html',
       controller: 'ChapterController',
       title: 'CHAPTER.PAGE_TITLE',
       access: 'chapter-video',
       resolve: {
-        video: ['$q', 'publishService', 'alertService', '$route', '$filter',
+        media: ['$q', 'publishService', 'alertService', '$route', '$filter',
           function($q, publishService, alertService, $route, $filter) {
             var deferred = $q.defer();
-            var videoId = $route.current.params.videoId;
+            var mediaId = $route.current.params.mediaId;
 
-            publishService.loadVideo(videoId).then(function(result) {
+            publishService.loadMedia(mediaId).then(function(result) {
               if (result.data.entity) {
                 if (result.data.entity.available)
                   deferred.resolve.apply(deferred, arguments);
                 else {
                   publishService.cacheClear('chapter');
-                  alertService.add('danger', $filter('translate')('VIDEOS.NOT_READY'), 8000);
-                  deferred.reject({redirect: '/publish/videos'});
+                  alertService.add('danger', $filter('translate')('MEDIAS.NOT_READY'), 8000);
+                  deferred.reject({redirect: '/publish/medias'});
                 }
               } else
                 deferred.reject();

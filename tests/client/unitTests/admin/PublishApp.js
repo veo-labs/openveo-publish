@@ -27,23 +27,23 @@ describe('PublishApp', function() {
     $httpBackend.when('POST', /.*/).respond(200, '');
   });
 
-  it('Should register routes to videos, watcher, video, properties and categories', function() {
-    assert.isDefined($route.routes['/publish/videos']);
+  it('Should register routes to medias, watcher, media, properties and categories', function() {
+    assert.isDefined($route.routes['/publish/medias']);
     assert.isDefined($route.routes['/publish/watcher']);
-    assert.isDefined($route.routes['/publish/video/:videoId']);
+    assert.isDefined($route.routes['/publish/media/:mediaId']);
     assert.isDefined($route.routes['/publish/properties']);
     assert.isDefined($route.routes['/publish/categories']);
   });
 
-  it('Should be able to route to videos page after retrieving the list of videos', function() {
+  it('Should be able to route to medias page after retrieving the list of medias', function() {
     $httpBackend.expectGET('/be/gettaxonomy/categories');
     $httpBackend.expectGET('/be/crud/property');
     $httpBackend.expectGET('/be/publish/getPlatforms');
-    $httpBackend.expectGET('/publish/be/views/videos.html');
+    $httpBackend.expectGET('/publish/be/views/medias.html');
 
-    $location.path('/publish/videos');
+    $location.path('/publish/medias');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/videos');
+    assert.equal($location.path(), '/publish/medias');
   });
 
   it('Should be able to route to watcher page after retrieving the watcher status', function() {

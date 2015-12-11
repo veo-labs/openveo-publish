@@ -3,9 +3,9 @@
 (function(app) {
 
   /**
-   * Defines the video controller for the videos page.
+   * Defines the media controller for the medias page.
    */
-  function VideoController(
+  function MediaController(
   $scope,
   $filter,
   $location,
@@ -21,7 +21,7 @@
 
     $scope.properties = properties.data.entities;
 
-    // Replace Id in Video by the name of the category
+    // Replace Id in Media by the name of the category
     // Category Id can be overwritten, it is only for display purpose
     $scope.categories = categories.data.taxonomy;
     $scope.platforms = platforms.data.platforms;
@@ -72,108 +72,108 @@
     }
 
     /**
-     * Opens an alert to display HTML code to share the video.
-     * @param {Object} video The video to share
+     * Opens an alert to display HTML code to share the media.
+     * @param {Object} media The media to share
      */
-    function shareCode(video) {
+    function shareCode(media) {
       $scope.$emit('setAlert', 'info', [
-        $filter('translate')('VIDEOS.SHARECODE'),
+        $filter('translate')('MEDIAS.SHARECODE'),
         '<br><br><div class="well well-sm"><code>',
         '&lt;iframe width="480" height="270" ',
-        'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + video.link,
+        'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + media.link,
         '?fullscreen&lang=' + i18nService.getLanguage() + '"',
         ' frameborder="0"&gt;&lt;/iframe&gt;',
         '</div>'
       ].join(''), 0);
     }
 
-    // Iterate through the list of videos, if at least one video
+    // Iterate through the list of medias, if at least one media
     // is pending, poll each 30 seconds to be informed of
     // its status
-    var pollVideosPromise = $interval(function() {
+    var pollMediasPromise = $interval(function() {
       if (!scopeEditForm.pendingEdition) {
-        $scope.$emit('setAlert', 'info', $filter('translate')('VIDEOS.RELOAD'), 4000);
+        $scope.$emit('setAlert', 'info', $filter('translate')('MEDIAS.RELOAD'), 4000);
         entityService.deleteCache(scopeDataTable.entityType);
         tableReloadEventService.broadcast();
       }
     }, 30000);
 
     /**
-     * Retries a video which is on error.
-     * @param {Array} videos The list of videos to work on
+     * Retries a media which is on error.
+     * @param {Array} medias The list of medias to work on
      * @param {Function} reload Function to reload the datatable
      */
-    function retryVideo(videos, reload) {
-      publishService.retryVideo(videos.join(','))
+    function retryMedia(medias, reload) {
+      publishService.retryMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.RETRY_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.RETRY_SUCCESS'), 4000);
           reload();
         });
     }
 
     /**
-     * Asks server to start uploading the video to the chosen platform.
-     * @param {Array} videos The list of videos to work on
+     * Asks server to start uploading the media to the chosen platform.
+     * @param {Array} medias The list of medias to work on
      * @param {String} platformName The name of platform to upload to
      * @param {Function} reload Function to reload the datatable
      */
-    function startVideoUpload(videos, platformName, reload) {
-      publishService.startVideoUpload(videos.join(','), platformName)
+    function startMediaUpload(medias, platformName, reload) {
+      publishService.startMediaUpload(medias.join(','), platformName)
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UPLOAD_START_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.UPLOAD_START_SUCCESS'), 4000);
           reload();
         });
     }
 
     /**
-     * Publishes a list of videos.
-     * @param {Array} videos The list of video ids to publish
+     * Publishes a list of medias.
+     * @param {Array} medias The list of media ids to publish
      * @param {Function} reload Function to reload the datatable
      */
-    function publishVideo(videos, reload) {
-      publishService.publishVideo(videos.join(','))
+    function publishMedia(medias, reload) {
+      publishService.publishMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.PUBLISHED_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.PUBLISHED_SUCCESS'), 4000);
           reload();
         });
     }
 
     /**
-     * Unpublishes a list of videos.
-     * @param {Array} videos The list of video ids to unpublish
+     * Unpublishes a list of medias.
+     * @param {Array} medias The list of media ids to unpublish
      * @param {Function} reload Function to reload the datatable
      */
-    function unpublishVideo(videos, reload) {
-      publishService.unpublishVideo(videos.join(','))
+    function unpublishMedia(medias, reload) {
+      publishService.unpublishMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.UNPUBLISHED_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.UNPUBLISHED_SUCCESS'), 4000);
           reload();
         });
     }
 
     /**
-     * Removes a list of videos.
-     * @param {Array} selected The list of video ids to remove
+     * Removes a list of medias.
+     * @param {Array} selected The list of media ids to remove
      * @param {Function} reload Function to reload the datatable
      */
     function removeRows(selected, reload) {
       entityService.removeEntity('video', selected.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('VIDEOS.REMOVE_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.REMOVE_SUCCESS'), 4000);
           reload();
         });
     }
 
     /**
-     * Saves video information.
-     * @param {Object} video Video data
+     * Saves media information.
+     * @param {Object} media Media data
      */
-    function saveVideo(video) {
-      return entityService.updateEntity('video', video.id, {
-        title: video.title,
-        description: video.description,
-        properties: video.properties,
-        category: video.category
+    function saveMedia(media) {
+      return entityService.updateEntity('video', media.id, {
+        title: media.title,
+        description: media.description,
+        properties: media.properties,
+        category: media.category
       }).then(function() {
         scopeEditForm.pendingEdition = false;
       });
@@ -181,10 +181,10 @@
 
     /**
      * Routes to chapters edition.
-     * @param {Object} video The video to edit
+     * @param {Object} media The media to edit
      */
-    function editChapter(video) {
-      $location.path('/publish/video/' + video.id);
+    function editChapter(media) {
+      $location.path('/publish/media/' + media.id);
     }
 
     /**
@@ -219,7 +219,7 @@
         key: 'title',
         type: 'horizontalExtendInput',
         templateOptions: {
-          label: $filter('translate')('VIDEOS.ATTR_TITLE'),
+          label: $filter('translate')('MEDIAS.ATTR_TITLE'),
           required: true
         }
       },
@@ -227,7 +227,7 @@
         key: 'description',
         type: 'horizontalExtendInput',
         templateOptions: {
-          label: $filter('translate')('VIDEOS.ATTR_DESCRIPTION'),
+          label: $filter('translate')('MEDIAS.ATTR_DESCRIPTION'),
           required: true
         }
       },
@@ -235,7 +235,7 @@
         key: 'category',
         type: 'horizontalExtendSelect',
         templateOptions: {
-          label: $filter('translate')('VIDEOS.ATTR_CATEGORY'),
+          label: $filter('translate')('MEDIAS.ATTR_CATEGORY'),
           options: categoriesfield
         }
       }
@@ -257,21 +257,21 @@
       {
         key: 'title',
         value: '',
-        label: $filter('translate')('VIDEOS.TITLE_FILTER')
+        label: $filter('translate')('MEDIAS.TITLE_FILTER')
       }, {
         key: 'description',
         value: '',
-        label: $filter('translate')('VIDEOS.DESCRIPTION_FILTER')
+        label: $filter('translate')('MEDIAS.DESCRIPTION_FILTER')
       }, {
         key: 'date',
         type: 'date',
         value: '',
-        label: $filter('translate')('VIDEOS.DATE_FILTER')
+        label: $filter('translate')('MEDIAS.DATE_FILTER')
       }, {
         key: 'category',
         type: 'select',
         value: null,
-        label: $filter('translate')('VIDEOS.CATEGORY_FILTER'),
+        label: $filter('translate')('MEDIAS.CATEGORY_FILTER'),
 
         /*
          * [{
@@ -291,25 +291,25 @@
     scopeDataTable.header = [
       {
         key: 'title',
-        name: $filter('translate')('VIDEOS.NAME_COLUMN'),
+        name: $filter('translate')('MEDIAS.NAME_COLUMN'),
         class: ['col-xs-8 col-sm-5']
       },
       {
         key: 'date',
         type: 'date',
-        name: $filter('translate')('VIDEOS.DATE_COLUMN'),
+        name: $filter('translate')('MEDIAS.DATE_COLUMN'),
         class: ['col-xs-1']
       },
       {
         key: 'category',
         type: 'category',
-        name: $filter('translate')('VIDEOS.CATEGORY_COLUMN'),
+        name: $filter('translate')('MEDIAS.CATEGORY_COLUMN'),
         class: ['hidden-xs col-sm-3']
       },
       {
         key: 'state',
         type: 'status',
-        name: $filter('translate')('VIDEOS.STATUS_COLUMN'),
+        name: $filter('translate')('MEDIAS.STATUS_COLUMN'),
         class: ['col-xs-2']
       },
       {
@@ -337,31 +337,31 @@
         }
       },
       {
-        label: $filter('translate')('VIDEOS.PUBLISH'),
+        label: $filter('translate')('MEDIAS.PUBLISH'),
         condition: function(row) {
           return $scope.rights.publish && row.state == 11 && !row.saving;
         },
         callback: function(row, reload) {
-          publishVideo([row.id], reload);
+          publishMedia([row.id], reload);
         },
         global: function(selected, reload) {
-          publishVideo(selected, reload);
+          publishMedia(selected, reload);
         }
       },
       {
-        label: $filter('translate')('VIDEOS.UNPUBLISH'),
+        label: $filter('translate')('MEDIAS.UNPUBLISH'),
         condition: function(row) {
           return $scope.rights.publish && row.state == 12 && !row.saving;
         },
         callback: function(row, reload) {
-          unpublishVideo([row.id], reload);
+          unpublishMedia([row.id], reload);
         },
         global: function(selected, reload) {
-          unpublishVideo(selected, reload);
+          unpublishMedia(selected, reload);
         }
       },
       {
-        label: $filter('translate')('VIDEOS.CHAPTER_EDIT'),
+        label: $filter('translate')('MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
           return $scope.rights.chapter && !row.saving && (row.state == 11 || row.state == 12);
         },
@@ -370,12 +370,12 @@
         }
       },
       {
-        label: $filter('translate')('VIDEOS.RETRY'),
+        label: $filter('translate')('MEDIAS.RETRY'),
         condition: function(row) {
           return $scope.rights.retry && row.state == 0 && !row.saving;
         },
         callback: function(row, reload) {
-          retryVideo([row.id], reload);
+          retryMedia([row.id], reload);
         }
       },
       {
@@ -400,12 +400,12 @@
     for (var i = 0; i < $scope.platforms.length; i++) {
       var platformName = $scope.platforms[i];
       scopeDataTable.actions.push({
-        label: $filter('translate')('VIDEOS.UPLOAD_' + platformName.toUpperCase()),
+        label: $filter('translate')('MEDIAS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
           return $scope.rights.upload && row.state == 6 && !row.saving;
         },
         callback: function(row, reload) {
-          startVideoUpload([row.id], this.platform, reload);
+          startMediaUpload([row.id], this.platform, reload);
         },
         platform: platformName
       });
@@ -434,17 +434,17 @@
       return $scope.rights.edit && !row.locked && row.state !== 0;
     };
     scopeEditForm.onSubmit = function(model) {
-      return saveVideo(model);
+      return saveMedia(model);
     };
 
     // Listen to destroy event on the view to update
     $scope.$on('$destroy', function() {
-      $interval.cancel(pollVideosPromise);
+      $interval.cancel(pollMediasPromise);
     });
   }
 
-  app.controller('VideoController', VideoController);
-  VideoController.$inject = [
+  app.controller('MediaController', MediaController);
+  MediaController.$inject = [
     '$scope',
     '$filter',
     '$location',
