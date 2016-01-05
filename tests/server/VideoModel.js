@@ -5,7 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var assert = require('chai').assert;
 var openVeoAPI = require('@openveo/api');
-var ut = require('@openveo/test').generator;
+var ut = require('@openveo/test').unit.generator;
 
 // VideoModel.js
 describe('VideoModel', function() {
