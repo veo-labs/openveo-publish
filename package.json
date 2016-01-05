@@ -71,7 +71,7 @@
   "scripts": {
     "prepublish": "grunt prod",
     "preuninstall": "node update.js backup",
-    "postinstall": "bower install && node install.js && node update.js restore",
+    "postinstall": "bower install && node install.js && node backup.js restore",
     "eslint": "grunt eslint",
     "mocha": "grunt mochaTest",
     "karma": "grunt karma"
