@@ -18,14 +18,19 @@ var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHel
 module.exports.getOAuthInformationsAction = function(request, response) {
 
   var infos = {};
-  googleOAuthHelper.hasToken(function(hasToken) {
+  if (googleOAuthHelper.oauth2Client) {
+    googleOAuthHelper.hasToken(function(hasToken) {
 
-    infos.hasToken = hasToken;
-    infos.authUrl = googleOAuthHelper.getAuthUrl(
-            {scope: ['https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload']}
-    );
-    response.send({authInfos: infos});
-  });
+      infos.hasToken = hasToken;
+      infos.authUrl = googleOAuthHelper.getAuthUrl(
+              {scope: ['https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload']}
+      );
+      response.send({authInfos: infos});
+    });
+  } else {
+    logger.debug('Youtube Oauth information are missing');
+    response.send({authInfos: {error: 1}});
+  }
 };
 
 

@@ -8,7 +8,7 @@ var OAuth2 = google.auth.OAuth2;
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
 var publishConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
-var config = publishConf.youtube.googleOAuth;
+var config;
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 /**
@@ -17,7 +17,9 @@ var ConfigurationModel = process.requirePublish('app/server/models/Configuration
  * @returns {nm$_googleOAuthHelper.GoogleOAuthHelper}
  */
 function GoogleOAuthHelper() {
-  this.oauth2Client = new OAuth2(config.clientId, config.clientSecret, config.redirectUrl);
+  if (publishConf.youtube && publishConf.youtube.googleOAuth)
+    config = publishConf.youtube.googleOAuth;
+  this.oauth2Client = config ? new OAuth2(config.clientId, config.clientSecret, config.redirectUrl) : null;
   this.confModel = new ConfigurationModel();
 }
 
