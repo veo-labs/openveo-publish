@@ -39,10 +39,9 @@ function VideoPackageError(message, code) {
  * @constructor
  * @extends Package
  * @param {Object} mediaPackage Information about the video
- * @param {Object} logger A Winston logger
  */
-function VideoPackage(mediaPackage, logger) {
-  Package.call(this, mediaPackage, logger);
+function VideoPackage(mediaPackage) {
+  Package.call(this, mediaPackage);
 }
 
 module.exports = VideoPackage;
@@ -132,7 +131,7 @@ VideoPackage.prototype.preparePublicDirectory = function() {
   var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.PREPARING_STATE);
 
-  this.logger.debug('Prepare package public directory ' + publicDirectory);
+  process.logger.debug('Prepare package public directory ' + publicDirectory);
 
   openVeoAPI.fileSystem.mkdir(path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id),
     function(error) {
@@ -197,7 +196,7 @@ VideoPackage.prototype.copyImages = function() {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
-  this.logger.debug('Copy images to ' + videoFinalDir);
+  process.logger.debug('Copy images to ' + videoFinalDir);
 
   fs.readdir(extractDirectory, function(error, files) {
     if (error)
@@ -218,7 +217,7 @@ VideoPackage.prototype.copyImages = function() {
         openVeoAPI.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
 
           if (error)
-            self.logger.warn(error.message, {
+            process.logger.warn(error.message, {
               action: 'copyImages',
               mediaId: self.mediaPackage.id
             });

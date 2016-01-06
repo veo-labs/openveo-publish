@@ -46,14 +46,13 @@ function PackageError(message, code) {
  * @class Package
  * @constructor
  * @param {Object} mediaPackage Information about the media
- * @param {Object} logger A Winston logger
  * Package emits the following events :
  *  - Event *error* An error occured
  *    - **Error** The error
  *  - Event *complete* A package was successfully published
  *    - **Object** The published package
  */
-function Package(mediaPackage, logger) {
+function Package(mediaPackage) {
   this.publishConf = publishConf;
 
   // Validate temporary directory
@@ -63,7 +62,6 @@ function Package(mediaPackage, logger) {
 
   this.videoModel = new VideoModel();
   this.mediaPackage = mediaPackage;
-  this.logger = logger;
   this.videoPlatformConf = videoPlatformConf;
 }
 
@@ -139,10 +137,9 @@ Package.stateMachine = [
  * @static
  * @param {String} type The type of the package platform to instanciate
  * @param {Object} mediaPackage Information about the media
- * @param {Object} logger A Winston logger
  * @return {Package} An instance of a Package sub class
  */
-Package.getPackage = function(type, mediaPackage, logger) {
+Package.getPackage = function(type, mediaPackage) {
   var self = this;
   if (type) {
 
@@ -150,11 +147,11 @@ Package.getPackage = function(type, mediaPackage, logger) {
 
       case 'tar':
         var TarPackage = process.requirePublish('app/server/packages/TarPackage.js');
-        return new TarPackage(mediaPackage, logger);
+        return new TarPackage(mediaPackage);
 
       case 'mp4':
         var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
-        return new VideoPackage(mediaPackage, logger);
+        return new VideoPackage(mediaPackage);
 
       default:
         self.emit('error', new PackageError('Package type is not valid (' + mediaPackage.packageType + ')',
@@ -190,13 +187,13 @@ Package.prototype.init = function(initialState, initialTransition) {
   // Handle each enter state event to launch automatically the next
   // transition regarding the stack of transitions
   this.fsm.onenterstate = function() {
-    self.logger.verbose('State = ' + self.fsm.current);
+    process.logger.verbose('State = ' + self.fsm.current);
     self.executeTransition((transitions[transition + 1]) ? transitions[++transition] : null);
   };
 
   // Handle each leave state event to execute the corresponding transition
   this.fsm.onleavestate = function(event) {
-    self.logger.verbose('Transition = ' + event);
+    process.logger.verbose('Transition = ' + event);
 
     // Executes function corresponding to transition
     if (self[event])
@@ -232,7 +229,7 @@ Package.prototype.executeTransition = function(transition) {
     // Package has not been uploaded yet and request a manual upload
     // Change package state
     if (transition === Package.UPLOAD_MEDIA_TRANSITION) {
-      this.logger.debug('Package ' + this.mediaPackage.id + ' is waiting for manual upload');
+      process.logger.debug('Package ' + this.mediaPackage.id + ' is waiting for manual upload');
       this.videoModel.updateState(this.mediaPackage.id, VideoModel.WAITING_FOR_UPLOAD_STATE);
     }
     else
@@ -256,7 +253,7 @@ Package.prototype.executeTransition = function(transition) {
  * @private
  */
 Package.prototype.initPackage = function() {
-  this.logger.debug('Init package ' + this.mediaPackage.id);
+  process.logger.debug('Init package ' + this.mediaPackage.id);
 
   var self = this;
   this.mediaPackage.state = VideoModel.PENDING_STATE;
@@ -296,7 +293,7 @@ Package.prototype.copyPackage = function() {
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.COPYING_STATE);
 
   // Copy package
-  this.logger.debug('Copy ' + this.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
+  process.logger.debug('Copy ' + this.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
   openVeoAPI.fileSystem.copy(this.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
     if (copyError)
       self.setError(new PackageError(copyError.message, errors.COPY_ERROR));
@@ -317,7 +314,7 @@ Package.prototype.removeOriginalPackage = function() {
   var self = this;
 
   // Try to remove the original package
-  this.logger.debug('Remove original package ' + this.mediaPackage.originalPackagePath);
+  process.logger.debug('Remove original package ' + this.mediaPackage.originalPackagePath);
   fs.unlink(this.mediaPackage.originalPackagePath, function(error) {
     if (error)
       self.setError(new PackageError(error.message, errors.UNLINK_ERROR));
@@ -343,7 +340,7 @@ Package.prototype.uploadMedia = function() {
     this.videoPlatformConf[this.mediaPackage.type]);
 
   // Start uploading the media to the platform
-  this.logger.debug('Upload media ' + this.mediaPackage.id);
+  process.logger.debug('Upload media ' + this.mediaPackage.id);
   videoPlatformProvider.upload(this.getMediaFilePath(), function(error, mediaId) {
     if (error)
       self.setError(new PackageError(error.message, errors.MEDIA_UPLOAD_ERROR));
@@ -366,7 +363,7 @@ Package.prototype.uploadMedia = function() {
  */
 Package.prototype.configureMedia = function() {
   var self = this;
-  this.logger.debug('Configure media ' + this.mediaPackage.id);
+  process.logger.debug('Configure media ' + this.mediaPackage.id);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.CONFIGURING_STATE);
 
   // Get video plaform provider from package type
@@ -395,7 +392,7 @@ Package.prototype.cleanDirectory = function() {
   var directoryToRemove = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
   // Remove package temporary directory
-  this.logger.debug('Remove temporary directory ' + directoryToRemove);
+  process.logger.debug('Remove temporary directory ' + directoryToRemove);
   openVeoAPI.fileSystem.rmdir(directoryToRemove, function(error) {
     if (error)
       self.setError(new PackageError(error.message, errors.CLEAN_DIRECTORY_ERROR));

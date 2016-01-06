@@ -60,31 +60,31 @@ var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 
-// Get a logger
-var logger = openVeoAPI.logger.get('watcher', require(path.join(configDir, 'publish/loggerConf.json')).watcher);
+// Create logger
+process.logger = openVeoAPI.logger.add('openveo', require(path.join(configDir, 'publish/loggerConf.json')).watcher);
 
 // hotFolders and videoTmpDir must be defined
 if (!watcherConf.hotFolders || !publishConf.videoTmpDir) {
-  logger.error('You must configure a hot folder and a video temporary directory in watcherConf.json ' +
+  process.logger.error('You must configure a hot folder and a video temporary directory in watcherConf.json ' +
                'and publishConf.json files');
   return;
 }
 
 // hotFolders must be a non empty Array
 if (!util.isArray(watcherConf.hotFolders) || !watcherConf.hotFolders.length) {
-  logger.error('hotFolders property must be an array of objects');
+  process.logger.error('hotFolders property must be an array of objects');
   return;
 }
 
 // videoTmpDir must be an String
 if (typeof publishConf.videoTmpDir !== 'string') {
-  logger.error('videoTmpDir property must be a String');
+  process.logger.error('videoTmpDir property must be a String');
   return;
 }
 
 // databaseConf must be an Object
 if (typeof databaseConf !== 'object') {
-  logger.error('--databaseConf argument must point to a JSON file');
+  process.logger.error('--databaseConf argument must point to a JSON file');
   return;
 }
 
@@ -94,7 +94,7 @@ var db = openVeoAPI.Database.getDatabase(databaseConf);
 // Establish connection to the database
 db.connect(function(error) {
 
-  var publishManager = new PublishManager(db, logger);
+  var publishManager = new PublishManager(db);
 
   /**
    * Publishes a package by its name after making sure the
@@ -110,7 +110,7 @@ db.connect(function(error) {
     fs.stat(filePath, function(error, stat) {
 
       if (error)
-        logger.error(error && error.message, {code: error.code});
+        process.logger.error(error && error.message, {code: error.code});
       else if (lastStat && stat.mtime.getTime() === lastStat.mtime.getTime()) {
 
         // Files modification date hasn't change in 10 seconds
@@ -119,7 +119,7 @@ db.connect(function(error) {
 
         // Only files with tar or mp4 extensions are accepted
         if (fileExtension === 'tar' || fileExtension === 'mp4') {
-          logger.info('File ' + filePath + ' has been added to hot folder');
+          process.logger.info('File ' + filePath + ' has been added to hot folder');
           var dirName = path.dirname(filePath);
           var packageInfo = null;
 
@@ -135,7 +135,7 @@ db.connect(function(error) {
           publishManager.publish(packageInfo);
         }
         else
-          logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
+          process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
 
       } else {
 
@@ -147,7 +147,7 @@ db.connect(function(error) {
 
   // Connection to database failed
   if (error) {
-    logger.error(error && error.message);
+    process.logger.error(error && error.message);
     throw new Error('Connection to database failed');
   } else {
 
@@ -191,12 +191,12 @@ db.connect(function(error) {
 
     // Listen to errors dispatched by the publish manager
     publishManager.on('error', function(error) {
-      logger.error(error && error.message, {code: error.code});
+      process.logger.error(error && error.message, {code: error.code});
     });
 
     // Listen to complete publications dispatched by the publish manager
     publishManager.on('complete', function(videoPackage) {
-      logger.info('Publish complete for video ' + videoPackage.id);
+      process.logger.info('Publish complete for video ' + videoPackage.id);
     });
 
     async.filter(hotFoldersPaths, fs.exists, function(results) {
@@ -214,7 +214,7 @@ db.connect(function(error) {
       });
 
       watcher.on('ready', function() {
-        logger.info('Initial scan complete. Ready for changes.');
+        process.logger.info('Initial scan complete. Ready for changes.');
 
         // If process is a child process
         if (process.connected)
@@ -222,7 +222,7 @@ db.connect(function(error) {
       });
 
       watcher.on('error', function(error) {
-        logger.error(error && error.message);
+        process.logger.error(error && error.message);
       });
     });
   }

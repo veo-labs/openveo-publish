@@ -10,12 +10,8 @@
 // Module dependencies
 var path = require('path');
 var childProcess = require('child_process');
-var winston = require('winston');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
-
-// Retrieve logger
-var logger = winston.loggers.get('openveo');
 
 // Watcher status
 module.exports.STARTING_STATUS = 0;
@@ -36,7 +32,7 @@ module.exports.start = function() {
 
   if (!watcher && status === this.STOPPED_STATUS) {
 
-    logger.info('Watcher starting');
+    process.logger.info('Watcher starting');
     status = this.STARTING_STATUS;
 
     // Executes watcher as a child process
@@ -49,7 +45,7 @@ module.exports.start = function() {
     watcher.on('message', function(data) {
       if (data) {
         if (data.status === 'started') {
-          logger.info('Watcher started');
+          process.logger.info('Watcher started');
           status = self.STARTED_STATUS;
         }
       }
@@ -57,7 +53,7 @@ module.exports.start = function() {
 
     // Handle watcher close event
     watcher.on('close', function() {
-      logger.info('Watcher stopped');
+      process.logger.info('Watcher stopped');
       status = self.STOPPED_STATUS;
       watcher = null;
     });
@@ -72,7 +68,7 @@ module.exports.start = function() {
  */
 module.exports.stop = function() {
   if (watcher && status === this.STARTED_STATUS) {
-    logger.info('Watcher stopping');
+    process.logger.info('Watcher stopping');
     status = this.STOPPING_STATUS;
     watcher.kill('SIGINT');
   }

@@ -9,9 +9,8 @@
  *     var openVeoAPI = require("@openveo/api");
  *     var PublishManager = process.requirePublish("app/server/PublishManager.js");
  *     var db = openVeoAPI.applicationStorage.getDatabase();
- *     var logger = openVeoAPI.logger.get("openveo");
  *
- *     var publishManager = new PublishManager(db, logger);
+ *     var publishManager = new PublishManager(db);
  *
  *     // Listen to errors dispatched by the publish manager
  *     publishManager.on("error", function(error){
@@ -69,19 +68,17 @@ util.inherits(PublishError, Error);
  * @constructor
  * @param {Database} database A database to store information about
  * the package
- * @param {Object} logger A Winston logger
  * PublishManager emits the following events :
  *  - Event *error* An error occured
  *    - **Error** The error
  *  - Event *complete* A package was successfully published
  *    - **Object** The published package
  */
-function PublishManager(database, logger) {
+function PublishManager(database) {
   openVeoAPI.applicationStorage.setDatabase(database);
   this.queue = [];
   this.pendingPackages = [];
   this.videoModel = new VideoModel();
-  this.logger = logger;
 }
 
 util.inherits(PublishManager, events.EventEmitter);
@@ -154,7 +151,7 @@ function onComplete(mediaPackage) {
  */
 function createMediaPackageManager(mediaPackage) {
   var self = this;
-  var mediaPackageManager = Package.getPackage(mediaPackage.packageType, mediaPackage, this.logger);
+  var mediaPackageManager = Package.getPackage(mediaPackage.packageType, mediaPackage);
 
   // Handle errors from package manager
   mediaPackageManager.on('error', function(error) {
@@ -179,19 +176,19 @@ function createMediaPackageManager(mediaPackage) {
  * false if it has been added to queue
  */
 function addPackage(mediaPackage) {
-  this.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
+  process.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
 
   // Too much pending packages
   if (this.pendingPackages.length >= maxConcurrentPublish) {
 
     // Add package to queue
     this.queue.push(mediaPackage);
-    this.logger.debug('Add package ' + mediaPackage.originalPackagePath + '(' + mediaPackage.id + ') to queue');
+    process.logger.debug('Add package ' + mediaPackage.originalPackagePath + '(' + mediaPackage.id + ') to queue');
     return false;
   } else {
 
     // Process can deal with the package
-    this.logger.debug('Add package ' + mediaPackage.originalPackagePath +
+    process.logger.debug('Add package ' + mediaPackage.originalPackagePath +
                       '(' + mediaPackage.id + ') to pending packages');
 
     // Add package to the list of pending packages
@@ -276,7 +273,7 @@ PublishManager.prototype.retry = function(packageId) {
         self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE);
 
         var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        self.logger.info('Retry package ' + mediaPackage.id);
+        process.logger.info('Retry package ' + mediaPackage.id);
         mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
 
         // Package can be added to pending packages
@@ -313,7 +310,7 @@ PublishManager.prototype.upload = function(packageId, platform) {
         self.videoModel.updateType(mediaPackage.id, platform);
 
         var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        self.logger.info('Force upload package ' + mediaPackage.id);
+        process.logger.info('Force upload package ' + mediaPackage.id);
         mediaPackage.type = platform;
         mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
 

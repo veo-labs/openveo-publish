@@ -18,8 +18,6 @@ var YoutubeResumableUpload = process.requirePublish('app/server/helper/youtubeRe
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
 
-var logger = require('winston').loggers.get('publish');
-
 var uploadMethods = ['uploadClassic', 'uploadResumable'];
 
 /**
@@ -237,10 +235,10 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
       resumableUpload.retry = 3; // Maximum retries when upload failed.
 
       resumableUpload.on('progress', function(progress) {
-        logger.debug('Upload progress', progress);
+        process.logger.debug('Upload progress', progress);
       });
       resumableUpload.on('error', function(error) {
-        logger.debug('Upload error', error);
+        process.logger.debug('Upload error', error);
         if (resumableUpload.retry === 0) {
           callback(error);
         }

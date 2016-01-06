@@ -86,12 +86,6 @@ function createLoggerConf(callback) {
       level: 'info',
       maxFileSize: 1048576,
       maxFiles: 2
-    },
-    publish: {
-      fileName: path.join(defaultPath, 'openveo-publish.log').replace(/\\/g, '/'),
-      level: 'info',
-      maxFileSize: 1048576,
-      maxFiles: 2
     }
   };
 

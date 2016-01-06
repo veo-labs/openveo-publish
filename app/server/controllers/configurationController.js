@@ -6,7 +6,6 @@
 
 // Module dependencies
 var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
-var logger = require('winston').loggers.get('publish');
 
 /**
  * Retrieve informations about oAuth authenfifiction :
@@ -39,7 +38,7 @@ module.exports.getOAuthInformationsAction = function(request, response) {
  */
 module.exports.handleGoogleOAuthCodeAction = function(request, response) {
   var code = request.query.code;
-  logger.debug('Code received ', code);
+  process.logger.debug('Code received ', code);
   googleOAuthHelper.persistTokenWithCode(code, function() {
     response.redirect('/be/publish/configuration');
   });

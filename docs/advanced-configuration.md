@@ -57,12 +57,6 @@ Open **~/.openveo/publish/loggerConf.json**
     "level" : "info", // Log level
     "maxFileSize" : 1048576, // Maximum log file size (in Bytes)
     "maxFiles" : 2 // Maximum number of files archived
-  },
-  "publish" : { // Publish logger
-    "fileName" : "var/log/openveo-publish.log", // Path to log file
-    "level" : "info", // Log level
-    "maxFileSize" : 1048576, // Maximum log file size (in Bytes)
-    "maxFiles" : 2 // Maximum number of files archived
   }
 }
 ```

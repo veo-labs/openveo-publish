@@ -69,8 +69,8 @@ function TarPackageError(message, code) {
  * @constructor
  * @extends Package
  */
-function TarPackage(mediaPackage, logger) {
-  Package.call(this, mediaPackage, logger);
+function TarPackage(mediaPackage) {
+  Package.call(this, mediaPackage);
 
   // Validate package timecode file name
   if (!this.publishConf.timecodeFileName || (typeof this.publishConf.timecodeFileName !== 'string'))
@@ -384,7 +384,7 @@ TarPackage.prototype.extractPackage = function() {
   // Copy destination
   var packagePath = path.join(extractDirectory, this.mediaPackage.id + '.tar');
 
-  this.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
+  process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
   openVeoAPI.fileSystem.extract(packagePath, extractDirectory, function(error) {
 
     // Extraction failed
@@ -409,7 +409,7 @@ TarPackage.prototype.extractPackage = function() {
  */
 TarPackage.prototype.validatePackage = function() {
   var self = this;
-  this.logger.debug('Validate package ' + this.mediaPackage.originalPackagePath);
+  process.logger.debug('Validate package ' + this.mediaPackage.originalPackagePath);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.VALIDATING_STATE);
 
   // Validate package content
@@ -440,7 +440,7 @@ TarPackage.prototype.saveTimecodes = function() {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
-  this.logger.debug('Save timecodes to ' + videoFinalDir);
+  process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
 
   saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,

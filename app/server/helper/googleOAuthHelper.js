@@ -11,8 +11,6 @@ var publishConf = require(path.join(configDir, 'publish/videoPlatformConf.json')
 var config = publishConf.youtube.googleOAuth;
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
-var logger = require('winston').loggers.get('publish');
-
 /**
  * Construct a new helper for google OAuth association and requests
  *
@@ -54,9 +52,9 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
       } else {
         var cb = function(err, data) {
           if (err) {
-            logger.error('Error while saving configuration data', err);
+            process.logger.error('Error while saving configuration data', err);
           } else {
-            logger.debug('Configuration data has been saved : ', data);
+            process.logger.debug('Configuration data has been saved : ', data);
           }
           if (callback) {
             callback(null, data);
@@ -81,14 +79,14 @@ GoogleOAuthHelper.prototype.fetchToken = function(callback) {
   this.confModel.get(function(error, result) {
 
     if (error || !result || result.length < 1) {
-      logger.error('Error while retrieving configuration data', error);
+      process.logger.error('Error while retrieving configuration data', error);
       callback(error);
       return;
     } else {
       var conf = result[0];
-      logger.debug('Configuration id retrieved', result && conf && conf.id);
+      process.logger.debug('Configuration id retrieved', result && conf && conf.id);
       var tokens = conf && conf.hasOwnProperty('googleOAuthTokens') ? conf.googleOAuthTokens : null;
-      logger.debug('Token retrieved from DB', tokens);
+      process.logger.debug('Token retrieved from DB', tokens);
       callback(null, tokens);
     }
   });
@@ -126,11 +124,11 @@ GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
   var self = this;
   self.oauth2Client.getToken(code, function(err, tokens, response) {
     if (err) {
-      logger.error('Error while trying to retrieve access token', err);
-      logger.error(response.body);
+      process.logger.error('Error while trying to retrieve access token', err);
+      process.logger.error(response.body);
       callback(err, null);
     } else if (tokens && Object.keys(tokens).length > 0) {
-      logger.debug('Token as been retrieved sucessfully', tokens);
+      process.logger.debug('Token as been retrieved sucessfully', tokens);
       self.saveToken(tokens, callback);
     } else if (callback) {
       callback(null, null);
@@ -160,27 +158,27 @@ GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
   var self = this;
   this.fetchToken(function(err, tokens) {
     if (err) {
-      logger.error('Error while retrieving the token', err);
+      process.logger.error('Error while retrieving the token', err);
       callback(err, null);
     } else if (!tokens || Object.keys(tokens).length <= 0) {
       callback(new Error('No token was previously set'), null);
     } else {
       var tokenHasExpired = tokens.expiry_date ? tokens.expiry_date <= (new Date()).getTime() : false;
       if (!tokenHasExpired) {
-        logger.debug('Token found and up to date');
+        process.logger.debug('Token found and up to date');
         callback(null, tokens);
       } else {
-        logger.debug('Token found but has expired, querying for a new one');
+        process.logger.debug('Token found but has expired, querying for a new one');
 
         // hint : the tokens object also contains our refresh token
         self.oauth2Client.setCredentials(tokens);
         self.oauth2Client.refreshAccessToken(function(err, freshTokens) {
           if (err) {
-            logger.error('Error while trying to refresh the access token', err);
+            process.logger.error('Error while trying to refresh the access token', err);
             callback(err, freshTokens);
             return;
           }
-          logger.debug('Token as been retrieved sucessfully', freshTokens);
+          process.logger.debug('Token as been retrieved sucessfully', freshTokens);
           self.saveToken(freshTokens, callback);
         });
       }
