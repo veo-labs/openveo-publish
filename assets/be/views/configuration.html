@@ -1,5 +1,18 @@
-<h2>{{CONFIGURATION.TITLE | translate}}</h2>
-<div>
-    <a ng-if="!viewModel.oAuthInfos.hasToken" href="{{viewModel.oAuthInfos.authUrl}}">Associate to google</a>
-    <p ng-if="viewModel.oAuthInfos.hasToken">Correctly associated to google<br /><a href="{{viewModel.oAuthInfos.authUrl}}">Edit the association</a></p>
+<div class="pu-config">
+<h2 ng-bind="'CONFIGURATION.TITLE' | translate"></h2>
+<div class="well well-lg" ng-bind="'CONFIGURATION.INFO' | translate"></div>
+<div class="row">
+  <div class="col-sd-12 col-md-4">
+    <div class="panel panel-default">
+      <div uib-popover="{{'CONFIGURATION.YOUTUBE_INFO' | translate}}" popover-trigger="mouseenter" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'CONFIGURATION.YOUTUBE_TITLE' | translate"></div>
+      <div class="panel-body">
+        <a ng-if="!viewModel.oAuthInfos.hasToken" href="{{viewModel.oAuthInfos.authUrl}}" ng-bind="'CONFIGURATION.YOUTUBE_PEER' | translate"></a>
+        <p ng-if="viewModel.oAuthInfos.hasToken">
+          {{ 'CONFIGURATION.YOUTUBE_PEER_STATUS' | translate}}
+          <br>
+          <a href="{{viewModel.oAuthInfos.authUrl}}" ng-bind="'CONFIGURATION.YOUTUBE_MODIFY_PEER' | translate"></a>
+        </p>
+      </div>
+    </div>
+  </div>
 </div>

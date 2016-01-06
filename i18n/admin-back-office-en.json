@@ -143,6 +143,12 @@
   },
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",
-    "TITLE" : "Configuration"
+    "TITLE" : "Publish - Configuration",
+    "INFO" : "Defining configuration options for Publish are needed to use some features like publishing on Youtube",
+    "YOUTUBE_INFO": "Publish need to be connected to a Google Account that allow to connect to Youtube API.",
+    "YOUTUBE_PEER": "Associate to Google",
+    "YOUTUBE_PEER_STATUS": "Correctly associated to Google.",
+    "YOUTUBE_TITLE": "Youtube",
+    "YOUTUBE_MODIFY_PEER": "Edit the association"
   }
 }
