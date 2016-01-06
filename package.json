@@ -70,7 +70,7 @@
   },
   "scripts": {
     "prepublish": "grunt prod",
-    "preuninstall": "node update.js backup",
+    "preuninstall": "node backup.js backup",
     "postinstall": "bower install && node install.js && node backup.js restore",
     "eslint": "grunt eslint",
     "mocha": "grunt mochaTest",
