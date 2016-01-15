@@ -28,7 +28,7 @@ module.exports.getOAuthInformationsAction = function(request, response) {
       response.send({authInfos: infos});
     });
   } else {
-    logger.debug('Youtube Oauth information are missing');
+    process.logger.debug('Youtube Oauth information are missing');
     response.send({authInfos: {error: 1}});
   }
 };
