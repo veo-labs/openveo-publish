@@ -169,16 +169,18 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/configuration', {
       templateUrl: '/publish/be/views/configuration.html',
       title: 'CONFIGURATION.PAGE_TITLE',
-      access: 'access-categories-page',
+      access: 'access-conf-page',
       controller: (function() {
 
         /**
          * Init controller with oAuth information
          */
-        function ctrl(oAuthInfos) {
+        function ctrl(oAuthInfos, $scope) {
           this.oAuthInfos = oAuthInfos.data.authInfos;
+          $scope.rights = {};
+          $scope.rights.edit = $scope.checkAccess('manage-publish-config');
         }
-        ctrl.$inject = ['oAuthInfos'];
+        ctrl.$inject = ['oAuthInfos', '$scope'];
         return ctrl;
       })(),
       controllerAs: 'viewModel',

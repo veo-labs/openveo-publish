@@ -61,13 +61,24 @@
       "name" : "PERMISSIONS.MANAGE_WATCHER_NAME",
       "description" : "PERMISSIONS.MANAGE_WATCHER_DESCRIPTION",
       "paths" : [
-        "get /stopWatcher*",
-        "get /startWatcher*"
+        "get /publish/stopWatcher*",
+        "get /publish/startWatcher*"
       ]
     },
     {
       "id" : "access-conf-page",
-      "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE"
+      "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE",
+      "paths" : [
+        "get /publish/configuration/oAuthInformations"
+      ]
+    },
+    {
+      "id" : "manage-publish-config",
+      "name" : "PERMISSIONS.MANAGE_PUBLISH_CONF_NAME",
+      "description" : "PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION",
+      "paths" : [
+        "get /publish/configuration/googleOAuthAssosiation"
+      ]
     },
     {
       "label": "PERMISSIONS.GROUP_VIDEO",
@@ -77,8 +88,8 @@
           "name" : "PERMISSIONS.PUBLISH_VIDEO_NAME",
           "description" : "PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION",
           "paths" : [
-            "get /publishVideo*",
-            "get /unpublishVideo*"
+            "get /publish/publishVideo*",
+            "get /publish/unpublishVideo*"
           ]
         },
         {
