@@ -77,8 +77,8 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/startUpload/1/vimeo').respond(200);
-      $httpBackend.expectGET('/be/publish/startUpload/1/vimeo');
+      $httpBackend.when('POST', '/be/publish/startUpload/1/vimeo').respond(200);
+      $httpBackend.expectPOST('/be/publish/startUpload/1/vimeo');
 
       scope.tableContainer.actions[7].callback(scope.test.rows[0], done);
 
@@ -94,10 +94,10 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/publishVideo/1').respond(200, {
+      $httpBackend.when('POST', '/be/publish/publishVideo/1').respond(200, {
         state: 12
       });
-      $httpBackend.expectGET('/be/publish/publishVideo/1');
+      $httpBackend.expectPOST('/be/publish/publishVideo/1');
 
       scope.tableContainer.actions[2].callback(scope.test.rows[0], done);
 
@@ -107,8 +107,8 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/publishVideo/1,2').respond(200);
-      $httpBackend.expectGET('/be/publish/publishVideo/1,2');
+      $httpBackend.when('POST', '/be/publish/publishVideo/1,2').respond(200);
+      $httpBackend.expectPOST('/be/publish/publishVideo/1,2');
 
       scope.tableContainer.actions[2].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
@@ -124,10 +124,10 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/unpublishVideo/1').respond(200, {
+      $httpBackend.when('POST', '/be/publish/unpublishVideo/1').respond(200, {
         state: 12
       });
-      $httpBackend.expectGET('/be/publish/unpublishVideo/1');
+      $httpBackend.expectPOST('/be/publish/unpublishVideo/1');
 
       scope.tableContainer.actions[3].callback(scope.test.rows[0], done);
 
@@ -137,8 +137,8 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/unpublishVideo/1,2').respond(200);
-      $httpBackend.expectGET('/be/publish/unpublishVideo/1,2');
+      $httpBackend.when('POST', '/be/publish/unpublishVideo/1,2').respond(200);
+      $httpBackend.expectPOST('/be/publish/unpublishVideo/1,2');
 
       scope.tableContainer.actions[3].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
@@ -154,8 +154,8 @@ describe('MediaController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('GET', '/be/publish/retryVideo/1').respond(200);
-      $httpBackend.expectGET('/be/publish/retryVideo/1');
+      $httpBackend.when('POST', '/be/publish/retryVideo/1').respond(200);
+      $httpBackend.expectPOST('/be/publish/retryVideo/1');
 
       scope.tableContainer.actions[5].callback(scope.test.rows[0], done);
 

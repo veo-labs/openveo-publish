@@ -28,7 +28,7 @@
      */
     function retryMedia(id) {
       entityService.deleteCache('video');
-      return $http.get(basePath + 'publish/retryVideo/' + id);
+      return $http.post(basePath + 'publish/retryVideo/' + id);
     }
 
     /**
@@ -40,7 +40,7 @@
      */
     function publishMedia(id) {
       entityService.deleteCache('video');
-      return $http.get(basePath + 'publish/publishVideo/' + id);
+      return $http.post(basePath + 'publish/publishVideo/' + id);
     }
 
     /**
@@ -52,7 +52,7 @@
      */
     function unpublishMedia(id) {
       entityService.deleteCache('video');
-      return $http.get(basePath + 'publish/unpublishVideo/' + id);
+      return $http.post(basePath + 'publish/unpublishVideo/' + id);
     }
 
     /**
@@ -72,7 +72,7 @@
      * @method startWatcher
      */
     function startWatcher() {
-      return $http.get(basePath + 'publish/startWatcher');
+      return $http.post(basePath + 'publish/startWatcher');
     }
 
     /**
@@ -82,7 +82,7 @@
      * @method stopWatcher
      */
     function stopWatcher() {
-      return $http.get(basePath + 'publish/stopWatcher');
+      return $http.post(basePath + 'publish/stopWatcher');
     }
 
     /**
@@ -156,7 +156,7 @@
      */
     function startMediaUpload(id, platform) {
       entityService.deleteCache('media');
-      return $http.get(basePath + 'publish/startUpload/' + id + '/' + platform);
+      return $http.post(basePath + 'publish/startUpload/' + id + '/' + platform);
     }
 
     /**

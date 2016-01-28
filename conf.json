@@ -6,15 +6,15 @@
     },
     "private" : {
       "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
-      "get /stopWatcher" : "app/server/controllers/watcherController.stopAction",
-      "get /startWatcher" : "app/server/controllers/watcherController.startAction",
-      "get /retryVideo/:ids" : "app/server/controllers/watcherController.retryVideoAction",
-      "get /startUpload/:ids/:platform" : "app/server/controllers/watcherController.startUploadAction",
-      "get /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
-      "get /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
+      "post /stopWatcher" : "app/server/controllers/watcherController.stopAction",
+      "post /startWatcher" : "app/server/controllers/watcherController.startAction",
+      "post /retryVideo/:ids" : "app/server/controllers/watcherController.retryVideoAction",
+      "post /startUpload/:ids/:platform" : "app/server/controllers/watcherController.startUploadAction",
+      "post /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
+      "post /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
       "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction",
       "get /configuration/oAuthInformations" : "app/server/controllers/configurationController.getOAuthInformationsAction",
-      "get /configuration/googleOAuthAssosiation" : "app/server/controllers/configurationController.handleGoogleOAuthCodeAction"
+      "post /configuration/googleOAuthAssociation" : "app/server/controllers/configurationController.handleGoogleOAuthCodeAction"
     },
     "ws": {
       "get /video/:id" : "app/server/controllers/videoController.getVideoAction",

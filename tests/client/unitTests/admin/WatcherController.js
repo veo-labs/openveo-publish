@@ -48,10 +48,10 @@ describe('WatcherController', function() {
   describe('startWatcher', function() {
 
     it('Should be able to ask the server to start the watcher', function() {
-      $httpBackend.when('GET', '/be/publish/startWatcher').respond(200, {
+      $httpBackend.when('POST', '/be/publish/startWatcher').respond(200, {
         status: 1
       });
-      $httpBackend.expectGET('/be/publish/startWatcher');
+      $httpBackend.expectPOST('/be/publish/startWatcher');
       scope.watcherStatus = 0;
       scope.startWatcher();
       $httpBackend.flush();
@@ -59,10 +59,10 @@ describe('WatcherController', function() {
     });
 
     it('Should be able to ask the server to stop the watcher', function() {
-      $httpBackend.when('GET', '/be/publish/stopWatcher').respond(200, {
+      $httpBackend.when('POST', '/be/publish/stopWatcher').respond(200, {
         status: 3
       });
-      $httpBackend.expectGET('/be/publish/stopWatcher');
+      $httpBackend.expectPOST('/be/publish/stopWatcher');
       scope.watcherStatus = 1;
       scope.stopWatcher();
       $httpBackend.flush();

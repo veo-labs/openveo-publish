@@ -34,25 +34,25 @@ describe('PublishService', function() {
   });
 
   it('Should be able to ask server to start watcher', function() {
-    $httpBackend.expectGET('/be/publish/startWatcher');
+    $httpBackend.expectPOST('/be/publish/startWatcher');
     publishService.startWatcher();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to stop watcher', function() {
-    $httpBackend.expectGET('/be/publish/stopWatcher');
+    $httpBackend.expectPOST('/be/publish/stopWatcher');
     publishService.stopWatcher();
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to publish a media', function() {
-    $httpBackend.expectGET('/be/publish/publishVideo/5');
+    $httpBackend.expectPOST('/be/publish/publishVideo/5');
     publishService.publishMedia(5);
     $httpBackend.flush();
   });
 
   it('Should be able to ask server to unpublish a media', function() {
-    $httpBackend.expectGET('/be/publish/unpublishVideo/5');
+    $httpBackend.expectPOST('/be/publish/unpublishVideo/5');
     publishService.unpublishMedia(5);
     $httpBackend.flush();
   });
