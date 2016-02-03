@@ -61,6 +61,9 @@ VideoPlatformProvider.getProvider = function(type, providerConf) {
       case 'youtube':
         var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
         return new YoutubeProvider(providerConf);
+      case 'wowza':
+        var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
+        return new WowzaProvider(providerConf);
 
       default:
         throw new Error('Unknown video plateform type');
