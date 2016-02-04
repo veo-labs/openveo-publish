@@ -43,9 +43,27 @@ function createVideoTmpDir(callback) {
  */
 function createHotFolder(callback) {
   var conf = require(path.join(confDir, 'watcherConf.json'));
+  var parallelFunctions = [];
 
+  // Add closure to create a hot folder
+  function createFunction(hotFolderPath) {
+    return function(callback) {
+      openVeoAPI.fileSystem.mkdir(hotFolderPath, callback);
+    };
+  }
+
+  // Create a function for each hot folder
   for (var i = 0; i < conf.hotFolders.length; i++)
-    openVeoAPI.fileSystem.mkdir(conf.hotFolders[i].path, callback);
+    parallelFunctions.push(createFunction(conf.hotFolders[i].path));
+
+  // Create hot folders
+  async.parallel(parallelFunctions, function(error, results) {
+    if (error)
+      throw error;
+    else
+      callback();
+  });
+
 }
 
 /**
@@ -104,17 +122,8 @@ function createLoggerConf(callback) {
  */
 function createVideoPlatformConf(callback) {
   var confFile = path.join(confDir, 'videoPlatformConf.json');
-  var conf = {
-    vimeo: {},
-    youtube: {
-      uploadMethod: 'uploadResumable',
-      googleOAuth: {
-        clientId: '',
-        clientSecret: '',
-        redirectUrl: 'http://localhost:3000/be/publish/configuration/googleOAuthAssosiation'
-      }
-    }
-  };
+  var vimeoConf;
+  var youtubeConf;
 
   async.series([
     function(callback) {
@@ -126,39 +135,70 @@ function createVideoPlatformConf(callback) {
       });
     },
     function(callback) {
+      rl.question('Do you want to configure a Vimeo account ? (y/N) :\n', function(answer) {
+        if (answer === 'y') vimeoConf = {};
+        callback(null);
+      });
+    },
+    function(callback) {
+      if (!vimeoConf) return callback();
       rl.question('Enter Vimeo Web Service client id (available in your Vimeo account) :\n', function(answer) {
-        conf.vimeo.clientId = answer;
+        vimeoConf.clientId = answer;
         callback();
       });
     },
     function(callback) {
+      if (!vimeoConf) return callback();
       rl.question('Enter Vimeo Web Service client secret (available in your Vimeo account) :\n', function(answer) {
-        conf.vimeo.clientSecret = answer;
+        vimeoConf.clientSecret = answer;
         callback();
       });
     },
     function(callback) {
+      if (!vimeoConf) return callback();
       rl.question('Enter Vimeo Web Service access token (available in your Vimeo account) :\n', function(answer) {
-        conf.vimeo.accessToken = answer;
+        vimeoConf.accessToken = answer;
         callback();
       });
     },
     function(callback) {
-      rl.question('Enter Youtube API client Id (available in your Google Developper Console ) :\n', function(answer) {
-        conf.youtube.googleOAuth.clientId = answer;
+      rl.question('Do you want to configure a Youtube account ? (y/N) :\n', function(answer) {
+        if (answer === 'y') {
+          youtubeConf = {
+            uploadMethod: 'uploadResumable',
+            googleOAuth: {}
+          };
+        }
         callback();
       });
     },
     function(callback) {
-      rl.question('Enter Youtube API client secret (available in your Google Developper Console )  :\n',
+      if (!youtubeConf) return callback();
+      rl.question('Enter Youtube API client id (available in your Google Developper Console) :\n', function(answer) {
+        youtubeConf.googleOAuth.clientId = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!youtubeConf) return callback();
+      rl.question('Enter Youtube API client secret (available in your Google Developper Console) :\n',
       function(answer) {
-        conf.youtube.googleOAuth.clientSecret = answer;
+        youtubeConf.googleOAuth.clientSecret = answer;
         callback();
       });
     },
     function(callback) {
+      if (!youtubeConf) return callback();
+      rl.question('Enter Youtube redirect url (available in your Google Developper Console) :\n',
+      function(answer) {
+        youtubeConf.googleOAuth.redirectUrl = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!youtubeConf) return callback();
       rl.question('Do you want to overwrite Youtube resumable upload by classic upload (y/N) :\n', function(answer) {
-        if (answer === 'y') conf.youtube.uploadMethod = 'uploadClassic';
+        if (answer === 'y') youtubeConf.uploadMethod = 'uploadClassic';
         callback();
       });
     }
@@ -167,8 +207,12 @@ function createVideoPlatformConf(callback) {
       process.stdout.write(error.message);
       callback();
     }
-    else
+    else {
+      var conf = {};
+      if (vimeoConf) conf.vimeo = vimeoConf;
+      if (youtubeConf) conf.youtube = youtubeConf;
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
+    }
   });
 }
 
@@ -176,6 +220,7 @@ function createVideoPlatformConf(callback) {
  * Creates watcher configuration file if it does not exist.
  */
 function createWatcherConf(callback) {
+  var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
   var confFile = path.join(confDir, 'watcherConf.json');
   var conf = {hotFolders: []};
 
@@ -189,6 +234,7 @@ function createWatcherConf(callback) {
       });
     },
     function(callback) {
+      if (!videoPlatformConf.vimeo) return callback();
       var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'vimeo');
       rl.question('Enter Vimeo hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
@@ -199,6 +245,7 @@ function createWatcherConf(callback) {
       });
     },
     function(callback) {
+      if (!videoPlatformConf.youtube) return callback();
       var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'youtube');
       rl.question('Enter Youtube hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
