@@ -6,6 +6,7 @@
 
 // Module dependencies
 var util = require('util');
+var shortid = require('shortid');
 var openVeoAPI = require('@openveo/api');
 var async = require('async');
 
@@ -51,7 +52,7 @@ PropertyModel.prototype.add = function(data, callback) {
   }
 
   var property = {
-    id: Date.now().toString(),
+    id: shortid.generate(),
     name: data.name,
     description: data.description,
     type: data.type

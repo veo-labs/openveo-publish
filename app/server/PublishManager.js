@@ -34,6 +34,7 @@
 var util = require('util');
 var events = require('events');
 var path = require('path');
+var shortid = require('shortid');
 var openVeoAPI = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
@@ -228,7 +229,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
   if (mediaPackage && (typeof mediaPackage === 'object')) {
 
     // Generate a package id
-    mediaPackage.id = Date.now();
+    mediaPackage.id = shortid.generate();
 
     // Defines transitions to perform depending on package extension
     mediaPackage.packageType = path.extname(mediaPackage.originalPackagePath).slice(1);
