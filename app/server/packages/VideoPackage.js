@@ -133,7 +133,7 @@ VideoPackage.prototype.preparePublicDirectory = function() {
 
   process.logger.debug('Prepare package public directory ' + publicDirectory);
 
-  openVeoAPI.fileSystem.mkdir(path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id),
+  openVeoAPI.fileSystem.mkdir(publicDirectory,
     function(error) {
       if (error && error.code !== 'EEXIST')
         self.setError(new VideoPackageError(error.message, errors.CREATE_VIDEO_PUBLIC_DIR_ERROR));
