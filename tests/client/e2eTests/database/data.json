@@ -1,0 +1,178 @@
+{
+  "roles": {
+    "publishGuest": {
+      "name": "publish-guest",
+      "permissions": []
+    },
+    "publishPropertiesNoWrite": {
+      "name": "publish-properties-no-write",
+      "permissions": [
+        "access-properties-page",
+        "update-property",
+        "delete-property"
+      ]
+    },
+    "publishPropertiesNoUpdate": {
+      "name": "publish-properties-no-update",
+      "permissions": [
+        "access-properties-page",
+        "create-property",
+        "delete-property"
+      ]
+    },
+    "publishPropertiesNoDelete": {
+      "name": "publish-properties-no-delete",
+      "permissions": [
+        "access-properties-page",
+        "create-property",
+        "update-property"
+      ]
+    },
+    "publishWatcherNoManage": {
+      "name": "publish-watcher-no-manage",
+      "permissions": [
+        "access-watcher-page"
+      ]
+    },
+    "publishCategoriesNoWrite": {
+      "name": "publish-categories-no-write",
+      "permissions": [
+        "access-categories-page",
+        "update-taxonomy",
+        "delete-taxonomy"
+      ]
+    },
+    "publishCategoriesNoUpdate": {
+      "name": "publish-categories-no-update",
+      "permissions": [
+        "access-categories-page",
+        "create-taxonomy",
+        "delete-taxonomy"
+      ]
+    },
+    "publishCategoriesNoDelete": {
+      "name": "publish-categories-no-delete",
+      "permissions": [
+        "access-categories-page",
+        "create-taxonomy",
+        "update-taxonomy"
+      ]
+    },
+    "publishCategoriesNoManage": {
+      "name": "publish-categories-no-manage",
+      "permissions": [
+        "access-categories-page"
+      ]
+    },
+    "publishMediasNoWrite": {
+      "name": "publish-medias-no-write",
+      "permissions": [
+        "access-videos-page",
+        "update-video",
+        "delete-video"
+      ]
+    },
+    "publishMediasNoUpdate": {
+      "name": "publish-medias-no-update",
+      "permissions": [
+        "access-videos-page",
+        "create-video",
+        "delete-video"
+      ]
+    },
+    "publishMediasNoDelete": {
+      "name": "publish-medias-no-delete",
+      "permissions": [
+        "access-videos-page",
+        "create-video",
+        "update-video"
+      ]
+    },
+    "publishChaptersEdit": {
+      "name": "publish-chapters-edit",
+      "permissions": [
+        "chapter-video"
+      ]
+    }
+  },
+  "users": {
+    "publishGuest": {
+      "name": "publish-guest",
+      "email": "publish-guest@veo-labs.com",
+      "password": "publish-guest",
+      "roles": [ "publishGuest" ]
+    },
+    "publishPropertiesNoWrite": {
+      "name": "publish-properties-no-write",
+      "email": "publish-properties-no-write@veo-labs.com",
+      "password": "publish-properties-no-write",
+      "roles": [ "publishPropertiesNoWrite" ]
+    },
+    "publishPropertiesNoUpdate": {
+      "name": "publish-properties-no-update",
+      "email": "publish-properties-no-update@veo-labs.com",
+      "password": "publish-properties-no-update",
+      "roles": [ "publishPropertiesNoUpdate" ]
+    },
+    "publishPropertiesNoDelete": {
+      "name": "publish-properties-no-delete",
+      "email": "publish-properties-no-delete@veo-labs.com",
+      "password": "publish-properties-no-delete",
+      "roles": [ "publishPropertiesNoDelete" ]
+    },
+    "publishWatcherNoManage": {
+      "name": "publish-watcher-no-manage",
+      "email": "publish-watcher-no-manage@veo-labs.com",
+      "password": "publish-watcher-no-manage",
+      "roles": [ "publishWatcherNoManage" ]
+    },
+    "publishCategoriesNoWrite": {
+      "name": "publish-categories-no-write",
+      "email": "publish-categories-no-write@veo-labs.com",
+      "password": "publish-categories-no-write",
+      "roles": [ "publishCategoriesNoWrite" ]
+    },
+    "publishCategoriesNoUpdate": {
+      "name": "publish-categories-no-update",
+      "email": "publish-categories-no-update@veo-labs.com",
+      "password": "publish-categories-no-update",
+      "roles": [ "publishCategoriesNoUpdate" ]
+    },
+    "publishCategoriesNoDelete": {
+      "name": "publish-categories-no-delete",
+      "email": "publish-categories-no-delete@veo-labs.com",
+      "password": "publish-categories-no-delete",
+      "roles": [ "publishCategoriesNoDelete" ]
+    },
+    "publishCategoriesNoManage": {
+      "name": "publish-categories-no-manage",
+      "email": "publish-categories-no-manage@veo-labs.com",
+      "password": "publish-categories-no-manage",
+      "roles": [ "publishCategoriesNoManage" ]
+    },
+    "publishMediasNoWrite": {
+      "name": "publish-medias-no-write",
+      "email": "publish-medias-no-write@veo-labs.com",
+      "password": "publish-medias-no-write",
+      "roles": [ "publishMediasNoWrite" ]
+    },
+    "publishMediasNoUpdate": {
+      "name": "publish-medias-no-update",
+      "email": "publish-medias-no-update@veo-labs.com",
+      "password": "publish-medias-no-update",
+      "roles": [ "publishMediasNoUpdate" ]
+    },
+    "publishMediasNoDelete": {
+      "name": "publish-medias-no-delete",
+      "email": "publish-medias-no-delete@veo-labs.com",
+      "password": "publish-medias-no-delete",
+      "roles": [ "publishMediasNoDelete" ]
+    },
+    "publishChaptersEdit": {
+      "name": "publish-chapters-edit",
+      "email": "publish-chapters-edit@veo-labs.com",
+      "password": "publish-chapters-edit",
+      "roles": [ "publishChaptersEdit" ]
+    }
+  }
+}

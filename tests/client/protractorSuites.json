@@ -1,0 +1,8 @@
+{
+  "propertyPage": "e2eTests/propertyPage*.js",
+  "watcherPage": "e2eTests/watcherPage*.js",
+  "categoryPage": "e2eTests/categoryPage*.js",
+  "mediaPage": "e2eTests/mediaPage*.js",
+  "chapterPage": "e2eTests/chapterPage*.js",
+  "publish" : "e2eTests/*.js"
+}
