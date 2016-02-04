@@ -155,17 +155,25 @@ function removeDirectories(directories, callback) {
 VideoModel.prototype.add = function(videoPackage, callback) {
   var data = {
     id: String(videoPackage.id),
+    available: videoPackage.available,
+    title: videoPackage.title,
+    description: videoPackage.description,
     state: videoPackage.state,
     date: videoPackage.date,
     metadata: videoPackage.metadata,
     type: videoPackage.type,
     errorCode: videoPackage.errorCode,
     category: videoPackage.category,
-    properties: videoPackage.properties,
+    properties: videoPackage.properties || [],
     packageType: videoPackage.packageType,
     lastState: videoPackage.lastState,
     lastTransition: videoPackage.lastTransition,
-    originalPackagePath: videoPackage.originalPackagePath
+    originalPackagePath: videoPackage.originalPackagePath,
+    mediaId: videoPackage.mediaId,
+    timecodes: videoPackage.timecodes,
+    chapters: videoPackage.chapters || [],
+    cut: videoPackage.cut || [],
+    files: videoPackage.files || []
   };
 
   this.provider.add(data, function(error) {
