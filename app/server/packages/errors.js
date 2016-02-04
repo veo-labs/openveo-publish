@@ -2,6 +2,7 @@
 
 // The list of package publication errors.
 module.exports = {
+  NO_ERROR: -1,
   PACKAGE_NOT_DEFINED_ERROR: 0,
   INVALID_PACKAGE_TYPE_ERROR: 1,
   COPY_ERROR: 2,
