@@ -277,10 +277,11 @@ angular.module('ov.multirange.lite', [])
         onEnablemouseover: '='
       },
       template:
-        '<div class="ov-multirange-container" ng-mousemove="onMouseMove($event)">' +
+        '<div class="ov-multirange-container" ng-mousemove="onMouseMove($event, onEnablemouseover)">' +
         '<div class="ov-multirange-track"></div>' +
         '<div class="ov-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ' +
-        'ng-mouseup="mouserelease(onMouserelease)"  ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
+        'ng-mouseup="mouserelease(onMouserelease, range)" ' +
+        'ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
         '<ov-range class="ov-multirange" ng-class="{\'active\':range.select}" position="range.value" min="0" ' +
         'max="{{ precision }}" step="{{ preciseStep }}">' +
         '</div>' +
@@ -289,12 +290,14 @@ angular.module('ov.multirange.lite', [])
         var mousex;
         scope.precision = 1000000;
         scope.preciseStep = 1;
-        scope.onMouseMove = function(evt) {
-          var bound = elem[0].getBoundingClientRect();
-          mousex = (evt.pageX - bound.left) / bound.width;
+        scope.onMouseMove = function(evt, condition) {
+          if (condition) {
+            var bound = elem[0].getBoundingClientRect();
+            mousex = (evt.pageX - bound.left) / bound.width;
+          }
         };
-        scope.mouserelease = function(release) {
-          release();
+        scope.mouserelease = function(release, range) {
+          release(range);
         };
         scope.mouseover = function(range, select, condition) {
           if (!range.select && condition)

@@ -248,14 +248,21 @@
       $scope.slider.view = indexView;
     };
 
-    $scope.releaseRange = function() {
-      playerController.setTime(parseInt($scope.selectRow.value * $scope.duration) * 1000);
+    $scope.releaseRange = function(range) {
+      var value;
+      if (!range.select) {
+        value = range.value;
+      } else {
+        value = $scope.selectRow.value;
+      }
+      playerController.setTime(parseInt(value * $scope.duration) * 1000);
 
       // we only save the chnage if the time of the selected row has changed
-      if ($scope.selectRow.value !== $scope.selectRowInitialValue) {
+      if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
         $scope.saveChapter();
-        $scope.selectRowInitialValue = $scope.selectRow.value;
       }
+      if (range.select)
+        $scope.selectRowInitialValue = range.value;
     };
 
     /*
