@@ -51,7 +51,8 @@
         </div>
         <div class="form-group">
           <label for="title">{{ 'CHAPTER.FORM_TITLE' | translate}}*</label>
-          <input type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
+          <div ng-hide="!modelToEdit.type" class="well well-sm">{{modelToEdit.name | translate}}</div>
+          <input ng-show="!modelToEdit.type" type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
         </div>
       </div>
       <div class="col-sm-5" >

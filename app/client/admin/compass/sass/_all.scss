@@ -57,7 +57,7 @@
       height: 358px;
       max-height: 358px;
       overflow-y: auto;
-      display: inline-block;
+      display: block;
       width: 100%;
       @include mobile(){
         height:auto;
