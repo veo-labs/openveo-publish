@@ -45,7 +45,12 @@ function createHotFolder(callback) {
   var conf = require(path.join(confDir, 'watcherConf.json'));
   var parallelFunctions = [];
 
-  // Add closure to create a hot folder
+  /**
+   * Adds closure to create a hot folder.
+   *
+   * @param {String} hotFolderPath The path to the hot folder to create
+   * @return {Function} A function to call with async
+   */
   function createFunction(hotFolderPath) {
     return function(callback) {
       openVeoAPI.fileSystem.mkdir(hotFolderPath, callback);
@@ -202,12 +207,12 @@ function createVideoPlatformConf(callback) {
         callback();
       });
     }
-  ], function(error, results) {
+  ],
+  function(error, results) {
     if (error) {
       process.stdout.write(error.message);
       callback();
-    }
-    else {
+    } else {
       var conf = {};
       if (vimeoConf) conf.vimeo = vimeoConf;
       if (youtubeConf) conf.youtube = youtubeConf;

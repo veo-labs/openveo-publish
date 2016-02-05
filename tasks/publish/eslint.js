@@ -5,6 +5,8 @@ module.exports = {
     src: [
       'index.js',
       'Gruntfile.js',
+      'install.js',
+      'backup.js',
       'tasks/**/*.js',
       'tests/**/*.js',
       'app/**/*.js'

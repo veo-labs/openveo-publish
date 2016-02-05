@@ -120,7 +120,7 @@ if (args == 'backup') {
       throw error;
     else {
       process.stdout.write('Backup complete.\n');
-      process.stdout.write('Backup folder : '+updateTmpDir+'\n');
+      process.stdout.write('Backup folder : ' + updateTmpDir + '\n');
       exit();
     }
   });
@@ -137,7 +137,7 @@ if (args == 'backup') {
       throw error;
     else {
       process.stdout.write('Restore complete.\n');
-      process.stdout.write('Restored folder : '+assetsDir+'\n');
+      process.stdout.write('Restored folder : ' + assetsDir + '\n');
       exit();
     }
   });
