@@ -13,8 +13,8 @@
       "post /publishVideo/:id" : "app/server/controllers/videoController.publishVideoAction",
       "post /unpublishVideo/:id" : "app/server/controllers/videoController.unpublishVideoAction",
       "get /getPlatforms" : "app/server/controllers/videoController.getPlatformsAction",
-      "get /configuration/oAuthInformations" : "app/server/controllers/configurationController.getOAuthInformationsAction",
-      "post /configuration/googleOAuthAssociation" : "app/server/controllers/configurationController.handleGoogleOAuthCodeAction"
+      "get /configuration/all" : "app/server/controllers/configurationController.getConfigurationAllAction",
+      "get /configuration/googleOAuthAssociation" : "app/server/controllers/configurationController.handleGoogleOAuthCodeAction"
     },
     "ws": {
       "get /video/:id" : "app/server/controllers/videoController.getVideoAction",
@@ -77,7 +77,7 @@
       "name" : "PERMISSIONS.MANAGE_PUBLISH_CONF_NAME",
       "description" : "PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION",
       "paths" : [
-        "get /publish/configuration/googleOAuthAssosiation"
+        "get /publish/configuration/all"
       ]
     },
     {
@@ -165,6 +165,7 @@
         "/publish/ovPub/PropertiesController.js",
         "/publish/ovPub/CategoriesController.js",
         "/publish/ovPub/ChapterController.js",
+        "/publish/ovPub/ConfigurationController.js",
         "/publish/ovPub/PublishService.js"
       ],
       "prod" : [

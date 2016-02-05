@@ -271,12 +271,13 @@
     }
 
     /**
-     * Retrieve oAuth informations
+     * Retrieves publish plugin configuration.
      *
      * @return {Promise} The HTTP promise
+     * @method getConfiguration
      */
-    function getOAuthInfos() {
-      return $http.get(basePath + 'publish/configuration/oAuthInformations');
+    function getConfiguration() {
+      return $http.get(basePath + 'publish/configuration/all');
     }
 
     return {
@@ -296,7 +297,7 @@
       startWatcher: startWatcher,
       stopWatcher: stopWatcher,
       loadMedia: loadMedia,
-      getOAuthInfos: getOAuthInfos,
+      getConfiguration: getConfiguration,
       cacheClear: cacheClear
     };
 

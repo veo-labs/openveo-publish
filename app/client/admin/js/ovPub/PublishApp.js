@@ -166,27 +166,16 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
+    // Add route /publish/configuration with authentication.
+    // Also retrieve the list of configurations
     $routeProvider.when('/publish/configuration', {
       templateUrl: '/publish/be/views/configuration.html',
+      controller: 'ConfigurationController',
       title: 'CONFIGURATION.PAGE_TITLE',
       access: 'access-conf-page',
-      controller: (function() {
-
-        /**
-         * Init controller with oAuth information
-         */
-        function ctrl(oAuthInfos, $scope) {
-          this.oAuthInfos = oAuthInfos.data.authInfos;
-          $scope.rights = {};
-          $scope.rights.edit = $scope.checkAccess('manage-publish-config');
-        }
-        ctrl.$inject = ['oAuthInfos', '$scope'];
-        return ctrl;
-      })(),
-      controllerAs: 'viewModel',
       resolve: {
-        oAuthInfos: ['publishService', function(publishService) {
-          return publishService.getOAuthInfos();
+        publishConf: ['publishService', function(publishService) {
+          return publishService.getConfiguration();
         }]
       }
     });

@@ -148,9 +148,8 @@
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",
     "TITLE" : "Publish - Configuration",
-    "INFO" : "Defining configuration options for Publish are needed to use some features like publishing on Youtube",
-    "YOUTUBE_CONF_ERROR": "Please verify your video configuration in Publish module.",
-    "YOUTUBE_INFO": "Publish need to be connected to a Google Account that allow to connect to Youtube API.",
+    "INFO" : "Configure OpenVeo publish plugin.",
+    "YOUTUBE_INFO" : "Publish needs to be connected to a Google Account that allow connection to Youtube API.",
     "YOUTUBE_PEER": "Associate to Google",
     "YOUTUBE_PEER_STATUS": "Correctly associated to Google.",
     "YOUTUBE_TITLE": "Youtube",

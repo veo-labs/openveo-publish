@@ -4,42 +4,50 @@
  * @module publish-controllers
  */
 
-// Module dependencies
+var path = require('path');
+var async = require('async');
+var openVeoAPI = require('@openveo/api');
 var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
+var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
+var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
 
 /**
- * Retrieve informations about oAuth authenfifiction :
- *  - the url to authenticate to google
- *  - a boolean to chec kwheter we already have a token or not
- *
- * @param {type} request express request
- * @param {type} response express response
+ * Retrieves publish plugin configurations.
  */
-module.exports.getOAuthInformationsAction = function(request, response) {
+module.exports.getConfigurationAllAction = function(request, response) {
+  var configurations = {};
 
-  var infos = {};
-  if (googleOAuthHelper.oauth2Client) {
-    googleOAuthHelper.hasToken(function(hasToken) {
+  async.series([
 
-      infos.hasToken = hasToken;
-      infos.authUrl = googleOAuthHelper.getAuthUrl(
-              {scope: ['https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload']}
-      );
-      response.send({authInfos: infos});
-    });
-  } else {
-    process.logger.debug('Youtube Oauth information are missing');
-    response.send({authInfos: {error: 1}});
-  }
+    // Get Youtube configuration
+    function(callback) {
+      if (videoPlatformConf['youtube']) {
+        var youtubeConf = configurations['youtube'] = {};
+
+        googleOAuthHelper.hasToken(function(hasToken) {
+          youtubeConf.hasToken = hasToken;
+          youtubeConf.authUrl = googleOAuthHelper.getAuthUrl(
+            {
+              scope: [
+                'https://www.googleapis.com/auth/youtube',
+                'https://www.googleapis.com/auth/youtube.upload'
+              ]
+            }
+          );
+          callback();
+        });
+      } else
+        callback();
+    }
+
+  ], function(error, results) {
+    response.send(configurations);
+  });
 };
 
-
 /**
- * Redirect action that will be called by google when the user associate our application,
- * a code will be in the parameters
- *
- * @param {type} request express request
- * @param {type} response express response
+ * Redirects action that will be called by google when the user associate our application,
+ * a code will be in the parameters.
  */
 module.exports.handleGoogleOAuthCodeAction = function(request, response) {
   var code = request.query.code;
