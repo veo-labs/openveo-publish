@@ -3,12 +3,13 @@
 // Module dependencies
 var readline = require('readline');
 var path = require('path');
+var os = require('os');
 var fs = require('fs');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
 
 var assetsDir = path.join(__dirname, 'assets', 'player', 'videos');
-var updateTmpDir = path.join(__dirname, '..', 'tmp', 'publish', 'videos');
+var backupDir = path.join(os.tmpdir(), 'openveo', 'publish', 'update', 'videos');
 var exit = process.exit;
 
 // Set module root directory
@@ -24,7 +25,7 @@ var rl = readline.createInterface({
 });
 
 /**
- * Verify that asset file exist and continue to backing up
+ * Verifies that assets directory exists and continue to back up.
  */
 function verifyAssetNotEmpty(callback) {
   fs.exists(assetsDir, function(exists) {
@@ -36,35 +37,32 @@ function verifyAssetNotEmpty(callback) {
 }
 
 /**
- * Verify that backup folder is empty to continue backing up
+ * Verifies that backup directory does not exists to continue backing up
  */
 function verifyTmpIsEmpty(callback) {
-  fs.exists(updateTmpDir, function(exists) {
+  fs.exists(backupDir, function(exists) {
     if (exists) {
       rl.question('Backup files already exists. Do you want to abort (Y/n)?\n', function(answer) {
         if (answer != 'n') exit(128);
-        else {
-          openVeoAPI.fileSystem.rmdir(updateTmpDir, callback);
-        }
+        else
+          openVeoAPI.fileSystem.rmdir(backupDir, callback);
       });
     } else callback();
   });
 }
 
 /**
- * Create Tmp if it does not exist and Copy assets files to tmp
+ * Copies assets files to tmp.
  */
-function copyFileToTmp(callback) {
-  openVeoAPI.fileSystem.mkdir(updateTmpDir, function() {
-    fs.rename(assetsDir, updateTmpDir, callback);
-  });
+function copyAssetsToTmp(callback) {
+  openVeoAPI.fileSystem.copy(assetsDir, backupDir, callback);
 }
 
 /**
- * Verify that bakup file exist and continue to restoring
+ * Verifies that backup directory exist and continue to restore.
  */
 function verifyTmpNotEmpty(callback) {
-  fs.exists(updateTmpDir, function(exists) {
+  fs.exists(backupDir, function(exists) {
     if (!exists) {
       process.stdout.write('No files to restore.\n');
       exit();
@@ -73,16 +71,15 @@ function verifyTmpNotEmpty(callback) {
 }
 
 /**
- * Verify that file in asset does not exist to continue restoring
+ * Verifies that assets does not exist to continue restoring.
  */
 function verifyAssetIsEmpty(callback) {
   fs.exists(assetsDir, function(assetsExists) {
     if (assetsExists) {
       rl.question('Restored files already exists. Do you want to abort (Y/n)?\n', function(answer) {
         if (answer != 'n') exit(128);
-        else {
+        else
           openVeoAPI.fileSystem.rmdir(assetsDir, callback);
-        }
       });
     }
     else callback();
@@ -90,19 +87,17 @@ function verifyAssetIsEmpty(callback) {
 }
 
 /**
- * Create assets if it does exist and  Copy Tmp files to assets
+ * Copies assets back from tmp directory.
  */
 function copyTmpToAssets(callback) {
-  openVeoAPI.fileSystem.mkdir(assetsDir, function() {
-    fs.rename(updateTmpDir, assetsDir, callback);
-  });
+  openVeoAPI.fileSystem.copy(backupDir, assetsDir, callback);
 }
 
 /**
- * Remove tmp directory if it does exist.
+ * Removes tmp directory if it exists.
  */
 function removeTmpDir(callback) {
-  openVeoAPI.fileSystem.rmdir(updateTmpDir, callback);
+  openVeoAPI.fileSystem.rmdir(backupDir, callback);
 }
 
 // Get args 'backup' or 'restore', default 'backup'
@@ -114,13 +109,13 @@ if (args == 'backup') {
   async.series([
     verifyAssetNotEmpty,
     verifyTmpIsEmpty,
-    copyFileToTmp
+    copyAssetsToTmp
   ], function(error, results) {
     if (error)
       throw error;
     else {
       process.stdout.write('Backup complete.\n');
-      process.stdout.write('Backup folder : ' + updateTmpDir + '\n');
+      process.stdout.write('Backup folder : ' + backupDir + '\n');
       exit();
     }
   });
@@ -146,5 +141,5 @@ if (args == 'backup') {
   // Bad script launch
   process.stdout.write('Bad arguments for update script.\n');
   exit(128);
-}
 
+}
