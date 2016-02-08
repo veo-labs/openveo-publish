@@ -69,7 +69,7 @@
       "id" : "access-conf-page",
       "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE",
       "paths" : [
-        "get /publish/configuration/oAuthInformations"
+        "get /publish/configuration/all"
       ]
     },
     {
