@@ -199,6 +199,19 @@ ChapterPage.prototype.addChapter = function(data, cancel) {
 };
 
 /**
+ * Gets cut's title.
+ *
+ * @param {Field} field Field corresponding to cut's title
+ * @return {Promise} Promise resolving with the cut's title
+ */
+ChapterPage.prototype.getCutTitle = function(field) {
+  return field.getElement().then(function(fieldElement) {
+    var titleElement = fieldElement.element(by.css('input')).all(by.xpath('preceding-sibling::div')).get(0);
+    return titleElement.getText();
+  });
+};
+
+/**
  * Tests if the given line correspond to the given value.
  *
  * Tests if a value is found in a line's table cells.
@@ -289,11 +302,17 @@ ChapterPage.prototype.getLineFieldValues = function(finder, type) {
   var self = this;
   var fieldValues = {};
 
-  function getFieldValue(field, fieldName) {
+  var getFieldValue = function(field, fieldName) {
     return field.getValue().then(function(text) {
       fieldValues[fieldName] = text;
     });
-  }
+  };
+
+  var getCutTitle = function(field, fieldName) {
+    return self.getCutTitle(field).then(function(text) {
+      fieldValues[fieldName] = text;
+    });
+  };
 
   return this.getLine(finder).then(function(line) {
     var promises = [];
@@ -307,8 +326,16 @@ ChapterPage.prototype.getLineFieldValues = function(finder, type) {
     // Get all field values
     var fields = self.getEditFormFields(self.formElement, type);
 
-    for (var fieldId in fields)
-      promises.push(getFieldValue(fields[fieldId], fieldId));
+    for (var fieldId in fields) {
+
+      // The title of a cut is not contained in the value of the input field
+      // Value is stored in an HTMLDivElement preceding the input field
+      if (fieldId === 'title' && type === 'cut')
+        promises.push(getCutTitle(fields[fieldId], fieldId));
+      else
+        promises.push(getFieldValue(fields[fieldId], fieldId));
+
+    }
 
     return protractor.promise.all(promises);
   }).then(function() {

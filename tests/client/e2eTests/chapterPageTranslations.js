@@ -92,7 +92,7 @@ describe('Chapter page translations', function() {
         browserExt.click(page.editButtonElement);
         assert.eventually.equal(cutTimeField.getLabel(), page.translations.CHAPTER.FORM_TIME);
         assert.eventually.equal(cutTitleField.getLabel(), page.translations.CHAPTER.FORM_TITLE);
-        assert.eventually.equal(cutTitleField.getValue(), page.translations.UI.BEGIN);
+        assert.eventually.equal(page.getCutTitle(cutTitleField), page.translations.UI.BEGIN);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.UI.FORM_SAVE);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.UI.FORM_CANCEL);
         page.setMouseOverCutButton(true);
@@ -117,7 +117,7 @@ describe('Chapter page translations', function() {
         browserExt.click(page.editButtonElement);
         assert.eventually.equal(cutTimeField.getLabel(), page.translations.CHAPTER.FORM_TIME);
         assert.eventually.equal(cutTitleField.getLabel(), page.translations.CHAPTER.FORM_TITLE);
-        assert.eventually.equal(cutTitleField.getValue(), page.translations.UI.END);
+        assert.eventually.equal(page.getCutTitle(cutTitleField), page.translations.UI.END);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.UI.FORM_SAVE);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.UI.FORM_CANCEL);
         page.setMouseOverCutButton(false);
