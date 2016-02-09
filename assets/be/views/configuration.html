@@ -6,11 +6,15 @@
     <div class="panel panel-default">
       <div uib-popover="{{'CONFIGURATION.YOUTUBE_INFO' | translate}}" popover-trigger="mouseenter" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'CONFIGURATION.YOUTUBE_TITLE' | translate"></div>
       <div class="panel-body">
-        <a ng-if="!youtubeConf.hasToken && rights.edit" href="{{youtubeConf.authUrl}}" ng-bind="'CONFIGURATION.YOUTUBE_PEER' | translate"></a>
         <p ng-if="youtubeConf.hasToken">
-          {{ 'CONFIGURATION.YOUTUBE_PEER_STATUS' | translate}}
+          {{ 'CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS' | translate}}
           <br>
           <a ng-if="rights.edit" href="{{youtubeConf.authUrl}}" ng-bind="'CONFIGURATION.YOUTUBE_MODIFY_PEER' | translate"></a>
+        </p>
+        <p ng-if="!youtubeConf.hasToken">
+          {{ 'CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS' | translate}}
+          <br>
+          <a ng-if="rights.edit" href="{{youtubeConf.authUrl}}" ng-bind="'CONFIGURATION.YOUTUBE_PEER' | translate"></a>
         </p>
       </div>
     </div>

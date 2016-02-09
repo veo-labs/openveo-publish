@@ -152,7 +152,8 @@
     "INFO" : "Configuration du plugin OpenVeo publish.",
     "YOUTUBE_INFO" : "Publish a besoin de se connecter à un compte Google autorisant l'accès à l'API Youtube.",
     "YOUTUBE_PEER": "Associer un compte Google",
-    "YOUTUBE_PEER_STATUS": "Un compte Google est bien associé à Openveo.",
+    "YOUTUBE_PEER_ASSOCIATED_STATUS": "Un compte Google est bien associé.",
+    "YOUTUBE_PEER_NOT_ASSOCIATED_STATUS": "Aucun compte Google associé.",
     "YOUTUBE_TITLE": "Youtube",
     "YOUTUBE_MODIFY_PEER": "Changer le compte associé"
   }
