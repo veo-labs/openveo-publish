@@ -114,7 +114,7 @@ function moveTimeBarElement(index, percent) {
   return browser.executeScript('var scope = angular.element(arguments[0]).scope(); ' +
                                'scope.ranges[arguments[1]].value = arguments[2]; ' +
                                'scope.updateTime(); ' +
-                               'scope.releaseRange(); ' +
+                               'scope.releaseRange(scope.ranges[arguments[1]]); ' +
                                'scope.$apply();',
                                this.timeBarElement.getWebElement(), index, percent);
 }
