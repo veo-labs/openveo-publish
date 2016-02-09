@@ -102,6 +102,7 @@ describe('Chapter page translations', function() {
           assert.equal(text.replace(/\u00A0/g, ' '), page.translations.CHAPTER.REMOVE_BEGIN);
 
         });
+        page.removeCut(true);
 
         // End cut
         page.setMouseOverCutButton(false);
@@ -119,12 +120,14 @@ describe('Chapter page translations', function() {
         assert.eventually.equal(cutTitleField.getValue(), page.translations.UI.END);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.UI.FORM_SAVE);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.UI.FORM_CANCEL);
+        page.setMouseOverCutButton(false);
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
           assert.equal(text.replace(/\u00A0/g, ' '), page.translations.CHAPTER.REMOVE_END);
 
         });
+        page.removeCut(false);
 
         return browser.waitForAngular();
       }).then(function() {
