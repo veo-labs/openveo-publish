@@ -171,7 +171,7 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     originalPackagePath: videoPackage.originalPackagePath,
     mediaId: videoPackage.mediaId,
     timecodes: videoPackage.timecodes,
-    chapters: videoPackage.chapters || [],
+    chapters: videoPackage.chapters,
     cut: videoPackage.cut || [],
     files: videoPackage.files || []
   };
