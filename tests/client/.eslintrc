@@ -28,11 +28,14 @@
   },
   "rules": {
 
-    // Require JSDoc comment
+    // JSDoc comments not required
     "require-jsdoc": 0,
 
     // Strict mode not required
-    "strict": 0
+    "strict": 0,
+
+    // Google Youtube API uses non camelcase properties
+    "camelcase": 0,
 
   }
 

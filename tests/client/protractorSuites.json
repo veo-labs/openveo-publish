@@ -4,5 +4,6 @@
   "categoryPage": "e2eTests/categoryPage*.js",
   "mediaPage": "e2eTests/mediaPage*.js",
   "chapterPage": "e2eTests/chapterPage*.js",
+  "configurationPage": "e2eTests/configurationPage*.js",
   "publish" : "e2eTests/*.js"
 }

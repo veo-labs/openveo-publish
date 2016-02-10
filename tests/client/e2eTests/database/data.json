@@ -93,6 +93,12 @@
       "permissions": [
         "chapter-video"
       ]
+    },
+    "publishConfigurationNoManage": {
+      "name": "publish-configuration-no-manage",
+      "permissions": [
+        "access-conf-page"
+      ]
     }
   },
   "users": {
@@ -173,6 +179,12 @@
       "email": "publish-chapters-edit@veo-labs.com",
       "password": "publish-chapters-edit",
       "roles": [ "publishChaptersEdit" ]
+    },
+    "publishConfigurationNoManage": {
+      "name": "publish-configuration-no-manage",
+      "email": "publish-configuration-no-manage@veo-labs.com",
+      "password": "publish-configuration-no-manage",
+      "roles": [ "publishConfigurationNoManage" ]
     }
   }
 }
