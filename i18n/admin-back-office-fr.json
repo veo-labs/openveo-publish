@@ -37,7 +37,7 @@
     "ACCESS_PUBLISH_CONF_PAGE" : "Accès à la page de configuration de Publish",
     "EDIT_CHAPTER_NAME": "Editer les chapitres",
     "EDIT_CHAPTER_DESCRIPTION": "Editer les chapitres personnalisés",
-    "RETRY_VIDEO_NAME": "Relancer le processus d'enregistrement de la vidéo",
+    "RETRY_VIDEO_NAME": "Relancer le traitement de la vidéo",
     "RETRY_VIDEO_DESCRIPTION": "Relancer manuellement le processus d'enregistrement de la vidéo",
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
     "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo"

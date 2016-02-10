@@ -37,7 +37,7 @@
     "ACCESS_PUBLISH_CONF_PAGE" : "Access Publish configuration page",
     "EDIT_CHAPTER_NAME": "Edit chapters",
     "EDIT_CHAPTER_DESCRIPTION": "Edit custom chapters",
-    "RETRY_VIDEO_NAME": "Retry to launch video saving process",
+    "RETRY_VIDEO_NAME": "Retry video processing",
     "RETRY_VIDEO_DESCRIPTION": "Retry to launch manually the video saving process",
     "UPLOAD_VIDEO_NAME": "Launch video upload",
     "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload"
