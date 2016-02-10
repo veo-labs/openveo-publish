@@ -15,5 +15,6 @@ Publish main module defines the following routes :
 - **/publish/watcher** to access watcher page
 - **/publish/properties** to access custom properties page
 - **/publish/categories** to access categories page
+- **/publish/configuration** to access publish configuration page
 
 **Nb:** Available services / filters defined in **ov.publish** module are described in the [API](/api/back-end/modules/ov.publish.html).
