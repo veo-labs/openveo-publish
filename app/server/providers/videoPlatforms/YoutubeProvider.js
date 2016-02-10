@@ -148,22 +148,19 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
 
     // Check auth
     function(callback) {
-      googleOAuthHelper.getOAuthClient(function(error, authClient) {
+      googleOAuthHelper.getFreshToken(function(error, tokens) {
         if (error) {
           callback(error);
           return;
         }
-        uploadParams.auth = authClient;
+        googleOAuthHelper.oauth2Client.setCredentials(tokens);
         callback();
       });
     },
 
     // Upload video
     function(callback) {
-      if (!uploadParams.hasOwnProperty('auth') || !uploadParams.auth) {
-        callback(new Error('Auth has not been set correctly'));
-        return;
-      }
+      uploadParams.auth = googleOAuthHelper.oauth2Client;
       youtube.videos.insert(uploadParams, function(error, video) {
         if (error) {
           callback(error);

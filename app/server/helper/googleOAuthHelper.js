@@ -187,24 +187,4 @@ GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
   });
 };
 
-/**
- * Returns a client to perform request to the google apis.
- * This function should be used after a previous successfull google association
- *
- * @param {function} callback
- */
-GoogleOAuthHelper.prototype.getOAuthClient = function(callback) {
-  var self = this;
-  this.fetchToken(function(err, tokens) {
-    if (err) {
-      callback(err, null);
-    } else if (!tokens || Object.keys(tokens).length <= 0) {
-      callback(new Error('No token was previously set'), null);
-    } else {
-      self.oauth2Client.setCredentials(tokens);
-      callback(null, self.oauth2Client);
-    }
-  });
-};
-
 module.exports = new GoogleOAuthHelper();
