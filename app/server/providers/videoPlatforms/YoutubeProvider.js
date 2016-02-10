@@ -263,28 +263,14 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
  *     // Returned data example
  *     {
  *       available : true,
- *       pictures : [
- *         {
- *           width : 100,
- *           height : 75,
- *           link : 'https://i.vimeocdn.com/video/530303243_100x75.jpg'
- *         },
- *         ...
- *       ],
- *       files : [
- *         {
- *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *           width : 640,
- *           height : 360,
- *           link : 'https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094'
- *         },
- *         ...
- *       ]
+ *       pictures : [],
+ *       files : [],
+ *       mediaId : '123456'
  *     }
  *
  * @method getVideoInfo
  * @async
- * @param {String} mediaId The Vimeo id of the video
+ * @param {String} mediaId The Youtube id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
