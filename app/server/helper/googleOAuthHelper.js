@@ -1,7 +1,6 @@
 'use strict';
 
 var google = require('googleapis');
-var merge = require('merge');
 var path = require('path');
 var async = require('async');
 var OAuth2 = google.auth.OAuth2;
@@ -34,7 +33,7 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
   var self = this;
   async.series([
 
-    // Retrieve video information from database
+    // Retrieve token information from database
     function(callback) {
       self.confModel.get(function(error, result) {
         if (error || !result || result.length < 1) {
@@ -106,7 +105,7 @@ GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
     throw new Error('Please specify the scope');
   }
 
-  var _options = merge.recursive({
+  var _options = openVeoAPI.util.merge({
     access_type: 'offline', // eslint-disable-line camelcase
     approval_prompt: 'force', // eslint-disable-line camelcase
     response_type: 'code' // eslint-disable-line camelcase
