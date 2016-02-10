@@ -19,6 +19,7 @@ var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPl
 var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
 
 var uploadMethods = ['uploadClassic', 'uploadResumable'];
+var privacyStatus = ['public', 'private', 'unlisted'];
 
 /**
  * Defines a YoutubeProvider class to interact with youtube platform
@@ -31,8 +32,9 @@ var uploadMethods = ['uploadClassic', 'uploadResumable'];
  */
 function YoutubeProvider(providerConf) {
   VideoPlatformProvider.call(this, providerConf);
-  var uploadMethodIndex = providerConf.uploadMethod ? uploadMethods.indexOf(providerConf.uploadMethod) : -1;
-  this.uploadMethod = uploadMethodIndex > -1 ? uploadMethods[uploadMethodIndex] : 'uploadClassic';
+  this.uploadMethod = uploadMethods.indexOf(providerConf.uploadMethod) > -1 ?
+    providerConf.uploadMethod : 'uploadClassic';
+  this.privacy = privacyStatus.indexOf(providerConf['privacy']) > -1 ? providerConf['privacy'] : 'public';
 }
 
 module.exports = YoutubeProvider;
@@ -120,7 +122,7 @@ YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
         description: 'Video description'
       },
       status: {
-        privacyStatus: 'private'
+        privacyStatus: this.privacy
       }
     }
   };

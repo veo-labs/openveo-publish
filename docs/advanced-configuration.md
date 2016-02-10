@@ -36,12 +36,13 @@ Open **~/.openveo/publish/videoPlatformConf.json**
     "accessToken" : "vimeo access token (available on vimeo application page https://developer.vimeo.com/apps)"
   },
   "youtube": {
-    "uploadMethod": "uploadResumable", //(uploadResumable or uploadClassic; default: uploadResumable)
+    "uploadMethod": "uploadResumable", // (uploadResumable or uploadClassic; default: uploadResumable)
     "googleOAuth": {
        "clientId": "Youtube API client Id (available in your Google Developper Console )",
        "clientSecret":  "Youtube API client secret (available in your Google Developper Console )",
        "redirectUrl": "http://SERVER_HOST_NAME:SERVER_PORT/be/publish/configuration/googleOAuthAssosiation"
-     }
+     },
+     "privacy": "public" // (public, private or unlisted; default: public)
   }
 }
 ```
