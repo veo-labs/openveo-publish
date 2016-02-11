@@ -64,6 +64,11 @@ module.exports = {
     httpCode: 500,
     module: 'publish'
   },
+  GET_CONFIGURATION_ERROR: {
+    code: 0x303,
+    httpCode: 500,
+    module: 'publish'
+  },
 
   // Webservices
   UNKNOWN_PROPERTY_ERROR: {
