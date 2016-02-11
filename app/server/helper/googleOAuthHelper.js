@@ -11,9 +11,7 @@ var config;
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 /**
- * Construct a new helper for google OAuth association and requests
- *
- * @returns {nm$_googleOAuthHelper.GoogleOAuthHelper}
+ * Constructs a new helper for google OAuth association and requests.
  */
 function GoogleOAuthHelper() {
   if (publishConf.youtube && publishConf.youtube.googleOAuth)
@@ -23,10 +21,12 @@ function GoogleOAuthHelper() {
 }
 
 /**
- * Persists the tokens retrieved from Google
+ * Persists the tokens retrieved from Google.
  *
- * @param {object}   tokens   the tokens retrieved from Google
- * @param {function} callback Optional callback function
+ * @param {Object} tokens The tokens retrieved from Google
+ * @param {Function} [callback] Callback function with :
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The saved token object
  */
 GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
   var configuration;
@@ -55,11 +55,11 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
           if (err) {
             process.logger.error('Error while saving configuration data', err);
           } else {
-            process.logger.debug('Configuration data has been saved : ', data);
+            process.logger.debug('Configuration data has been saved');
           }
-          if (callback) {
-            callback(null, data);
-          }
+
+          if (callback)
+            callback(err, tokens);
         };
 
         if (configuration && configuration.id)
@@ -72,16 +72,21 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
 };
 
 /**
- * Retrieve the current token or null if it was not persisted earlier
+ * Retrieves the current token or null if it was not persisted earlier.
  *
- * @param {function} callback function
+ * @param {Function} callback Callback function with :
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The token object
  */
 GoogleOAuthHelper.prototype.fetchToken = function(callback) {
   this.confModel.get(function(error, result) {
 
-    if (error || !result || result.length < 1) {
+    if (error) {
       process.logger.error('Error while retrieving configuration data', error);
       callback(error);
+      return;
+    } else if (!result || result.length < 1) {
+      callback();
       return;
     } else {
       var conf = result[0];
@@ -94,11 +99,10 @@ GoogleOAuthHelper.prototype.fetchToken = function(callback) {
 };
 
 /**
- * Builds the url that will permit to access google association page on the client's browser
+ * Builds the url that will permit to access google association page on the client's browser.
  *
- * @param {object} options options to build the url, 'scope' is mandatory
- *
- * @returns {string} the url to the google association page
+ * @param {Object} options Options to build the url, 'scope' is mandatory
+ * @return {String} The url to the google association page
  */
 GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
   if (!options.hasOwnProperty('scope')) {
@@ -115,11 +119,13 @@ GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
 };
 
 /**
- * Retrieve a token from google with an authorization code, this token is then saved for later use and can be
- * retrieved with @see this.fetchToken
+ * Retrieves a token from google with an authorization code, this token is then saved for later use and can be
+ * retrieved with @see this.fetchToken.
  *
- * @param {string} code The authorization code.
- * @param {function} callback callback function
+ * @param {String} code The authorization code
+ * @param {Function} callback Callback function with :
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The token object
  */
 GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
   var self = this;
@@ -138,22 +144,26 @@ GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
 };
 
 /**
- * Check whether or not a previous token has been retrieved
+ * Checks whether or not a previous token has been retrieved.
  *
- * @param {function} callback callback function
+ * @param {Function} callback Callback function with :
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Boolean** true a token exists, false otherwise
  */
 GoogleOAuthHelper.prototype.hasToken = function(callback) {
-  this.fetchToken(function(err, tokens) {
-    callback(new Boolean(tokens && Object.keys(tokens).length > 0));
+  this.fetchToken(function(error, tokens) {
+    callback(error, new Boolean(tokens && Object.keys(tokens).length > 0));
   });
 };
 
 /**
- * Retrieve a fresh (=valid) token, if a previous token was set and is still valid it is returned. If this previous
+ * Retrieves a fresh (=valid) token, if a previous token was set and is still valid it is returned. If this previous
  * token is not valid anymore a new token is retrieved.
- * This function should be used after a previous successfull google association
+ * This function should be used after a previous successfull google association.
  *
- * @param {function} callback callback function
+ * @param {Function} callback Callback function with :
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The token object
  */
 GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
   var self = this;
