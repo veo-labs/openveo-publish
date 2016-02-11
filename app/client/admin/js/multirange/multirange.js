@@ -293,7 +293,7 @@ angular.module('ov.multirange.lite', [])
         scope.onMouseMove = function(evt, condition) {
           if (condition) {
             var bound = elem[0].getBoundingClientRect();
-            mousex = (evt.pageX - bound.left) / bound.width;
+            mousex = Math.min((evt.pageX - bound.left) / bound.width, 1);
           }
         };
         scope.mouserelease = function(release, range) {
@@ -348,6 +348,7 @@ angular.module('ov.multirange.lite', [])
             },
             set: function(n) {
               this.value = Math.ceil(n) / this.multiplier;
+              if (this.value + attr.step / attr.max >= 1) this.value = 1;
               scope.position = this.value;
             }
           });

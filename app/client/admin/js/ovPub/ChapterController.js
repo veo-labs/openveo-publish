@@ -276,6 +276,7 @@
      */
     function toggleCut(cut, addOrRemove) {
       var index = $scope.media.cut.indexOf(cut);
+
       // cuts will be updated by the watchCollection
       if (index === -1 && addOrRemove !== false) {
         $scope.media.cut.push(cut);
@@ -310,6 +311,7 @@
         // Reset end
         $scope.endCut.range.value = 1;
         $scope.$emit('setAlert', 'warning', $filter('translate')('CHAPTER.DELETE_END_CUT'), 8000);
+        toggleEnd(false);
 
         // the watch for endCut.isInArray will save everything
         $scope.endCut.isInArray = false;
