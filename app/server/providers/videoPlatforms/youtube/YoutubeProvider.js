@@ -13,10 +13,12 @@ var async = require('async');
 
 var google = require('googleapis');
 var youtube = google.youtube('v3');
-var YoutubeResumableUpload = process.requirePublish('app/server/helper/youtubeResumableUpload.js');
+var YoutubeResumableUpload = process.requirePublish(
+  'app/server/providers/videoPlatforms/youtube/youtubeResumableUpload.js'
+);
 
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
-var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
+var googleOAuthHelper = process.requirePublish('app/server/providers/videoPlatforms/youtube/googleOAuthHelper.js');
 
 var uploadMethods = ['uploadClassic', 'uploadResumable'];
 var privacyStatus = ['public', 'private', 'unlisted'];

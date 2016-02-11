@@ -7,7 +7,7 @@
 var path = require('path');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
-var googleOAuthHelper = process.requirePublish('app/server/helper/googleOAuthHelper.js');
+var googleOAuthHelper = process.requirePublish('app/server/providers/videoPlatforms/youtube/googleOAuthHelper.js');
 var errors = process.requirePublish('app/server/httpErrors.js');
 var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
