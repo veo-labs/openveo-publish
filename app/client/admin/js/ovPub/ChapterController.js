@@ -276,11 +276,11 @@
      */
     function toggleCut(cut, addOrRemove) {
       var index = $scope.media.cut.indexOf(cut);
-
       // cuts will be updated by the watchCollection
       if (index === -1 && addOrRemove !== false) {
         $scope.media.cut.push(cut);
       } else if (index !== -1 && addOrRemove !== true) {
+        cut.select = false;
         $scope.media.cut.splice(index, 1);
       }
 
