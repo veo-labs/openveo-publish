@@ -93,7 +93,7 @@ describe('VideoModel', function() {
 
       process.rootPublish = __dirname;
       videoModel.remove('5', function(error) {
-        assert.isUndefined(error);
+        assert.isNull(error);
         var videosDirectoryPath = path.normalize(process.rootPublish + '/assets/player/videos/5');
 
         process.rootPublish = path.join(__dirname, '../../');

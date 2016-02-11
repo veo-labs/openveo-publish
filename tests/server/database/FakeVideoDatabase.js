@@ -23,7 +23,7 @@ FakeVideoDatabase.prototype.get = function(collection, criteria, projection, lim
 };
 
 FakeVideoDatabase.prototype.insert = function(collection, data, callback) {
-  callback(null);
+  callback(null, (Array.isArray(data) ? data.length : 1), (Array.isArray(data) ? data : [data]));
 };
 
 FakeVideoDatabase.prototype.update = function(collection, criteria, data, callback) {
@@ -33,6 +33,6 @@ FakeVideoDatabase.prototype.update = function(collection, criteria, data, callba
     callback(null);
 };
 
-FakeVideoDatabase.prototype.remove = function(collection, criteria, callback) {
-  callback(null);
+FakeVideoDatabase.prototype.remove = function(collection, filter, callback) {
+  callback(null, 1);
 };
