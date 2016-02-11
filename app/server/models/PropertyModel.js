@@ -91,7 +91,6 @@ PropertyModel.prototype.update = function(id, data, callback) {
   this.provider.update(id, property, callback);
 };
 
-
 /**
  * Removes a property.
  *
@@ -100,7 +99,7 @@ PropertyModel.prototype.update = function(id, data, callback) {
  * @param {String} ids The ids of the property
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed items
+ *   - **Number** The number of removed properties
  */
 PropertyModel.prototype.remove = function(ids, callback) {
   var self = this;
@@ -109,8 +108,8 @@ PropertyModel.prototype.remove = function(ids, callback) {
   // Remove property from database
   series.push(
     function(callback) {
-      self.provider.remove(ids, function(error) {
-        callback(error);
+      self.provider.remove(ids, function(error, deletedCount) {
+        callback(error, deletedCount);
       });
     }
   );
@@ -120,17 +119,17 @@ PropertyModel.prototype.remove = function(ids, callback) {
     series.push(
       function(callback) {
         var prop = 'properties.' + value;
-        self.videoProvider.removeProp(prop, function(error) {
-          callback(error);
+        self.videoProvider.removeProp(prop, function(error, modifiedCount) {
+          callback(error, modifiedCount);
         });
       }
     );
   });
 
-  async.series(series, function(error) {
+  async.series(series, function(error, results) {
     if (error)
       callback(error);
     else
-      callback();
+      callback(null, results[0]);
   });
 };

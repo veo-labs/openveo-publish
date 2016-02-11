@@ -693,6 +693,7 @@ VideoModel.prototype.getOne = function(id, callback) {
  * @param {Array} ids The list of video ids
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The total number of deleted videos
  */
 VideoModel.prototype.remove = function(ids, callback) {
   var self = this;
@@ -700,8 +701,8 @@ VideoModel.prototype.remove = function(ids, callback) {
 
     // Remove videos from database
     function(callback) {
-      self.provider.remove(ids, function(error) {
-        callback(error);
+      self.provider.remove(ids, function(error, deletedCount) {
+        callback(error, deletedCount);
       });
     },
 
@@ -729,11 +730,11 @@ VideoModel.prototype.remove = function(ids, callback) {
       });
     }
 
-  ], function(error) {
+  ], function(error, results) {
     if (error)
       callback(error);
     else
-      callback();
+      callback(null, results[0]);
   });
 };
 
