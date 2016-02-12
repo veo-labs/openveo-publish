@@ -74,6 +74,10 @@ util.inherits(PublishError, Error);
  *    - **Error** The error
  *  - Event *complete* A package was successfully published
  *    - **Object** The published package
+ *  - Event *retry* A package in error restarts
+ *    - **Object** The package
+ *  - Event *upload* A package stuck in "waiting for upload" state starts upload process
+ *    - **Object** The package
  */
 function PublishManager(database) {
   openVeoAPI.applicationStorage.setDatabase(database);
@@ -271,7 +275,12 @@ PublishManager.prototype.retry = function(packageId) {
 
         // Got package information
         // Package is indeed in error
-        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE);
+        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE, function() {
+
+          // Retry officially started
+          self.emit('retry', mediaPackage);
+
+        });
 
         var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
         process.logger.info('Retry package ' + mediaPackage.id);
@@ -307,7 +316,12 @@ PublishManager.prototype.upload = function(packageId, platform) {
       } else if (mediaPackage.state === VideoModel.WAITING_FOR_UPLOAD_STATE) {
 
         // Package is indeed waiting for upload
-        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE);
+        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE, function() {
+
+          // Upload officially started
+          self.emit('upload', mediaPackage);
+
+        });
         self.videoModel.updateType(mediaPackage.id, platform);
 
         var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);

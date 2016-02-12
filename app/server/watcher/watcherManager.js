@@ -77,15 +77,25 @@ module.exports.stop = function() {
 /**
  * Sends a message to the watcher to retry a package.
  *
+ * @async
  * @method retryPackage
  * @param {String} id The id of the media to retry
+ * @param {Function} callback Function to call when retry is started
  */
-module.exports.retryPackage = function(id) {
-  if (watcher && status === this.STARTED_STATUS)
+module.exports.retryPackage = function(id, callback) {
+  if (watcher && status === this.STARTED_STATUS) {
+
+    // Listen to retry message from child process
+    watcher.once('message', function(data) {
+      if (data && data.action === 'retry')
+        callback();
+    });
+
     watcher.send({
       action: 'retry',
       id: id
     });
+  }
 };
 
 /**
@@ -94,14 +104,24 @@ module.exports.retryPackage = function(id) {
  * @method uploadPackage
  * @param {String} id The id of the media to upload
  * @param {String} platform The name of the platform to upload to
+ * @param {Function} callback Function to call when upload is started
  */
-module.exports.uploadPackage = function(id, platform) {
-  if (watcher && status === this.STARTED_STATUS)
+module.exports.uploadPackage = function(id, platform, callback) {
+  if (watcher && status === this.STARTED_STATUS) {
+
+    // Listen to upload message from child process
+    watcher.once('message', function(data) {
+      if (data && data.action === 'upload')
+        callback();
+    });
+
     watcher.send({
       action: 'upload',
       id: id,
       platform: platform
     });
+
+  }
 };
 
 /**

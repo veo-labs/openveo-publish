@@ -155,7 +155,7 @@
      * @method startMediaUpload
      */
     function startMediaUpload(id, platform) {
-      entityService.deleteCache('media');
+      entityService.deleteCache('video');
       return $http.post(basePath + 'publish/startUpload/' + id + '/' + platform);
     }
 

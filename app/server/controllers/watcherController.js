@@ -10,7 +10,7 @@
  * @class watcherController
  */
 
-// Module files
+var async = require('async');
 var errors = process.requirePublish('app/server/httpErrors.js');
 var watcherManager = process.requirePublish('app/server/watcher/watcherManager.js');
 
@@ -27,10 +27,21 @@ module.exports.retryVideoAction = function(request, response, next) {
   if (request.params.ids) {
     var ids = request.params.ids.split(',');
 
-    for (var i = 0; i < ids.length; i++)
-      watcherManager.retryPackage(ids[i]);
+    var asyncFunctions = [];
+    var retryAsyncFunction = function(id) {
+      return function(callback) {
+        watcherManager.retryPackage(id, function() {
+          callback();
+        });
+      };
+    };
 
-    response.send();
+    for (var i = 0; i < ids.length; i++)
+      asyncFunctions.push(retryAsyncFunction(ids[i]));
+
+    async.parallel(asyncFunctions, function() {
+      response.send();
+    });
   }
 
   // Missing type and / or id of the video
@@ -52,10 +63,22 @@ module.exports.startUploadAction = function(request, response, next) {
   if (request.params.ids && request.params.platform) {
     var ids = request.params.ids.split(',');
 
-    for (var i = 0; i < ids.length; i++)
-      watcherManager.uploadPackage(ids[i], request.params.platform);
+    var asyncFunctions = [];
+    var uploadAsyncFunction = function(id, platform) {
+      return function(callback) {
+        watcherManager.uploadPackage(id, platform, function() {
+          callback();
+        });
+      };
+    };
 
-    response.send();
+    for (var i = 0; i < ids.length; i++)
+      asyncFunctions.push(uploadAsyncFunction(ids[i], request.params.platform));
+
+    async.parallel(asyncFunctions, function() {
+      response.send();
+    });
+
   }
 
   // Missing platform and / or id of the video

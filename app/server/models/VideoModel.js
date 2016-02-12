@@ -51,44 +51,6 @@ VideoModel.GENERATE_THUMB_STATE = 13;
 VideoModel.GET_METADATA_STATE = 14;
 
 /**
- * Updates the property of a given video.
- *
- * Update operations are grouped by event loop and only one request
- * is made to the database for each video id.
- *
- * @method updateVideoProperty
- * @private
- * @async
- * @param {Number} mediaId The id of the media to update
- * @param {String} propertyName The name of the property to update
- * @param {String|Number|Boolean} propertyValue The value of the
- * property
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- */
-function updateVideoProperty(mediaId, propertyName, propertyValue, callback) {
-  var self = this;
-
-  // No pending update operations for now
-  if (!this.pendingUpdateOperations) {
-    this.pendingUpdateOperations = {};
-
-    process.nextTick(function() {
-      for (var mediaId in self.pendingUpdateOperations) {
-        self.provider.update(mediaId, self.pendingUpdateOperations[mediaId], callback);
-      }
-      self.pendingUpdateOperations = null;
-    });
-  }
-
-  // Add update opration to pending operations
-  if (!this.pendingUpdateOperations[mediaId])
-    this.pendingUpdateOperations[mediaId] = {};
-
-  this.pendingUpdateOperations[mediaId][propertyName] = propertyValue;
-}
-
-/**
  * Removes a list of directories.
  *
  * @method removeDirectories
@@ -193,7 +155,7 @@ VideoModel.prototype.add = function(videoPackage, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateState = function(id, state, callback) {
-  updateVideoProperty.call(this, id, 'state', state, callback);
+  this.provider.update(id, {state: state}, callback);
 };
 
 /**
@@ -207,7 +169,7 @@ VideoModel.prototype.updateState = function(id, state, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateLastState = function(id, state, callback) {
-  updateVideoProperty.call(this, id, 'lastState', state, callback);
+  this.provider.update(id, {lastState: state}, callback);
 };
 
 /**
@@ -221,7 +183,7 @@ VideoModel.prototype.updateLastState = function(id, state, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateLastTransition = function(id, state, callback) {
-  updateVideoProperty.call(this, id, 'lastTransition', state, callback);
+  this.provider.update(id, {lastTransition: state}, callback);
 };
 
 /**
@@ -235,7 +197,7 @@ VideoModel.prototype.updateLastTransition = function(id, state, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
-  updateVideoProperty.call(this, id, 'errorCode', errorCode, callback);
+  this.provider.update(id, {errorCode: errorCode}, callback);
 };
 
 /**
@@ -249,7 +211,7 @@ VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateLink = function(id, link, callback) {
-  updateVideoProperty.call(this, id, 'link', link, callback);
+  this.provider.update(id, {link: link}, callback);
 };
 
 /**
@@ -263,7 +225,7 @@ VideoModel.prototype.updateLink = function(id, link, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
-  updateVideoProperty.call(this, id, 'mediaId', idMediaPlatform, callback);
+  this.provider.update(id, {mediaId: idMediaPlatform}, callback);
 };
 
 /**
@@ -277,7 +239,7 @@ VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
-  updateVideoProperty.call(this, id, 'metadata', metadata, callback);
+  this.provider.update(id, {metadata: metadata}, callback);
 };
 
 /**
@@ -291,7 +253,7 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateDate = function(id, date, callback) {
-  updateVideoProperty.call(this, id, 'date', date, callback);
+  this.provider.update(id, {date: date}, callback);
 };
 
 /**
@@ -305,7 +267,7 @@ VideoModel.prototype.updateDate = function(id, date, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
-  updateVideoProperty.call(this, id, 'category', categoryId, callback);
+  this.provider.update(id, {category: categoryId}, callback);
 };
 
 /**
@@ -319,7 +281,7 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateType = function(id, type, callback) {
-  updateVideoProperty.call(this, id, 'type', type, callback);
+  this.provider.update(id, {type: type}, callback);
 };
 
 /**
@@ -333,7 +295,7 @@ VideoModel.prototype.updateType = function(id, type, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoModel.prototype.updateThumbnail = function(id, path, callback) {
-  updateVideoProperty.call(this, id, 'thumbnail', path, callback);
+  this.provider.update(id, {thumbnail: path}, callback);
 };
 
 /**

@@ -199,6 +199,18 @@ db.connect(function(error) {
       process.logger.info('Publish complete for video ' + videoPackage.id);
     });
 
+    // Listen to retry dispatched by the publish manager when package retry has started
+    publishManager.on('retry', function(videoPackage) {
+      process.logger.info('Retry publishing package ' + videoPackage.id + ' started');
+      process.send({action: 'retry'});
+    });
+
+    // Listen to upload dispatched by the publish manager when package waiting for upload starts uploading
+    publishManager.on('upload', function(videoPackage) {
+      process.logger.info('Force uploading package ' + videoPackage.id + ' started');
+      process.send({action: 'upload'});
+    });
+
     async.filter(hotFoldersPaths, fs.exists, function(results) {
       hotFoldersPaths = results;
 
