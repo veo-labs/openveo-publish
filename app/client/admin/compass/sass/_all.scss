@@ -102,4 +102,13 @@
   .ov-player{
     height:450px;
   }
+  
+  .chapter-title{
+    line-height:37px;
+    span {
+      line-height: 18px;
+      display: block;
+      padding: 9px 0;
+    }
+  }
 }
