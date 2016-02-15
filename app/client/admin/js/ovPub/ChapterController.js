@@ -80,8 +80,9 @@
     }
 
     /**
-     * Gather some parameters before calling init
-     * @param {type} duration a parameter needed before init
+     * Gathers some parameters before calling init.
+     *
+     * @param {Number} duration Media duration
      */
     function preinit(duration) {
       safeApply(function() {
@@ -91,7 +92,7 @@
           playerController = angular.element(myPlayer).controller('ovPlayer');
 
           // Set Duration
-          $scope.duration = duration / 1000 || ($scope.media.metadata && $scope.media.metadata.duration);
+          $scope.duration = duration / 1000;
           init();
         }
       });
@@ -104,13 +105,12 @@
       preinit(duration);
     });
 
-    /**
-     * ... we also use a timer for initition, we consider 2 sec to be long enougth
-     */
-    var timer = setTimeout(function() {
-      preinit(null);
-      clearTimeout(timer);
-    }, 2000);
+    // Listen to player errors
+    // If an error occurs go back to catalog with an alert
+    angular.element(myPlayer).on('error', function(event, error) {
+      $scope.$emit('setAlert', 'danger', error.message, 8000);
+      $scope.back();
+    });
 
     // Init
     $scope.media = media.data.entity;
