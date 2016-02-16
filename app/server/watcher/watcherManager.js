@@ -57,6 +57,13 @@ module.exports.start = function() {
       watcher = null;
     });
 
+    // Kill watcher on node process signal interrupt
+    var exit = process.exit;
+    process.on('SIGINT', function() {
+      watcher.disconnect();
+      exit(0);
+    });
+
   }
 };
 
