@@ -51,7 +51,7 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
         callback(error);
         return;
       } else {
-        var cb = function(err, data) {
+        var cb = function(err, addedCount, data) {
           if (err) {
             process.logger.error('Error while saving configuration data', err);
           } else {

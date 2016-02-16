@@ -58,9 +58,9 @@ PropertyModel.prototype.add = function(data, callback) {
     type: data.type
   };
 
-  this.provider.add(property, function(error) {
+  this.provider.add(property, function(error, addedCount, properties) {
     if (callback)
-      callback(error, property);
+      callback(error, addedCount, properties && properties[0]);
   });
 };
 
