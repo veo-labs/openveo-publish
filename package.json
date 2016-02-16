@@ -24,7 +24,7 @@
     "chokidar": "0.12.6",
     "javascript-state-machine": "2.3.5",
     "vimeo": "1.1.4",
-    "googleapis": "^2.1.5",
+    "googleapis": "2.1.7",
     "mime": "1.3.4",
     "xml2js": "0.4.4 - 0.4.13",
     "fluent-ffmpeg": "2.0.1",
