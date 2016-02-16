@@ -4,7 +4,6 @@
  * @module publish-models
  */
 
-// Module dependencies
 var util = require('util');
 var shortid = require('shortid');
 var openVeoAPI = require('@openveo/api');
@@ -22,6 +21,13 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
  */
 function PropertyModel() {
   openVeoAPI.EntityModel.prototype.init.call(this, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
+
+  /**
+   * Video provider.
+   *
+   * @property videoProvider
+   * @type VideoProvider
+   */
   this.videoProvider = new VideoProvider(openVeoAPI.applicationStorage.getDatabase());
 }
 
@@ -44,6 +50,8 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
  * @param {Object} data A property object
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The total amount of items inserted
+ *   - **Object** The inserted property
  */
 PropertyModel.prototype.add = function(data, callback) {
   if (!data.name || !data.description || !data.type) {
@@ -79,6 +87,7 @@ PropertyModel.prototype.add = function(data, callback) {
  * @param {Object} data The property with all fields or not
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 PropertyModel.prototype.update = function(id, data, callback) {
   var property = {};

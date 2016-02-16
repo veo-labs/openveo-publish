@@ -4,7 +4,6 @@
  * @module publish-models
  */
 
-// Module dependencies
 var util = require('util');
 var openVeoAPI = require('@openveo/api');
 

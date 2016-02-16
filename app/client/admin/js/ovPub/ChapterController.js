@@ -61,7 +61,7 @@
     /**
      * Executes, safely, the given function in AngularJS process.
      *
-     * @param Function functionToExecute The function to execute as part of
+     * @param {Function} functionToExecute The function to execute as part of
      * the angular digest process.
      */
     function safeApply(functionToExecute) {
@@ -270,9 +270,10 @@
      */
 
     /**
-     * Selects and unselect a provided cut
-     * @param {Object} cut the cut to toggle
-     * @param {Boolean} addOrRemove forces the addition or removal of the cut
+     * Selects and unselect a provided cut.
+     *
+     * @param {Object} cut The cut to toggle
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
     function toggleCut(cut, addOrRemove) {
       var index = $scope.media.cut.indexOf(cut);
@@ -288,16 +289,18 @@
     }
 
     /**
-     * Selects or unselect the begin cut
-     * @param {Boolean} addOrRemove forces the addition or removal of the cut
+     * Selects or unselect the begin cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
     function toggleBegin(addOrRemove) {
       toggleCut($scope.beginCut.range, addOrRemove);
     }
 
     /**
-     * Selects or unselect the ending cut
-     * @param {Boolean} addOrRemove foreces the addition or removal of the cut
+     * Selects or unselect the ending cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
     function toggleEnd(addOrRemove) {
       toggleCut($scope.endCut.range, addOrRemove);

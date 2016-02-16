@@ -4,7 +4,6 @@
  * @module publish-packages
  */
 
-// Module dependencies
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
@@ -97,7 +96,16 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
   }
 ]);
 
-
+/**
+ * Generates a thumbnail for the video.
+ *
+ * It uses ffmpeg to extract an image from the video.
+ *
+ * This is a transition.
+ *
+ * @method generateThumb
+ * @private
+ */
 VideoPackage.prototype.generateThumb = function() {
   var self = this;
   var filePath = this.getMediaFilePath();

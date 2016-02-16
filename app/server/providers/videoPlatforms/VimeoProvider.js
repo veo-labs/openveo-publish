@@ -32,8 +32,20 @@ var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPl
 function VimeoProvider(providerConf) {
   VideoPlatformProvider.call(this, providerConf);
 
+  /**
+   * Vimeo client library.
+   *
+   * @property vimeo
+   * @type Vimeo
+   */
   this.vimeo = new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken);
 
+  /**
+   * List of accepted video qualities.
+   *
+   * @property qualitiesMap
+   * @type Object
+   */
   this.qualitiesMap = {
     sd: VideoPlatformProvider.SD_QUALITY,
     mobile: VideoPlatformProvider.MOBILE_QUALITY,
@@ -46,9 +58,6 @@ util.inherits(VimeoProvider, VideoPlatformProvider);
 
 /**
  * Uploads a video to the Vimeo platform.
- *
- * TODO Find a way to avoid sending default preset request on Vimeo
- * for each upload.
  *
  * @method upload
  * @async

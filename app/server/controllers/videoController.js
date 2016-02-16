@@ -10,7 +10,6 @@
  * @class videoController
  */
 
-// Module dependencies
 var path = require('path');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();

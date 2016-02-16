@@ -4,9 +4,7 @@
  * @module publish-providers
  */
 
-// Module dependencies
 var fs = require('fs');
-
 var util = require('util');
 var mime = require('mime');
 var async = require('async');
@@ -34,8 +32,22 @@ var privacyStatus = ['public', 'private', 'unlisted'];
  */
 function YoutubeProvider(providerConf) {
   VideoPlatformProvider.call(this, providerConf);
+
+  /**
+   * Youtube upload method, uploadClassic or uploadResumable.
+   *
+   * @property uploadMethod
+   * @type String
+   */
   this.uploadMethod = uploadMethods.indexOf(providerConf.uploadMethod) > -1 ?
     providerConf.uploadMethod : 'uploadClassic';
+
+  /**
+   * Privacy to apply to uploaded videos either public, private or unlisted.
+   *
+   * @property privacy
+   * @type String
+   */
   this.privacy = privacyStatus.indexOf(providerConf['privacy']) > -1 ? providerConf['privacy'] : 'public';
 }
 
@@ -87,6 +99,7 @@ util.inherits(YoutubeProvider, VideoPlatformProvider);
  * @param {Function} callback The function to call when the upload
  * is done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **String** The uploaded media id
  */
 YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
 
@@ -133,11 +146,13 @@ YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
 };
 
 /**
- * Upload to youtube in the classic way, using their api
+ * Uploads to youtube in the classic way, using their api.
  *
- * @param {string} videoFilePath the path to the video to upload
- * @param {object} uploadParams params to send to youtube when calling their api
- * @param {function} callback callback function
+ * @param {String} videoFilePath the path to the video to upload
+ * @param {Object} uploadParams params to send to youtube when calling their api
+ * @param {Function} callback callback function with :
+ *  - **Error** The error if an error occurred, null otherwise
+ *  - **String** The uploaded media id
  */
 YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, callback) {
   var mediaId;
@@ -183,13 +198,16 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
 
 
 /**
- * Upload to youtube in a fail safe way, using resumable uploads
+ * Uploads to youtube in a fail safe way, using resumable uploads.
+ *
  * The upload can fail 3 times before failing globally, each times it fails it perform an upload again
  * starting where it previously failed (ie: not re-upoloading all the video)
  *
- * @param {string} videoFilePath the path to the video to upload
- * @param {object} uploadParams params to send to youtube when calling their api
- * @param {function} callback callback function
+ * @param {String} videoFilePath the path to the video to upload
+ * @param {Object} uploadParams params to send to youtube when calling their api
+ * @param {Function} callback callback function with :
+ *  - **Error** The error if an error occurred, null otherwise
+ *  - **String** The uploaded media id
  */
 YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams, callback) {
   var mediaId;

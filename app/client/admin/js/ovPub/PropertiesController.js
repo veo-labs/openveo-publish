@@ -9,6 +9,7 @@
 
     /**
      * Removes a list of properties.
+     *
      * @param {Array} selected The list of property ids to remove
      * @param {Function} reload The reload Function to force reloading the table
      */
@@ -23,6 +24,7 @@
 
     /**
      * Adds a property.
+     *
      * @param {Object} property Property data
      */
     function addProperty(property) {
@@ -34,7 +36,8 @@
 
     /**
      * Saves property.
-     * @param Object property Property data
+     *
+     * @param {Object} property Property data
      */
     function saveProperty(property) {
       return entityService.updateEntity('property', property.id, {

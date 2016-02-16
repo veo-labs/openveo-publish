@@ -12,13 +12,13 @@
     /**
      * Executes when "link"ing a time input
      *
-     * @param {object} scope       The scope to be used by the directive for registering watches
-     * @param {object} element     The element where the directive is to be used.
-     * @param {object} attributes  Normalized list of attributes declared on this element
+     * @param {Object} scope The scope to be used by the directive for registering watches
+     * @param {Object} element The element where the directive is to be used.
+     * @param {Object} attributes Normalized list of attributes declared on this element
      * @param {array} controllers The directive's required controller instance(s)
-     * @param {object} $compile    The $ccompile service
-     * @param {object} $filter     The $filter service
-     * @param {object} $parse      The parse service
+     * @param {Object} $compile The $ccompile service
+     * @param {Object} $filter The $filter service
+     * @param {Object} $parse The parse service
      */
     function postLink(scope, element, attributes, controllers, $compile, $filter, $parse) {
       if (!controllers[0]) {

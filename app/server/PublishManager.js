@@ -30,7 +30,6 @@
  * @module publish-manager
  */
 
-// Module dependencies
 var util = require('util');
 var events = require('events');
 var path = require('path');
@@ -81,8 +80,29 @@ util.inherits(PublishError, Error);
  */
 function PublishManager(database) {
   openVeoAPI.applicationStorage.setDatabase(database);
+
+  /**
+   * Packages waiting to be processed.
+   *
+   * @property queue
+   * @type Array
+   */
   this.queue = [];
+
+  /**
+   * Packages being processed.
+   *
+   * @property pendingPackages
+   * @type Array
+   */
   this.pendingPackages = [];
+
+  /**
+   * Video model.
+   *
+   * @property videoModel
+   * @type VideoModel
+   */
   this.videoModel = new VideoModel();
 }
 

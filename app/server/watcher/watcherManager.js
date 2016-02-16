@@ -7,7 +7,6 @@
  * @class watcherManager
  */
 
-// Module dependencies
 var path = require('path');
 var childProcess = require('child_process');
 var openVeoAPI = require('@openveo/api');

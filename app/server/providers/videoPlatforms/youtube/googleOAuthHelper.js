@@ -16,7 +16,21 @@ var ConfigurationModel = process.requirePublish('app/server/models/Configuration
 function GoogleOAuthHelper() {
   if (publishConf.youtube && publishConf.youtube.googleOAuth)
     config = publishConf.youtube.googleOAuth;
+
+  /**
+   * Google oauth client library.
+   *
+   * @property oauth2Client
+   * @type OAuth2
+   */
   this.oauth2Client = config ? new OAuth2(config.clientId, config.clientSecret, config.redirectUrl) : null;
+
+  /**
+   * Configuration model.
+   *
+   * @property confModel
+   * @type ConfigurationModel
+   */
   this.confModel = new ConfigurationModel();
 }
 

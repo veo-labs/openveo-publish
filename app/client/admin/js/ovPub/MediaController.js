@@ -53,6 +53,7 @@
 
     /**
      * Gets all categories and add a value for "none".
+     *
      * @param {String} label The label for "no categories"
      * @return {Array} The list of categories
      */
@@ -65,6 +66,7 @@
 
     /**
      * Opens a link in a new tab.
+     *
      * @param {String} link Destination url
      */
     function goToPath(link) {
@@ -73,6 +75,7 @@
 
     /**
      * Opens an alert to display HTML code to share the media.
+     *
      * @param {Object} media The media to share
      */
     function shareCode(media) {
@@ -100,6 +103,7 @@
 
     /**
      * Retries a media which is on error.
+     *
      * @param {Array} medias The list of medias to work on
      * @param {Function} reload Function to reload the datatable
      */
@@ -113,6 +117,7 @@
 
     /**
      * Asks server to start uploading the media to the chosen platform.
+     *
      * @param {Array} medias The list of medias to work on
      * @param {String} platformName The name of platform to upload to
      * @param {Function} reload Function to reload the datatable
@@ -127,6 +132,7 @@
 
     /**
      * Publishes a list of medias.
+     *
      * @param {Array} medias The list of media ids to publish
      * @param {Function} reload Function to reload the datatable
      */
@@ -140,6 +146,7 @@
 
     /**
      * Unpublishes a list of medias.
+     *
      * @param {Array} medias The list of media ids to unpublish
      * @param {Function} reload Function to reload the datatable
      */
@@ -153,6 +160,7 @@
 
     /**
      * Removes a list of medias.
+     *
      * @param {Array} selected The list of media ids to remove
      * @param {Function} reload Function to reload the datatable
      */
@@ -166,6 +174,7 @@
 
     /**
      * Saves media information.
+     *
      * @param {Object} media Media data
      */
     function saveMedia(media) {
@@ -181,6 +190,7 @@
 
     /**
      * Routes to chapters edition.
+     *
      * @param {Object} media The media to edit
      */
     function editChapter(media) {
@@ -189,6 +199,7 @@
 
     /**
      * Gets property name by id.
+     *
      * @param {String} id Id of the property
      * @return {String} The property name
      */

@@ -30,8 +30,7 @@ It can contain some optional properties :
 ```json
 {
   "date": 1425916390, // The date the video was recorded (in Unix epoch time)
-  "rich-media": true, // true to indicates that video has associated images, false if only the video is in the package
-  "duration": 30 // The duration of the video (in seconds)
+  "rich-media": true // true to indicates that video has associated images, false if only the video is in the package
 }
 ```
 

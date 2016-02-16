@@ -4,7 +4,6 @@
  * @module publish-packages
  */
 
-// Module dependencies
 var path = require('path');
 var fs = require('fs');
 var util = require('util');

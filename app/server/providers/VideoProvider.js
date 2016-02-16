@@ -4,7 +4,6 @@
  * @module publish-providers
  */
 
-// Module dependencies
 var util = require('util');
 var openVeoAPI = require('@openveo/api');
 
@@ -52,23 +51,17 @@ VideoProvider.prototype.updateVideoState = function(id, oldState, newState, call
 };
 
 /**
- * *
- * @param {type} options
+ * Fetches a list of videos with pagination.
  *
- * sort is a collection of key to sort with the order value (-1 : desc, 1 asc)
- * example ( {"name":-1, age:"1"}  specifies a descending sort by the name field and then an ascending sort by
- * the age field
- *
- * filter is a collection of filter
- * example {"name": {$regex : ".*sam.*}, "age": {$lt:20}} specifies all document witch the name field contains
- * "sam" aged less than 20
- *
- * @param {type} filter
- * @param {type} count
- * @param {type} page
- * @param {type} sort
- * @param {type} callback
- * @returns {undefined}
+ * @method getPaginatedFilteredEntities
+ * @async
+ * @param {Object} filter Collection of filters formatted like MongoDB filters
+ * @param {Number} count The expected number of videos per page
+ * @param {Number} page The index of the page to retrieve
+ * @param {Object} sort Collection of keys to sort with the order value (-1 : desc, 1 asc) e.g. {"name":-1, age:"1"}
+ * @param {Function} callback Function to call when its done with :
+ *  - **Error** The error if an error occurred, null otherwise
+ *  - **Array** The list of videos
  */
 VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
   this.database.search(this.collection, filter, {

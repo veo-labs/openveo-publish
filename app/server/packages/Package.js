@@ -4,7 +4,6 @@
  * @module publish-packages
  */
 
-// Module dependencies
 var util = require('util');
 var fs = require('fs');
 var events = require('events');
@@ -53,16 +52,43 @@ function PackageError(message, code) {
  *    - **Object** The published package
  */
 function Package(mediaPackage) {
+
+  /**
+   * Publish configuration object from publishConf.json file.
+   *
+   * @property publishConf
+   * @type Object
+   */
   this.publishConf = publishConf;
+
+  /**
+   * Video model.
+   *
+   * @property videoModel
+   * @type VideoModel
+   */
+  this.videoModel = new VideoModel();
+
+  /**
+   * Media package description object.
+   *
+   * @property mediaPackage
+   * @type Object
+   */
+  this.mediaPackage = mediaPackage;
+
+  /**
+   * Video platforms configuration object from videoPlatformConf.json file.
+   *
+   * @property publishConf
+   * @type Object
+   */
+  this.videoPlatformConf = videoPlatformConf;
 
   // Validate temporary directory
   if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
     this.emit('error', new PackageError('videoTmpDir in publishConf.json must be a String'),
       errors.INVALID_CONFIGURATION);
-
-  this.videoModel = new VideoModel();
-  this.mediaPackage = mediaPackage;
-  this.videoPlatformConf = videoPlatformConf;
 }
 
 util.inherits(Package, events.EventEmitter);

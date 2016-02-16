@@ -19,6 +19,7 @@
 
     /**
      * Handles error when a category is added or updated.
+     *
      * @param {Object} data Response data
      * @param {Number} status HTTP code
      */
@@ -27,7 +28,7 @@
     }
 
     /**
-     * Check that category name field is not empty.
+     * Checks that category name field is not empty.
      */
     function isAddFieldEmpty() {
       if ($scope.newitem.title == undefined) {
@@ -95,7 +96,7 @@
       }
     };
 
-    /**
+    /*
      *
      * Rights
      *

@@ -4,7 +4,6 @@
  * @module publish-models
  */
 
-// Module dependencies
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
@@ -27,6 +26,13 @@ var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
  */
 function VideoModel() {
   openVeoAPI.EntityModel.prototype.init.call(this, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
+
+  /**
+   * Property provider.
+   *
+   * @property propertyProvider
+   * @type PropertyProvider
+   */
   this.propertyProvider = new PropertyProvider(openVeoAPI.applicationStorage.getDatabase());
 }
 
@@ -113,6 +119,8 @@ function removeDirectories(directories, callback) {
  * @param {Object} videoPackage Information about the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The total amount of items inserted
+ *   - **Object** The inserted video
  */
 VideoModel.prototype.add = function(videoPackage, callback) {
   var data = {
@@ -138,9 +146,9 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     files: videoPackage.files || []
   };
 
-  this.provider.add(data, function(error) {
+  this.provider.add(data, function(error, addedCount, videos) {
     if (callback)
-      callback(error, data);
+      callback(error, addedCount, videos && videos[0]);
   });
 };
 
@@ -153,6 +161,7 @@ VideoModel.prototype.add = function(videoPackage, callback) {
  * @param {String} state The state of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateState = function(id, state, callback) {
   this.provider.update(id, {state: state}, callback);
@@ -167,6 +176,7 @@ VideoModel.prototype.updateState = function(id, state, callback) {
  * @param {String} state The last state of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLastState = function(id, state, callback) {
   this.provider.update(id, {lastState: state}, callback);
@@ -181,6 +191,7 @@ VideoModel.prototype.updateLastState = function(id, state, callback) {
  * @param {String} state The last transition of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLastTransition = function(id, state, callback) {
   this.provider.update(id, {lastTransition: state}, callback);
@@ -195,6 +206,7 @@ VideoModel.prototype.updateLastTransition = function(id, state, callback) {
  * @param {Number} errorCode The error code of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
   this.provider.update(id, {errorCode: errorCode}, callback);
@@ -209,6 +221,7 @@ VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
  * @param {String} link The link of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLink = function(id, link, callback) {
   this.provider.update(id, {link: link}, callback);
@@ -223,6 +236,7 @@ VideoModel.prototype.updateLink = function(id, link, callback) {
  * @param {String} idMediaPlatform The id of the media in the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
   this.provider.update(id, {mediaId: idMediaPlatform}, callback);
@@ -237,6 +251,7 @@ VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
  * @param {String} metadata The metadata of the video in the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
   this.provider.update(id, {metadata: metadata}, callback);
@@ -251,6 +266,7 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
  * @param {Number} date The date of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateDate = function(id, date, callback) {
   this.provider.update(id, {date: date}, callback);
@@ -265,6 +281,7 @@ VideoModel.prototype.updateDate = function(id, date, callback) {
  * @param {String} category The category id of the video in the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
   this.provider.update(id, {category: categoryId}, callback);
@@ -279,6 +296,7 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
  * @param {String} type The type of the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateType = function(id, type, callback) {
   this.provider.update(id, {type: type}, callback);
@@ -293,6 +311,7 @@ VideoModel.prototype.updateType = function(id, type, callback) {
  * @param {String} path The path of the thumbnail file
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateThumbnail = function(id, path, callback) {
   this.provider.update(id, {thumbnail: path}, callback);
@@ -709,6 +728,7 @@ VideoModel.prototype.remove = function(ids, callback) {
  * @param {Object} data The video info
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
  */
 VideoModel.prototype.update = function(id, data, callback) {
   var info = {};
@@ -739,6 +759,7 @@ VideoModel.prototype.update = function(id, data, callback) {
  * @param {String} id The id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of published videos
  */
 VideoModel.prototype.publishVideo = function(id, callback) {
   this.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
@@ -755,6 +776,7 @@ VideoModel.prototype.publishVideo = function(id, callback) {
  * @param {String} id The id of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of unpublished videos
  */
 VideoModel.prototype.unpublishVideo = function(id, callback) {
   this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);

@@ -27,7 +27,6 @@ var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
 var databaseConf;
 
-// Process script arguments
 for (var i = 0; i < process.argv.length; i++) {
 
   switch (process.argv[i]) {

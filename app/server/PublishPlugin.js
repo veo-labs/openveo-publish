@@ -21,9 +21,28 @@ var watcherManager = process.requirePublish('app/server/watcher/watcherManager.j
  */
 function PublishPlugin() {
 
-  // Creates admin and front new routers
+  /**
+   * Publish public router.
+   *
+   * @property router
+   * @type Router
+   */
   this.router = express.Router();
+
+  /**
+   * Publish private router.
+   *
+   * @property router
+   * @type Router
+   */
   this.privateRouter = express.Router();
+
+  /**
+   * Publish web service router.
+   *
+   * @property router
+   * @type Router
+   */
   this.webServiceRouter = express.Router();
 
   // Define routes directly here or in the configuration file
