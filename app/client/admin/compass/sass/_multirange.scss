@@ -26,9 +26,15 @@
 }
 
 .ov-multirange-mk2-label span {
+  max-width: 100px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   display: inline-block;
   margin-left: -50%;
+  vertical-align: top;
   font-size: 11px;
+  line-height: 11px;
   color: #333333;
   font-family: 'Arial', sans-serif;
   text-align: center;
