@@ -171,7 +171,8 @@ function createVideoPlatformConf(callback) {
         if (answer === 'y') {
           youtubeConf = {
             uploadMethod: 'uploadResumable',
-            googleOAuth: {}
+            googleOAuth: {},
+            privacy: 'unlisted'
           };
         }
         callback();
@@ -202,8 +203,17 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!youtubeConf) return callback();
-      rl.question('Do you want to overwrite Youtube resumable upload by classic upload (y/N) :\n', function(answer) {
+      rl.question('Do you want to overwrite Youtube resumable upload by classic upload ? (y/N) :\n', function(answer) {
         if (answer === 'y') youtubeConf.uploadMethod = 'uploadClassic';
+        callback();
+      });
+    },
+    function(callback) {
+      if (!youtubeConf) return callback();
+      rl.question('Which Youtube privacy mode will be used ? ' +
+              '(0:unlisted -default- , 1:private, 2:public) :\n', function(answer) {
+        if (answer === '1') youtubeConf.privacy = 'private';
+        if (answer === '2') youtubeConf.privacy = 'public';
         callback();
       });
     }
