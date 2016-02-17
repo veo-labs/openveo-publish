@@ -39,18 +39,15 @@
   "permissions" : [
     {
       "id" : "access-videos-page",
-      "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_VIDEO_PAGE_DESCRIPTION"
+      "name" : "PERMISSIONS.ACCESS_VIDEO_PAGE_NAME"
     },
     {
       "id" : "access-properties-page",
-      "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_DESCRIPTION"
+      "name" : "PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME"
     },
     {
       "id" : "access-categories-page",
-      "name" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME",
-      "description" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_DESCRIPTION"
+      "name" : "PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME"
     },
     {
       "id" : "access-watcher-page",
@@ -67,7 +64,7 @@
     },
     {
       "id" : "access-conf-page",
-      "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE",
+      "name" : "PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME",
       "paths" : [
         "get /publish/configuration/all"
       ]
