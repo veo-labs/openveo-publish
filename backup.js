@@ -110,7 +110,7 @@ if (args == 'backup') {
     verifyAssetNotEmpty,
     verifyTmpIsEmpty,
     copyAssetsToTmp
-  ], function(error, results) {
+  ], function(error) {
     if (error)
       throw error;
     else {
@@ -139,7 +139,7 @@ if (args == 'backup') {
 } else {
 
   // Bad script launch
-  process.stdout.write('Bad arguments for update script.\n');
+  process.stdout.write('Bad arguments for backup script.\n');
   exit(128);
 
 }
