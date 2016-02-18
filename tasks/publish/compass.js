@@ -14,7 +14,9 @@ module.exports = {
       sourcemap: false,
       sassDir: '<%= publish.sass %>',
       cssDir: '<%= publish.beCSSAssets %>',
-      environment: 'production'
+      environment: 'production',
+      outputStyle: 'compressed',
+      force: true
     }
   }
 };
