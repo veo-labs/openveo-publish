@@ -226,6 +226,10 @@ describe('Media page', function() {
     return tableAssert.checkPagination();
   });
 
+  it('should be able to select lines', function() {
+    return tableAssert.checkLinesSelection(page.translations.MEDIAS.NAME_COLUMN);
+  });
+
   it('should be able to see, publish, access chapters or remove a media in ready state', function() {
     checkStateActions(VideoModel.READY_STATE, [
       page.translations.UI.VIEW,
