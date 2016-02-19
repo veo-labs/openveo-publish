@@ -1,6 +1,6 @@
 # Introduction
 
-OpenVeo Publish define its own Web Service endpoints. Web Service authentication is documented in [OpenVeo](https://github.com/veo-labs/openveo-core) project.
+OpenVeo Publish defines its own Web Service endpoints. Web Service authentication is documented in [OpenVeo](https://github.com/veo-labs/openveo-core) project.
 
 Videos can be in different states :
 

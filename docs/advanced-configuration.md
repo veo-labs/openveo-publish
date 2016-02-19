@@ -86,4 +86,4 @@ Open **~/.openveo/publish/watcherConf.json**
 }
 ```
 
-**Nb :** If **type** is missing for a hot folder, videos won't be automatically uploaded to Vimeo. Videos can be uploaded to Vimeo from the catalogue of videos in the back end.
+**Nb :** If **type** is missing for a hot folder, videos won't be automatically uploaded to the platform. Videos can be uploaded to the platform from the catalogue of videos in the back end.
