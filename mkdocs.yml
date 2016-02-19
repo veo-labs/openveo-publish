@@ -19,3 +19,4 @@ pages:
   - 'CSS / SASS / JS compilation': 'developers/compilation.md'
   - 'Unit tests': 'developers/unit-tests.md'
   - 'End to end tests': 'developers/end-to-end-tests.md'
+- 'API' : 'api.md'
