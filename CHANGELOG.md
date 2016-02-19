@@ -1,3 +1,19 @@
+# 1.2.0 / 2016-02-19
+
+- Update AngularJS from version 1.4.1 to 1.4.7
+- Update html5shiv from version 3.7.2 to 3.7.3
+- Add support for Youtube platform
+- Add a backup script to save data between upgrades
+- Correct availability bug on a video hosted by Vimeo
+- Correct cut title translations on chapters editor
+- Correct JavaScript when using time bar on chapters editor
+- Change the name of the retry permission from "Retry to launch video saving process" to "Retry video processing"
+- Immediately update the videos catalog when choosing the action "send to ..."
+- Add translation to the player in chapters editor
+- Activate auto-play on videos
+- Block chapters editor page if an error occured in the player
+- Improve display of long titles in chapters editor page
+
 # 1.1.3 / 2015-11-27
 
 Correct bug on video resolution cache for Vimeo platform
