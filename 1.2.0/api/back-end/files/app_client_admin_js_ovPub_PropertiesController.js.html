@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>app\client\admin\js\ovPub\PropertiesController.js - OpenVeo Publish AngularJS back end</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish AngularJS back end</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 1.2.0
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/publishService.html">publishService</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/ov.publish.html">ov.publish</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: app\client\admin\js\ovPub\PropertiesController.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+(function(app) {
+
+  /**
+   * Defines the properties controller for the properties page.
+   */
+  function PropertiesController($scope, $filter, entityService, publishService) {
+
+    /**
+     * Removes a list of properties.
+     *
+     * @param {Array} selected The list of property ids to remove
+     * @param {Function} reload The reload Function to force reloading the table
+     */
+    function removeRows(selected, reload) {
+      entityService.removeEntity(&#x27;property&#x27;, selected.join(&#x27;,&#x27;))
+        .then(function() {
+          publishService.cacheClear(&#x27;properties&#x27;);
+          $scope.$emit(&#x27;setAlert&#x27;, &#x27;success&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.REMOVE_SUCCESS&#x27;), 4000);
+          reload();
+        });
+    }
+
+    /**
+     * Adds a property.
+     *
+     * @param {Object} property Property data
+     */
+    function addProperty(property) {
+      return entityService.addEntity(&#x27;property&#x27;, property)
+        .then(function() {
+          publishService.cacheClear(&#x27;properties&#x27;);
+        });
+    }
+
+    /**
+     * Saves property.
+     *
+     * @param {Object} property Property data
+     */
+    function saveProperty(property) {
+      return entityService.updateEntity(&#x27;property&#x27;, property.id, {
+        name: property.name,
+        description: property.description,
+        type: property.type
+      }).then(function() {
+        publishService.cacheClear(&#x27;properties&#x27;);
+      });
+    }
+
+    /*
+     *
+     * RIGHTS
+     *
+     */
+    $scope.rights = {};
+    $scope.rights.add = $scope.checkAccess(&#x27;create-property&#x27;);
+    $scope.rights.edit = $scope.checkAccess(&#x27;update-property&#x27;);
+    $scope.rights.delete = $scope.checkAccess(&#x27;delete-property&#x27;);
+
+    /*
+     *
+     * DATATABLE
+     */
+    var scopeDataTable = $scope.tableContainer = {};
+    scopeDataTable.entityType = &#x27;property&#x27;;
+    scopeDataTable.filterBy = [
+      {
+        key: &#x27;name&#x27;,
+        value: &#x27;&#x27;,
+        label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.TITLE_FILTER&#x27;)
+      },
+      {
+        key: &#x27;description&#x27;,
+        value: &#x27;&#x27;,
+        label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.DESCRIPTION_FILTER&#x27;)
+      }
+    ];
+    scopeDataTable.header = [{
+      key: &#x27;name&#x27;,
+      name: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.NAME_COLUMN&#x27;),
+      class: [&#x27;col-xs-11&#x27;]
+    },
+    {
+      key: &#x27;action&#x27;,
+      name: $filter(&#x27;translate&#x27;)(&#x27;UI.ACTIONS_COLUMN&#x27;),
+      class: [&#x27;col-xs-1&#x27;]
+    }];
+
+    scopeDataTable.actions = [{
+      label: $filter(&#x27;translate&#x27;)(&#x27;UI.REMOVE&#x27;),
+      warningPopup: true,
+      condition: function(row) {
+        return $scope.rights.delete &amp;&amp; !row.locked &amp;&amp; !row.saving;
+      },
+      callback: function(row, reload) {
+        removeRows([row.id], reload);
+      },
+      global: function(selected, reload) {
+        removeRows(selected, reload);
+      }
+    }];
+
+    /*
+     * FORM
+     */
+    var scopeEditForm = $scope.editFormContainer = {};
+    scopeEditForm.model = {};
+    scopeEditForm.entityType = &#x27;property&#x27;;
+    var supportedTypes = [
+      {
+        value: &#x27;text&#x27;,
+        name: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.FORM_ADD_TEXT_TYPE&#x27;)
+      }
+    ];
+    scopeEditForm.fields = [
+      {
+
+        // the key to be used in the model values
+        // so this will be bound to vm.user.username
+        key: &#x27;name&#x27;,
+        type: &#x27;horizontalExtendInput&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_NAME&#x27;),
+          required: true
+        }
+      },
+      {
+        key: &#x27;description&#x27;,
+        type: &#x27;horizontalExtendInput&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_DESCRIPTION&#x27;),
+          required: true
+        },
+        expressionProperties: {
+          &#x27;templateOptions.disabled&#x27;: &#x27;!model.name&#x27; // disabled when username is blank
+        }
+      },
+      {
+        key: &#x27;type&#x27;,
+        type: &#x27;horizontalExtendSelect&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_TYPE&#x27;),
+          required: true,
+          options: supportedTypes
+        }
+      }
+    ];
+    scopeEditForm.conditionEditDetail = function(row) {
+      return $scope.rights.edit &amp;&amp; !row.locked;
+    };
+
+    scopeEditForm.onSubmit = function(model) {
+      return saveProperty(model);
+    };
+
+    /*
+     *  FORM Add Property
+     *
+     */
+    var scopeAddForm = $scope.addFormContainer = {};
+    scopeAddForm.model = {};
+    scopeAddForm.fields = [
+      {
+
+        // the key to be used in the model values
+        // so this will be bound to vm.user.username
+        key: &#x27;name&#x27;,
+        type: &#x27;horizontalInput&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_NAME&#x27;),
+          required: true,
+          description: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.FORM_ADD_NAME_DESC&#x27;)
+        }
+      },
+      {
+        key: &#x27;description&#x27;,
+        type: &#x27;horizontalInput&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_DESCRIPTION&#x27;),
+          required: true,
+          description: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.FORM_ADD_DESCRIPTION_DESC&#x27;)
+        },
+        expressionProperties: {
+          &#x27;templateOptions.disabled&#x27;: &#x27;!model.name&#x27; // disabled when username is blank
+        }
+      },
+      {
+        key: &#x27;type&#x27;,
+        type: &#x27;horizontalSelect&#x27;,
+        templateOptions: {
+          label: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.ATTR_TYPE&#x27;),
+          required: true,
+          description: $filter(&#x27;translate&#x27;)(&#x27;PROPERTIES.FORM_ADD_TYPE_DESC&#x27;),
+          options: supportedTypes
+        },
+        expressionProperties: {
+          &#x27;templateOptions.disabled&#x27;: &#x27;!model.description&#x27; // disabled when username is blank
+        }
+      }
+    ];
+
+    scopeAddForm.onSubmit = function(model) {
+      return addProperty(model);
+    };
+
+  }
+
+  app.controller(&#x27;PropertiesController&#x27;, PropertiesController);
+  PropertiesController.$inject = [&#x27;$scope&#x27;, &#x27;$filter&#x27;, &#x27;entityService&#x27;, &#x27;publishService&#x27;];
+
+})(angular.module(&#x27;ov.publish&#x27;));
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

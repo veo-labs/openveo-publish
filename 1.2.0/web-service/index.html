@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Web Service - Openveo Publish</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Web Service";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Openveo Publish</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">INTRODUCTION</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>USERS</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting started</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../watcher/">Watcher</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Web Service</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#introduction">Introduction</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#endpoints">Endpoints</a></li>
+                
+                    <li><a class="toctree-l4" href="#videos">Videos</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-configuration/">Advanced configuration</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>DEVELOPERS</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/basics/">Basics</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/installation/">Installation</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/back-end/">Back end AngularJS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/compilation/">CSS / SASS / JS compilation</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/unit-tests/">Unit tests</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/end-to-end-tests/">End to end tests</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../api/">API</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Openveo Publish</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>USERS &raquo;</li>
+        
+      
+    
+    <li>Web Service</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/veo-labs/openveo-publish" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="introduction">Introduction</h1>
+<p>OpenVeo Publish defines its own Web Service endpoints. Web Service authentication is documented in <a href="https://github.com/veo-labs/openveo-core">OpenVeo</a> project.</p>
+<p>Videos can be in different states :</p>
+<ul>
+<li><strong>0</strong> : The video is on error</li>
+<li><strong>1</strong> : The video is waiting to be treated</li>
+<li><strong>2</strong> : The video is copying</li>
+<li><strong>3</strong> : The video package is extracting</li>
+<li><strong>4</strong> : The video package is validating</li>
+<li><strong>5</strong> : The video package is preparing</li>
+<li><strong>6</strong> : The video is waiting for manual upload</li>
+<li><strong>7</strong> : The video is uploading to Vimeo</li>
+<li><strong>8</strong> : The video is being configured on Vimeo</li>
+<li><strong>9</strong> : The video timecodes are being saved</li>
+<li><strong>10</strong> : The video synchronized images are being saved</li>
+<li><strong>11</strong> : The video is uploaded and ready but unpublished</li>
+<li><strong>12</strong> : The video is uploaded and ready and published</li>
+<li><strong>13</strong> : The video thumbnail is generated</li>
+<li><strong>14</strong> : The video metadatas are being retrieved</li>
+</ul>
+<h1 id="endpoints">Endpoints</h1>
+<h2 id="videos">Videos</h2>
+<p>Get published videos.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/videos
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sortBy</td>
+<td>String</td>
+<td>No</td>
+<td>date</td>
+<td>Sort videos by either <strong>title</strong>, <strong>description</strong>, <strong>date</strong> or <strong>published</strong></td>
+</tr>
+<tr>
+<td>sortOrder</td>
+<td>String</td>
+<td>No</td>
+<td>desc</td>
+<td>Sort order (either <strong>asc</strong> or <strong>desc</strong>)</td>
+</tr>
+<tr>
+<td>page</td>
+<td>Number</td>
+<td>No</td>
+<td>1</td>
+<td>The expected page</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>Number</td>
+<td>No</td>
+<td>-</td>
+<td>Limit number of videos per page. If not specified get all videos</td>
+</tr>
+<tr>
+<td>properties</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>A list of properties with the property name as the key and the expected property value as the value. (e.g. <strong>properties[property1Name]=property1Value</strong>)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>200</td>
+<td>Got the list of videos (even if the list is empty)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;videos&quot; : [
+    {
+      &quot;id&quot; : 1444396683105, // Id of the video
+      &quot;state&quot; : 12, // Video state
+      &quot;date&quot; : 1425916390000, // Date in timestamp
+      &quot;metadata&quot; : {
+        // All metadata from package .session file
+      },
+      &quot;type&quot; : vimeo, // Video associated platform (only vimeo is supported)
+      &quot;errorCode&quot; : -1, // Video error code or -1 if no error
+      &quot;category&quot; : &quot;&quot;, // Video category
+      &quot;properties&quot; : { // Video custom properties
+        &quot;1444809111034&quot;: { // Custom property id
+          &quot;id&quot; : 1444809111034, // Custom property id
+          &quot;name&quot; : &quot;Property name&quot;, // Custom property name
+          &quot;description&quot; : &quot;Property description&quot;, // Custom property description
+          &quot;type&quot; : &quot;text&quot;, // Custom property type
+          &quot;value&quot; : &quot;Property value&quot; // Custom property value
+        }
+        ...
+      },
+      &quot;packageType&quot; : &quot;tar&quot;, // Initialize package type (either tar or mp4)
+      &quot;link&quot; : &quot;/publish/video/1444396683105&quot;, // Path to play the video
+      &quot;mediaId&quot; : &quot;141902178&quot;, // Video id on Vimeo
+      &quot;available&quot; : 1, // Video id on Vimeo
+      &quot;thumbnail&quot; : &quot;/1444396683105/thumbnail.jpg&quot;,
+      &quot;files&quot; : [ // Video files in different format
+        {
+          &quot;quality&quot; : 100, // Video file quality
+          &quot;width&quot; : 480, // Video width
+          &quot;height&quot; : 270, // Video height
+          &quot;link&quot; : &quot;https://player.vimeo.com/external/141902178.mobile.mp4?s=e5e51fa4d4d5437f6b0fe33d5c789624&amp;profile_id=116&amp;oauth2_token_id=54813546&quot;, // Video link
+        }
+        ...
+      ],
+      &quot;title&quot; : &quot;Video title&quot;,
+      &quot;description&quot; : &quot;Video title&quot;,
+      &quot;chapters&quot; : [ // Chapters
+        {
+          &quot;name&quot; : &quot;Chapter 1&quot;, // Chapter name
+          &quot;description&quot; : &quot;Chapter 1&quot;, // Chapter description
+          &quot;value&quot; : 0.04 // Chapter timecode in percent (percentage of the video)
+        },
+        {
+          &quot;name&quot; : &quot;Chapter 2&quot;, // Chapter name
+          &quot;description&quot; : &quot;Chapter 2&quot;, // Chapter description
+          &quot;value&quot; : 0.3 // Chapter timecode in percent (percentage of the video)
+        }
+      ],
+      &quot;cut&quot; : [ // Cut information (begin and end)
+        {
+          &quot;type&quot; : &quot;begin&quot;, // Cut type
+          &quot;value&quot; : 0 // Begin timecode (percentage of the media)
+        },
+        {
+          &quot;type&quot; : &quot;end&quot;, // Cut type
+          &quot;value&quot; : 0.9 // End timecode (percentage of the media)
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+
+<hr />
+<p>Get information about a video.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/video/{video_id}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>video_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>-</td>
+<td>The id of the video to fetch</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>The id of the video is missing</td>
+</tr>
+<tr>
+<td>200</td>
+<td>Got the video</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;video&quot; : {
+    &quot;id&quot; : 1444396683105, // Id of the video
+    &quot;state&quot; : 12, // Video state
+    &quot;date&quot; : 1425916390000, // Date in timestamp
+    &quot;metadata&quot; : {
+      // All metadata from package .session file
+    },
+    &quot;type&quot; : vimeo, // Video associated platform (only vimeo is supported)
+    &quot;errorCode&quot; : -1, // Video error code or -1 if no error
+    &quot;category&quot; : &quot;&quot;, // Video category
+    &quot;properties&quot; : { // Video custom properties
+      &quot;1444809111034&quot; : &quot;Property value&quot; // Custom property value by id
+      ...
+    },
+    &quot;packageType&quot; : &quot;tar&quot;, // Initialize package type (either tar or mp4)
+    &quot;link&quot; : &quot;/publish/video/1444396683105&quot;, // Path to play the video
+    &quot;mediaId&quot; : &quot;141902178&quot;, // Video id on Vimeo
+    &quot;available&quot; : 1, // Video id on Vimeo
+    &quot;thumbnail&quot; : &quot;/1444396683105/thumbnail.jpg&quot;,
+    &quot;files&quot; : [ // Video files in different format
+      {
+        &quot;quality&quot; : 100, // Video file quality
+        &quot;width&quot; : 480, // Video width
+        &quot;height&quot; : 270, // Video height
+        &quot;link&quot; : &quot;https://player.vimeo.com/external/141902178.mobile.mp4?s=e5e51fa4d4d5437f6b0fe33d5c789624&amp;profile_id=116&amp;oauth2_token_id=54813546&quot;, // Video link
+      }
+      ...
+    ],
+    &quot;title&quot; : &quot;Video title&quot;,
+    &quot;description&quot; : &quot;Video title&quot;,
+    &quot;chapters&quot; : [ // Chapters
+      {
+        &quot;name&quot; : &quot;Chapter 1&quot;, // Chapter name
+        &quot;description&quot; : &quot;Chapter 1&quot;, // Chapter description
+        &quot;value&quot; : 0.04 // Chapter timecode in percent (percentage of the video)
+      },
+      {
+        &quot;name&quot; : &quot;Chapter 2&quot;, // Chapter name
+        &quot;description&quot; : &quot;Chapter 2&quot;, // Chapter description
+        &quot;value&quot; : 0.3 // Chapter timecode in percent (percentage of the video)
+      }
+    ],
+    &quot;cut&quot; : [ // Cut information (begin and end)
+      {
+        &quot;type&quot; : &quot;begin&quot;, // Cut type
+        &quot;value&quot; : 0 // Begin timecode (percentage of the media)
+      },
+      {
+        &quot;type&quot; : &quot;end&quot;, // Cut type
+        &quot;value&quot; : 0.9 // End timecode (percentage of the media)
+      }
+    ],
+    &quot;timecodes&quot; : [ // Video synchronized images
+      {
+        &quot;image&quot; : {
+          &quot;large&quot; : &quot;/1440175380631/slide_00000.jpeg&quot;, // Large image
+          &quot;small&quot; : &quot;/1440175380631/slide_00000.jpeg?thumb=small&quot; // Small image
+        },
+        &quot;timecode&quot; : 0 // Timecode when to display the image (in ms)
+      },
+      {
+        &quot;image&quot; : {
+          &quot;large&quot; : &quot;/1440175380631/slide_00001.jpeg&quot;, // Large image
+          &quot;small&quot; : &quot;/1440175380631/slide_00001.jpeg?thumb=small&quot; // Small image
+        },
+        &quot;timecode&quot; : 1400 // Timecode when to display the image (in ms)
+      }
+      ...
+    ]
+  }
+}
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../advanced-configuration/" class="btn btn-neutral float-right" title="Advanced configuration"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../watcher/" class="btn btn-neutral" title="Watcher"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../watcher/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../advanced-configuration/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>
