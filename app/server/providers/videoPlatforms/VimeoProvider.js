@@ -146,15 +146,17 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
  *     // Returned data example
  *     {
  *       available : true,
- *       files : [
- *         {
- *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *           width : 640,
- *           height : 360,
- *           link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
- *         },
- *         ...
- *       ]
+ *       sources : {
+ *         files : [
+ *           {
+ *             quality : 0, // 0 = mobile, 1 = sd, 2 = hd
+ *             width : 640,
+ *             height : 360,
+ *             link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
+ *           },
+ *           ...
+ *         ]
+ *       }
  *     }
  *
  * @method getVideoInfo

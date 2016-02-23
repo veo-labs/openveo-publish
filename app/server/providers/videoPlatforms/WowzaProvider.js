@@ -13,7 +13,7 @@ var shortid = require('shortid');
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 
 /**
- * Defines a VimeoProvider class to interact with wowza platform
+ * Defines a WowzaProvider class to interact with wowza platform
  * (https://wowza.com/).
  *
  * @example
@@ -54,9 +54,9 @@ module.exports = WowzaProvider;
 util.inherits(WowzaProvider, VideoPlatformProvider);
 
 /**
- * Uploads a video to the Vimeo platform.
+ * Uploads a video to the Wowza platform.
  *
- * TODO Find a way to avoid sending default preset request on Vimeo
+ * TODO Find a way to avoid sending default preset request on Wowza
  * for each upload.
  *
  * @method upload
@@ -97,20 +97,17 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
 };
 
 /**
- * Gets information about a video hosted by Vimeo.
- *
- * Video is considered available if the expected video definition has been transcoded by the video platform.
+ * Gets information about a video hosted by Wowza.
  *
  * @example
  *     // Returned data example
  *     {
  *       available : true,
- *       files : [
+ *       sources : {
+ *         adaptive:[
  *         {
- *           quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *           width : 640,
- *           height : 360,
- *           link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
+ *           mimeType : application/dash+xml,
+ *           link : "http://192.168.1.20:1935/openveo/mp4:sample.mp4/manifest.mpd"
  *         },
  *         ...
  *       ]
@@ -118,8 +115,8 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
  *
  * @method getVideoInfo
  * @async
- * @param {String} mediaId The Vimeo id of the video
- * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080)
+ * @param {String} mediaId The wowza id of the video
+ * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080) _ not use on wowza
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
@@ -132,7 +129,6 @@ WowzaProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, cal
     return;
   }
 
-  // Ask Vimeo for video information
   var info = {};
   var basePath = self.wowzaConf.streamPath + '/' + mediaId;
   info.sources = {

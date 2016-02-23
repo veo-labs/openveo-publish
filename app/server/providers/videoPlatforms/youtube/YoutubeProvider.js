@@ -283,7 +283,7 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
  *     {
  *       available : true,
  *       pictures : [],
- *       files : [],
+ *       sources : [],
  *       mediaId : '123456'
  *     }
  *
@@ -300,6 +300,6 @@ YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback)
     return;
   }
 
-  // Files and pictures are not necessary: youtube player manage its own data
-  callback(null, {available: true, files: [], pictures: [], mediaId: mediaId});
+  // sources and pictures are not necessary: youtube player manage its own data
+  callback(null, {available: true, sources: [], pictures: [], mediaId: mediaId});
 };

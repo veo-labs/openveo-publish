@@ -143,7 +143,7 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     timecodes: videoPackage.timecodes,
     chapters: videoPackage.chapters,
     cut: videoPackage.cut || [],
-    files: videoPackage.files || []
+    sources: videoPackage.sources || []
   };
 
   this.provider.add(data, function(error, addedCount, videos) {
@@ -544,15 +544,28 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  *      },
  *      available : true,
  *      thumbnail : "/1439286245225/thumbnail.jpg",
- *      files : [ // Video original files
- *        {
- *          quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *          width : 640,
- *          height : 360,
- *          link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
- *        },
- *        ...
- *     ]
+ *      sources : {
+ *        files : [ // Video original files
+ *          {
+ *            quality : 0, // 0 = mobile, 1 = sd, 2 = hd
+ *            width : 640,
+ *            height : 360,
+ *            link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
+ *          },
+ *          ...
+ *        ],
+ *        adaptive : [ // list of streaming protocol for this video
+ *          {
+ *            link : 'http://streaming/platform/mp4:video.mp4/manifest.mpd'
+ *            mimeType : 'application/dash+xml'
+ *          },
+ *          {
+ *            link : 'http://streaming/platform/mp4:video.mp4/playlist.m3u8'
+ *            mimeType : 'application/x-mpegURL'
+ *          },
+ *          ...
+ *        ]
+ *      }
  *   }
  * }
  *
@@ -603,7 +616,7 @@ VideoModel.prototype.getOne = function(id, callback) {
           videoPlatformConf[videoInfo.type]);
         var expectedDefinition = videoInfo.metadata['profile-settings']['video-height'];
 
-        // Get video availability and files
+        // Get video availability and sources
         videoPlatformProvider.getVideoInfo(videoInfo.mediaId, expectedDefinition, function(error, info) {
           if (error) {
             callback(error);
