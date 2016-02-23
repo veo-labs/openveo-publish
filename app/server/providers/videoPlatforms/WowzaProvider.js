@@ -134,10 +134,23 @@ WowzaProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, cal
 
   // Ask Vimeo for video information
   var info = {};
-  info.files = [{
-    height: expectedDefinition,
-    link: self.wowzaConf.streamPath + '/' + mediaId + '.mp4'
-  }];
+  var basePath = self.wowzaConf.streamPath + '/' + mediaId;
+  info.sources = {
+    adaptive: [
+      {
+        mimeType: 'application/dash+xml',
+        link: basePath + '.mp4/manifest.mpd'
+      },
+      {
+        mimeType: 'application/x-mpegURL',
+        link: basePath + '.mp4/playlist.m3u8'
+      },
+      {
+        mimeType: 'application/f4m+xml',
+        link: basePath + '.mp4/manifest.f4m'
+      }
+    ]
+  };
   info.available = true;
 
   callback(null, info);

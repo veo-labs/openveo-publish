@@ -204,7 +204,7 @@ VimeoProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, cal
               available = true;
           }
         }
-        info['files'] = files;
+        info.sources = {files: files};
       }
 
       info.available = (body.status === 'available') && available;

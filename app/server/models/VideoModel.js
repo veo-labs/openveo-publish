@@ -611,7 +611,7 @@ VideoModel.prototype.getOne = function(id, callback) {
           }
 
           videoInfo.available = info.available;
-          videoInfo.files = info.files;
+          videoInfo.sources = info.sources;
 
           self.provider.update(videoInfo.id, info);
           callback();
