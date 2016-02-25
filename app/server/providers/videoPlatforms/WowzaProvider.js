@@ -38,7 +38,7 @@ function WowzaProvider(providerConf) {
     host: providerConf.host, // required
     username: providerConf.user, // required
     password: providerConf.pwd, // required
-    protocol: 'sftp', // optional, values : 'ftp', 'sftp', 'ftps',... default is 'ftp'
+    protocol: providerConf.protocol, // optional, values : 'ftp', 'sftp', 'ftps',... default is 'ftp'
     // protocol is added on beginning of host, ex : sftp://domain.com in this case
     port: providerConf.port, // optional
     // port is added to the end of the host, ex: sftp://domain.com:22 in this case
