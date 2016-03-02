@@ -74,6 +74,7 @@ module.exports = {
   UNKNOWN_PROPERTY_ERROR: {
     code: 0x400,
     httpCode: 500,
-    module: 'publish'
+    module: 'publish',
+    message: 'Unkown property'
   }
 };
