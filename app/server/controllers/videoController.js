@@ -158,7 +158,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     if (page < 1) page = 1;
   }
 
-  var wsSearch = query.properties;
+  var wsSearch = query.properties || {};
   var searchParam = {state: 12};
 
   var series = [];
