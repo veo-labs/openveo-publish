@@ -2,8 +2,8 @@
 
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
-var Field = e2e.Field;
-var BackEndPage = e2e.BackEndPage;
+var Field = e2e.fields.Field;
+var BackEndPage = e2e.pages.BackEndPage;
 var browserExt = e2e.browser;
 
 /**

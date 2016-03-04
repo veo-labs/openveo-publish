@@ -4,24 +4,27 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
 var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 
 // Load assertion library
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Category page', function() {
-  var page;
+  var page, categoryHelper;
 
   // Prepare page
   before(function() {
-    page = new CategoryPage(new CategoryModel());
+    var categoryModel = new CategoryModel();
+    categoryHelper = new CategoryHelper(categoryModel);
+    page = new CategoryPage(categoryModel);
     page.logAsAdmin();
     page.load();
   });
 
   // Clean tree after each test and reload page
   afterEach(function() {
-    page.removeCategoriesByPass(true);
+    categoryHelper.removeAllEntities();
     page.refresh();
   });
 
@@ -103,7 +106,8 @@ describe('Category page', function() {
         ]
       }
     ];
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     page.removeCategory('Test remove all a');
 
@@ -125,7 +129,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     expectedTree[0].items[0].title = 'Test edit b';
     page.editCategory('Test edit c', 'Test edit b');
@@ -181,7 +186,8 @@ describe('Category page', function() {
         items: []
       }
     ];
-    page.addCategoriesByPass(expectedTree, true);
+    categoryHelper.addEntities(expectedTree);
+    page.refresh();
     page.addCategory('Test cancel b');
     page.cancelCategoryModifications();
     page.getCategories().then(function(tree) {
@@ -198,7 +204,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Add category
     expectedTree.push({title: 'Test save b'});
@@ -230,7 +237,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Move category
     var category = expectedTree[0].items.pop();
@@ -262,7 +270,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Move category
     var category = expectedTree[0].items.shift();
@@ -290,7 +299,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Add category
     var category = expectedTree[0].items.pop();
@@ -317,7 +327,8 @@ describe('Category page', function() {
         ]
       }
     ];
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Close category
     page.closeCategory('Test open, close a');
@@ -353,7 +364,8 @@ describe('Category page', function() {
       }
     ];
     var expectedTree = JSON.parse(JSON.stringify(initialTree));
-    page.addCategoriesByPass(initialTree, true);
+    categoryHelper.addEntities(initialTree);
+    page.refresh();
 
     // Close category
     var category = expectedTree.shift();

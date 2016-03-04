@@ -4,7 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
-var propertyHelper = process.requirePublish('tests/client/e2eTests/helpers/propertyHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
 
 // Load assertion library
@@ -12,11 +12,13 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Property page', function() {
-  var page;
+  var page, propertyHelper;
 
   // Prepare page
   before(function() {
-    page = new PropertyPage(new PropertyModel());
+    var propertyModel = new PropertyModel();
+    propertyHelper = new PropertyHelper(propertyModel);
+    page = new PropertyPage(propertyModel);
   });
 
   // Logout after tests
@@ -51,7 +53,7 @@ describe('Property page', function() {
 
     // Remove all properties after each tests then reload the page
     afterEach(function() {
-      propertyHelper.removeAllProperties();
+      propertyHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -80,7 +82,7 @@ describe('Property page', function() {
 
     // Remove all properties after each tests then reload the page
     afterEach(function() {
-      propertyHelper.removeAllProperties();
+      propertyHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -121,20 +123,22 @@ describe('Property page', function() {
 
     // Remove all properties after each tests then reload the page
     afterEach(function() {
-      propertyHelper.removeAllProperties();
+      propertyHelper.removeAllEntities();
       page.refresh();
     });
 
     it('should not have delete action to remove a property', function() {
       var name = 'test delete without permission';
 
-      page.addLinesByPass([
+      propertyHelper.addEntities([
         {
           name: name,
           description: 'test delete without permission description',
           type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
         }
       ]);
+      page.refresh();
+
       assert.isRejected(page.removeLine(name));
     });
 

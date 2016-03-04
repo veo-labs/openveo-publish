@@ -4,7 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var mediaHelper = process.requirePublish('tests/client/e2eTests/helpers/mediaHelper.js');
+var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
 
 // Load assertion library
@@ -12,11 +12,13 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Media page', function() {
-  var page;
+  var page, mediaHelper;
 
   // Prepare page
   before(function() {
-    page = new MediaPage(new VideoModel());
+    var videoModel = new VideoModel();
+    mediaHelper = new MediaHelper(videoModel);
+    page = new MediaPage(videoModel);
   });
 
   // Logout after tests
@@ -51,7 +53,7 @@ describe('Media page', function() {
 
     // Remove all videos after each tests then reload the page
     afterEach(function() {
-      mediaHelper.removeAllMedias();
+      mediaHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -78,7 +80,7 @@ describe('Media page', function() {
 
     // Remove all videos after each tests then reload the page
     afterEach(function() {
-      mediaHelper.removeAllMedias();
+      mediaHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -93,7 +95,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       assert.isRejected(page.editMedia(name, {
         name: 'New name'
@@ -122,7 +125,7 @@ describe('Media page', function() {
 
     // Remove all videos after each tests then reload the page
     afterEach(function() {
-      mediaHelper.removeAllMedias();
+      mediaHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -137,7 +140,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Try to remove
       assert.isRejected(page.removeLine(name));

@@ -3,17 +3,19 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
-var configurationHelper = process.requirePublish('tests/client/e2eTests/helpers/configurationHelper.js');
+var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
+var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 // Load assertion library
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Configuration page', function() {
-  var page;
+  var page, configurationHelper;
 
   // Prepare page
   before(function() {
+    configurationHelper = new ConfigurationHelper(new ConfigurationModel());
     page = new ConfigurationPage();
     page.logAsAdmin();
     page.load();
@@ -26,7 +28,7 @@ describe('Configuration page', function() {
 
   // Reload page after each test and remove all configurations
   afterEach(function() {
-    configurationHelper.removeAllConfigurations();
+    configurationHelper.removeAllEntities();
     page.refresh();
   });
 
@@ -55,14 +57,14 @@ describe('Configuration page', function() {
     it('should display a specific message and link if a Google account is associated', function() {
 
       // Associate a fake Google account
-      configurationHelper.createConfiguration({
+      configurationHelper.addEntities([{
         googleOAuthTokens: {
           access_token: 'accessToken',
           token_type: 'Bearer',
           refresh_token: 'refreshToken',
           expiry_date: new Date().getTime()
         }
-      });
+      }]);
       page.refresh();
 
       assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());

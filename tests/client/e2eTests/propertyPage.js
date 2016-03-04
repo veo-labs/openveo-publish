@@ -5,7 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
-var propertyHelper = process.requirePublish('tests/client/e2eTests/helpers/propertyHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var TableAssert = e2e.asserts.TableAssert;
 
 // Load assertion library
@@ -13,12 +13,14 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Property page', function() {
-  var page, tableAssert;
+  var page, tableAssert, propertyHelper;
 
   // Prepare page
   before(function() {
-    page = new PropertyPage(new PropertyModel());
-    tableAssert = new TableAssert(page);
+    var propertyModel = new PropertyModel();
+    propertyHelper = new PropertyHelper(propertyModel);
+    page = new PropertyPage(propertyModel);
+    tableAssert = new TableAssert(page, propertyHelper);
     page.logAsAdmin();
     page.load();
   });
@@ -30,7 +32,7 @@ describe('Property page', function() {
 
   // Remove all properties after each tests then reload the page
   afterEach(function() {
-    propertyHelper.removeAllProperties();
+    propertyHelper.removeAllEntities();
     page.refresh();
   });
 
@@ -123,7 +125,8 @@ describe('Property page', function() {
         {name: 'test search 1', description: 'test search description', type: type}
       ];
 
-      return page.addLinesByPass(linesToAdd);
+      propertyHelper.addEntities(linesToAdd);
+      return page.refresh();
     });
 
     it('should be able to search by full name', function() {

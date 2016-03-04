@@ -3,14 +3,15 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
-var configurationHelper = process.requirePublish('tests/client/e2eTests/helpers/configurationHelper.js');
+var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
+var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 // Load assertion library
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Configuration page translations', function() {
-  var page;
+  var page, configurationHelper;
 
   /**
    * Checks translations.
@@ -50,14 +51,14 @@ describe('Configuration page translations', function() {
 
         // Youtube block with an associated account
         // Associate a fake Google account
-        configurationHelper.createConfiguration({
+        configurationHelper.addEntities([{
           googleOAuthTokens: {
             access_token: 'accessToken',
             token_type: 'Bearer',
             refresh_token: 'refreshToken',
             expiry_date: new Date().getTime()
           }
-        });
+        }]);
         page.refresh();
         assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());
         assert.eventually.equal(page.getYoutubeBlockText(),
@@ -65,7 +66,8 @@ describe('Configuration page translations', function() {
                                 page.translations.CONFIGURATION.YOUTUBE_MODIFY_PEER
                                );
 
-        configurationHelper.removeAllConfigurations();
+        configurationHelper.removeAllEntities();
+        page.refresh();
         return browser.waitForAngular();
       }).then(function() {
         return checkTranslations(++index);
@@ -77,6 +79,7 @@ describe('Configuration page translations', function() {
 
   // Prepare page
   before(function() {
+    configurationHelper = new ConfigurationHelper(new ConfigurationModel());
     page = new ConfigurationPage();
     page.logAsAdmin();
     page.load();
@@ -89,7 +92,7 @@ describe('Configuration page translations', function() {
 
   // Reload page after each test and remove all configurations
   afterEach(function() {
-    configurationHelper.removeAllConfigurations();
+    configurationHelper.removeAllEntities();
     page.refresh();
   });
 

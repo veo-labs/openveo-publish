@@ -2,7 +2,8 @@
 
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
-var BackEndPage = e2e.BackEndPage;
+var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
+var BackEndPage = e2e.pages.BackEndPage;
 var browserExt = e2e.browser;
 
 /**
@@ -31,6 +32,9 @@ function CategoryPage(model) {
 
   // Category EntityModel
   this.model = model;
+
+  // Category helper
+  this.helper = new CategoryHelper(this.model);
 }
 
 module.exports = CategoryPage;
@@ -638,8 +642,9 @@ CategoryPage.prototype.editCategory = function(name, newName) {
 CategoryPage.prototype.addCategories = function(tree) {
   var self = this;
 
-  return this.removeCategoriesByPass(true).then(function() {
-    return createTree.call(self, tree);
+  return this.helper.removeAllEntities().then(function() {
+    createTree.call(self, tree);
+    return self.refresh();
   });
 };
 
@@ -695,103 +700,5 @@ CategoryPage.prototype.setAddButtonMouseOver = function() {
     return browser.wait(self.EC.presenceOf(self.popoverElement), 1000, 'Missing dialog over add button');
   }).then(function() {
     return protractor.promise.fulfilled();
-  });
-};
-
-/**
- * Adds categories.
- *
- * If categories already exist, it will be updated.
- * This method bypass the web browser to directly add categories into database.
- *
- * @param {Object} tree The categories tree to add
- * @param {Boolean} [refresh=false] Request for a refresh
- * @return {Promise} Promise resolving when categories are added
- */
-CategoryPage.prototype.addCategoriesByPass = function(tree, refresh) {
-  var self = this;
-
-  return browser.waitForAngular().then(function() {
-    var deferred = protractor.promise.defer();
-    var categoriesToAdd = {
-      name: 'categories',
-      id: self.treeId,
-      tree: tree
-    };
-
-    self.model.getByFilter({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories) {
-        self.model.add(categoriesToAdd, function(error, data) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill(data);
-        });
-      } else {
-        self.model.update([self.treeId], categoriesToAdd, function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill(categoriesToAdd);
-        });
-      }
-    });
-
-    return self.flow.execute(function() {
-      return deferred.promise.then(function(data) {
-        if (refresh)
-          self.refresh();
-
-        return protractor.promise.fulfilled(data);
-      });
-    });
-  });
-};
-
-/**
- * Removes all categories.
- *
- * This method bypass the web browser to directly remove all categories from database.
- *
- * @param {Boolean} [refresh=false] Request for a refresh
- * @return {Promise} Promise resolving when categories are removed
- */
-CategoryPage.prototype.removeCategoriesByPass = function(refresh) {
-  var self = this;
-
-  return browser.waitForAngular().then(function() {
-    var deferred = protractor.promise.defer();
-
-    self.model.getByFilter({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories)
-        deferred.fulfill();
-      else {
-        self.model.remove([categories.id], function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill();
-        });
-      }
-    });
-
-    return self.flow.execute(function() {
-      return deferred.promise.then(function() {
-        if (refresh)
-          self.refresh();
-
-        return protractor.promise.fulfilled();
-      });
-    });
   });
 };

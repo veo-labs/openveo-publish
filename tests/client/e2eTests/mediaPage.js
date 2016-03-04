@@ -5,9 +5,11 @@ var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var mediaHelper = process.requirePublish('tests/client/e2eTests/helpers/mediaHelper.js');
-var propertyHelper = process.requirePublish('tests/client/e2eTests/helpers/propertyHelper.js');
-var categoryHelper = process.requirePublish('tests/client/e2eTests/helpers/categoryHelper.js');
+var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
+var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 var TableAssert = e2e.asserts.TableAssert;
 
 // Load assertion library
@@ -19,14 +21,24 @@ describe('Media page', function() {
   var addedProperties;
   var addedCategories;
   var tableAssert;
+  var categoryHelper;
+  var propertyHelper;
+  var mediaHelper;
+
+  before(function() {
+    var videoModel = new VideoModel();
+    categoryHelper = new CategoryHelper(new CategoryModel());
+    propertyHelper = new PropertyHelper(new PropertyModel());
+    mediaHelper = new MediaHelper(videoModel);
+    page = new MediaPage(videoModel);
+    tableAssert = new TableAssert(page, mediaHelper);
+  });
 
   // Add categories and custom properties before launching tests
   before(function() {
     var properties = [];
     var categoryNames = ['Test medias category 0', 'Test medias category 1'];
     var propertyNames = ['Test medias property'];
-    page = new MediaPage(new VideoModel());
-    tableAssert = new TableAssert(page);
     page.logAsAdmin();
     page.load().then(function() {
 
@@ -42,13 +54,15 @@ describe('Media page', function() {
         });
       }
 
-      propertyHelper.createProperties(properties).then(function(addedLines) {
+      propertyHelper.addEntities(properties).then(function(addedLines) {
         addedProperties = addedLines;
       });
 
       page.refresh().then(function() {
         page.setProperties(addedProperties);
         page.setCategories(addedCategories);
+        mediaHelper.setProperties(addedProperties);
+        mediaHelper.setCategories(addedCategories);
       });
 
     });
@@ -59,16 +73,16 @@ describe('Media page', function() {
     page.logout();
 
     // Remove categories added for tests
-    categoryHelper.removeAllCategories();
+    categoryHelper.removeAllEntities();
 
     // Remove properties added for tests
-    propertyHelper.removeProperties(addedProperties);
+    propertyHelper.removeEntities(addedProperties);
 
   });
 
   // Remove all videos after each tests then reload the page
   afterEach(function() {
-    mediaHelper.removeAllMedias();
+    mediaHelper.removeAllEntities();
     page.refresh();
   });
 
@@ -110,8 +124,9 @@ describe('Media page', function() {
         }
       ];
 
-      page.addLinesByPass(linesToAdd).then(function(addedLines) {
+      mediaHelper.addEntities(linesToAdd).then(function(addedLines) {
         lines = addedLines;
+        page.refresh();
       });
 
       page.getLineActions(linesToAdd[0].title).then(function(actions) {
@@ -123,7 +138,8 @@ describe('Media page', function() {
       });
 
       return browser.waitForAngular().then(function() {
-        return page.removeLinesByPass(lines);
+        mediaHelper.removeEntities(lines);
+        return page.refresh();
       });
     });
   }
@@ -146,7 +162,8 @@ describe('Media page', function() {
       }
     ];
 
-    page.addLinesByPass(linesToAdd);
+    mediaHelper.addEntities(linesToAdd);
+    page.refresh();
     assert.isFulfilled(page.getLine(linesToAdd[0].title));
     page.removeLine(linesToAdd[0].title);
     assert.isRejected(page.getLine(linesToAdd[0].title));
@@ -180,7 +197,8 @@ describe('Media page', function() {
     ];
 
     // Create line
-    page.addLinesByPass(linesToAdd);
+    mediaHelper.addEntities(linesToAdd);
+    page.refresh();
 
     // Edit property with a new name and new description
     page.editMedia(name, {
@@ -307,7 +325,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {name: linesToAdd[0].title};
@@ -337,7 +356,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {name: linesToAdd[0].title.slice(4, 2)};
@@ -375,7 +395,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {description: linesToAdd[0].description};
@@ -409,7 +430,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {description: linesToAdd[0].description};
@@ -450,7 +472,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       // Be careful dates are displayed in french format
@@ -493,7 +516,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {category: categories[0].id};
@@ -566,7 +590,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       // Build search query
       var search = {
@@ -606,7 +631,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       var search = {name: linesToAdd[0].title.toUpperCase()};
       page.search(search);
@@ -625,7 +651,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       var search = {name: linesToAdd[0].description.toUpperCase()};
       page.search(search);
@@ -643,7 +670,8 @@ describe('Media page', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd);
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
 
       var search = {name: linesToAdd[0].title.toUpperCase()};
       page.search(search);

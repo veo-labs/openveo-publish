@@ -4,13 +4,14 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
 var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 
 // Load assertion library
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Category page translations', function() {
-  var page;
+  var page, categoryHelper;
 
   /**
    * Checks translations.
@@ -52,7 +53,9 @@ describe('Category page translations', function() {
 
   // Prepare page
   before(function() {
-    page = new CategoryPage(new CategoryModel());
+    var categoryModel = new CategoryModel();
+    categoryHelper = new CategoryHelper(categoryModel);
+    page = new CategoryPage(categoryModel);
     page.logAsAdmin();
     page.load();
   });
@@ -64,7 +67,7 @@ describe('Category page translations', function() {
 
   // Clean tree after each test and reload page
   afterEach(function() {
-    page.removeCategoriesByPass(true);
+    categoryHelper.removeAllEntities();
     page.refresh();
   });
 

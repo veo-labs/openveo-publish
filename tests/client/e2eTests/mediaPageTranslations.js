@@ -5,7 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var mediaHelper = process.requirePublish('tests/client/e2eTests/helpers/mediaHelper.js');
+var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var browserExt = e2e.browser;
 
 // Load assertion library
@@ -13,7 +13,7 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Media page translations', function() {
-  var page;
+  var page, mediaHelper;
 
   /**
    * Checks translations.
@@ -94,8 +94,9 @@ describe('Media page translations', function() {
       ];
 
       // Add lines
-      page.addLinesByPass(linesToAdd).then(function(addedLines) {
+      mediaHelper.addEntities(linesToAdd).then(function(addedLines) {
         lines = addedLines;
+        return page.refresh();
       });
 
       // Get status header index
@@ -113,7 +114,8 @@ describe('Media page translations', function() {
 
       // Remove lines
       return browser.waitForAngular().then(function() {
-        return page.removeLinesByPass(lines);
+        mediaHelper.removeEntities(lines);
+        return page.refresh();
       });
     });
   }
@@ -162,7 +164,9 @@ describe('Media page translations', function() {
 
   // Load page
   before(function() {
-    page = new MediaPage(new VideoModel());
+    var videoModel = new VideoModel();
+    mediaHelper = new MediaHelper(videoModel);
+    page = new MediaPage(videoModel);
     page.logAsAdmin();
     page.load();
   });
@@ -174,18 +178,19 @@ describe('Media page translations', function() {
 
   // Remove all videos after each tests then reload the page
   afterEach(function() {
-    mediaHelper.removeAllMedias();
+    mediaHelper.removeAllEntities();
     page.refresh();
   });
 
   it('should be available in different languages', function() {
-    page.addLinesByPass([
+    mediaHelper.addEntities([
       {
         id: '0',
         state: VideoModel.PUBLISHED_STATE,
         title: 'Test state'
       }
     ]);
+    page.refresh();
 
     checkTranslations();
   });

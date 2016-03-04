@@ -5,7 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
-var propertyHelper = process.requirePublish('tests/client/e2eTests/helpers/propertyHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var browserExt = e2e.browser;
 
 // Load assertion library
@@ -13,7 +13,7 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Property page translations', function() {
-  var page;
+  var page, propertyHelper;
 
   /**
    * Checks translations.
@@ -28,7 +28,7 @@ describe('Property page translations', function() {
     if (index < languages.length) {
       return page.selectLanguage(languages[index]).then(function() {
         var lines;
-        page.addLinesByPass([
+        propertyHelper.addEntities([
           {
             name: 'test translations',
             description: 'test translations description',
@@ -36,6 +36,7 @@ describe('Property page translations', function() {
           }
         ]).then(function(addedLines) {
           lines = addedLines;
+          return page.refresh();
         });
 
         // Page translations
@@ -98,7 +99,8 @@ describe('Property page translations', function() {
             assert.ok(false, error.message);
           });
 
-          return page.removeLinesByPass(lines);
+          propertyHelper.removeEntities(lines);
+          return page.refresh();
         });
       }).then(function() {
         return checkTranslations(++index);
@@ -110,7 +112,9 @@ describe('Property page translations', function() {
 
   // Load page
   before(function() {
-    page = new PropertyPage(new PropertyModel());
+    var propertyModel = new PropertyModel();
+    propertyHelper = new PropertyHelper(propertyModel);
+    page = new PropertyPage(propertyModel);
     page.logAsAdmin();
     page.load();
   });
@@ -122,7 +126,7 @@ describe('Property page translations', function() {
 
   // Remove all properties after each tests then reload the page
   afterEach(function() {
-    propertyHelper.removeAllProperties();
+    propertyHelper.removeAllEntities();
     page.refresh();
   });
 

@@ -4,6 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
 var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
 
 // Load assertion library
@@ -11,11 +12,13 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Category page', function() {
-  var page;
+  var page, categoryHelper;
 
   // Prepare page
   before(function() {
-    page = new CategoryPage(new CategoryModel());
+    var categoryModel = new CategoryModel();
+    categoryHelper = new CategoryHelper(categoryModel);
+    page = new CategoryPage(categoryModel);
   });
 
   // Logout after tests
@@ -50,7 +53,7 @@ describe('Category page', function() {
 
     // Clean tree after each test and reload page
     afterEach(function() {
-      page.removeCategoriesByPass(true);
+      categoryHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -92,7 +95,7 @@ describe('Category page', function() {
 
     // Clean tree after each test and reload page
     afterEach(function() {
-      page.removeCategoriesByPass(true);
+      categoryHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -104,7 +107,8 @@ describe('Category page', function() {
           items: []
         }
       ];
-      page.addCategoriesByPass(initialTree, true);
+      categoryHelper.addEntities(initialTree);
+      page.refresh();
       assert.isRejected(page.editCategory(name, name + ' edited'));
     });
 
@@ -118,7 +122,8 @@ describe('Category page', function() {
           }
         ]
       };
-      page.addCategoriesByPass(initialTree, true);
+      categoryHelper.addEntities(initialTree);
+      page.refresh();
 
       page.sendRequest('be/crud/taxonomy/' + page.treeId, 'post', initialTree).then(function(response) {
         assert.equal(response.status, 403);
@@ -137,7 +142,7 @@ describe('Category page', function() {
 
     // Clean tree after each test and reload page
     afterEach(function() {
-      page.removeCategoriesByPass(true);
+      categoryHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -149,7 +154,8 @@ describe('Category page', function() {
           items: []
         }
       ];
-      page.addCategoriesByPass(initialTree, true);
+      categoryHelper.addEntities(initialTree);
+      page.refresh();
       assert.isRejected(page.removeCategory(name));
     });
 
@@ -163,7 +169,8 @@ describe('Category page', function() {
           }
         ]
       };
-      page.addCategoriesByPass(initialTree, true);
+      categoryHelper.addEntities(initialTree);
+      page.refresh();
 
       page.sendRequest('be/crud/taxonomy/' + page.treeId, 'delete').then(function(response) {
         assert.equal(response.status, 403);
@@ -192,7 +199,8 @@ describe('Category page', function() {
           items: []
         }
       ];
-      page.addCategoriesByPass(initialTree, true);
+      categoryHelper.addEntities(initialTree);
+      page.refresh();
       assert.isRejected(page.addCategory('Test add category without permissions'));
     });
 

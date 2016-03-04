@@ -4,7 +4,8 @@ var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
-var mediaHelper = process.requirePublish('tests/client/e2eTests/helpers/mediaHelper.js');
+var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
+var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
 
 // Load assertion library
@@ -17,18 +18,23 @@ describe('Chapter page', function() {
   var mediaId = 'test-chapters-page-translations';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
+  var mediaHelper;
 
   // Create a media content
   before(function() {
+    mediaHelper = new MediaHelper(new VideoModel());
     page = new ChapterPage(mediaId);
-    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName).then(function(mediasAdded) {
-      medias = mediasAdded;
-    });
+    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
+      function(mediasAdded) {
+        medias = mediasAdded;
+        return page.logAsAdmin();
+      }
+    );
   });
 
   // Remove media content
   after(function() {
-    mediaHelper.removeMedias(medias);
+    mediaHelper.removeEntities(medias);
     page.logout();
   });
 

@@ -2,8 +2,8 @@
 
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
-var Field = e2e.Field;
-var TablePage = e2e.TablePage;
+var Field = e2e.fields.Field;
+var TablePage = e2e.pages.TablePage;
 var browserExt = e2e.browser;
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 
@@ -195,41 +195,6 @@ MediaPage.prototype.editMedia = function(name, data) {
     // Click on save button
     return browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_SAVE')));
   });
-};
-
-/**
- * Adds multiple medias at the same time with automatic index.
- *
- * Some additional fields are required to create a media.
- *
- * @param {String} name Base name of the lines to add
- * @param {Number} total Number of lines to add
- * @param {Number} offset Index to start from for the name suffix
- * @param {Boolean} [refresh=true] Request for a refresh
- * @return {Promise} Promise resolving when lines are added and browser page has been reloaded
- */
-MediaPage.prototype.addLinesByPassAuto = function(name, total, offset, refresh) {
-  var lines = [];
-  var date = new Date();
-  var states = [VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE];
-  var categories = this.getCategories();
-  offset = offset || 0;
-
-  for (var i = offset; i < total; i++) {
-    date.setDate(date.getDate() + 1);
-    lines.push({
-      id: name + i,
-      state: (i < states.length) ? states[i] : states[0],
-      date: date.getTime(),
-      title: name + ' ' + i,
-      category: (i < categories.length) ? categories[i].id : categories[0].id,
-      properties: this.getProperties(),
-      packageType: 'tar',
-      description: name + ' description ' + i
-    });
-  }
-
-  return this.addLinesByPass(lines, refresh);
 };
 
 /**

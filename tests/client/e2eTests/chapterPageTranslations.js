@@ -5,8 +5,8 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
-var chapterHelper = process.requirePublish('tests/client/e2eTests/helpers/chapterHelper.js');
-var mediaHelper = process.requirePublish('tests/client/e2eTests/helpers/mediaHelper.js');
+var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
+var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var browserExt = e2e.browser;
 
 // Load assertion library
@@ -19,25 +19,30 @@ describe('Chapter page translations', function() {
   var mediaId = 'test-chapters-page-translations';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
+  var mediaHelper;
 
   // Create a media content
   before(function() {
+    mediaHelper = new MediaHelper(new VideoModel());
     page = new ChapterPage(mediaId);
-    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName).then(function(mediasAdded) {
-      medias = mediasAdded;
-      return page.load();
-    });
+    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
+      function(mediasAdded) {
+        medias = mediasAdded;
+        page.logAsAdmin();
+        return page.load();
+      }
+    );
   });
 
   // Remove media content
   after(function() {
-    mediaHelper.removeMedias(medias);
+    mediaHelper.removeEntities(medias);
     page.logout();
   });
 
   // Clear all cut and chapters before each test
   afterEach(function() {
-    chapterHelper.clearChapters(mediaId);
+    mediaHelper.clearChapters(mediaId);
     page.refresh();
   });
 

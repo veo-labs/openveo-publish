@@ -3,7 +3,7 @@
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
 var watcherManager = process.requirePublish('app/server/watcher/watcherManager.js');
-var BackEndPage = e2e.BackEndPage;
+var BackEndPage = e2e.pages.BackEndPage;
 var browserExt = e2e.browser;
 
 /**
