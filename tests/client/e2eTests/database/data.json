@@ -186,5 +186,15 @@
       "password": "publish-configuration-no-manage",
       "roles": [ "publishConfigurationNoManage" ]
     }
+  },
+  "applications": {
+    "publishApplicationsVideos": {
+      "name": "publish-applications-videos",
+      "scopes": [ "video" ]
+    },
+    "publishApplicationsNoPermission": {
+      "name": "publish-applications-guest",
+      "scopes": []
+    }
   }
 }
