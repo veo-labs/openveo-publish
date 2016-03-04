@@ -401,7 +401,7 @@ VideoModel.prototype.get = function(callback) {
  * @method getPaginatedFilteredEntities
  * @async
  * @param {Object} filter A MongoDB filter object
- * @param {Number} count The expected number of results
+ * @param {Number} limit The expected number of results
  * @param {Number} page The page number
  * @param {Object} sort A MongoDB sort object
  * @param {Boolean} populate Parameter to know if the entities must return populated dependencies
@@ -410,7 +410,7 @@ VideoModel.prototype.get = function(callback) {
  *   - **Array** The list of videos
  *   - **Object** Pagination information
  */
-VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, populate, callback) {
+VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page, sort, populate, callback) {
   var self = this;
   var videos = [];
   var properties = [];
@@ -419,7 +419,7 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, count, page
 
     // Get the list of videos
     function(callback) {
-      self.provider.getPaginatedFilteredEntities(filter, count, page, sort, function(error, videoList, pageArray) {
+      self.provider.getPaginatedFilteredEntities(filter, limit, page, sort, function(error, videoList, pageArray) {
         videos = videoList;
         pagination = pageArray;
         callback(error);

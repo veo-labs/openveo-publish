@@ -56,21 +56,21 @@ VideoProvider.prototype.updateVideoState = function(id, oldState, newState, call
  * @method getPaginatedFilteredEntities
  * @async
  * @param {Object} filter Collection of filters formatted like MongoDB filters
- * @param {Number} count The expected number of videos per page
+ * @param {Number} limit The expected number of videos per page
  * @param {Number} page The index of the page to retrieve
  * @param {Object} sort Collection of keys to sort with the order value (-1 : desc, 1 asc) e.g. {"name":-1, age:"1"}
  * @param {Function} callback Function to call when its done with :
  *  - **Error** The error if an error occurred, null otherwise
  *  - **Array** The list of videos
  */
-VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, count, page, sort, callback) {
+VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, limit, page, sort, callback) {
   this.database.search(this.collection, filter, {
     _id: 0,
     originalPackagePath: 0,
     packageType: 0,
     lastState: 0,
     lastTransition: 0
-  }, count, page, sort, callback);
+  }, limit, page, sort, callback);
 };
 
 /**
