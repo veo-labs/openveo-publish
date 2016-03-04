@@ -141,7 +141,7 @@ module.exports.getVideoAction = function(request, response, next) {
 module.exports.getVideoByPropertiesAction = function(request, response, next) {
   var query = request.query;
   var sortBy = query.sortBy || 'date';
-  var sortOrder = query.sortOrder == 'asc' ? -1 : 1;
+  var sortOrder = query.sortOrder == 'asc' ? 1 : -1;
   var sort = {};
   sort[sortBy] = sortOrder;
 
