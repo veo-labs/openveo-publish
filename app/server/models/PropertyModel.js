@@ -12,6 +12,7 @@ var async = require('async');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 
+
 /**
  * Defines a PropertyModel class to manipulate custom properties.
  *
@@ -34,6 +35,10 @@ function PropertyModel() {
 module.exports = PropertyModel;
 util.inherits(PropertyModel, openVeoAPI.EntityModel);
 
+PropertyModel.TYPE_TEXT = 'text';
+PropertyModel.TYPE_LIST = 'list';
+PropertyModel.availableTypes = [PropertyModel.TYPE_TEXT, PropertyModel.TYPE_LIST];
+
 /**
  * Adds a new property.
  *
@@ -54,10 +59,11 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
  *   - **Object** The inserted property
  */
 PropertyModel.prototype.add = function(data, callback) {
-  if (!data.name || !data.description || !data.type) {
-    callback(new Error('Requires name, description or type to add a property'));
-    return;
-  }
+  if (!data.name || !data.description || !data.type)
+    return callback(new Error('Requires name, description and type to add a property'));
+
+  if (PropertyModel.availableTypes.indexOf(data.type) < 0)
+    return callback(new Error('Invalid property type ' + data.type));
 
   var property = {
     id: shortid.generate(),
@@ -65,6 +71,9 @@ PropertyModel.prototype.add = function(data, callback) {
     description: data.description,
     type: data.type
   };
+
+  if (data.type === PropertyModel.TYPE_LIST)
+    property.values = data.values || [];
 
   this.provider.add(property, function(error, addedCount, properties) {
     if (callback)
@@ -92,11 +101,15 @@ PropertyModel.prototype.add = function(data, callback) {
 PropertyModel.prototype.update = function(id, data, callback) {
   var property = {};
   if (data.name)
-    property['name'] = data.name;
+    property.name = data.name;
   if (data.description)
-    property['description'] = data.description;
+    property.description = data.description;
   if (data.type)
-    property['type'] = data.type;
+    property.type = data.type;
+  if (data.type === PropertyModel.TYPE_LIST)
+    property.values = data.values || [];
+  else
+    property.values = null;
   this.provider.update(id, property, callback);
 };
 

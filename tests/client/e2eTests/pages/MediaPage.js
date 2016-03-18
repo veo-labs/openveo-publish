@@ -6,6 +6,7 @@ var Field = e2e.fields.Field;
 var TablePage = e2e.pages.TablePage;
 var browserExt = e2e.browser;
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 
 /**
  * Creates a new MediaPage representing the medias back end page.
@@ -182,13 +183,13 @@ MediaPage.prototype.editMedia = function(name, data) {
     // Set custom properties
     if (data.properties) {
       for (var propertyId in data.properties) {
-        var propertyName = self.getPropertyName(propertyId);
+        var property = self.getProperty(propertyId);
         var propertyField = Field.get({
-          type: 'text',
-          name: propertyName,
+          type: (property.type === PropertyModel.TYPE_TEXT) ? 'text' : 'select',
+          name: property.name,
           baseElement: formElement
         });
-        propertyField.setValue(data.properties[propertyName]);
+        propertyField.setValue(data.properties[property.id]);
       }
     }
 
@@ -198,31 +199,27 @@ MediaPage.prototype.editMedia = function(name, data) {
 };
 
 /**
- * Gets properties with null as default value.
+ * Gets property information.
  *
- * @return {Object} The list of properties with null as default value
+ * @param {String} id The id of the property to retrieve
+ * @return {Object} The property
  */
-MediaPage.prototype.getProperties = function() {
-  var properties = {};
-  for (var i = 0; i < this.properties.length; i++)
-    properties[this.properties[i].id] = null;
-
-  return properties;
-};
-
-/**
- * Gets a property name.
- *
- * @param {String} id The property id
- * @return {String} The property name
- */
-MediaPage.prototype.getPropertyName = function(id) {
+MediaPage.prototype.getProperty = function(id) {
   for (var i = 0; i < this.properties.length; i++) {
     if (this.properties[i].id === id)
-      return this.properties[i].name;
+      return this.properties[i];
   }
 
   return null;
+};
+
+/**
+ * Gets properties.
+ *
+ * @return {Object} The list of properties
+ */
+MediaPage.prototype.getProperties = function() {
+  return this.properties;
 };
 
 /**

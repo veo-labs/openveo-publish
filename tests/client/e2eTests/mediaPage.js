@@ -48,9 +48,15 @@ describe('Media page', function() {
 
       for (var i = 0; i < propertyNames.length; i++) {
         properties.push({
-          name: propertyNames[i],
-          description: propertyNames[i] + ' description',
-          type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+          name: propertyNames[i] + ' text',
+          description: propertyNames[i] + ' text description',
+          type: PropertyModel.TYPE_TEXT
+        });
+        properties.push({
+          name: propertyNames[i] + ' list',
+          description: propertyNames[i] + ' list description',
+          type: PropertyModel.TYPE_LIST,
+          values: ['tag1', 'tag2']
         });
       }
 
@@ -144,6 +150,21 @@ describe('Media page', function() {
     });
   }
 
+  /**
+   * Gets properties as key / value object.
+   *
+   * @return {Object} The custom properties with values initialized to null
+   */
+  function getProperties() {
+    var properties = page.getProperties();
+    var propertiesById = {};
+
+    for (var i = 0; i < properties.length; i++)
+      propertiesById[properties[i].id] = null;
+
+    return propertiesById;
+  }
+
   it('should display page title', function() {
     assert.eventually.ok(page.pageTitleElement.isPresent());
   });
@@ -158,7 +179,7 @@ describe('Media page', function() {
         id: '0',
         state: VideoModel.PUBLISHED_STATE,
         title: 'Test remove',
-        properties: page.getProperties()
+        properties: getProperties()
       }
     ];
 
@@ -183,16 +204,22 @@ describe('Media page', function() {
     var newName = 'test edition renamed';
     var newDescription = 'test edition renamed description';
     var newCategory = categories[0].id;
+    var propertiesById = {};
 
-    for (var property in properties)
-      properties[property] = 'test edition ' + property + ' value';
+    // Set custom properties values
+    for (var i = 0; i < properties.length; i++) {
+      if (properties[i].type === PropertyModel.TYPE_TEXT)
+        propertiesById[properties[i].id] = 'test edition ' + properties[i].name + ' value';
+      else if (properties[i].type === PropertyModel.TYPE_LIST)
+        propertiesById[properties[i].id] = properties[i].values[0];
+    }
 
     var linesToAdd = [
       {
         id: '0',
         state: VideoModel.PUBLISHED_STATE,
         title: name,
-        properties: page.getProperties()
+        properties: getProperties()
       }
     ];
 
@@ -205,7 +232,7 @@ describe('Media page', function() {
       name: newName,
       description: newDescription,
       category: newCategory,
-      properties: properties
+      properties: propertiesById
     });
     assert.isFulfilled(page.getLine(newName));
     assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
@@ -314,13 +341,13 @@ describe('Media page', function() {
           id: '0',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
-          properties: page.getProperties()
+          properties: getProperties()
         },
         {
           id: '1',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 1',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -351,7 +378,7 @@ describe('Media page', function() {
           id: '0',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -383,14 +410,14 @@ describe('Media page', function() {
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
           description: 'Test search description 0',
-          properties: page.getProperties()
+          properties: getProperties()
         },
         {
           id: '1',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 1',
           description: 'Test search description 1',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -425,7 +452,7 @@ describe('Media page', function() {
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
           description: 'Test search description 0',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -460,14 +487,14 @@ describe('Media page', function() {
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
           date: new Date('2016/01/20').getTime(),
-          properties: page.getProperties()
+          properties: getProperties()
         },
         {
           id: '1',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 1',
           date: new Date('2015/01/20').getTime(),
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -503,14 +530,14 @@ describe('Media page', function() {
           id: '0',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 0',
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[0].id
         },
         {
           id: '1',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search 1',
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[1].id
         }
       ];
@@ -548,7 +575,7 @@ describe('Media page', function() {
           title: 'Test search',
           description: 'Test search description',
           date: new Date('2016/01/20').getTime(),
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[0].id
         },
         {
@@ -557,7 +584,7 @@ describe('Media page', function() {
           title: 'Test search',
           description: 'Test search description',
           date: new Date('2016/01/20').getTime(),
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[1].id
         },
         {
@@ -566,7 +593,7 @@ describe('Media page', function() {
           title: 'Test search',
           description: 'Test search description',
           date: new Date('2015/11/20').getTime(),
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[0].id
         },
         {
@@ -575,7 +602,7 @@ describe('Media page', function() {
           title: 'Test search',
           description: 'Different',
           date: new Date('2016/01/20').getTime(),
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[0].id
         },
         {
@@ -584,7 +611,7 @@ describe('Media page', function() {
           title: 'Different',
           description: 'Test search description',
           date: new Date('2016/01/20').getTime(),
-          properties: page.getProperties(),
+          properties: getProperties(),
           category: categories[0].id
         }
       ];
@@ -626,7 +653,7 @@ describe('Media page', function() {
           id: '0',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -646,7 +673,7 @@ describe('Media page', function() {
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search',
           description: 'Test search description',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 
@@ -665,7 +692,7 @@ describe('Media page', function() {
           id: '0',
           state: VideoModel.PUBLISHED_STATE,
           title: 'Test search',
-          properties: page.getProperties()
+          properties: getProperties()
         }
       ];
 

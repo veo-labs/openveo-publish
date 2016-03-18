@@ -32,7 +32,7 @@ describe('Property page translations', function() {
           {
             name: 'test translations',
             description: 'test translations description',
-            type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+            type: PropertyModel.TYPE_TEXT
           }
         ]).then(function(addedLines) {
           lines = addedLines;
@@ -51,6 +51,7 @@ describe('Property page translations', function() {
         var nameField = addFormFields.name;
         var descriptionField = addFormFields.description;
         var typeField = addFormFields.type;
+        var listValuesField = addFormFields.listValues;
         assert.eventually.equal(nameField.getLabel(), page.translations.PROPERTIES.ATTR_NAME);
         assert.eventually.equal(nameField.getDescription(), page.translations.PROPERTIES.FORM_ADD_NAME_DESC);
         assert.eventually.equal(descriptionField.getLabel(), page.translations.PROPERTIES.ATTR_DESCRIPTION);
@@ -59,6 +60,14 @@ describe('Property page translations', function() {
         assert.eventually.equal(typeField.getLabel(), page.translations.PROPERTIES.ATTR_TYPE);
         assert.eventually.equal(typeField.getDescription(), page.translations.PROPERTIES.FORM_ADD_TYPE_DESC);
         assert.eventually.equal(page.addButtonElement.getText(), page.translations.UI.FORM_ADD);
+
+        // Set name, description and type to display the list of values
+        nameField.setValue('Name');
+        descriptionField.setValue('Description');
+        typeField.setValue(page.translations.PROPERTIES.FORM_ADD_LIST_TYPE);
+        assert.eventually.equal(listValuesField.getLabel(), page.translations.PROPERTIES.ATTR_LIST_VALUES);
+        assert.eventually.equal(listValuesField.getDescription(),
+                                page.translations.PROPERTIES.FORM_ADD_LIST_VALUES_DESC);
         page.closeAddForm();
 
         // Search engine translations
@@ -66,11 +75,15 @@ describe('Property page translations', function() {
           assert.equal(text.trim(), page.translations.UI.SEARCH_BY);
         });
 
+        page.openSearchEngine();
         var searchFields = page.getSearchFields(page.searchFormElement);
         var searchNameField = searchFields.name;
         var searchDescriptionField = searchFields.description;
+        var searchTypeField = searchFields.type;
         assert.eventually.equal(searchNameField.getLabel(), page.translations.PROPERTIES.TITLE_FILTER);
         assert.eventually.equal(searchDescriptionField.getLabel(), page.translations.PROPERTIES.DESCRIPTION_FILTER);
+        assert.eventually.equal(searchTypeField.getLabel(), page.translations.PROPERTIES.TYPE_FILTER);
+        page.closeSearchEngine();
 
         // All actions translations
         page.setSelectAllMouseOver();

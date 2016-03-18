@@ -56,6 +56,13 @@ PropertyPage.prototype.getSearchFields = function(form) {
     baseElement: form
   });
 
+  // Type field
+  fields.type = Field.get({
+    type: 'select',
+    name: this.translations.PROPERTIES.TYPE_FILTER,
+    baseElement: form
+  });
+
   return fields;
 };
 
@@ -86,6 +93,13 @@ PropertyPage.prototype.getAddFormFields = function(form) {
   fields.type = Field.get({
     type: 'select',
     name: this.translations.PROPERTIES.ATTR_TYPE,
+    baseElement: form
+  });
+
+  // Values field
+  fields.listValues = Field.get({
+    type: 'tags',
+    name: this.translations.PROPERTIES.ATTR_LIST_VALUES,
     baseElement: form
   });
 
@@ -122,6 +136,10 @@ PropertyPage.prototype.addLine = function(name, data) {
     fields.name.setValue(data.name || name);
     fields.description.setValue(data.description);
     fields.type.setValue(data.type);
+
+    // Set list values
+    if (data.type === self.translations.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
+      fields.listValues.setValue(data.values);
 
     // Click the add button
     browserExt.click(self.addButtonElement);
@@ -164,6 +182,10 @@ PropertyPage.prototype.editProperty = function(name, data) {
     // Set type
     if (data.type !== undefined)
       fields.type.setValue(data.type);
+
+    // Set list values
+    if (data.type === self.translations.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
+      fields.listValues.setValue(data.values);
 
     // Click on save button
     return browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_SAVE')));

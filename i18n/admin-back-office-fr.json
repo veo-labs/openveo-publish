@@ -109,14 +109,18 @@
     "ATTR_NAME" : "Nom",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_TYPE" : "Type",
+    "ATTR_LIST_VALUES" : "Valeurs",
     "ADD_PROPERTY" : "Ajouter une propriété personnalisée",
     "FORM_ADD_TEXT_TYPE" : "Texte",
+    "FORM_ADD_LIST_TYPE" : "Liste",
     "FORM_ADD_NAME_DESC" : "Le nom de la propriété tel qu'il apparaîtra lors de l'édition d'une vidéo",
     "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
     "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété",
+    "FORM_ADD_LIST_VALUES_DESC" : "Ajouter des valeurs à la liste (valider avec la touche \"entrée\" pour ajouter une nouvelle valeur)",
     "REMOVE_SUCCESS" : "La propriété a été supprimée.",
     "TITLE_FILTER": "Nom",
-    "DESCRIPTION_FILTER": "Description"
+    "DESCRIPTION_FILTER": "Description",
+    "TYPE_FILTER": "Type"
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Rubrique",

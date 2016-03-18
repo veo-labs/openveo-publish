@@ -109,14 +109,18 @@
     "ATTR_NAME" : "Name",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_TYPE" : "Type",
+    "ATTR_LIST_VALUES" : "Values",
     "ADD_PROPERTY" : "Add a custom property",
     "FORM_ADD_TEXT_TYPE" : "Text",
+    "FORM_ADD_LIST_TYPE" : "List",
     "FORM_ADD_NAME_DESC" : "Name of the property as it will appear while editing a video",
     "FORM_ADD_DESCRIPTION_DESC" : "A short description of the property",
     "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",
+    "FORM_ADD_LIST_VALUES_DESC" : "Add values to the list (press \"enter\" to add a new value)",
     "REMOVE_SUCCESS" : "Property successfully removed.",
     "TITLE_FILTER": "Name",
-    "DESCRIPTION_FILTER": "Description"
+    "DESCRIPTION_FILTER": "Description",
+    "TYPE_FILTER": "Type"
   },
   "CATEGORIES" : {
     "PAGE_TITLE" : "Publish - Category",

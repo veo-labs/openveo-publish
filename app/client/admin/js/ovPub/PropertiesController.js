@@ -6,6 +6,18 @@
    * Defines the properties controller for the properties page.
    */
   function PropertiesController($scope, $filter, entityService, publishService) {
+    var TEXT_TYPE = 'text';
+    var LIST_TYPE = 'list';
+    var supportedTypes = [
+      {
+        value: TEXT_TYPE,
+        name: $filter('translate')('PROPERTIES.FORM_ADD_TEXT_TYPE')
+      },
+      {
+        value: LIST_TYPE,
+        name: $filter('translate')('PROPERTIES.FORM_ADD_LIST_TYPE')
+      }
+    ];
 
     /**
      * Removes a list of properties.
@@ -40,11 +52,17 @@
      * @param {Object} property Property data
      */
     function saveProperty(property) {
-      return entityService.updateEntity('property', property.id, {
+      var propertyInfo = {
         name: property.name,
         description: property.description,
         type: property.type
-      }).then(function() {
+      };
+
+      // Add list values if any
+      if (property.type === LIST_TYPE && property.listValues)
+        propertyInfo.values = property.listValues;
+
+      return entityService.updateEntity('property', property.id, propertyInfo).then(function() {
         publishService.cacheClear('properties');
       });
     }
@@ -64,6 +82,8 @@
      * DATATABLE
      */
     var scopeDataTable = $scope.tableContainer = {};
+    var filterTypeOptions = angular.copy(supportedTypes);
+    filterTypeOptions.unshift({name: $filter('translate')('UI.EMPTY'), value: ''});
     scopeDataTable.entityType = 'property';
     scopeDataTable.filterBy = [
       {
@@ -75,6 +95,13 @@
         key: 'description',
         value: '',
         label: $filter('translate')('PROPERTIES.DESCRIPTION_FILTER')
+      },
+      {
+        key: 'type',
+        type: 'select',
+        value: '',
+        label: $filter('translate')('PROPERTIES.TYPE_FILTER'),
+        options: filterTypeOptions
       }
     ];
     scopeDataTable.header = [{
@@ -108,19 +135,13 @@
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
     scopeEditForm.entityType = 'property';
-    var supportedTypes = [
-      {
-        value: 'text',
-        name: $filter('translate')('PROPERTIES.FORM_ADD_TEXT_TYPE')
-      }
-    ];
     scopeEditForm.fields = [
       {
 
         // the key to be used in the model values
         // so this will be bound to vm.user.username
         key: 'name',
-        type: 'horizontalExtendInput',
+        type: 'horizontalEditableInput',
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_NAME'),
           required: true
@@ -128,7 +149,7 @@
       },
       {
         key: 'description',
-        type: 'horizontalExtendInput',
+        type: 'horizontalEditableInput',
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_DESCRIPTION'),
           required: true
@@ -139,19 +160,56 @@
       },
       {
         key: 'type',
-        type: 'horizontalExtendSelect',
+        type: 'horizontalEditableSelect',
         templateOptions: {
           label: $filter('translate')('PROPERTIES.ATTR_TYPE'),
           required: true,
           options: supportedTypes
         }
+      },
+      {
+        key: 'listValues',
+        type: 'horizontalEditableTags',
+        templateOptions: {
+          label: $filter('translate')('PROPERTIES.ATTR_LIST_VALUES'),
+          required: true,
+          inputOptions: {
+            type: 'editableInput'
+          }
+        },
+        hideExpression: 'model.type !== "' + LIST_TYPE + '"'
       }
     ];
     scopeEditForm.conditionEditDetail = function(row) {
       return $scope.rights.edit && !row.locked;
     };
+    scopeEditForm.init = function(row) {
+
+      // List values are stored in entity "values" property while the model uses property "listValues"
+      // Thus move values to listValues
+      if (row.type === LIST_TYPE) {
+        row.listValues = row.values || row.listValues;
+        delete row.values;
+      }
+
+    };
 
     scopeEditForm.onSubmit = function(model) {
+      if (model.type === LIST_TYPE) {
+
+        // Edited custom property is a property of type list
+        // Filter list to keep only non empty values
+        model.listValues = model.listValues.filter(function(value) {
+          return value;
+        });
+
+      } else {
+
+        // Edited custom property is not a property of type list, thus entered list values are not needed
+        delete model.listValues;
+
+      }
+
       return saveProperty(model);
     };
 
@@ -198,11 +256,37 @@
         expressionProperties: {
           'templateOptions.disabled': '!model.description' // disabled when username is blank
         }
+      },
+      {
+        key: 'listValues',
+        type: 'horizontalTags',
+        templateOptions: {
+          label: $filter('translate')('PROPERTIES.ATTR_LIST_VALUES'),
+          description: $filter('translate')('PROPERTIES.FORM_ADD_LIST_VALUES_DESC'),
+          required: true
+        },
+        hideExpression: 'model.type !== "' + LIST_TYPE + '"'
       }
     ];
 
     scopeAddForm.onSubmit = function(model) {
-      return addProperty(model);
+      var data = {
+        name: model.name,
+        description: model.description,
+        type: model.type
+      };
+
+      if (model.type === LIST_TYPE) {
+
+        // Added custom property is a property of type list
+        // Filter list to keep only non empty values
+        data.values = model.listValues.filter(function(value) {
+          return value;
+        });
+
+      }
+
+      return addProperty(data);
     };
 
   }

@@ -14,6 +14,8 @@ chai.use(chaiAsPromised);
 
 describe('Property page', function() {
   var page, tableAssert, propertyHelper;
+  var LIST_TYPE = 'list';
+  var TEXT_TYPE = 'text';
 
   // Prepare page
   before(function() {
@@ -44,9 +46,9 @@ describe('Property page', function() {
     assert.eventually.ok(page.pageDescriptionElement.isPresent());
   });
 
-  it('should be able to add / remove a property', function() {
-    var name = 'test add / remove property';
-    var description = 'test add / remove property description';
+  it('should be able to add / remove a text property', function() {
+    var name = 'test add / remove text property';
+    var description = 'test add / remove text property description';
     var type = page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE;
     page.addLine(name, {type: type, description: description});
     assert.isFulfilled(page.getLine(name));
@@ -55,7 +57,20 @@ describe('Property page', function() {
     page.removeLine(name);
   });
 
-  it('should not be able to add a property without name, description or type', function() {
+  it('should be able to add / remove a list property', function() {
+    var name = 'test add / remove list property';
+    var description = 'test add / remove list property description';
+    var type = page.translations.PROPERTIES.FORM_ADD_LIST_TYPE;
+    var values = ['value1', 'value2', 'value3'];
+    page.addLine(name, {type: type, description: description, values: values});
+    assert.isFulfilled(page.getLine(name));
+    assert.eventually.equal(page.getLineFieldText(name, 'description'), description);
+    assert.eventually.equal(page.getLineFieldText(name, 'type'), type);
+    assert.eventually.equal(page.getLineFieldText(name, 'listValues'), values.join(', '));
+    page.removeLine(name);
+  });
+
+  it('should not be able to add a text property without name, description or type', function() {
     var name = 'test add without all info';
     var description = 'test add without all info description';
 
@@ -65,6 +80,13 @@ describe('Property page', function() {
     assert.isRejected(page.addLine(name, {type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE}));
   });
 
+  it('should not be able to add a list property without values', function() {
+    assert.isRejected(page.addLine('test add without all info', {
+      description: 'test add without all info description',
+      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE
+    }));
+  });
+
   it('should not display buttons to change the number of items per page if lines lower than 6', function() {
     page.getTotalLines().then(function(totalLines) {
       if (totalLines < 6)
@@ -72,7 +94,7 @@ describe('Property page', function() {
     });
   });
 
-  it('should be able to edit a property', function() {
+  it('should be able to edit a text property', function() {
     var name = 'test edition';
     var description = 'test edition description';
     var newName = 'test edition renamed';
@@ -88,6 +110,32 @@ describe('Property page', function() {
     page.editProperty(name, {name: newName, description: newDescription});
     assert.isFulfilled(page.getLine(newName));
     assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
+  });
+
+  it('should be able to edit a list property', function() {
+    var name = 'test edition';
+    var description = 'test edition description';
+    var newName = 'test edition renamed';
+    var newDescription = 'test edition renamed description';
+    var newValues = ['value2', 'value2'];
+
+    // Create line
+    page.addLine(name, {
+      description: description,
+      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE,
+      values: ['value1']
+    });
+
+    // Edit property with a new name and new description
+    page.editProperty(name, {
+      name: newName,
+      description: newDescription,
+      values: newValues,
+      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE
+    });
+    assert.isFulfilled(page.getLine(newName));
+    assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
+    assert.eventually.equal(page.getLineFieldText(newName, 'listValues'), newValues.join(', '));
   });
 
   it('should be able to cancel when removing a property', function() {
@@ -119,10 +167,10 @@ describe('Property page', function() {
 
     // Add lines
     beforeEach(function() {
-      var type = page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE;
       linesToAdd = [
-        {name: 'test search 0', description: 'test search description', type: type},
-        {name: 'test search 1', description: 'test search description', type: type}
+        {name: 'test search 0', description: 'test search description', type: TEXT_TYPE},
+        {name: 'test search 1', description: 'test search description', type: TEXT_TYPE},
+        {name: 'test search 2', description: 'test search description', type: LIST_TYPE, values: ['value1']}
       ];
 
       propertyHelper.addEntities(linesToAdd);
@@ -196,6 +244,27 @@ describe('Property page', function() {
         // Predict values
         expectedValues = values.filter(function(element) {
           return new RegExp(search.name).test(element);
+        });
+
+      }).then(function() {
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+      });
+    });
+
+    it('should be able to search by type', function() {
+      var expectedValues;
+      var search = {type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE};
+
+      // Get all line values before search
+      return page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN).then(function(values) {
+
+        // Predict values
+        expectedValues = values.filter(function(element) {
+          for (var i = 0; i < linesToAdd.length; i++) {
+            if (element === linesToAdd[i].name && linesToAdd[i].type === LIST_TYPE)
+              return true;
+          }
+          return false;
         });
 
       }).then(function() {

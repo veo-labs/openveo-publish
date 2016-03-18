@@ -134,7 +134,7 @@ describe('Property page', function() {
         {
           name: name,
           description: 'test delete without permission description',
-          type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+          type: PropertyModel.TYPE_TEXT
         }
       ]);
       page.refresh();

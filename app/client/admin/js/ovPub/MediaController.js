@@ -197,28 +197,6 @@
       $location.path('/publish/media/' + media.id);
     }
 
-    /**
-     * Gets property name by id.
-     *
-     * @param {String} id Id of the property
-     * @return {String} The property name
-     */
-    function replacePropIdByName(id) {
-      var found = -1;
-      for (var i = 0; i < $scope.properties.length && found < 0; i++) {
-        var value = $scope.properties[i];
-        if (value.id == String(id)) {
-          found = i;
-          break;
-        }
-      }
-
-      if (found != -1)
-        return $scope.properties[found].name;
-      else
-        return id;
-    }
-
     /*
      * FORM EDIT
      */
@@ -228,7 +206,7 @@
     scopeEditForm.fieldsBase = [
       {
         key: 'title',
-        type: 'horizontalExtendInput',
+        type: 'horizontalEditableInput',
         templateOptions: {
           label: $filter('translate')('MEDIAS.ATTR_TITLE'),
           required: true
@@ -236,7 +214,7 @@
       },
       {
         key: 'description',
-        type: 'horizontalExtendInput',
+        type: 'horizontalEditableInput',
         templateOptions: {
           label: $filter('translate')('MEDIAS.ATTR_DESCRIPTION'),
           required: true
@@ -244,7 +222,7 @@
       },
       {
         key: 'category',
-        type: 'horizontalExtendSelect',
+        type: 'horizontalEditableSelect',
         templateOptions: {
           label: $filter('translate')('MEDIAS.ATTR_CATEGORY'),
           options: categoriesfield
@@ -424,17 +402,46 @@
 
     scopeEditForm.init = function(row) {
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
-      angular.forEach(row.properties, function(value, key) {
-        var newField = {
-          key: key,
-          type: 'horizontalExtendInput',
-          model: row.properties,
-          templateOptions: {
-            label: replacePropIdByName(key)
+
+      // Create a formly field for each property
+      angular.forEach($scope.properties, function(property, index) {
+        if (property.type === 'text') {
+          scopeEditForm.fields.push({
+            key: property.id,
+            type: 'horizontalEditableInput',
+            model: row.properties,
+            templateOptions: {
+              label: property.name || property.id
+            }
+          });
+
+        } else if (property.type === 'list') {
+
+          // Build list options with list values
+          var options = [{
+            value: '',
+            name: $filter('translate')('UI.EMPTY')
+          }];
+
+          for (var i = 0; i < property.values.length; i++) {
+            options.push({
+              value: property.values[i],
+              name: property.values[i]
+            });
           }
-        };
-        scopeEditForm.fields.push(newField);
+
+          scopeEditForm.fields.push({
+            key: property.id,
+            type: 'horizontalEditableSelect',
+            model: row.properties,
+            templateOptions: {
+              label: property.name || property.id,
+              options: options
+            }
+          });
+        }
       });
+
     };
 
     scopeEditForm.conditionToggleDetail = function(row) {
