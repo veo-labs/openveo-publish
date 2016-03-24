@@ -8,9 +8,9 @@ var util = require('util');
 var openVeoAPI = require('@openveo/api');
 
 /**
- * Defines a VideoModel class to manipulate videos.
+ * Defines a ConfigurationModel class to manipulate configurations.
  *
- * @class VideoModel
+ * @class ConfigurationModel
  * @constructor
  * @extends EntityModel
  */
