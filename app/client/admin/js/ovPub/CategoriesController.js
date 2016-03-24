@@ -78,7 +78,7 @@
 
       // If no categories exist : Do create
       if (categories.data.taxonomy.id === undefined) {
-        entityService.addEntity('taxonomy', {
+        entityService.addEntity('category', {
           name: 'categories',
           tree: $scope.list
         }).success(function(data) {
@@ -87,7 +87,7 @@
       } else {
 
         // Else : Do update
-        entityService.updateEntity('taxonomy', categories.data.taxonomy.id, {
+        entityService.updateEntity('category', categories.data.taxonomy.id, {
           tree: $scope.list
         }).success(function(data) {
           data.entity = {id: categories.data.taxonomy.id};
@@ -102,9 +102,9 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('create-taxonomy');
-    $scope.rights.edit = $scope.checkAccess('update-taxonomy');
-    $scope.rights.delete = $scope.checkAccess('delete-taxonomy');
+    $scope.rights.add = $scope.checkAccess('create-category');
+    $scope.rights.edit = $scope.checkAccess('update-category');
+    $scope.rights.delete = $scope.checkAccess('delete-category');
 
   }
 

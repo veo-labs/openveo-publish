@@ -3,7 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var CategoryModel = process.requirePublish('app/server/models/CategoryModel.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
 
@@ -78,7 +78,7 @@ describe('Category page', function() {
           }
         ]
       };
-      page.sendRequest('be/crud/taxonomy', 'put', data).then(function(response) {
+      page.sendRequest('be/crud/category', 'put', data).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -125,7 +125,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/crud/taxonomy/' + page.treeId, 'post', initialTree).then(function(response) {
+      page.sendRequest('be/crud/category/' + page.treeId, 'post', initialTree).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -172,7 +172,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/crud/taxonomy/' + page.treeId, 'delete').then(function(response) {
+      page.sendRequest('be/crud/category/' + page.treeId, 'delete').then(function(response) {
         assert.equal(response.status, 403);
       });
     });

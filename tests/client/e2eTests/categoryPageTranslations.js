@@ -3,7 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/categories/CategoryModel.js');
+var CategoryModel = process.requirePublish('app/server/models/CategoryModel.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 
 // Load assertion library
