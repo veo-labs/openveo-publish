@@ -5,6 +5,6 @@
   "mediaPage": "e2eTests/mediaPage*.js",
   "chapterPage": "e2eTests/chapterPage*.js",
   "configurationPage": "e2eTests/configurationPage*.js",
-  "webService": "e2eTests/webService*.js",
+  "publishWebService": "e2eTests/webService*.js",
   "publish" : "e2eTests/*.js"
 }

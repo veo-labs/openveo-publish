@@ -102,8 +102,8 @@ module.exports.getPlatformsAction = function(request, response) {
  */
 module.exports.getVideoAction = function(request, response, next) {
   if (request.params.id) {
-    videoModel.getOneReady(request.params.id, function(error, video) {
-      if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
+    videoModel.getOne(request.params.id, function(error, video) {
+      if (error)
         next(errors.GET_VIDEO_ERROR);
       else
         response.send({
@@ -118,12 +118,51 @@ module.exports.getVideoAction = function(request, response, next) {
 };
 
 /**
+ * Gets information about a ready video (state is ready or published).
+ *
+ * Expects one GET parameter :
+ *  - **id** The id of the video
+ *
+ * @example
+ *     {
+ *       video : {
+ *         id : 123456789,
+ *         ...
+ *       }
+ *     }
+ *
+ * @method getVideoReadyAction
+ * @static
+ */
+module.exports.getVideoReadyAction = function(request, response, next) {
+  if (request.params.id) {
+    videoModel.getOneReady(request.params.id, function(error, video) {
+      if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
+        next(errors.GET_VIDEO_READY_ERROR);
+      else
+        response.send({
+          video: video
+        });
+    });
+  }
+
+  // Missing id of the video
+  else
+    next(errors.GET_VIDEO_READY_MISSING_PARAMETERS);
+};
+
+/**
  * Gets published videos by properties.
  *
  * Optional GET parameters :
- *  - **sortBy** Sort videos by either title, description, date or published
+ *  - **query** To search on both videos title and description
+ *  - **states** To filter videos by state
+ *  - **dateStart** To get videos after a date
+ *  - **dateEnd** To get videos before a date
+ *  - **categories** To filter videos by category
+ *  - **sortBy** To sort videos by either title, description or date
  *  - **sortOrder** Sort order (either asc or desc)
- *  - **limit** Limit number of videos per page
+ *  - **limit** To limit the number of videos per page
  *  - **page** The expected page
  *  - **properties** A list of properties with the property name as the key and the expected property
  *    value as the value. (e.g. properties[property1Name]=property1Value)
@@ -139,28 +178,65 @@ module.exports.getVideoAction = function(request, response, next) {
  * @static
  */
 module.exports.getVideoByPropertiesAction = function(request, response, next) {
-  var query = request.query;
-  var sortBy = query.sortBy || 'date';
-  var sortOrder = query.sortOrder == 'asc' ? 1 : -1;
+  var params;
+  var orderedProperties = ['title', 'description', 'date', 'state'];
+
+  try {
+    params = openVeoAPI.util.shallowValidateObject(request.query, {
+      query: {type: 'string'},
+      states: {type: 'array<number>'},
+      dateStart: {type: 'date'},
+      dateEnd: {type: 'date'},
+      categories: {type: 'array<string>'},
+      limit: {type: 'number', gt: 0},
+      page: {type: 'number', gt: 0, default: 1},
+      sortBy: {type: 'string', in: orderedProperties, default: 'date'},
+      sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
+    });
+  } catch (error) {
+    return response.status(500).send({
+      error: {
+        message: error.message
+      }
+    });
+  }
+
+  // Build sort
   var sort = {};
-  sort[sortBy] = sortOrder;
+  sort[params.sortBy] = params.sortOrder === 'asc' ? 1 : -1;
 
-  // authorized unlimited query
-  var limit = null;
-  if (query.limit) {
-    limit = parseInt(query.limit) || 10;
-    if (limit < 1) limit = null;
+  // Build filter
+  var filter = {};
+
+  // Add search query
+  if (params.query) {
+    filter.$text = {
+      $search: params.query
+    };
   }
 
-  var page = null;
-  if (limit) {
-    page = query.page || 1;
-    if (page < 1) page = 1;
+  // Add states
+  if (params.states && params.states.length) {
+    filter.state = {
+      $in: params.states
+    };
   }
 
-  var wsSearch = query.properties || {};
-  var searchParam = {state: 12};
+  // Add categories
+  if (params.categories && params.categories.length) {
+    filter.category = {
+      $in: params.categories
+    };
+  }
 
+  // Add date
+  if (params.dateStart || params.dateEnd) {
+    filter.date = {};
+    if (params.dateStart) filter.date.$gte = params.dateStart;
+    if (params.dateEnd) filter.date.$lt = params.dateEnd;
+  }
+
+  var wsSearch = request.query.properties || {};
   var series = [];
 
   // Construct MongoDb search query with parameters
@@ -176,7 +252,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
         var val = wsSearch[key];
 
         // Build search for each existing property
-        searchParam['properties.' + prop.id] = {$in: [].concat(val)};
+        filter['properties.' + prop.id] = {$in: [].concat(val)};
         callback();
       });
     });
@@ -184,13 +260,17 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
 
   // Do series call function and execute final search
   async.series(series, function(err) {
-    if (err) next(err);
+    if (err) {
+      process.logger.error(err);
+      next(errors.GET_VIDEOS_ERROR);
+    }
 
     // find in mongoDb
-    else videoModel.getPaginatedFilteredEntities(searchParam, limit, page, sort, true,
+    else videoModel.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
       function(error, entities, pagination) {
         if (error) {
-          response.status(500).send(error);
+          process.logger.error(error);
+          next(errors.GET_VIDEOS_ERROR);
         } else {
           response.send({
             videos: entities,

@@ -45,7 +45,7 @@ CategoryHelper.prototype.addEntities = function(tree) {
       if (error)
         deferred.reject(error);
       else if (!categories) {
-        self.model.add(categoriesToAdd, function(error, data) {
+        self.model.add(categoriesToAdd, function(error, addedCount, data) {
           if (error)
             deferred.reject(error);
           else

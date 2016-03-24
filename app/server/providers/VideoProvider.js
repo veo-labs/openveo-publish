@@ -101,3 +101,22 @@ VideoProvider.prototype.getOne = function(id, callback) {
       callback(error);
   });
 };
+
+/**
+ * Creates videos indexes.
+ *
+ * @method createIndexes
+ * @async
+ * @param {Function} callback Function to call when it's done with :
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+VideoProvider.prototype.createIndexes = function(callback) {
+  this.database.createIndexes(this.collection, [
+    {key: {title: 'text', description: 'text'}, weights: {title: 2}, name: 'querySearch'}
+  ], function(error, result) {
+    if (result && result.note)
+      process.logger.debug('Create videos indexes : ' + result.note);
+
+    callback(error);
+  });
+};

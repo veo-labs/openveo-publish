@@ -2,39 +2,27 @@
 
 OpenVeo Publish defines its own Web Service endpoints. Web Service authentication is documented in [OpenVeo](https://github.com/veo-labs/openveo-core) project.
 
-Videos can be in different states :
-
-- **0** : The video is on error
-- **1** : The video is waiting to be treated
-- **2** : The video is copying
-- **3** : The video package is extracting
-- **4** : The video package is validating
-- **5** : The video package is preparing
-- **6** : The video is waiting for manual upload
-- **7** : The video is uploading to Vimeo
-- **8** : The video is being configured on Vimeo
-- **9** : The video timecodes are being saved
-- **10** : The video synchronized images are being saved
-- **11** : The video is uploaded and ready but unpublished
-- **12** : The video is uploaded and ready and published
-- **13** : The video thumbnail is generated
-- **14** : The video metadatas are being retrieved
-
 # Endpoints
 
 ## Videos
 
-Get published videos.
+Get videos.
 
     GET WEB_SERVICE_URL/publish/videos
 
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
-sortBy | String | No | date | Sort videos by either **title**, **description**, **date** or **published**
+query | String | No | - | To search on both videos' title and description
+states | String/Array | No | - | To filter videos by state
+dateStart | String | No | - | To get videos after or equal to a date (in format mm/dd/yyyy)
+dateEnd | String | No | - | To get videos before a date (in format mm/dd/yyyy)
+categories | String/Array | No | - | To filter videos by category
+sortBy | String | No | date | To sort videos by either **title**, **description** or **date**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 1 | The expected page
-limit | Number | No | - | Limit number of videos per page. If not specified get all videos
-properties | Array | No | - | A list of properties with the property name as the key and the expected property value as the value. (e.g. **properties[property1Name]=property1Value**)
+limit | Number | No | - | To limit the number of videos per page. If not specified get all videos
+properties | Object | No | - | A list of properties with the property name as the key and the expected property value as the value. (e.g. **properties[property1Name]=property1Value**)
+
 
 HTTP Status Code | Details
 ---- | ----
@@ -106,6 +94,24 @@ HTTP Status Code | Details
   ]
 }
 ```
+
+Videos can be in different states :
+
+- **0** : The video is on error
+- **1** : The video is waiting to be treated
+- **2** : The video is copying
+- **3** : The video package is extracting
+- **4** : The video package is validating
+- **5** : The video package is preparing
+- **6** : The video is waiting for manual upload
+- **7** : The video is uploading to Vimeo
+- **8** : The video is being configured on Vimeo
+- **9** : The video timecodes are being saved
+- **10** : The video synchronized images are being saved
+- **11** : The video is uploaded and ready but unpublished
+- **12** : The video is uploaded and ready and published
+- **13** : The video thumbnail is generated
+- **14** : The video metadatas are being retrieved
 
 ---
 
@@ -194,6 +200,125 @@ HTTP Status Code | Details
       }
       ...
     ]
+  }
+}
+```
+
+## Properties
+
+Get custom properties.
+
+    GET WEB_SERVICE_URL/publish/properties
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+query | String | No | - | To search on both properties' name and description
+types | String/Array | No | - | To filter properties by type
+sortBy | String | No | name | To sort properties by either **name** or **description**
+sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
+page | Number | No | 1 | The expected page
+limit | Number | No | - | To limit the number of properties per page. If not specified get all properties
+
+HTTP Status Code | Details
+---- | ----
+500 | An error occured on the server side
+200 | Got the list of properties (even if the list is empty)
+
+```json
+{
+  "properties": [
+    {
+      "id": "4JMy6htjpe",
+      "name": "Property name",
+      "description": "Property description",
+      "type": "text"
+    },
+    {
+      "id": "4JMy6htjpe",
+      "name": "Property name",
+      "description": "Property description",
+      "type": "list",
+      "values": ["value1", "value2"]
+    }
+  ],
+  "pagination": {
+    "limit": 1,
+    "page": 1,
+    "pages": 2,
+    "size": 2
+  }
+}
+```
+
+---
+
+Get information about a property.
+
+    GET WEB_SERVICE_URL/publish/property/{property_id}
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+property_id | String | Yes | - | The id of the property to fetch
+
+HTTP Status Code | Details
+---- | ----
+500 | An error occured on the server side
+400 | The id of the property is missing
+200 | Got the property
+
+```json
+{
+  "property": {
+    "id": "NyiBTYjTe",
+    "name": "Property name",
+    "description": "Property description",
+    "type": "text"
+  }
+}
+```
+
+---
+
+Get the list of properties' types.
+
+    GET WEB_SERVICE_URL/publish/properties/types
+
+HTTP Status Code | Details
+---- | ----
+200 | Got the list of properties' types
+
+```json
+{
+  "types": [
+    "text",
+    "list"
+  ]
+}
+```
+
+
+## Categories
+
+Get information about a category.
+
+    GET WEB_SERVICE_URL/publish/category/{category_id}
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+category_id | String | Yes | - | The id of the category to fetch
+
+HTTP Status Code | Details
+---- | ----
+500 | An error occured on the server side
+400 | The id of the category is missing
+200 | Got the category
+
+```json
+{
+  "category": {
+    "id": "123456",
+    "title": "Category title",
+    "items": [ ]
   }
 }
 ```

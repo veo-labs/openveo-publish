@@ -38,24 +38,24 @@
       "name": "publish-categories-no-write",
       "permissions": [
         "access-categories-page",
-        "update-taxonomy",
-        "delete-taxonomy"
+        "update-category",
+        "delete-category"
       ]
     },
     "publishCategoriesNoUpdate": {
       "name": "publish-categories-no-update",
       "permissions": [
         "access-categories-page",
-        "create-taxonomy",
-        "delete-taxonomy"
+        "create-category",
+        "delete-category"
       ]
     },
     "publishCategoriesNoDelete": {
       "name": "publish-categories-no-delete",
       "permissions": [
         "access-categories-page",
-        "create-taxonomy",
-        "update-taxonomy"
+        "create-category",
+        "update-category"
       ]
     },
     "publishCategoriesNoManage": {
@@ -191,6 +191,14 @@
     "publishApplicationsVideos": {
       "name": "publish-applications-videos",
       "scopes": [ "video" ]
+    },
+    "publishApplicationsProperties": {
+      "name": "publish-applications-properties",
+      "scopes": [ "property" ]
+    },
+    "publishApplicationsCategories": {
+      "name": "publish-applications-categories",
+      "scopes": [ "category" ]
     },
     "publishApplicationsNoPermission": {
       "name": "publish-applications-guest",

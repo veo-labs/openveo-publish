@@ -22,7 +22,7 @@ module.exports = {
   },
 
   // Missing parameters errors
-  GET_VIDEO_MISSING_PARAMETERS: {
+  GET_VIDEO_READY_MISSING_PARAMETERS: {
     code: 0x200,
     httpCode: 400,
     module: 'publish'
@@ -47,9 +47,25 @@ module.exports = {
     httpCode: 400,
     module: 'publish'
   },
+  GET_PROPERTY_MISSING_PARAMETERS: {
+    code: 0x205,
+    httpCode: 400,
+    module: 'publish',
+    message: 'Missing property id'
+  },
+  GET_VIDEO_MISSING_PARAMETERS: {
+    code: 0x206,
+    httpCode: 400,
+    module: 'publish'
+  },
+  GET_CATEGORY_MISSING_PARAMETERS: {
+    code: 0x207,
+    httpCode: 400,
+    module: 'publish'
+  },
 
   // Other errors
-  GET_VIDEO_ERROR: {
+  GET_VIDEO_READY_ERROR: {
     code: 0x300,
     httpCode: 500,
     module: 'publish'
@@ -66,6 +82,31 @@ module.exports = {
   },
   GET_CONFIGURATION_ERROR: {
     code: 0x303,
+    httpCode: 500,
+    module: 'publish'
+  },
+  GET_PROPERTY_ERROR: {
+    code: 0x304,
+    httpCode: 500,
+    module: 'publish'
+  },
+  GET_PROPERTIES_ERROR: {
+    code: 0x305,
+    httpCode: 500,
+    module: 'publish'
+  },
+  GET_VIDEO_ERROR: {
+    code: 0x306,
+    httpCode: 500,
+    module: 'publish'
+  },
+  GET_VIDEOS_ERROR: {
+    code: 0x307,
+    httpCode: 500,
+    module: 'publish'
+  },
+  GET_CATEGORY_ERROR: {
+    code: 0x308,
     httpCode: 500,
     module: 'publish'
   },

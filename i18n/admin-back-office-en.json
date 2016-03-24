@@ -9,7 +9,11 @@
   },
   "WS_SCOPES" : {
     "GET_VIDEO_NAME" : "Get videos",
-    "GET_VIDEO_DESCRIPTION" : "Get the list of videos"
+    "GET_VIDEO_DESCRIPTION" : "Get the list of videos",
+    "GET_PROPERTY_NAME" : "Get properties",
+    "GET_PROPERTY_DESCRIPTION" : "Get the list of properties",
+    "GET_CATEGORY_NAME" : "Get categories",
+    "GET_CATEGORY_DESCRIPTION" : "Get the list of categories"
   },
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Create properties",
@@ -40,7 +44,16 @@
     "RETRY_VIDEO_NAME": "Retry video processing",
     "RETRY_VIDEO_DESCRIPTION": "Retry to launch manually the video saving process",
     "UPLOAD_VIDEO_NAME": "Launch video upload",
-    "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload"
+    "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload",
+    "GROUP_PROPERTY" : "Properties",
+    "GROUP_VIDEO" : "Videos",
+    "GROUP_CATEGORY" : "Categories",
+    "CREATE_CATEGORY_NAME" : "Create categories",
+    "CREATE_CATEGORY_DESCRIPTION" : "Create media categories",
+    "UPDATE_CATEGORY_NAME" : "Edit categories",
+    "UPDATE_CATEGORY_DESCRIPTION" : "Edit media categories",
+    "DELETE_CATEGORY_NAME" : "Remove categories",
+    "DELETE_CATEGORY_DESCRIPTION" : "Remove media categories"
   },
   "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Videos",

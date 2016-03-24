@@ -9,7 +9,11 @@
   },
   "WS_SCOPES" : {
     "GET_VIDEO_NAME" : "Récupérer les vidéos",
-    "GET_VIDEO_DESCRIPTION" : "Récupérer la liste des vidéos"
+    "GET_VIDEO_DESCRIPTION" : "Récupérer la liste des vidéos",
+    "GET_PROPERTY_NAME" : "Récupérer les propriétés",
+    "GET_PROPERTY_DESCRIPTION" : "Récupérer la liste des propriétés personnalisées",
+    "GET_CATEGORY_NAME" : "Récupérer les catégories",
+    "GET_CATEGORY_DESCRIPTION" : "Récupérer la liste des categories"
   },
   "PERMISSIONS" : {
     "CREATE_PROPERTY_NAME" : "Créer des propriétés",
@@ -40,7 +44,16 @@
     "RETRY_VIDEO_NAME": "Relancer le traitement de la vidéo",
     "RETRY_VIDEO_DESCRIPTION": "Relancer manuellement le processus d'enregistrement de la vidéo",
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
-    "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo"
+    "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo",
+    "GROUP_PROPERTY" : "Propriétés",
+    "GROUP_VIDEO" : "Vidéos",
+    "GROUP_CATEGORY" : "Catégories",
+    "CREATE_CATEGORY_NAME" : "Créer des catégories",
+    "CREATE_CATEGORY_DESCRIPTION" : "Créer des catégories de médias",
+    "UPDATE_CATEGORY_NAME" : "Editer les catégories",
+    "UPDATE_CATEGORY_DESCRIPTION" : "Editer les catégories de médias",
+    "DELETE_CATEGORY_NAME" : "Supprimer les catégories",
+    "DELETE_CATEGORY_DESCRIPTION" : "Supprimer les catégories de médias"
   },
   "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Vidéos",

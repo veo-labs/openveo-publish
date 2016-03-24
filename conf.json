@@ -2,7 +2,7 @@
   "routes" : {
     "public" : {
       "get /video/*" : "app/server/controllers/videoController.displayVideoAction",
-      "get /getVideo/:id" : "app/server/controllers/videoController.getVideoAction"
+      "get /getVideo/:id" : "app/server/controllers/videoController.getVideoReadyAction"
     },
     "private" : {
       "get /watcherStatus" : "app/server/controllers/watcherController.getStatusAction",
@@ -18,10 +18,15 @@
     },
     "ws": {
       "get /video/:id" : "app/server/controllers/videoController.getVideoAction",
-      "get /videos" : "app/server/controllers/videoController.getVideoByPropertiesAction"
+      "get /videos" : "app/server/controllers/videoController.getVideoByPropertiesAction",
+      "get /property/:id" : "app/server/controllers/propertyController.getPropertyAction",
+      "get /properties" : "app/server/controllers/propertyController.getPropertiesAction",
+      "get /properties/types" : "app/server/controllers/propertyController.getPropertyTypesAction",
+      "get /category/:id" : "app/server/controllers/categoryController.getCategoryAction"
     }
   },
   "entities" : {
+    "category" : "app/server/models/CategoryModel",
     "property" : "app/server/models/PropertyModel",
     "video" : "app/server/models/VideoModel"
   },
@@ -33,6 +38,23 @@
       "paths" : [
         "get /publish/video/*",
         "get /publish/videos*"
+      ]
+    },
+    {
+      "id": "property",
+      "name" : "WS_SCOPES.GET_PROPERTY_NAME",
+      "description" : "WS_SCOPES.GET_PROPERTY_DESCRIPTON",
+      "paths" : [
+        "get /publish/property/*",
+        "get /publish/properties*"
+      ]
+    },
+    {
+      "id": "category",
+      "name" : "WS_SCOPES.GET_CATEGORY_NAME",
+      "description" : "WS_SCOPES.GET_CATEGORY_DESCRIPTON",
+      "paths" : [
+        "get /publish/category/*"
       ]
     }
   ],
