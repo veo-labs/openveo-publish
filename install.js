@@ -116,8 +116,7 @@ function createLoggerConf(callback) {
     if (exists) {
       process.stdout.write(confFile + ' already exists\n');
       callback();
-    }
-    else
+    } else
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
   });
 }
@@ -274,8 +273,7 @@ function createWatcherConf(callback) {
     if (error) {
       process.stdout.write(error.message);
       callback();
-    }
-    else
+    } else
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
   });
 }

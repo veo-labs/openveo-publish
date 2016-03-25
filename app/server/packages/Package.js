@@ -257,17 +257,17 @@ Package.prototype.executeTransition = function(transition) {
     if (transition === Package.UPLOAD_MEDIA_TRANSITION) {
       process.logger.debug('Package ' + this.mediaPackage.id + ' is waiting for manual upload');
       this.videoModel.updateState(this.mediaPackage.id, VideoModel.WAITING_FOR_UPLOAD_STATE);
-    }
-    else
+    } else
       this.videoModel.updateState(this.mediaPackage.id, VideoModel.READY_STATE);
 
     // Done, final state reached
     this.emit('complete', this.mediaPackage);
-  }
+  } else {
 
-  // Continue by executing the next transition in the stack
-  else
+    // Continue by executing the next transition in the stack
     this.fsm[transition]();
+
+  }
 };
 
 /**

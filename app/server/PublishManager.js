@@ -269,8 +269,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
     // Package can be added to pending packages
     if (addPackage.call(this, mediaPackage))
       mediaPackageManager.executeTransition(Package.INIT_TRANSITION);
-  }
-  else
+  } else
     this.emit('error', new PublishError('mediaPackage argument must be an Object', errors.PACKAGE_NOT_DEFINED_ERROR));
 };
 

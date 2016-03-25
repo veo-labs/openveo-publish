@@ -81,8 +81,7 @@ function verifyAssetIsEmpty(callback) {
         else
           openVeoAPI.fileSystem.rmdir(assetsDir, callback);
       });
-    }
-    else callback();
+    } else callback();
   });
 }
 

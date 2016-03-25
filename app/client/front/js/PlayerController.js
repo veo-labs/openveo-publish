@@ -31,8 +31,7 @@
             $scope.playerType = $scope.data.type == 'youtube' ? 'youtube' : urlParams['type'] || 'html';
             $scope.ready = true;
           }
-        }
-        else
+        } else
           $window.location.href = '/notFound';
 
       });

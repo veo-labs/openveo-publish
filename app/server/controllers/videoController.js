@@ -59,11 +59,12 @@ module.exports.displayVideoAction = function(request, response, next) {
     });
 
     response.render('player', response.locals);
-  }
+  } else {
 
-  // No sub plugins
-  else
+    // No sub plugins
     next();
+
+  }
 };
 
 /**
@@ -110,11 +111,12 @@ module.exports.getVideoAction = function(request, response, next) {
           video: video
         });
     });
-  }
+  } else {
 
-  // Missing id of the video
-  else
+    // Missing id of the video
     next(errors.GET_VIDEO_MISSING_PARAMETERS);
+
+  }
 };
 
 /**
@@ -144,11 +146,12 @@ module.exports.getVideoReadyAction = function(request, response, next) {
           video: video
         });
     });
-  }
+  } else {
 
-  // Missing id of the video
-  else
+    // Missing id of the video
     next(errors.GET_VIDEO_READY_MISSING_PARAMETERS);
+
+  }
 };
 
 /**
@@ -263,22 +266,24 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     if (err) {
       process.logger.error(err);
       next(errors.GET_VIDEOS_ERROR);
-    }
+    } else {
 
-    // find in mongoDb
-    else videoModel.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
-      function(error, entities, pagination) {
-        if (error) {
-          process.logger.error(error);
-          next(errors.GET_VIDEOS_ERROR);
-        } else {
-          response.send({
-            videos: entities,
-            pagination: pagination
-          });
+      // find in mongoDb
+      videoModel.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
+        function(error, entities, pagination) {
+          if (error) {
+            process.logger.error(error);
+            next(errors.GET_VIDEOS_ERROR);
+          } else {
+            response.send({
+              videos: entities,
+              pagination: pagination
+            });
+          }
         }
-      }
-    );
+      );
+
+    }
   });
 };
 
@@ -309,11 +314,12 @@ module.exports.publishVideoAction = function(request, response, next) {
           state: VideoModel.PUBLISHED_STATE
         });
     });
-  }
+  } else {
 
-  // Missing type and / or id of the video
-  else
+    // Missing type and / or id of the video
     next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
+
+  }
 };
 
 /**
@@ -343,9 +349,10 @@ module.exports.unpublishVideoAction = function(request, response, next) {
           state: VideoModel.READY_STATE
         });
     });
-  }
+  } else {
 
-  // Missing type and / or id of the video
-  else
+    // Missing type and / or id of the video
     next(errors.UNPUBLISH_VIDEO_MISSING_PARAMETERS);
+
+  }
 };

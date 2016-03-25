@@ -389,11 +389,12 @@ TarPackage.prototype.extractPackage = function() {
     // Extraction failed
     if (error) {
       self.setError(new TarPackageError(error.message, errors.EXTRACT_ERROR));
-    }
+    } else {
 
-    // Extraction done
-    else
+      // Extraction done
       self.fsm.transition();
+
+    }
 
   });
 };

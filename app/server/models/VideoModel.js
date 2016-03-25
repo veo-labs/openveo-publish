@@ -630,8 +630,7 @@ VideoModel.prototype.getOne = function(id, callback) {
           callback();
         });
 
-      }
-      else
+      } else
         callback();
     },
 
@@ -649,8 +648,7 @@ VideoModel.prototype.getOne = function(id, callback) {
           }
           callback();
         });
-      }
-      else
+      } else
         callback();
     }
 

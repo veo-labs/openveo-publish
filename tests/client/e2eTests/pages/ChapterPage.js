@@ -86,8 +86,7 @@ function getLineByIndex(lines, name, index) {
         });
       }
     });
-  }
-  else
+  } else
     deferred.reject(new Error('No line corresponding to ' + name));
 
   return deferred.promise;

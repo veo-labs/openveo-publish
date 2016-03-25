@@ -251,8 +251,7 @@
       if (!type) {
         properties = categories = null;
         mediaChapter = {};
-      }
-      else
+      } else
         switch (type) {
           case 'properties':
             properties = null;

@@ -85,8 +85,7 @@ WatcherPage.prototype.startWatcher = function() {
     if (status === watcherManager.STARTING_STATUS) {
       browser.wait(self.EC.visibilityOf(self.startedAlertElement), 5000, 'Watcher not starting');
       return protractor.promise.fulfilled();
-    }
-    else if (status === watcherManager.STARTED_STATUS)
+    } else if (status === watcherManager.STARTED_STATUS)
       return protractor.promise.fulfilled();
     else if (status === watcherManager.STOPPING_STATUS)
       browser.wait(self.EC.visibilityOf(self.stoppedAlertElement), 5000, 'Watcher not stopping');
@@ -110,8 +109,7 @@ WatcherPage.prototype.stopWatcher = function() {
     if (status === watcherManager.STOPPING_STATUS) {
       browser.wait(self.EC.visibilityOf(self.stoppedAlertElement), 5000, 'Watcher not stopping');
       return protractor.promise.fulfilled();
-    }
-    else if (status === watcherManager.STOPPED_STATUS)
+    } else if (status === watcherManager.STOPPED_STATUS)
       return protractor.promise.fulfilled();
     else if (status === watcherManager.STARTING_STATUS)
       browser.wait(self.EC.visibilityOf(self.startedAlertElement), 5000, 'Watcher not starting');

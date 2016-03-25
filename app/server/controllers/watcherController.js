@@ -1,3 +1,4 @@
+
 'use strict';
 
 /**
@@ -42,11 +43,12 @@ module.exports.retryVideoAction = function(request, response, next) {
     async.parallel(asyncFunctions, function() {
       response.send();
     });
-  }
+  } else {
 
-  // Missing type and / or id of the video
-  else
+    // Missing type and / or id of the video
     next(errors.RETRY_VIDEO_MISSING_PARAMETERS);
+
+  }
 };
 
 /**
@@ -79,11 +81,12 @@ module.exports.startUploadAction = function(request, response, next) {
       response.send();
     });
 
-  }
+  } else {
 
-  // Missing platform and / or id of the video
-  else
+    // Missing platform and / or id of the video
     next(errors.START_UPLOAD_VIDEO_MISSING_PARAMETERS);
+
+  }
 };
 
 /**

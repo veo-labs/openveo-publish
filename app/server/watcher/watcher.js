@@ -132,14 +132,14 @@ db.connect(function(error) {
 
           packageInfo['originalPackagePath'] = filePath;
           publishManager.publish(packageInfo);
-        }
-        else
+        } else
           process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
 
       } else {
 
         // File modification date has changed, file is not complete yet
         setTimeout(publishPackage, 10000, filePath, stat);
+
       }
     });
   }

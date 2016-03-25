@@ -47,11 +47,12 @@ module.exports.getPropertyAction = function(request, response, next) {
           property: property
         });
     });
-  }
+  } else {
 
-  // Missing type and / or id of the property
-  else
+    // Missing type and / or id of the property
     next(errors.GET_PROPERTY_MISSING_PARAMETERS);
+
+  }
 };
 
 /**

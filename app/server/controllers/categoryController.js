@@ -61,9 +61,10 @@ module.exports.getCategoryAction = function(request, response, next) {
         });
       }
     });
-  }
+  } else {
 
-  // Missing type and / or id of the category
-  else
+    // Missing type and / or id of the category
     next(errors.GET_CATEGORY_MISSING_PARAMETERS);
+
+  }
 };
