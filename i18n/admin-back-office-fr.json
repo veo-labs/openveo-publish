@@ -126,6 +126,7 @@
     "ADD_PROPERTY" : "Ajouter une propriété personnalisée",
     "FORM_ADD_TEXT_TYPE" : "Texte",
     "FORM_ADD_LIST_TYPE" : "Liste",
+    "FORM_ADD_BOOLEAN_TYPE" : "Vrai / faux",
     "FORM_ADD_NAME_DESC" : "Le nom de la propriété tel qu'il apparaîtra lors de l'édition d'une vidéo",
     "FORM_ADD_DESCRIPTION_DESC" : "Une brève description de la propriété",
     "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété",

@@ -58,6 +58,11 @@ describe('Media page', function() {
           type: PropertyModel.TYPE_LIST,
           values: ['tag1', 'tag2']
         });
+        properties.push({
+          name: propertyNames[i] + ' boolean',
+          description: propertyNames[i] + ' boolean description',
+          type: PropertyModel.TYPE_BOOLEAN
+        });
       }
 
       propertyHelper.addEntities(properties).then(function(addedLines) {
@@ -212,6 +217,8 @@ describe('Media page', function() {
         propertiesById[properties[i].id] = 'test edition ' + properties[i].name + ' value';
       else if (properties[i].type === PropertyModel.TYPE_LIST)
         propertiesById[properties[i].id] = properties[i].values[0];
+      else if (properties[i].type === PropertyModel.TYPE_BOOLEAN)
+        propertiesById[properties[i].id] = true;
     }
 
     var linesToAdd = [

@@ -37,7 +37,8 @@ util.inherits(PropertyModel, openVeoAPI.EntityModel);
 
 PropertyModel.TYPE_TEXT = 'text';
 PropertyModel.TYPE_LIST = 'list';
-PropertyModel.availableTypes = [PropertyModel.TYPE_TEXT, PropertyModel.TYPE_LIST];
+PropertyModel.TYPE_BOOLEAN = 'boolean';
+PropertyModel.availableTypes = [PropertyModel.TYPE_TEXT, PropertyModel.TYPE_LIST, PropertyModel.TYPE_BOOLEAN];
 
 /**
  * Adds a new property.

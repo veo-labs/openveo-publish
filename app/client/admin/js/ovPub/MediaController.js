@@ -439,6 +439,15 @@
               options: options
             }
           });
+        } else if (property.type === 'boolean') {
+          scopeEditForm.fields.push({
+            key: property.id,
+            type: 'horizontalEditableCheckbox',
+            model: row.properties,
+            templateOptions: {
+              label: property.name || property.id
+            }
+          });
         }
       });
 

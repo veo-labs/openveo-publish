@@ -8,6 +8,7 @@
   function PropertiesController($scope, $filter, entityService, publishService) {
     var TEXT_TYPE = 'text';
     var LIST_TYPE = 'list';
+    var BOOLEAN_TYPE = 'boolean';
     var supportedTypes = [
       {
         value: TEXT_TYPE,
@@ -16,6 +17,10 @@
       {
         value: LIST_TYPE,
         name: $filter('translate')('PROPERTIES.FORM_ADD_LIST_TYPE')
+      },
+      {
+        value: BOOLEAN_TYPE,
+        name: $filter('translate')('PROPERTIES.FORM_ADD_BOOLEAN_TYPE')
       }
     ];
 

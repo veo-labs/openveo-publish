@@ -184,8 +184,13 @@ MediaPage.prototype.editMedia = function(name, data) {
     if (data.properties) {
       for (var propertyId in data.properties) {
         var property = self.getProperty(propertyId);
+        var fieldType = 'text';
+
+        if (property.type === PropertyModel.TYPE_LIST) fieldType = 'select';
+        if (property.type === PropertyModel.TYPE_BOOLEAN) fieldType = 'checkbox';
+
         var propertyField = Field.get({
-          type: (property.type === PropertyModel.TYPE_TEXT) ? 'text' : 'select',
+          type: fieldType,
           name: property.name,
           baseElement: formElement
         });

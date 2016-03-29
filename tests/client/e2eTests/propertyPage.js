@@ -14,8 +14,6 @@ chai.use(chaiAsPromised);
 
 describe('Property page', function() {
   var page, tableAssert, propertyHelper;
-  var LIST_TYPE = 'list';
-  var TEXT_TYPE = 'text';
 
   // Prepare page
   before(function() {
@@ -70,6 +68,17 @@ describe('Property page', function() {
     page.removeLine(name);
   });
 
+  it('should be able to add / remove a boolean property', function() {
+    var name = 'test add / remove boolean property';
+    var description = 'test add / remove boolean property description';
+    var type = page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE;
+    page.addLine(name, {type: type, description: description});
+    assert.isFulfilled(page.getLine(name));
+    assert.eventually.equal(page.getLineFieldText(name, 'description'), description);
+    assert.eventually.equal(page.getLineFieldText(name, 'type'), type);
+    page.removeLine(name);
+  });
+
   it('should not be able to add a text property without name, description or type', function() {
     var name = 'test add without all info';
     var description = 'test add without all info description';
@@ -78,6 +87,16 @@ describe('Property page', function() {
     assert.isRejected(page.addLine(name, {}));
     assert.isRejected(page.addLine(name, {description: description}));
     assert.isRejected(page.addLine(name, {type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE}));
+  });
+
+  it('should not be able to add a boolean property without name, description or type', function() {
+    var name = 'test add without all info';
+    var description = 'test add without all info description';
+
+    assert.isRejected(page.addLine(null, {}));
+    assert.isRejected(page.addLine(name, {}));
+    assert.isRejected(page.addLine(name, {description: description}));
+    assert.isRejected(page.addLine(name, {type: page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE}));
   });
 
   it('should not be able to add a list property without values', function() {
@@ -104,6 +123,24 @@ describe('Property page', function() {
     page.addLine(name, {
       description: description,
       type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+    });
+
+    // Edit property with a new name and new description
+    page.editProperty(name, {name: newName, description: newDescription});
+    assert.isFulfilled(page.getLine(newName));
+    assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
+  });
+
+  it('should be able to edit a boolean property', function() {
+    var name = 'test edition';
+    var description = 'test edition description';
+    var newName = 'test edition renamed';
+    var newDescription = 'test edition renamed description';
+
+    // Create line
+    page.addLine(name, {
+      description: description,
+      type: page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE
     });
 
     // Edit property with a new name and new description
@@ -168,9 +205,10 @@ describe('Property page', function() {
     // Add lines
     beforeEach(function() {
       linesToAdd = [
-        {name: 'test search 0', description: 'test search description', type: TEXT_TYPE},
-        {name: 'test search 1', description: 'test search description', type: TEXT_TYPE},
-        {name: 'test search 2', description: 'test search description', type: LIST_TYPE, values: ['value1']}
+        {name: 'test search 0', description: 'test search', type: PropertyModel.TYPE_TEXT},
+        {name: 'test search 1', description: 'test search', type: PropertyModel.TYPE_TEXT},
+        {name: 'test search 2', description: 'test search', type: PropertyModel.TYPE_LIST, values: ['value1']},
+        {name: 'test search 3', description: 'test search', type: PropertyModel.TYPE_BOOLEAN}
       ];
 
       propertyHelper.addEntities(linesToAdd);
@@ -261,7 +299,7 @@ describe('Property page', function() {
         // Predict values
         expectedValues = values.filter(function(element) {
           for (var i = 0; i < linesToAdd.length; i++) {
-            if (element === linesToAdd[i].name && linesToAdd[i].type === LIST_TYPE)
+            if (element === linesToAdd[i].name && linesToAdd[i].type === PropertyModel.TYPE_LIST)
               return true;
           }
           return false;
