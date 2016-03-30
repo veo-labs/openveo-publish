@@ -4,6 +4,7 @@ module.exports = {
   publish: {
     src: [
       'index.js',
+      'conf.js',
       'Gruntfile.js',
       'install.js',
       'backup.js',

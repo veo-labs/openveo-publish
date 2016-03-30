@@ -1,6 +1,6 @@
 'use strict';
 
-var applicationConf = process.requirePublish('conf.json');
+var applicationConf = process.requirePublish('conf.js');
 
 /**
  * Gets the list of minified JavaScript files from the given list of files.
