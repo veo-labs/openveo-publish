@@ -15,7 +15,7 @@ chai.use(chaiAsPromised);
 describe('Chapter page', function() {
   var page;
   var medias;
-  var mediaId = 'test-chapters-page-translations';
+  var mediaId = 'test-chapters-page-permissions';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
   var mediaHelper;

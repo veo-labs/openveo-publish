@@ -22,10 +22,11 @@ var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
  *
  * @class VideoModel
  * @constructor
- * @extends EntityModel
+ * @extends ContentModel
+ * @param {Object} user The user the video belongs to
  */
-function VideoModel() {
-  openVeoAPI.EntityModel.prototype.init.call(this, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
+function VideoModel(user) {
+  openVeoAPI.ContentModel.call(this, user, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
 
   /**
    * Property provider.
@@ -37,7 +38,7 @@ function VideoModel() {
 }
 
 module.exports = VideoModel;
-util.inherits(VideoModel, openVeoAPI.EntityModel);
+util.inherits(VideoModel, openVeoAPI.ContentModel);
 
 // States codes
 VideoModel.ERROR_STATE = 0;
@@ -145,6 +146,11 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     cut: videoPackage.cut || [],
     sources: videoPackage.sources || []
   };
+
+  if (!data.metadata)
+    data.metadata = {};
+
+  data.metadata['user'] = (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId();
 
   this.provider.add(data, function(error, addedCount, videos) {
     if (callback)
@@ -322,11 +328,12 @@ VideoModel.prototype.updateThumbnail = function(id, path, callback) {
  *
  * @method get
  * @async
+ * @param {Object} filter A MongoDB filter
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Array** The list of videos
  */
-VideoModel.prototype.get = function(callback) {
+VideoModel.prototype.get = function(filter, callback) {
   var self = this;
   var videos = [];
   var properties = [];
@@ -335,7 +342,7 @@ VideoModel.prototype.get = function(callback) {
 
     // Get the list of videos
     function(callback) {
-      self.provider.get(function(error, videoList) {
+      self.provider.get(self.addAccessFilter(filter), function(error, videoList) {
         videos = videoList;
         callback(error);
       });
@@ -343,7 +350,7 @@ VideoModel.prototype.get = function(callback) {
 
     // Get the list of custom properties
     function(callback) {
-      self.propertyProvider.get(function(error, propertyList) {
+      self.propertyProvider.get(null, function(error, propertyList) {
         properties = propertyList;
         callback(error);
       });
@@ -419,7 +426,8 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page
 
     // Get the list of videos
     function(callback) {
-      self.provider.getPaginatedFilteredEntities(filter, limit, page, sort, function(error, videoList, pageArray) {
+      self.provider.getPaginatedFilteredEntities(self.addAccessFilter(filter), limit, page, sort,
+      function(error, videoList, pageArray) {
         videos = videoList;
         pagination = pageArray;
         callback(error);
@@ -428,7 +436,7 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page
 
     // Get the list of custom properties
     function(callback) {
-      self.propertyProvider.get(function(error, propertyList) {
+      self.propertyProvider.get(null, function(error, propertyList) {
         properties = propertyList;
         callback(error);
       });
@@ -488,7 +496,7 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page
  *   - **Object** The video
  */
 VideoModel.prototype.getOneReady = function(id, callback) {
-  this.getOne(id, function(error, video) {
+  this.getOne(id, null, function(error, video) {
     if (error)
       callback(error);
     else if (video && (video.state === VideoModel.PUBLISHED_STATE || video.state === VideoModel.READY_STATE))
@@ -572,11 +580,12 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  * @method getOne
  * @async
  * @param {String} id The id of the video
+ * @param {Object} filter A MongoDB filter
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** The video information (see example)
  */
-VideoModel.prototype.getOne = function(id, callback) {
+VideoModel.prototype.getOne = function(id, filter, callback) {
   var self = this;
   var videoInfo,
     timecodesFilePath,
@@ -586,10 +595,13 @@ VideoModel.prototype.getOne = function(id, callback) {
 
     // Retrieve video information from database
     function(callback) {
-      self.provider.getOne(id, function(error, video) {
+      self.provider.getOne(id, filter, function(error, video) {
         if (error || !video) {
           callback(error);
           return;
+        } else if (!error && !self.isUserAuthorized(video)) {
+          var userId = self.user.id;
+          callback(new Error('User "' + userId + '" doesn\'t have access to video "' + id + '"'));
         } else {
 
           // Retreive video timecode file
@@ -689,12 +701,20 @@ VideoModel.prototype.getOne = function(id, callback) {
  */
 VideoModel.prototype.remove = function(ids, callback) {
   var self = this;
+  var idsToRemove = [];
   async.parallel([
 
     // Remove videos from database
     function(callback) {
-      self.provider.remove(ids, function(error, deletedCount) {
-        callback(error, deletedCount);
+      self.provider.get({id: {$in: ids}}, function(error, videos) {
+        if (!error) {
+          for (var i = 0; i < videos.length; i++) {
+            if (self.isUserAuthorized(videos[i]))
+              idsToRemove.push(videos[i].id);
+          }
+        }
+
+        self.provider.remove(idsToRemove, callback);
       });
     },
 
@@ -742,6 +762,7 @@ VideoModel.prototype.remove = function(ids, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.update = function(id, data, callback) {
+  var self = this;
   var info = {};
   if (data.title)
     info['title'] = data.title;
@@ -756,7 +777,15 @@ VideoModel.prototype.update = function(id, data, callback) {
   if (data.chapters)
     info['chapters'] = data.chapters;
 
-  this.provider.update(id, info, callback);
+  this.provider.getOne(id, null, function(error, entity) {
+    if (!error) {
+      if (self.isUserAuthorized(entity))
+        self.provider.update(id, info, callback);
+      else
+        callback(new Error('User "' + self.user.id + '" can\'t edit video "' + id + '"'));
+    } else
+      callback(error);
+  });
 };
 
 /**
@@ -773,7 +802,16 @@ VideoModel.prototype.update = function(id, data, callback) {
  *   - **Number** The number of published videos
  */
 VideoModel.prototype.publishVideo = function(id, callback) {
-  this.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
+  var self = this;
+  this.provider.getOne(id, null, function(error, entity) {
+    if (!error) {
+      if (self.isUserAuthorized(entity))
+        self.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
+      else
+        callback(new Error('User "' + self.user.id + '" can\'t publish video "' + id + '"'));
+    } else
+      callback(error);
+  });
 };
 
 /**
@@ -790,7 +828,16 @@ VideoModel.prototype.publishVideo = function(id, callback) {
  *   - **Number** The number of unpublished videos
  */
 VideoModel.prototype.unpublishVideo = function(id, callback) {
-  this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
+  var self = this;
+  this.provider.getOne(id, null, function(error, entity) {
+    if (!error) {
+      if (self.isUserAuthorized(entity))
+        self.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
+      else
+        callback(new Error('User "' + self.user.id + '" can\'t unpublish video "' + id + '"'));
+    } else
+      callback(error);
+  });
 };
 
 

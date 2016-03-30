@@ -57,7 +57,7 @@ module.exports.getCategoryAction = function(request, response, next) {
         next(errors.GET_CATEGORY_ERROR);
       } else {
         response.send({
-          category: categories && getCategory(categories.tree, request.params.id)
+          category: categories && getCategory(categories[0].tree, request.params.id)
         });
       }
     });

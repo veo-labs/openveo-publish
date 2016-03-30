@@ -39,7 +39,7 @@ module.exports.getPropertyTypesAction = function(request, response, next) {
  */
 module.exports.getPropertyAction = function(request, response, next) {
   if (request.params.id) {
-    propertyModel.getOne(request.params.id, function(error, property) {
+    propertyModel.getOne(request.params.id, null, function(error, property) {
       if (error)
         next(errors.GET_PROPERTY_ERROR);
       else

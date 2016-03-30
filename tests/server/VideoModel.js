@@ -60,7 +60,7 @@ describe('VideoModel', function() {
 
     it('Should be able to get videos and their associated properties', function() {
 
-      videoModel.get(function(error, videos) {
+      videoModel.get(null, function(error, videos) {
         assert.isNull(error);
         assert.isDefined(videos);
         assert.isArray(videos);
@@ -76,7 +76,7 @@ describe('VideoModel', function() {
     it('Should be able to get a video and the list of timecodes', function(done) {
 
       process.rootPublish = path.join(__dirname);
-      videoModel.getOne('1', function(error) {
+      videoModel.getOne('1', null, function(error) {
         process.rootPublish = path.join(__dirname, '../../');
         assert.isNull(error);
         done();

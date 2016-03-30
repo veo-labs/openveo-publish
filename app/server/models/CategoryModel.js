@@ -13,9 +13,10 @@ var openVeoAPI = require('@openveo/api');
  * @class CategoryModel
  * @constructor
  * @extends TaxonomyModel
+ * @param {Object} user The user the entity belongs to
  */
-function CategoryModel() {
-  CategoryModel.super_.call(this);
+function CategoryModel(user) {
+  openVeoAPI.TaxonomyModel.call(this, user);
 }
 
 module.exports = CategoryModel;

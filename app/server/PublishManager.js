@@ -284,7 +284,7 @@ PublishManager.prototype.retry = function(packageId) {
     var self = this;
 
     // Retrieve package information
-    this.videoModel.getByFilter({id: packageId}, function(error, mediaPackage) {
+    this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
 
       // Package does not exist
       if (error || !mediaPackage) {
@@ -326,7 +326,7 @@ PublishManager.prototype.upload = function(packageId, platform) {
     var self = this;
 
     // Retrieve package information
-    this.videoModel.getByFilter({id: packageId}, function(error, mediaPackage) {
+    this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
 
       // Package does not exist
       if (error || !mediaPackage) {

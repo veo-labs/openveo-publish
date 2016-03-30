@@ -49,7 +49,7 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
 
     // Retrieve token information from database
     function(callback) {
-      self.confModel.get(function(error, result) {
+      self.confModel.get(null, function(error, result) {
         if (error || !result || result.length < 1) {
           callback(error);
           return;
@@ -93,7 +93,7 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
  *   - **Object** The token object
  */
 GoogleOAuthHelper.prototype.fetchToken = function(callback) {
-  this.confModel.get(function(error, result) {
+  this.confModel.get(null, function(error, result) {
 
     if (error) {
       process.logger.error('Error while retrieving configuration data', error);

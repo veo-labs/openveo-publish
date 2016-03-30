@@ -38,13 +38,13 @@ CategoryHelper.prototype.addEntities = function(tree) {
       tree: tree
     };
 
-    self.model.getByFilter({
+    self.model.get({
       name: 'categories'
     },
     function(error, categories) {
       if (error)
         deferred.reject(error);
-      else if (!categories) {
+      else if (!categories.length) {
         self.model.add(categoriesToAdd, function(error, addedCount, data) {
           if (error)
             deferred.reject(error);
@@ -79,16 +79,16 @@ CategoryHelper.prototype.removeAllEntities = function() {
   return this.flow.execute(function() {
     var deferred = protractor.promise.defer();
 
-    self.model.getByFilter({
+    self.model.get({
       name: 'categories'
     },
     function(error, categories) {
       if (error)
         deferred.reject(error);
-      else if (!categories)
+      else if (!categories.length)
         deferred.fulfill();
       else {
-        self.model.remove([categories.id], function(error) {
+        self.model.remove([categories[0].id], function(error) {
           if (error)
             deferred.reject(error);
           else

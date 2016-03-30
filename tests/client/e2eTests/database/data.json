@@ -88,6 +88,15 @@
         "update-video"
       ]
     },
+    "publishMedias": {
+      "name": "publish-medias",
+      "permissions": [
+        "access-videos-page",
+        "create-video",
+        "update-video",
+        "delete-video"
+      ]
+    },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",
       "permissions": [
@@ -173,6 +182,18 @@
       "email": "publish-medias-no-delete@veo-labs.com",
       "password": "publish-medias-no-delete",
       "roles": [ "publishMediasNoDelete" ]
+    },
+    "publishMedias1": {
+      "name": "publish-medias-1",
+      "email": "publish-medias-1@veo-labs.com",
+      "password": "publish-medias-1",
+      "roles": [ "publishMedias" ]
+    },
+    "publishMedias2": {
+      "name": "publish-medias-2",
+      "email": "publish-medias-2@veo-labs.com",
+      "password": "publish-medias-2",
+      "roles": [ "publishMedias" ]
     },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",

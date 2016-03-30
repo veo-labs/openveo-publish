@@ -17,7 +17,6 @@ var errors = process.requirePublish('app/server/httpErrors.js');
 var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var videoModel = new VideoModel();
 var async = require('async');
 
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
@@ -103,7 +102,8 @@ module.exports.getPlatformsAction = function(request, response) {
  */
 module.exports.getVideoAction = function(request, response, next) {
   if (request.params.id) {
-    videoModel.getOne(request.params.id, function(error, video) {
+    var videoModel = new VideoModel(request.user);
+    videoModel.getOne(request.params.id, null, function(error, video) {
       if (error)
         next(errors.GET_VIDEO_ERROR);
       else
@@ -138,6 +138,7 @@ module.exports.getVideoAction = function(request, response, next) {
  */
 module.exports.getVideoReadyAction = function(request, response, next) {
   if (request.params.id) {
+    var videoModel = new VideoModel(request.user);
     videoModel.getOneReady(request.params.id, function(error, video) {
       if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
         next(errors.GET_VIDEO_READY_ERROR);
@@ -247,15 +248,15 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     series.push(function(callback) {
 
       // get property which name corresponding to parameter
-      propertyModel.getByFilter({name: key}, function(error, prop) {
+      propertyModel.get({name: key}, function(error, properties) {
         if (error) return callback(error);
 
         // Error if no property corresponding
-        if (!prop || prop.length == 0) return callback(errors.UNKNOWN_PROPERTY_ERROR);
+        if (!properties || properties.length == 0) return callback(errors.UNKNOWN_PROPERTY_ERROR);
         var val = wsSearch[key];
 
         // Build search for each existing property
-        filter['properties.' + prop.id] = {$in: [].concat(val)};
+        filter['properties.' + properties[0].id] = {$in: [].concat(val)};
         callback();
       });
     });
@@ -269,6 +270,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     } else {
 
       // find in mongoDb
+      var videoModel = new VideoModel();
       videoModel.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
         function(error, entities, pagination) {
           if (error) {
@@ -306,6 +308,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
 module.exports.publishVideoAction = function(request, response, next) {
   if (request.params.id) {
     var arrayId = request.params.id.split(',');
+    var videoModel = new VideoModel(request.user);
     videoModel.publishVideo(arrayId, function(error) {
       if (error)
         next(errors.PUBLISH_VIDEO_ERROR);
@@ -341,6 +344,7 @@ module.exports.publishVideoAction = function(request, response, next) {
 module.exports.unpublishVideoAction = function(request, response, next) {
   if (request.params.id) {
     var arrayId = request.params.id.split(',');
+    var videoModel = new VideoModel(request.user);
     videoModel.unpublishVideo(arrayId, function(error) {
       if (error)
         next(errors.UNPUBLISH_VIDEO_ERROR);

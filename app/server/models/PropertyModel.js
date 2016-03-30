@@ -19,9 +19,10 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
  * @class PropertyModel
  * @constructor
  * @extends EntityModel
+ * @param {Object} user The user the entity belongs to
  */
-function PropertyModel() {
-  openVeoAPI.EntityModel.prototype.init.call(this, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
+function PropertyModel(user) {
+  openVeoAPI.EntityModel.call(this, user, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
 
   /**
    * Video provider.

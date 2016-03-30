@@ -16,7 +16,7 @@ var openVeoAPI = require('@openveo/api');
  * @param {Database} database The database to interact with
  */
 function VideoProvider(database) {
-  openVeoAPI.EntityProvider.prototype.init.call(this, database, 'videos');
+  openVeoAPI.EntityProvider.call(this, database, 'videos');
 }
 
 module.exports = VideoProvider;
@@ -79,14 +79,16 @@ VideoProvider.prototype.getPaginatedFilteredEntities = function(filter, limit, p
  * @method getOne
  * @async
  * @param {String} id The entity id
+ * @param {Object} filter A MongoDB filter
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** The entity
  */
-VideoProvider.prototype.getOne = function(id, callback) {
-  this.database.get(this.collection, {
-    id: id
-  },
+VideoProvider.prototype.getOne = function(id, filter, callback) {
+  if (!filter) filter = {};
+  filter.id = id;
+
+  this.database.get(this.collection, filter,
     {
       _id: 0,
       originalPackagePath: 0,
