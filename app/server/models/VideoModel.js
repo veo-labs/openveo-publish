@@ -792,3 +792,19 @@ VideoModel.prototype.publishVideo = function(id, callback) {
 VideoModel.prototype.unpublishVideo = function(id, callback) {
   this.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
 };
+
+
+/**
+ * Updates video views.
+ *
+ * @method increaseVideoViews
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {Number} views number to add to existing count (or to initialize)
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
+ */
+VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
+  this.provider.increase(id, {views: count}, callback);
+};

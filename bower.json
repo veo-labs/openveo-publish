@@ -5,12 +5,12 @@
     "angular": "1.4.7",
     "html5shiv": "~3.7.3",
     "angular-animate": "1.4.7",
-    "openveo-player": "1.* >=1.1.0"
+    "openveo-player": "1.* >=1.1.0",
+    "angular-cookies": "1.4.7"
   },
   "devDependencies": {
     "angular-route": "1.4.7",
     "angular-mocks": "1.4.7",
-    "angular-cookies": "1.4.7",
     "ng-jsonpath": "~0.1.3"
   }
 }

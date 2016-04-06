@@ -209,12 +209,14 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!youtubeConf) return callback();
-      rl.question('Which Youtube privacy mode will be used ? ' +
-              '(0:unlisted -default- , 1:private, 2:public) :\n', function(answer) {
-        if (answer === '1') youtubeConf.privacy = 'private';
-        if (answer === '2') youtubeConf.privacy = 'public';
-        callback();
-      });
+      rl.question(
+        'Which Youtube privacy mode will be used ? (0:unlisted -default- , 1:private, 2:public) :\n',
+        function(answer) {
+          if (answer === '1') youtubeConf.privacy = 'private';
+          if (answer === '2') youtubeConf.privacy = 'public';
+          callback();
+        }
+      );
     }
   ],
   function(error, results) {

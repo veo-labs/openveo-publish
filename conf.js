@@ -25,7 +25,8 @@ module.exports = {
       'get /property/:id': 'app/server/controllers/propertyController.getPropertyAction',
       'get /properties': 'app/server/controllers/propertyController.getPropertiesAction',
       'get /properties/types': 'app/server/controllers/propertyController.getPropertyTypesAction',
-      'get /category/:id': 'app/server/controllers/categoryController.getCategoryAction'
+      'get /category/:id': 'app/server/controllers/categoryController.getCategoryAction',
+      "post /statistics/:entity/:type/:id" : "app/server/controllers/statisticsController.statisticsAction"
     }
   },
   entities: {
@@ -58,6 +59,14 @@ module.exports = {
       description: 'WS_SCOPES.GET_CATEGORY_DESCRIPTON',
       paths: [
         'get /publish/category/*'
+      ]
+    },
+    {
+      "id": "statistics",
+      "name" : "WS_SCOPES.INCREASE_VIEW_NAME",
+      "description" : "WS_SCOPES.INCREASE_VIEW_DESCRIPTION",
+      "paths" : [
+        "post /statistics/*"
       ]
     }
   ],
