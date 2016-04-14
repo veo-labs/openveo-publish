@@ -68,3 +68,21 @@ module.exports.getCategoryAction = function(request, response, next) {
 
   }
 };
+
+/**
+ * Gets list of categories.
+ *
+ * @method getCategoriesAction
+ * @static
+ */
+module.exports.getCategoriesAction = function(request, response, next) {
+  categoryModel.getByName('categories', function(error, categories) {
+    if (error) {
+      next(errors.GET_CATEGORY_ERROR);
+    } else {
+      response.send({
+        category: categories.tree
+      });
+    }
+  });
+};

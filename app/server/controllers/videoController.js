@@ -182,7 +182,7 @@ module.exports.getVideoReadyAction = function(request, response, next) {
  */
 module.exports.getVideoByPropertiesAction = function(request, response, next) {
   var params;
-  var orderedProperties = ['title', 'description', 'date', 'state'];
+  var orderedProperties = ['title', 'description', 'date', 'state', 'views'];
 
   try {
     params = openVeoAPI.util.shallowValidateObject(request.query, {
