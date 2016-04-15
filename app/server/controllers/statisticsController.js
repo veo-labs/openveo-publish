@@ -31,9 +31,13 @@ module.exports.statisticsAction = function(request, response, next) {
         case 'views':
           if (request.params.id) {
             var body = request.body;
+            if (!body.count) {
+              next(errors.STATISTICS_MISSING_COUNT_PARAMETERS);
+              return;
+            }
             videoModel.increaseVideoViews(request.params.id, body.count, function(error, done) {
               if (error || !done) {
-                next(errors.STATISTICS_VIDEO_ERROR);
+                next(errors.STATISTICS_UPDATE_ERROR);
               } else {
                 response.send({done: done});
               }
@@ -45,7 +49,7 @@ module.exports.statisticsAction = function(request, response, next) {
           }
           break;
         default:
-          next(errors.STATISTICS_ACTION_UNKNOWN);
+          next(errors.STATISTICS_PROPERTY_UNKNOWN);
       }
       break;
     default:

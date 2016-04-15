@@ -117,5 +117,36 @@ module.exports = {
     httpCode: 500,
     module: 'publish',
     message: 'Unkown property'
+  },
+  STATISTICS_MISSING_ID_PARAMETERS: {
+    code: 0x401,
+    httpCode: 500,
+    module: 'publish',
+    message: 'Missing Id parameter'
+  },
+  STATISTICS_PROPERTY_UNKNOWN: {
+    code: 0x402,
+    httpCode: 500,
+    module: 'publish',
+    message: 'Unknown statistics property'
+  },
+  STATISTICS_ENTITY_UNKNOWN: {
+    code: 0x403,
+    httpCode: 500,
+    module: 'publish',
+    message: 'Unknown statistics entity'
+  },
+  STATISTICS_MISSING_COUNT_PARAMETERS: {
+    code: 0x404,
+    httpCode: 500,
+    module: 'publish',
+    message: 'Missing count parameter'
+  },
+  STATISTICS_UPDATE_ERROR: {
+    code: 0x405,
+    httpCode: 500,
+    module: 'publish',
+    message: 'Error updating statistics'
   }
+
 };
