@@ -13,12 +13,10 @@ var openVeoAPI = require('@openveo/api');
  * @class ConfigurationModel
  * @constructor
  * @extends EntityModel
- * @param {Object} user The user the entity belongs to
  */
-function ConfigurationModel(user) {
+function ConfigurationModel() {
   openVeoAPI.EntityModel.call(
           this,
-          user,
           new openVeoAPI.EntityProvider(openVeoAPI.applicationStorage.getDatabase(), 'configurations')
           );
 }
