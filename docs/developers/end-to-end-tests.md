@@ -8,10 +8,6 @@ You first have to install and configure tests as described in core documentation
 
 All end to end tests are located in **tests/client/e2eTests/**. Suites are described in **tests/client/protractorSuites.json**. And the list of datas to create before launching tests are available in **tests/client/e2eTests/database/data.json**
 
-# Launch server in test mode
-
-    node server.js -t
-
 # Launch publish end to end tests
 
     # Launch all publish end to end tests on chrome
