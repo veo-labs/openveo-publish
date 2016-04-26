@@ -59,6 +59,14 @@ describe('MediaController', function() {
         data: {
           platforms: ['vimeo', 'youtube']
         }
+      },
+      groups: {
+        data: {
+          entities: [{
+            id: '1',
+            name: 'Name 1'
+          }]
+        }
       }
 
     });

@@ -22,6 +22,7 @@ var async = require('async');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var propertyModel = new PropertyModel();
 var applicationStorage = openVeoAPI.applicationStorage;
+var AccessError = openVeoAPI.errors.AccessError;
 
 var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
 
@@ -105,7 +106,7 @@ module.exports.getVideoAction = function(request, response, next) {
     var videoModel = new VideoModel(request.user);
     videoModel.getOne(request.params.id, null, function(error, video) {
       if (error)
-        next(errors.GET_VIDEO_ERROR);
+        next((error instanceof AccessError) ? errors.GET_VIDEO_FORBIDDEN : errors.GET_VIDEO_ERROR);
       else
         response.send({
           video: video
@@ -140,7 +141,9 @@ module.exports.getVideoReadyAction = function(request, response, next) {
   if (request.params.id) {
     var videoModel = new VideoModel(request.user);
     videoModel.getOneReady(request.params.id, function(error, video) {
-      if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
+      if (error && error instanceof AccessError)
+        next(errors.GET_VIDEO_READY_FORBIDDEN);
+      else if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
         next(errors.GET_VIDEO_READY_ERROR);
       else
         response.send({
@@ -266,7 +269,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
   async.series(series, function(err) {
     if (err) {
       process.logger.error(err);
-      next(errors.GET_VIDEOS_ERROR);
+      next((err instanceof AccessError) ? errors.GET_VIDEOS_FORBIDDEN : errors.GET_VIDEOS_ERROR);
     } else {
 
       // find in mongoDb
@@ -275,7 +278,7 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
         function(error, entities, pagination) {
           if (error) {
             process.logger.error(error);
-            next(errors.GET_VIDEOS_ERROR);
+            next((error instanceof AccessError) ? errors.GET_VIDEOS_FORBIDDEN : errors.GET_VIDEOS_ERROR);
           } else {
             response.send({
               videos: entities,
@@ -311,7 +314,7 @@ module.exports.publishVideoAction = function(request, response, next) {
     var videoModel = new VideoModel(request.user);
     videoModel.publishVideo(arrayId, function(error) {
       if (error)
-        next(errors.PUBLISH_VIDEO_ERROR);
+        next((error instanceof AccessError) ? errors.PUBLISH_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
       else
         response.send({
           state: VideoModel.PUBLISHED_STATE
@@ -347,7 +350,7 @@ module.exports.unpublishVideoAction = function(request, response, next) {
     var videoModel = new VideoModel(request.user);
     videoModel.unpublishVideo(arrayId, function(error) {
       if (error)
-        next(errors.UNPUBLISH_VIDEO_ERROR);
+        next((error instanceof AccessError) ? errors.UNPUBLISH_VIDEO_FORBIDDEN : errors.UNPUBLISH_VIDEO_ERROR);
       else
         response.send({
           state: VideoModel.READY_STATE

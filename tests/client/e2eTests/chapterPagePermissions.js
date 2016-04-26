@@ -20,25 +20,25 @@ describe('Chapter page', function() {
   var mediaFileName = 'blank.mp4';
   var mediaHelper;
 
-  // Create a media content
-  before(function() {
-    mediaHelper = new MediaHelper(new VideoModel());
-    page = new ChapterPage(mediaId);
-    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
-      function(mediasAdded) {
-        medias = mediasAdded;
-        return page.logAsAdmin();
-      }
-    );
-  });
-
-  // Remove media content
-  after(function() {
-    mediaHelper.removeEntities(medias);
-    page.logout();
-  });
-
   describe('without manage permission', function() {
+
+    // Create a media content
+    before(function() {
+      mediaHelper = new MediaHelper(new VideoModel());
+      page = new ChapterPage(mediaId);
+      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
+        function(mediasAdded) {
+          medias = mediasAdded;
+          return page.logAsAdmin();
+        }
+      );
+    });
+
+    // Remove media content
+    after(function() {
+      mediaHelper.removeEntities(medias);
+      page.logout();
+    });
 
     // Log with a user without manage permission
     before(function() {
@@ -57,6 +57,19 @@ describe('Chapter page', function() {
 
   describe('with only edit chapters permission', function() {
 
+    // Create a media content
+    before(function() {
+      var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
+      mediaHelper = new MediaHelper(new VideoModel(owner));
+      page = new ChapterPage(mediaId);
+      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE, 'publishGroup1').then(
+        function(mediasAdded) {
+          medias = mediasAdded;
+          return page.logAsAdmin();
+        }
+      );
+    });
+
     // Log with a user with only edit chapters permission
     before(function() {
       page.logAs(datas.users.publishChaptersEdit);
@@ -66,6 +79,12 @@ describe('Chapter page', function() {
     // Reload page after each test
     afterEach(function() {
       page.refresh();
+    });
+
+    // Remove media content
+    after(function() {
+      mediaHelper.removeEntities(medias);
+      page.logout();
     });
 
     it('should not be able to add / remove a begin cut', function() {

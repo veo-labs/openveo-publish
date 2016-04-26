@@ -81,9 +81,10 @@ MediaHelper.prototype.addEntitiesAuto = function(name, total, offset) {
  * @param {String} mediaFilePath Path to the directory containing the media package
  * @param {String} mediaFileName Name of the media package file
  * @param {Number} mediaState State of the media
+ * @param {Array} groups A list of group ids
  * @return {Promise} Promise resolving with create media information
  */
-MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileName, mediaState) {
+MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileName, mediaState, groups) {
   var self = this;
 
   return this.flow.execute(function() {
@@ -121,6 +122,7 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
         available: true,
         state: mediaState,
         title: 'Test',
+        groups: groups,
         sources: {
           files: [{
             width: 1920,

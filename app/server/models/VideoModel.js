@@ -16,6 +16,7 @@ var PropertyProvider = process.requirePublish('app/server/providers/PropertyProv
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
+var AccessError = openVeoAPI.errors.AccessError;
 
 /**
  * Defines a VideoModel class to manipulate videos.
@@ -147,10 +148,10 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     sources: videoPackage.sources || []
   };
 
-  if (!data.metadata)
-    data.metadata = {};
-
-  data.metadata['user'] = (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId();
+  data.metadata = {
+    user: (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId(),
+    groups: videoPackage.groups || []
+  };
 
   this.provider.add(data, function(error, addedCount, videos) {
     if (callback)
@@ -599,9 +600,9 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
         if (error || !video) {
           callback(error);
           return;
-        } else if (!error && !self.isUserAuthorized(video)) {
+        } else if (!error && !self.isUserAuthorized(video, openVeoAPI.ContentModel.READ_OPERATION)) {
           var userId = self.user.id;
-          callback(new Error('User "' + userId + '" doesn\'t have access to video "' + id + '"'));
+          callback(new AccessError('User "' + userId + '" doesn\'t have access to video "' + id + '"'));
         } else {
 
           // Retreive video timecode file
@@ -709,7 +710,7 @@ VideoModel.prototype.remove = function(ids, callback) {
       self.provider.get({id: {$in: ids}}, function(error, videos) {
         if (!error) {
           for (var i = 0; i < videos.length; i++) {
-            if (self.isUserAuthorized(videos[i]))
+            if (self.isUserAuthorized(videos[i], openVeoAPI.ContentModel.DELETE_OPERATION))
               idsToRemove.push(videos[i].id);
           }
         }
@@ -765,24 +766,29 @@ VideoModel.prototype.update = function(id, data, callback) {
   var self = this;
   var info = {};
   if (data.title)
-    info['title'] = data.title;
+    info.title = data.title;
   if (data.description)
-    info['description'] = data.description;
+    info.description = data.description;
   if (data.properties)
-    info['properties'] = data.properties;
+    info.properties = data.properties;
   if (data.hasOwnProperty('category'))
-    info['category'] = data.category;
+    info.category = data.category;
   if (data.cut)
-    info['cut'] = data.cut;
+    info.cut = data.cut;
   if (data.chapters)
-    info['chapters'] = data.chapters;
+    info.chapters = data.chapters;
+  if (data.groups) {
+    info['metadata.groups'] = data.groups.filter(function(group) {
+      return group ? true : false;
+    });
+  }
 
   this.provider.getOne(id, null, function(error, entity) {
     if (!error) {
-      if (self.isUserAuthorized(entity))
+      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
         self.provider.update(id, info, callback);
       else
-        callback(new Error('User "' + self.user.id + '" can\'t edit video "' + id + '"'));
+        callback(new AccessError('User "' + self.user.id + '" can\'t edit video "' + id + '"'));
     } else
       callback(error);
   });
@@ -805,10 +811,10 @@ VideoModel.prototype.publishVideo = function(id, callback) {
   var self = this;
   this.provider.getOne(id, null, function(error, entity) {
     if (!error) {
-      if (self.isUserAuthorized(entity))
+      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
         self.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
       else
-        callback(new Error('User "' + self.user.id + '" can\'t publish video "' + id + '"'));
+        callback(new AccessError('User "' + self.user.id + '" can\'t publish video "' + id + '"'));
     } else
       callback(error);
   });
@@ -831,15 +837,14 @@ VideoModel.prototype.unpublishVideo = function(id, callback) {
   var self = this;
   this.provider.getOne(id, null, function(error, entity) {
     if (!error) {
-      if (self.isUserAuthorized(entity))
+      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
         self.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
       else
-        callback(new Error('User "' + self.user.id + '" can\'t unpublish video "' + id + '"'));
+        callback(new AccessError('User "' + self.user.id + '" can\'t unpublish video "' + id + '"'));
     } else
       callback(error);
   });
 };
-
 
 /**
  * Updates video views.

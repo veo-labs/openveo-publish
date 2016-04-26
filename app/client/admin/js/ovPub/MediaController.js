@@ -16,15 +16,16 @@
   properties,
   categories,
   platforms,
+  groups,
   tableReloadEventService,
   i18nService) {
-
     $scope.properties = properties.data.entities;
 
     // Replace Id in Media by the name of the category
     // Category Id can be overwritten, it is only for display purpose
     $scope.categories = categories.data.taxonomy;
     $scope.platforms = platforms.data.platforms;
+    $scope.groups = groups.data.entities;
 
     /*
      *
@@ -32,8 +33,6 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.edit = $scope.checkAccess('update-video');
-    $scope.rights.delete = $scope.checkAccess('delete-video');
     $scope.rights.publish = $scope.checkAccess('publish-video');
     $scope.rights.chapter = $scope.checkAccess('chapter-video');
     $scope.rights.retry = $scope.checkAccess('retry-video');
@@ -62,6 +61,27 @@
         value: null,
         name: $filter('translate')(label)
       }].concat(publishService.getCategoriesOptions());
+    }
+
+    /**
+     * Builds groups select options.
+     *
+     * @return {Array} The list of options
+     */
+    function buildGroupOptions() {
+      var options = [{
+        name: $filter('translate')('UI.NONE'),
+        value: null
+      }];
+
+      $scope.groups.forEach(function(group) {
+        options.push({
+          name: group.name,
+          value: group.id
+        });
+      });
+
+      return options;
     }
 
     /**
@@ -182,7 +202,8 @@
         title: media.title,
         description: media.description,
         properties: media.properties,
-        category: media.category
+        category: media.category,
+        groups: media.groups
       }).then(function() {
         scopeEditForm.pendingEdition = false;
       });
@@ -226,6 +247,19 @@
         templateOptions: {
           label: $filter('translate')('MEDIAS.ATTR_CATEGORY'),
           options: categoriesfield
+        }
+      },
+      {
+        key: 'groups',
+        type: 'horizontalEditableSelect',
+        templateOptions: {
+          label: $filter('translate')('MEDIAS.ATTR_GROUPS'),
+          options: buildGroupOptions()
+        },
+        ngModelAttrs: {
+          'true': {
+            value: 'multiple'
+          }
         }
       }
     ];
@@ -328,7 +362,10 @@
       {
         label: $filter('translate')('MEDIAS.PUBLISH'),
         condition: function(row) {
-          return $scope.rights.publish && row.state == 11 && !row.saving;
+          return $scope.rights.publish &&
+            $scope.checkContentAccess(row, 'update') &&
+            row.state == 11 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           publishMedia([row.id], reload);
@@ -340,7 +377,10 @@
       {
         label: $filter('translate')('MEDIAS.UNPUBLISH'),
         condition: function(row) {
-          return $scope.rights.publish && row.state == 12 && !row.saving;
+          return $scope.rights.publish &&
+            $scope.checkContentAccess(row, 'update') &&
+            row.state == 12 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           unpublishMedia([row.id], reload);
@@ -352,7 +392,10 @@
       {
         label: $filter('translate')('MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
-          return $scope.rights.chapter && !row.saving && (row.state == 11 || row.state == 12);
+          return $scope.rights.chapter &&
+            $scope.checkContentAccess(row, 'update') &&
+            !row.saving &&
+            (row.state == 11 || row.state == 12);
         },
         callback: function(row) {
           editChapter(row);
@@ -361,7 +404,7 @@
       {
         label: $filter('translate')('MEDIAS.RETRY'),
         condition: function(row) {
-          return $scope.rights.retry && row.state == 0 && !row.saving;
+          return $scope.rights.retry && $scope.checkContentAccess(row, 'update') && row.state == 0 && !row.saving;
         },
         callback: function(row, reload) {
           retryMedia([row.id], reload);
@@ -370,7 +413,7 @@
       {
         label: $filter('translate')('UI.REMOVE'),
         condition: function(row) {
-          return $scope.rights.delete &&
+          return $scope.checkContentAccess(row, 'delete') &&
             !row.locked &&
             !row.saving &&
             (row.state === 6 || row.state === 11 || row.state === 12 || row.state === 0);
@@ -391,7 +434,7 @@
       scopeDataTable.actions.push({
         label: $filter('translate')('MEDIAS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
-          return $scope.rights.upload && row.state == 6 && !row.saving;
+          return $scope.rights.upload && $scope.checkContentAccess(row, 'update') && row.state == 6 && !row.saving;
         },
         callback: function(row, reload) {
           startMediaUpload([row.id], this.platform, reload);
@@ -402,6 +445,7 @@
 
     scopeEditForm.init = function(row) {
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
+      row.groups = row.metadata.groups;
 
       // Create a formly field for each property
       angular.forEach($scope.properties, function(property, index) {
@@ -458,7 +502,7 @@
     };
 
     scopeEditForm.conditionEditDetail = function(row) {
-      return $scope.rights.edit && !row.locked && row.state !== 0;
+      return $scope.checkContentAccess(row, 'update') && !row.locked && row.state !== 0;
     };
     scopeEditForm.onSubmit = function(model) {
       return saveMedia(model);
@@ -482,6 +526,7 @@
     'properties',
     'categories',
     'platforms',
+    'groups',
     'tableReloadEventService',
     'i18nService'
   ];

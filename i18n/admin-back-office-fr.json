@@ -74,6 +74,7 @@
     "ATTR_TITLE" : "Titre",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Rubrique",
+    "ATTR_GROUPS" : "Groupes",
     "STATE_0" : "Erreur",
     "STATE_1" : "En attente",
     "STATE_2" : "Copie",

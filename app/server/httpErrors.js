@@ -147,6 +147,31 @@ module.exports = {
     httpCode: 500,
     module: 'publish',
     message: 'Error updating statistics'
+  },
+
+  // Authentication errors
+  GET_VIDEO_FORBIDDEN: {
+    code: 0x500,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  GET_VIDEO_READY_FORBIDDEN: {
+    code: 0x501,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  PUBLISH_VIDEO_FORBIDDEN: {
+    code: 0x502,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  UNPUBLISH_VIDEO_FORBIDDEN: {
+    code: 0x503,
+    httpCode: 403,
+    module: 'publish'
   }
 
 };

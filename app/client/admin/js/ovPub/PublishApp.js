@@ -91,6 +91,9 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
         }],
         platforms: ['publishService', function(publishService) {
           return publishService.loadPlatforms();
+        }],
+        groups: ['entityService', function(entityService) {
+          return entityService.getAllEntities('group');
         }]
       }
     });

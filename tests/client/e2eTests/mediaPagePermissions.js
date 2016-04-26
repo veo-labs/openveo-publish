@@ -33,7 +33,7 @@ describe('Media page', function() {
       return page.logAs(datas.users.publishGuest);
     });
 
-    it('Should not access the page', function() {
+    it('should not access the page', function() {
       return page.load().then(function() {
         assert.ok(false, 'User has access to medias page and should not');
       }, function() {
@@ -43,119 +43,7 @@ describe('Media page', function() {
 
   });
 
-  describe('without write permission', function() {
-
-    // Log with a user without write permission
-    before(function() {
-      page.logAs(datas.users.publishMediasNoWrite);
-      page.load();
-    });
-
-    // Remove all videos after each tests then reload the page
-    afterEach(function() {
-      mediaHelper.removeAllEntities();
-      page.refresh();
-    });
-
-    it('should not be able to create video by requesting the server directly', function() {
-      var data = {
-        id: '0',
-        state: VideoModel.PUBLISHED_STATE,
-        title: 'Test no write'
-      };
-      page.sendRequest('be/crud/video', 'put', data).then(function(response) {
-        assert.equal(response.status, 403);
-      });
-    });
-
-  });
-
-  describe('without update permission', function() {
-
-    // Log with a user without update permission
-    before(function() {
-      page.logAs(datas.users.publishMediasNoUpdate);
-      page.load();
-    });
-
-    // Remove all videos after each tests then reload the page
-    afterEach(function() {
-      mediaHelper.removeAllEntities();
-      page.refresh();
-    });
-
-    it('should not have edit button to edit a media', function() {
-      var name = 'Test no edit permission';
-      var linesToAdd = [
-        {
-          id: '0',
-          state: VideoModel.PUBLISHED_STATE,
-          title: name
-        }
-      ];
-
-      // Add lines
-      mediaHelper.addEntities(linesToAdd);
-      page.refresh();
-
-      assert.isRejected(page.editMedia(name, {
-        name: 'New name'
-      }));
-    });
-
-    it('should not be able to edit video by requesting the server directly', function() {
-      var data = {
-        name: 'New name'
-      };
-
-      page.sendRequest('be/crud/video/whatever', 'post', data).then(function(response) {
-        assert.equal(response.status, 403);
-      });
-    });
-
-  });
-
-  describe('without delete permission', function() {
-
-    // Log with a user without delete permission
-    before(function() {
-      page.logAs(datas.users.publishMediasNoDelete);
-      page.load();
-    });
-
-    // Remove all videos after each tests then reload the page
-    afterEach(function() {
-      mediaHelper.removeAllEntities();
-      page.refresh();
-    });
-
-    it('should not have delete action to remove a media', function() {
-      var name = 'test delete without permission';
-      var linesToAdd = [
-        {
-          id: '0',
-          state: VideoModel.PUBLISHED_STATE,
-          title: name
-        }
-      ];
-
-      // Add lines
-      mediaHelper.addEntities(linesToAdd);
-      page.refresh();
-
-      // Try to remove
-      assert.isRejected(page.removeLine(name));
-    });
-
-    it('should not be able to remove media by requesting the server directly', function() {
-      page.sendRequest('be/crud/video/whatever', 'delete').then(function(response) {
-        assert.equal(response.status, 403);
-      });
-    });
-
-  });
-
-  describe('owner and anonymous medias', function() {
+  describe('medias', function() {
     var ownerLineToAdd;
     var anonymousLineToAdd;
     var mediaHelperWithUser;
@@ -171,13 +59,16 @@ describe('Media page', function() {
       anonymousLineToAdd = {
         id: '0',
         state: VideoModel.PUBLISHED_STATE,
-        title: 'Media 1'
+        title: 'Media 1',
+        description: 'Media 1 description'
       };
 
       ownerLineToAdd = {
         id: '1',
         state: VideoModel.PUBLISHED_STATE,
-        title: 'Media 2'
+        title: 'Media 2',
+        description: 'Media 2 description',
+        groups: ['publishGroup1']
       };
 
       mediaHelper.addEntities([anonymousLineToAdd]);
@@ -189,97 +80,256 @@ describe('Media page', function() {
       mediaHelper.removeAllEntities();
     });
 
-    it('Should be accessible by the owner', function() {
-      page.logAs(datas.users.publishMedias1);
-      page.load();
-      assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
-      assert.isFulfilled(page.getLine(ownerLineToAdd.title), 'Expected media ' + ownerLineToAdd.title);
-    });
+    describe('access', function() {
 
-    it('Should be accessible by the super administrator', function() {
-      page.logAsAdmin();
-      page.load();
-      assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
-      assert.isFulfilled(page.getLine(ownerLineToAdd.title), 'Expected media ' + ownerLineToAdd.title);
-      page.logout();
-    });
+      it('should be able by the owner', function() {
+        page.logAs(datas.users.publishMedias1);
+        page.load();
+        assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
+        assert.isFulfilled(page.getLine(ownerLineToAdd.title), 'Expected media ' + ownerLineToAdd.title);
 
-    it('Should not be accessible by other users', function() {
-      page.logAs(datas.users.publishMedias2);
-      page.load();
-      assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
-      assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
-    });
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be accessible');
+        });
 
-    it('Should be edited by the owner', function() {
-      var ownerLineNewTitle = ownerLineToAdd.title + ' new';
-      var anonymousLineNewTitle = anonymousLineToAdd.title + ' new';
-
-      page.logAs(datas.users.publishMedias1);
-      page.load();
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
-        title: ownerLineNewTitle
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected owner video to be accessible');
+        });
       });
-      page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'post', {
-        title: anonymousLineNewTitle
+
+      it('should be able by the super administrator', function() {
+        page.logAsAdmin();
+        page.load();
+        assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
+        assert.isFulfilled(page.getLine(ownerLineToAdd.title), 'Expected media ' + ownerLineToAdd.title);
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be accessible');
+        });
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected owner video to be accessible');
+        });
       });
-      page.refresh();
-      assert.isFulfilled(page.getLine(anonymousLineNewTitle), 'Expected media ' + anonymousLineNewTitle);
-      assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
-    });
 
-    it('Should be edited by the super administrator', function() {
-      var ownerLineNewTitle = ownerLineToAdd.title + ' new';
-      var anonymousLineNewTitle = anonymousLineToAdd.title + ' new';
+      it('should be able by users in the group', function() {
+        page.logAs(datas.users.publishMediasGroup);
+        page.load();
+        assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
+        assert.isFulfilled(page.getLine(ownerLineToAdd.title), 'Expected media ' + ownerLineToAdd.title);
 
-      page.logAsAdmin();
-      page.load();
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
-        title: ownerLineNewTitle
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be accessible');
+        });
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected owner video to be accessible');
+        });
       });
-      page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'post', {
-        title: anonymousLineNewTitle
+
+      it('should not be able by users in the group without read permission', function() {
+        page.logAs(datas.users.publishMediasGroupNoRead);
+        page.load();
+        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 403, 'Expected video to be inaccessible');
+        });
       });
-      page.refresh();
-      assert.isFulfilled(page.getLine(anonymousLineNewTitle), 'Expected media ' + anonymousLineNewTitle);
-      assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
+
+      it('should not be able by other users', function() {
+        page.logAs(datas.users.publishMedias2);
+        page.load();
+        assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be accessible');
+        });
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'get').then(function(response) {
+          assert.equal(response.status, 403, 'Expected owner video to be inaccessible');
+        });
+      });
+
     });
 
-    it('Should not be edited by other users', function() {
-      page.logAs(datas.users.publishMedias2);
-      page.load();
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
-        title: ownerLineToAdd.title + ' new'
-      }).then(function(response) {
-        assert.equal(response.status, 500);
+    describe('edition', function() {
+
+      it('should be able by the owner', function() {
+        var ownerLineNewTitle = ownerLineToAdd.title + ' new';
+        var anonymousLineNewTitle = anonymousLineToAdd.title + ' new';
+
+        page.logAs(datas.users.publishMedias1);
+        page.load();
+
+        assert.isFulfilled(page.editMedia(ownerLineToAdd.title, {
+          name: ownerLineNewTitle
+        }), 'Expected media ' + ownerLineNewTitle + ' to be editable');
+
+        assert.isFulfilled(page.editMedia(anonymousLineToAdd.title, {
+          name: anonymousLineNewTitle
+        }), 'Expected media ' + anonymousLineNewTitle + ' to be editable');
+
+        assert.isFulfilled(page.getLine(anonymousLineNewTitle), 'Expected media ' + anonymousLineNewTitle);
+        assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
+          title: ownerLineToAdd.title
+        }).then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be editable');
+        });
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'post', {
+          title: anonymousLineToAdd.title
+        }).then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be editable');
+        });
+      });
+
+      it('should be able by the super administrator', function() {
+        var ownerLineNewTitle = ownerLineToAdd.title + ' new';
+        var anonymousLineNewTitle = anonymousLineToAdd.title + ' new';
+
+        page.logAsAdmin();
+        page.load();
+
+        assert.isFulfilled(page.editMedia(ownerLineToAdd.title, {
+          name: ownerLineNewTitle
+        }), 'Expected media ' + ownerLineNewTitle + ' to be editable');
+
+        assert.isFulfilled(page.editMedia(anonymousLineToAdd.title, {
+          name: anonymousLineNewTitle
+        }), 'Expected media ' + anonymousLineNewTitle + ' to be editable');
+
+        assert.isFulfilled(page.getLine(anonymousLineNewTitle), 'Expected media ' + anonymousLineNewTitle);
+        assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
+          title: ownerLineToAdd.title
+        }).then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be editable');
+        });
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'post', {
+          title: anonymousLineToAdd.title
+        }).then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be editable');
+        });
+
+      });
+
+      it('should be able by users in the group', function() {
+        var ownerLineNewTitle = ownerLineToAdd.title + ' new';
+        page.logAs(datas.users.publishMediasGroup);
+        page.load();
+
+        assert.isFulfilled(page.editMedia(ownerLineToAdd.title, {
+          name: ownerLineNewTitle
+        }), 'Expected media ' + ownerLineNewTitle + ' to be editable');
+
+        assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
+          title: ownerLineToAdd.title
+        }).then(function(response) {
+          assert.equal(response.status, 200, 'Expected video in the group to be editable');
+        });
+      });
+
+      it('should not be able by other users', function() {
+        var ownerLineNewTitle = ownerLineToAdd.title + ' new';
+        page.logAs(datas.users.publishMedias2);
+        page.load();
+
+        assert.isRejected(page.editMedia(ownerLineToAdd.title, {
+          name: ownerLineNewTitle
+        }), 'Expected media ' + ownerLineNewTitle + ' not to be editable');
+
+        assert.isRejected(page.getLine(ownerLineNewTitle), 'Unexpected media ' + ownerLineNewTitle);
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'post', {
+          title: ownerLineNewTitle
+        }).then(function(response) {
+          assert.equal(response.status, 403, 'Expected video in the group not to be editable');
+        });
       });
     });
 
-    it('Should be deleted by the owner', function() {
-      page.logAs(datas.users.publishMedias1);
-      page.load();
-      page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'delete');
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete');
-      page.refresh();
-      assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
-      assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
-    });
+    describe('deletion', function() {
 
-    it('Should be deleted by the super administrator', function() {
-      page.logAsAdmin();
-      page.load();
-      page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'delete');
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete');
-      page.refresh();
-      assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
-      assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
-    });
+      it('should be deletable by the owner', function() {
+        page.logAs(datas.users.publishMedias1);
+        page.load();
 
-    it('Should not be deleted by other users', function() {
-      page.logAs(datas.users.publishMedias2);
-      page.load();
-      page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete').then(function(response) {
-        assert.equal(response.status, 500);
+        page.removeLine(ownerLineToAdd.title);
+        page.removeLine(anonymousLineToAdd.title);
+        assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+      });
+
+      it('should be able by the owner by calling the server directly', function() {
+        page.logAs(datas.users.publishMedias1);
+        page.load();
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be deletable');
+        });
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 200, 'Expected owner video to be deletable');
+        });
+      });
+
+      it('should be able by the super administrator', function() {
+        page.logAsAdmin();
+        page.load();
+
+        page.removeLine(ownerLineToAdd.title);
+        page.removeLine(anonymousLineToAdd.title);
+        assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+      });
+
+      it('should be able by the administrator by calling the server directly', function() {
+        page.logAsAdmin();
+        page.load();
+
+        page.sendRequest('be/crud/video/' + anonymousLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 200, 'Expected anonymous video to be deletable');
+        });
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 200, 'Expected owner video to be deletable');
+        });
+      });
+
+      it('should be able by users in the group', function() {
+        page.logAs(datas.users.publishMediasGroup);
+        page.load();
+
+        page.removeLine(ownerLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+      });
+
+      it('should be able by users in the group by calling the server directly', function() {
+        page.logAs(datas.users.publishMediasGroup);
+        page.load();
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 200, 'Expected video in the group to be deletable');
+        });
+      });
+
+      it('should not be able by other users', function() {
+        page.logAs(datas.users.publishMedias2);
+        page.load();
+
+        assert.isRejected(page.removeLine(ownerLineToAdd.title));
+
+        page.sendRequest('be/crud/video/' + ownerLineToAdd.id, 'delete').then(function(response) {
+          assert.equal(response.status, 500);
+        });
       });
     });
 

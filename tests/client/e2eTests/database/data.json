@@ -1,4 +1,10 @@
 {
+  "groups": {
+    "publishGroup1": {
+      "name": "publish-group-1",
+      "description": "publish-group-1"
+    }
+  },
   "roles": {
     "publishGuest": {
       "name": "publish-guest",
@@ -64,30 +70,6 @@
         "access-categories-page"
       ]
     },
-    "publishMediasNoWrite": {
-      "name": "publish-medias-no-write",
-      "permissions": [
-        "access-videos-page",
-        "update-video",
-        "delete-video"
-      ]
-    },
-    "publishMediasNoUpdate": {
-      "name": "publish-medias-no-update",
-      "permissions": [
-        "access-videos-page",
-        "create-video",
-        "delete-video"
-      ]
-    },
-    "publishMediasNoDelete": {
-      "name": "publish-medias-no-delete",
-      "permissions": [
-        "access-videos-page",
-        "create-video",
-        "update-video"
-      ]
-    },
     "publishMedias": {
       "name": "publish-medias",
       "permissions": [
@@ -97,10 +79,44 @@
         "delete-video"
       ]
     },
+    "publishMediasGroup": {
+      "name": "publish-medias-group",
+      "permissions": [
+        "access-videos-page",
+        "read-group-publishGroup1",
+        "update-group-publishGroup1",
+        "delete-group-publishGroup1"
+      ]
+    },
+    "publishMediasGroupNoRead": {
+      "name": "publish-medias-group-no-read",
+      "permissions": [
+        "access-videos-page",
+        "update-group-publishGroup1",
+        "delete-group-publishGroup1"
+      ]
+    },
+    "publishMediasGroupNoUpdate": {
+      "name": "publish-medias-group-no-update",
+      "permissions": [
+        "access-videos-page",
+        "read-group-publishGroup1",
+        "delete-group-publishGroup1"
+      ]
+    },
+    "publishMediasGroupNoDelete": {
+      "name": "publish-medias-group-no-delete",
+      "permissions": [
+        "access-videos-page",
+        "read-group-publishGroup1",
+        "update-group-publishGroup1"
+      ]
+    },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",
       "permissions": [
-        "chapter-video"
+        "chapter-video",
+        "read-group-publishGroup1"
       ]
     },
     "publishConfigurationNoManage": {
@@ -165,24 +181,6 @@
       "password": "publish-categories-no-manage",
       "roles": [ "publishCategoriesNoManage" ]
     },
-    "publishMediasNoWrite": {
-      "name": "publish-medias-no-write",
-      "email": "publish-medias-no-write@veo-labs.com",
-      "password": "publish-medias-no-write",
-      "roles": [ "publishMediasNoWrite" ]
-    },
-    "publishMediasNoUpdate": {
-      "name": "publish-medias-no-update",
-      "email": "publish-medias-no-update@veo-labs.com",
-      "password": "publish-medias-no-update",
-      "roles": [ "publishMediasNoUpdate" ]
-    },
-    "publishMediasNoDelete": {
-      "name": "publish-medias-no-delete",
-      "email": "publish-medias-no-delete@veo-labs.com",
-      "password": "publish-medias-no-delete",
-      "roles": [ "publishMediasNoDelete" ]
-    },
     "publishMedias1": {
       "name": "publish-medias-1",
       "email": "publish-medias-1@veo-labs.com",
@@ -194,6 +192,30 @@
       "email": "publish-medias-2@veo-labs.com",
       "password": "publish-medias-2",
       "roles": [ "publishMedias" ]
+    },
+    "publishMediasGroup": {
+      "name": "publish-medias-group",
+      "email": "publish-medias-group@veo-labs.com",
+      "password": "publish-medias-group",
+      "roles": [ "publishMediasGroup" ]
+    },
+    "publishMediasGroupNoRead": {
+      "name": "publish-medias-group-no-read",
+      "email": "publish-medias-group-no-read@veo-labs.com",
+      "password": "publish-medias-group-no-read",
+      "roles": [ "publishMediasGroupNoRead" ]
+    },
+    "publishMediasGroupNoUpdate": {
+      "name": "publish-medias-group-no-update",
+      "email": "publish-medias-group-no-update@veo-labs.com",
+      "password": "publish-medias-group-no-update",
+      "roles": [ "publishMediasGroupNoUpdate" ]
+    },
+    "publishMediasGroupNoDelete": {
+      "name": "publish-medias-group-no-delete",
+      "email": "publish-medias-group-no-delete@veo-labs.com",
+      "password": "publish-medias-group-no-delete",
+      "roles": [ "publishMediasGroupNoDelete" ]
     },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",

@@ -114,7 +114,9 @@ VideoProvider.prototype.getOne = function(id, filter, callback) {
  */
 VideoProvider.prototype.createIndexes = function(callback) {
   this.database.createIndexes(this.collection, [
-    {key: {title: 'text', description: 'text'}, weights: {title: 2}, name: 'querySearch'}
+    {key: {title: 'text', description: 'text'}, weights: {title: 2}, name: 'querySearch'},
+    {key: {'metadata.groups': 1}, name: 'byGroups'},
+    {key: {'metadata.user': 1}, name: 'byOwner'}
   ], function(error, result) {
     if (result && result.note)
       process.logger.debug('Create videos indexes : ' + result.note);

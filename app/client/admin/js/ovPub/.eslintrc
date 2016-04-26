@@ -1,0 +1,10 @@
+{
+
+  "rules": {
+
+    // Quoting style for property names
+    "quote-props": 0
+
+  }
+
+}
