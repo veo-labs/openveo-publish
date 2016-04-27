@@ -36,7 +36,7 @@ describe('PublishApp', function() {
   });
 
   it('Should be able to route to medias page after retrieving the list of medias', function() {
-    $httpBackend.expectGET('/be/gettaxonomy/categories');
+    $httpBackend.expectGET('/be/getTaxonomies?query=categories');
     $httpBackend.expectGET('/be/crud/property');
     $httpBackend.expectGET('/be/publish/getPlatforms');
     $httpBackend.expectGET('/publish/be/views/medias.html');
@@ -64,7 +64,7 @@ describe('PublishApp', function() {
   });
 
   it('Should be able to route to categories page after retrieving the list of categories', function() {
-    $httpBackend.expectGET('/be/gettaxonomy/categories');
+    $httpBackend.expectGET('/be/getTaxonomies?query=categories');
     $httpBackend.expectGET('/publish/be/views/categories.html');
 
     $location.path('/publish/categories');

@@ -6,12 +6,13 @@
    * Defines the categories controller for the categories page.
    */
   function CategoriesController($scope, $filter, entityService, categories) {
+    $scope.categoryTaxonomy = categories.data.taxonomies[0];
 
     /**
      * Handles success when a category is added or updated.
      */
     function successCb(data) {
-      categories.data.taxonomy.id = data.entity.id;
+      $scope.categoryTaxonomy.id = data.entity.id;
       $scope.saveIsDisabled = $scope.list.length == 0;
       $scope.listback = angular.copy($scope.list);
       $scope.$emit('setAlert', 'success', $filter('translate')('CATEGORIES.SAVE_SUCCESS'), 4000);
@@ -42,7 +43,7 @@
     $scope.newitem = {
       items: []
     };
-    $scope.list = categories.data.taxonomy.tree;
+    $scope.list = $scope.categoryTaxonomy.tree;
     if ($scope.list.length > 0)
       $scope.listback = angular.copy($scope.list);
     else
@@ -77,7 +78,7 @@
       $scope.saveIsDisabled = true;
 
       // If no categories exist : Do create
-      if (categories.data.taxonomy.id === undefined) {
+      if ($scope.categoryTaxonomy.id === undefined) {
         entityService.addEntity('category', {
           name: 'categories',
           tree: $scope.list
@@ -87,10 +88,10 @@
       } else {
 
         // Else : Do update
-        entityService.updateEntity('category', categories.data.taxonomy.id, {
+        entityService.updateEntity('category', $scope.categoryTaxonomy.id, {
           tree: $scope.list
         }).success(function(data) {
-          data.entity = {id: categories.data.taxonomy.id};
+          data.entity = {id: $scope.categoryTaxonomy.id};
           successCb(data);
         }).error(errorCb);
       }

@@ -14,16 +14,12 @@
   entityService,
   publishService,
   properties,
-  categories,
   platforms,
   groups,
   tableReloadEventService,
   i18nService) {
-    $scope.properties = properties.data.entities;
 
-    // Replace Id in Media by the name of the category
-    // Category Id can be overwritten, it is only for display purpose
-    $scope.categories = categories.data.taxonomy;
+    $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
     $scope.groups = groups.data.entities;
 
@@ -524,7 +520,6 @@
     'entityService',
     'publishService',
     'properties',
-    'categories',
     'platforms',
     'groups',
     'tableReloadEventService',

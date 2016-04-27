@@ -11,7 +11,7 @@
   function PublishService($http, $q, entityService, jsonPath) {
     var basePath = '/be/';
     var properties;
-    var categories;
+    var taxonomyCategory;
     var categoriesOptions;
     var categoriesByKey;
     var platforms;
@@ -160,19 +160,20 @@
     }
 
     /**
-     * Loads the list of media categories.
+     * Loads taxonomy "categories".
      *
      * @return {Promise} The HTTP promise
-     * @method loadCategories
+     * @method loadTaxonomyCategory
      */
-    function loadCategories() {
-      if (!categories) {
-        // Get categories from server
-        return $http.get(basePath + 'gettaxonomy/categories').success(function(taxonomyObj) {
-          categories = taxonomyObj;
+    function loadTaxonomyCategory() {
+      if (!taxonomyCategory) {
+
+        // Get taxonomy "categories" from server
+        return $http.get(basePath + 'getTaxonomies?query=categories').success(function(results) {
+          taxonomyCategory = results.taxonomies && results.taxonomies[0];
           categoriesByKey = {};
           categoriesOptions = [];
-          var categoriestmp = jsonPath(taxonomyObj, '$..*[?(@.id)]');
+          var categoriestmp = jsonPath(taxonomyCategory, '$..*[?(@.id)]');
           if (categoriestmp)
             categoriestmp.map(function(obj) {
               var children = jsonPath(obj, '$..*[?(@.id)].id');
@@ -188,18 +189,18 @@
         });
       }
       return $q.when({
-        data: categories
+        data: taxonomyCategory
       });
     }
 
     /**
-     * Gets the list of categories.
+     * Gets the taxonomy "categories".
      *
-     * @return {Array} The list of categories
-     * @method getCategories
+     * @return {Object} The taxonomy
+     * @method getTaxonomyCategory
      */
-    function getCategories() {
-      return categories;
+    function getTaxonomyCategory() {
+      return taxonomyCategory;
     }
 
     /**
@@ -249,7 +250,7 @@
      */
     function cacheClear(type) {
       if (!type) {
-        properties = categories = null;
+        properties = taxonomyCategory = null;
         mediaChapter = {};
       } else
         switch (type) {
@@ -257,7 +258,7 @@
             properties = null;
             break;
           case 'categories':
-            categories = null;
+            taxonomyCategory = null;
             categoriesOptions = null;
             categoriesByKey = null;
             break;
@@ -286,8 +287,8 @@
       startMediaUpload: startMediaUpload,
       loadProperties: loadProperties,
       getProperties: getProperties,
-      loadCategories: loadCategories,
-      getCategories: getCategories,
+      loadTaxonomyCategory: loadTaxonomyCategory,
+      getTaxonomyCategory: getTaxonomyCategory,
       getCategoriesOptions: getCategoriesOptions,
       getCategoriesByKey: getCategoriesByKey,
       loadPlatforms: loadPlatforms,

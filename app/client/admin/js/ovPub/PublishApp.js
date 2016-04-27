@@ -84,7 +84,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       access: 'access-videos-page',
       resolve: {
         categories: ['publishService', function(publishService) {
-          return publishService.loadCategories();
+          return publishService.loadTaxonomyCategory();
         }],
         properties: ['publishService', function(publishService) {
           return publishService.loadProperties();
@@ -164,7 +164,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       access: 'access-categories-page',
       resolve: {
         categories: ['publishService', function(publishService) {
-          return publishService.loadCategories();
+          return publishService.loadTaxonomyCategory();
         }]
       }
     });
