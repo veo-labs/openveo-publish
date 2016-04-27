@@ -81,7 +81,7 @@ module.exports.getCategoriesAction = function(request, response, next) {
       next(errors.GET_CATEGORY_ERROR);
     } else {
       response.send({
-        category: categories.tree
+        category: categories[0].tree
       });
     }
   });
