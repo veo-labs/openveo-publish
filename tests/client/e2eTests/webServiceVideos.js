@@ -31,7 +31,7 @@ describe('Web service /videos', function() {
     var propertiesQuery = '';
 
     for (var i = 0; i < properties.length; i++) {
-      propertiesQuery += 'properties[' + encodeURIComponent(properties[i].name) + ']=' +
+      propertiesQuery += 'properties[' + encodeURIComponent(properties[i].id) + ']=' +
         encodeURIComponent(properties[i].value) + '&';
     }
 
@@ -150,11 +150,11 @@ describe('Web service /videos', function() {
 
       propertiesQuery = buildPropertiesQuery([
         {
-          name: addedProperties[0].name,
+          id: addedProperties[0].id,
           value: properties[addedProperties[0].id]
         },
         {
-          name: addedProperties[1].name,
+          id: addedProperties[1].id,
           value: properties[addedProperties[1].id]
         }
       ]);
@@ -166,7 +166,7 @@ describe('Web service /videos', function() {
 
         propertiesQuery = buildPropertiesQuery([
           {
-            name: addedProperties[0].name,
+            id: addedProperties[0].id,
             value: 'unknown'
           }
         ]);
@@ -180,23 +180,6 @@ describe('Web service /videos', function() {
         deferred.fulfill();
       });
 
-    });
-
-    return page.flow.execute(function() {
-      return deferred.promise;
-    });
-  });
-
-  it('should return an error if a specified property is unknown', function() {
-    var deferred = protractor.promise.defer();
-
-    webServiceClient.get('publish/videos?properties[unknown]=unknown').then(function(results) {
-      assert.eventually.ok(protractor.promise.fulfilled(false), 'Unknown property should not return results');
-      deferred.fulfill();
-    }).catch(function(error) {
-      assert.eventually.isDefined(protractor.promise.fulfilled(error));
-      assert.eventually.ok(protractor.promise.fulfilled(true));
-      deferred.fulfill();
     });
 
     return page.flow.execute(function() {

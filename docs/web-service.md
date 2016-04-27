@@ -22,7 +22,7 @@ sortBy | String | No | date | To sort videos by either **title**, **description*
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 1 | The expected page
 limit | Number | No | - | To limit the number of videos per page. If not specified get all videos
-properties | Object | No | - | A list of properties with the property name as the key and the expected property value as the value. (e.g. **properties[property1Name]=property1Value**)
+properties | Object | No | - | A list of properties with the property id as the key and the expected property value as the value. (e.g. **properties[property1Id]=property1Value**)
 
 
 HTTP Status Code | Details
