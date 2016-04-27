@@ -3,6 +3,14 @@
     "publishGroup1": {
       "name": "publish-group-1",
       "description": "publish-group-1"
+    },
+    "publishGroupWebService1": {
+      "name": "Publish group web service 1",
+      "description": "Publish group web service 1 description"
+    },
+    "publishGroupWebService2": {
+      "name": "Publish group web service 2",
+      "description": "Publish group web service 2 description"
     }
   },
   "roles": {

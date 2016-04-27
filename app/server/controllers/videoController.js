@@ -167,6 +167,7 @@ module.exports.getVideoReadyAction = function(request, response, next) {
  *  - **dateStart** To get videos after a date
  *  - **dateEnd** To get videos before a date
  *  - **categories** To filter videos by category
+ *  - **groups** To filter videos by group
  *  - **sortBy** To sort videos by either title, description or date
  *  - **sortOrder** Sort order (either asc or desc)
  *  - **limit** To limit the number of videos per page
@@ -195,6 +196,8 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
       dateStart: {type: 'date'},
       dateEnd: {type: 'date'},
       categories: {type: 'array<string>'},
+      groups: {type: 'array<string>'},
+      properties: {type: 'object', default: {}},
       limit: {type: 'number', gt: 0},
       page: {type: 'number', gt: 0, default: 1},
       sortBy: {type: 'string', in: orderedProperties, default: 'date'},
@@ -236,6 +239,13 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     };
   }
 
+  // Add groups
+  if (params.groups && params.groups.length) {
+    filter['metadata.groups'] = {
+      $in: params.groups
+    };
+  }
+
   // Add date
   if (params.dateStart || params.dateEnd) {
     filter.date = {};
@@ -243,23 +253,19 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     if (params.dateEnd) filter.date.$lt = params.dateEnd;
   }
 
-  var wsSearch = request.query.properties || {};
+  // Custom properties
   var series = [];
+  Object.keys(params.properties).forEach(function(propertyName) {
+    var propertyValue = params.properties[propertyName];
 
-  // Construct MongoDb search query with parameters
-  Object.keys(wsSearch).forEach(function(key) {
     series.push(function(callback) {
-
-      // get property which name corresponding to parameter
-      propertyModel.get({name: key}, function(error, properties) {
+      propertyModel.get({name: propertyName}, function(error, properties) {
         if (error) return callback(error);
 
         // Error if no property corresponding
         if (!properties || properties.length == 0) return callback(errors.UNKNOWN_PROPERTY_ERROR);
-        var val = wsSearch[key];
 
-        // Build search for each existing property
-        filter['properties.' + properties[0].id] = {$in: [].concat(val)};
+        filter['properties.' + properties[0].id] = propertyValue;
         callback();
       });
     });

@@ -17,6 +17,7 @@ states | String/Array | No | - | To filter videos by state
 dateStart | String | No | - | To get videos after or equal to a date (in format mm/dd/yyyy)
 dateEnd | String | No | - | To get videos before a date (in format mm/dd/yyyy)
 categories | String/Array | No | - | To filter videos by category
+groups | String/Array | No | - | To filter videos by group
 sortBy | String | No | date | To sort videos by either **title**, **description** or **date**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 1 | The expected page

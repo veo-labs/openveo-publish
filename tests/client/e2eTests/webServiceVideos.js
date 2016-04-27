@@ -204,7 +204,7 @@ describe('Web service /videos', function() {
     });
   });
 
-  it('should not be able search for videos without permissions', function() {
+  it('should not be able to search for videos without permissions', function() {
     var deferred = protractor.promise.defer();
     var unAuthorizedApplication = process.protractorConf.getWebServiceApplication(
       datas.applications.publishApplicationsNoPermission.name
@@ -416,6 +416,47 @@ describe('Web service /videos', function() {
         var videos = results.videos;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?categories[]=2&categories[]=3');
+      }).then(function(results) {
+        var videos = results.videos;
+        assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
+        deferred.fulfill();
+      }).catch(function(error) {
+        assert.eventually.ok(protractor.promise.fulfilled(false), error.message);
+        deferred.fulfill();
+      });
+    });
+
+    return page.flow.execute(function() {
+      return deferred.promise;
+    });
+  });
+
+  it('should be able to filter by groups', function() {
+    var deferred = protractor.promise.defer();
+    var group1Id = 'publishGroupWebService1';
+    var group2Id = 'publishGroupWebService2';
+
+    var linesToAdd = [
+      {
+        id: '0',
+        groups: [group1Id]
+      },
+      {
+        id: '1'
+      },
+      {
+        id: '2',
+        groups: [group2Id]
+      }
+    ];
+
+    mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+      page.refresh();
+
+      webServiceClient.get('publish/videos?groups=' + group1Id).then(function(results) {
+        var videos = results.videos;
+        assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
+        return webServiceClient.get('publish/videos?groups[]=' + group1Id + '&groups[]=' + group2Id);
       }).then(function(results) {
         var videos = results.videos;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
