@@ -52,7 +52,7 @@ describe('Web service /video', function() {
     videoHelper.addEntities(videosToAdd).then(function(addedVideos) {
       page.refresh();
 
-      webServiceClient.get('publish/video/' + addedVideos[0].id).then(function(results) {
+      webServiceClient.get('publish/videos/' + addedVideos[0].id).then(function(results) {
         var video = results.video;
         assert.eventually.isDefined(protractor.promise.fulfilled(video));
         assert.eventually.equal(protractor.promise.fulfilled(video.id), addedVideos[0].id);
@@ -72,28 +72,11 @@ describe('Web service /video', function() {
   it('should not return any video if it does not exist', function() {
     var deferred = protractor.promise.defer();
 
-    webServiceClient.get('publish/video/unkown').then(function(results) {
+    webServiceClient.get('publish/videos/unkown').then(function(results) {
       assert.eventually.isUndefined(protractor.promise.fulfilled(results.video));
       deferred.fulfill();
     }).catch(function(error) {
       assert.eventually.ok(protractor.promise.fulfilled(false), error.message);
-      deferred.fulfill();
-    });
-
-    return page.flow.execute(function() {
-      return deferred.promise;
-    });
-  });
-
-
-  it('should return an error if no id', function() {
-    var deferred = protractor.promise.defer();
-
-    webServiceClient.get('publish/video/').then(function(results) {
-      assert.eventually.ok(protractor.promise.fulfilled(false), 'Unexpected HTTP 200 response');
-      deferred.fulfill();
-    }).catch(function(error) {
-      assert.eventually.ok(protractor.promise.fulfilled(true));
       deferred.fulfill();
     });
 
@@ -123,7 +106,7 @@ describe('Web service /video', function() {
     videoHelper.addEntities(videosToAdd).then(function(addedVideos) {
       page.refresh();
 
-      client.get('publish/video/' + addedVideos[0].id).then(function(results) {
+      client.get('publish/videos/' + addedVideos[0].id).then(function(results) {
         assert.eventually.ok(protractor.promise.fulfilled(false),
                              'Application without permission should not be able to get videos');
         deferred.fulfill();

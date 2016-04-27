@@ -118,7 +118,7 @@ Videos can be in different states :
 
 Get information about a video.
 
-    GET WEB_SERVICE_URL/publish/video/{video_id}
+    GET WEB_SERVICE_URL/publish/videos/{video_id}
 
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
@@ -255,7 +255,7 @@ HTTP Status Code | Details
 
 Get information about a property.
 
-    GET WEB_SERVICE_URL/publish/property/{property_id}
+    GET WEB_SERVICE_URL/publish/properties/{property_id}
 
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
@@ -282,7 +282,7 @@ HTTP Status Code | Details
 
 Get the list of properties' types.
 
-    GET WEB_SERVICE_URL/publish/properties/types
+    GET WEB_SERVICE_URL/publish/propertiesTypes
 
 HTTP Status Code | Details
 ---- | ----
@@ -302,7 +302,7 @@ HTTP Status Code | Details
 
 Get information about a category.
 
-    GET WEB_SERVICE_URL/publish/category/{category_id}
+    GET WEB_SERVICE_URL/publish/categories/{category_id}
 
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----

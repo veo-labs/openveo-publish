@@ -53,7 +53,7 @@ describe('Web service /property', function() {
     propertyHelper.addEntities(propertiesToAdd).then(function(addedProperties) {
       page.refresh();
 
-      webServiceClient.get('publish/property/' + addedProperties[0].id).then(function(results) {
+      webServiceClient.get('publish/properties/' + addedProperties[0].id).then(function(results) {
         var property = results.property;
         assert.eventually.isDefined(protractor.promise.fulfilled(property));
         assert.eventually.equal(protractor.promise.fulfilled(property.id), addedProperties[0].id);
@@ -73,28 +73,11 @@ describe('Web service /property', function() {
   it('should not return any property if it does not exist', function() {
     var deferred = protractor.promise.defer();
 
-    webServiceClient.get('publish/property/unkown').then(function(results) {
+    webServiceClient.get('publish/properties/unkown').then(function(results) {
       assert.eventually.isUndefined(protractor.promise.fulfilled(results.property));
       deferred.fulfill();
     }).catch(function(error) {
       assert.eventually.ok(protractor.promise.fulfilled(false), error.message);
-      deferred.fulfill();
-    });
-
-    return page.flow.execute(function() {
-      return deferred.promise;
-    });
-  });
-
-
-  it('should return an error if no id', function() {
-    var deferred = protractor.promise.defer();
-
-    webServiceClient.get('publish/property/').then(function(results) {
-      assert.eventually.ok(protractor.promise.fulfilled(false), 'Unexpected HTTP 200 response');
-      deferred.fulfill();
-    }).catch(function(error) {
-      assert.eventually.ok(protractor.promise.fulfilled(true));
       deferred.fulfill();
     });
 
@@ -125,7 +108,7 @@ describe('Web service /property', function() {
     propertyHelper.addEntities(propertiesToAdd).then(function(addedProperties) {
       page.refresh();
 
-      client.get('publish/property/' + addedProperties[0].id).then(function(results) {
+      client.get('publish/properties/' + addedProperties[0].id).then(function(results) {
         assert.eventually.ok(protractor.promise.fulfilled(false),
                              'Application without permission should not be able to get properties');
         deferred.fulfill();

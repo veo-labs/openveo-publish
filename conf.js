@@ -20,12 +20,12 @@ module.exports = {
       'app/server/controllers/configurationController.handleGoogleOAuthCodeAction'
     },
     ws: {
-      'get /video/:id': 'app/server/controllers/videoController.getVideoAction',
+      'get /videos/:id': 'app/server/controllers/videoController.getVideoAction',
       'get /videos': 'app/server/controllers/videoController.getVideoByPropertiesAction',
-      'get /property/:id': 'app/server/controllers/propertyController.getPropertyAction',
+      'get /properties/:id': 'app/server/controllers/propertyController.getPropertyAction',
       'get /properties': 'app/server/controllers/propertyController.getPropertiesAction',
-      'get /properties/types': 'app/server/controllers/propertyController.getPropertyTypesAction',
-      'get /category/:id': 'app/server/controllers/categoryController.getCategoryAction',
+      'get /propertiesTypes': 'app/server/controllers/propertyController.getPropertyTypesAction',
+      'get /categories/:id': 'app/server/controllers/categoryController.getCategoryAction',
       'get /categories': 'app/server/controllers/categoryController.getCategoriesAction',
       'post /statistics/:entity/:type/:id': 'app/server/controllers/statisticsController.statisticsAction'
     }
@@ -41,7 +41,6 @@ module.exports = {
       name: 'WS_SCOPES.GET_VIDEO_NAME',
       description: 'WS_SCOPES.GET_VIDEO_DESCRIPTON',
       paths: [
-        'get /publish/video/*',
         'get /publish/videos*'
       ]
     },
@@ -50,7 +49,6 @@ module.exports = {
       name: 'WS_SCOPES.GET_PROPERTY_NAME',
       description: 'WS_SCOPES.GET_PROPERTY_DESCRIPTON',
       paths: [
-        'get /publish/property/*',
         'get /publish/properties*'
       ]
     },
@@ -59,8 +57,7 @@ module.exports = {
       name: 'WS_SCOPES.GET_CATEGORY_NAME',
       description: 'WS_SCOPES.GET_CATEGORY_DESCRIPTON',
       paths: [
-        'get /publish/category/*',
-        'get /publish/categories'
+        'get /publish/categories*'
       ]
     },
     {

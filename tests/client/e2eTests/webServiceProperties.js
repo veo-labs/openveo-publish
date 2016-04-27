@@ -71,7 +71,7 @@ describe('Web service /properties', function() {
   it('should be able to get the list of available property types', function() {
     var deferred = protractor.promise.defer();
 
-    webServiceClient.get('publish/properties/types').then(function(results) {
+    webServiceClient.get('publish/propertiesTypes').then(function(results) {
       var types = results.types;
       assert.eventually.isDefined(protractor.promise.fulfilled(types));
       assert.eventually.equal(protractor.promise.fulfilled(types.length), PropertyModel.availableTypes.length);

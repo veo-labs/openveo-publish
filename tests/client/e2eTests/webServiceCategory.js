@@ -64,7 +64,7 @@ describe('Web service /category', function() {
     categoryHelper.addEntities(initialTree).then(function(addedTree) {
       page.refresh();
 
-      webServiceClient.get('publish/category/' + addedTree.tree[0].id).then(function(results) {
+      webServiceClient.get('publish/categories/' + addedTree.tree[0].id).then(function(results) {
         var category = results.category;
         assert.eventually.isDefined(protractor.promise.fulfilled(category));
         assert.eventually.equal(protractor.promise.fulfilled(category.id), addedTree.tree[0].id);
@@ -95,29 +95,13 @@ describe('Web service /category', function() {
     categoryHelper.addEntities(initialTree).then(function(addedTree) {
       page.refresh();
 
-      webServiceClient.get('publish/category/unkown').then(function(results) {
+      webServiceClient.get('publish/categories/unkown').then(function(results) {
         assert.eventually.isUndefined(protractor.promise.fulfilled(results.category));
         deferred.fulfill();
       }).catch(function(error) {
         assert.eventually.ok(protractor.promise.fulfilled(false), error.message);
         deferred.fulfill();
       });
-    });
-
-    return page.flow.execute(function() {
-      return deferred.promise;
-    });
-  });
-
-  it('should return an error if no id', function() {
-    var deferred = protractor.promise.defer();
-
-    webServiceClient.get('publish/category/').then(function(results) {
-      assert.eventually.ok(protractor.promise.fulfilled(false), 'Unexpected HTTP 200 response');
-      deferred.fulfill();
-    }).catch(function(error) {
-      assert.eventually.ok(protractor.promise.fulfilled(true));
-      deferred.fulfill();
     });
 
     return page.flow.execute(function() {
@@ -147,7 +131,7 @@ describe('Web service /category', function() {
     categoryHelper.addEntities(initialTree).then(function(addedTree) {
       page.refresh();
 
-      client.get('publish/category/' + addedTree.tree[0].id).then(function(results) {
+      client.get('publish/categories/' + addedTree.tree[0].id).then(function(results) {
         assert.eventually.ok(protractor.promise.fulfilled(false),
                              'Application without permission should not be able to get categories');
         deferred.fulfill();
