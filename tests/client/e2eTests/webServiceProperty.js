@@ -54,7 +54,7 @@ describe('Web service /property', function() {
       page.refresh();
 
       webServiceClient.get('publish/properties/' + addedProperties[0].id).then(function(results) {
-        var property = results.property;
+        var property = results.entity;
         assert.eventually.isDefined(protractor.promise.fulfilled(property));
         assert.eventually.equal(protractor.promise.fulfilled(property.id), addedProperties[0].id);
         deferred.fulfill();
@@ -74,7 +74,7 @@ describe('Web service /property', function() {
     var deferred = protractor.promise.defer();
 
     webServiceClient.get('publish/properties/unkown').then(function(results) {
-      assert.eventually.isUndefined(protractor.promise.fulfilled(results.property));
+      assert.eventually.isUndefined(protractor.promise.fulfilled(results.entity));
       deferred.fulfill();
     }).catch(function(error) {
       assert.eventually.ok(protractor.promise.fulfilled(false), error.message);

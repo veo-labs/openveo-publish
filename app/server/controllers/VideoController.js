@@ -4,23 +4,32 @@
  * @module publish-controllers
  */
 
-/**
- * Provides route actions for all requests relative to videos.
- *
- * @class videoController
- */
-
+var util = require('util');
 var path = require('path');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
 var errors = process.requirePublish('app/server/httpErrors.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
-
 var applicationStorage = openVeoAPI.applicationStorage;
 var AccessError = openVeoAPI.errors.AccessError;
+var ContentController = openVeoAPI.controllers.ContentController;
 
 var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
+
+/**
+ * Provides route actions for all requests relative to videos.
+ *
+ * @class VideoController
+ * @constructor
+ * @extends ContentController
+ */
+function VideoController() {
+  ContentController.call(this, VideoModel);
+}
+
+module.exports = VideoController;
+util.inherits(VideoController, ContentController);
 
 /**
  * Displays video player template.
@@ -29,9 +38,8 @@ var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
  * before returning the template.
  *
  * @method displayVideoAction
- * @static
  */
-module.exports.displayVideoAction = function(request, response, next) {
+VideoController.prototype.displayVideoAction = function(request, response, next) {
   response.locals.scripts = [];
   response.locals.css = [];
 
@@ -72,48 +80,11 @@ module.exports.displayVideoAction = function(request, response, next) {
  *     }
  *
  * @method getPlatformsAction
- * @static
  */
-module.exports.getPlatformsAction = function(request, response) {
+VideoController.prototype.getPlatformsAction = function(request, response) {
   response.send({
     platforms: Object.keys(platforms) || []
   });
-};
-
-/**
- * Gets information about a video.
- *
- * Expects one GET parameter :
- *  - **id** The id of the video
- *
- * @example
- *     {
- *       video : {
- *         id : 123456789,
- *         ...
- *       }
- *     }
- *
- * @method getVideoAction
- * @static
- */
-module.exports.getVideoAction = function(request, response, next) {
-  if (request.params.id) {
-    var videoModel = new VideoModel(request.user);
-    videoModel.getOne(request.params.id, null, function(error, video) {
-      if (error)
-        next((error instanceof AccessError) ? errors.GET_VIDEO_FORBIDDEN : errors.GET_VIDEO_ERROR);
-      else
-        response.send({
-          video: video
-        });
-    });
-  } else {
-
-    // Missing id of the video
-    next(errors.GET_VIDEO_MISSING_PARAMETERS);
-
-  }
 };
 
 /**
@@ -131,19 +102,19 @@ module.exports.getVideoAction = function(request, response, next) {
  *     }
  *
  * @method getVideoReadyAction
- * @static
  */
-module.exports.getVideoReadyAction = function(request, response, next) {
+VideoController.prototype.getVideoReadyAction = function(request, response, next) {
   if (request.params.id) {
-    var videoModel = new VideoModel(request.user);
-    videoModel.getOneReady(request.params.id, function(error, video) {
+    var model = new this.Entity(request.user);
+
+    model.getOneReady(request.params.id, function(error, video) {
       if (error && error instanceof AccessError)
         next(errors.GET_VIDEO_READY_FORBIDDEN);
       else if (error || (video.state === VideoModel.READY_STATE && !request.isAuthenticated()))
         next(errors.GET_VIDEO_READY_ERROR);
       else
         response.send({
-          video: video
+          entity: video
         });
     });
   } else {
@@ -178,11 +149,11 @@ module.exports.getVideoReadyAction = function(request, response, next) {
  *       ]
  *     }
  *
- * @method getVideoByPropertiesAction
- * @static
+ * @method getEntitiesAction
  */
-module.exports.getVideoByPropertiesAction = function(request, response, next) {
+VideoController.prototype.getEntitiesAction = function(request, response, next) {
   var params;
+  var model = new this.Entity(request.user);
   var orderedProperties = ['title', 'description', 'date', 'state', 'views'];
 
   try {
@@ -256,15 +227,14 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
     });
   }
 
-  var videoModel = new VideoModel();
-  videoModel.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
+  model.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
     function(error, entities, pagination) {
       if (error) {
         process.logger.error(error);
         next((error instanceof AccessError) ? errors.GET_VIDEOS_FORBIDDEN : errors.GET_VIDEOS_ERROR);
       } else {
         response.send({
-          videos: entities,
+          entities: entities,
           pagination: pagination
         });
       }
@@ -286,13 +256,13 @@ module.exports.getVideoByPropertiesAction = function(request, response, next) {
  *     }
  *
  * @method publishVideoAction
- * @static
  */
-module.exports.publishVideoAction = function(request, response, next) {
+VideoController.prototype.publishVideoAction = function(request, response, next) {
   if (request.params.id) {
     var arrayId = request.params.id.split(',');
-    var videoModel = new VideoModel(request.user);
-    videoModel.publishVideo(arrayId, function(error) {
+    var model = new this.Entity(request.user);
+
+    model.publishVideo(arrayId, function(error) {
       if (error)
         next((error instanceof AccessError) ? errors.PUBLISH_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
       else
@@ -322,13 +292,13 @@ module.exports.publishVideoAction = function(request, response, next) {
  *     }
  *
  * @method unpublishVideoAction
- * @static
  */
-module.exports.unpublishVideoAction = function(request, response, next) {
+VideoController.prototype.unpublishVideoAction = function(request, response, next) {
   if (request.params.id) {
     var arrayId = request.params.id.split(',');
-    var videoModel = new VideoModel(request.user);
-    videoModel.unpublishVideo(arrayId, function(error) {
+    var model = new this.Entity(request.user);
+
+    model.unpublishVideo(arrayId, function(error) {
       if (error)
         next((error instanceof AccessError) ? errors.UNPUBLISH_VIDEO_FORBIDDEN : errors.UNPUBLISH_VIDEO_ERROR);
       else

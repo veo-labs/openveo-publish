@@ -94,7 +94,7 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), addedVideos.length);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
         deferred.fulfill();
@@ -113,7 +113,7 @@ describe('Web service /videos', function() {
     var deferred = protractor.promise.defer();
 
     webServiceClient.get('publish/videos').then(function(results) {
-      var videos = results.videos;
+      var videos = results.entities;
       assert.eventually.equal(protractor.promise.fulfilled(videos.length), 0);
       deferred.fulfill();
     }).catch(function(error) {
@@ -160,7 +160,7 @@ describe('Web service /videos', function() {
       ]);
 
       webServiceClient.get('publish/videos?' + propertiesQuery).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
 
@@ -172,7 +172,7 @@ describe('Web service /videos', function() {
         ]);
         return webServiceClient.get('publish/videos?' + propertiesQuery);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 0);
         deferred.fulfill();
       }).catch(function(error) {
@@ -234,15 +234,15 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos?query=' + encodeURIComponent('video')).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         return webServiceClient.get('publish/videos?query=' + encodeURIComponent('2'));
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?query=' + encodeURIComponent('"video description"'));
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -281,12 +281,12 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos?states=' + VideoModel.READY_STATE).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?states[]=' + VideoModel.READY_STATE + '&states[]=' +
                                    VideoModel.PUBLISHED_STATE);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -334,27 +334,27 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos?dateStart=' + dateLiteral1).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 3, 'Wrong number of results');
         return webServiceClient.get('publish/videos?dateStart=' + dateLiteral2);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         return webServiceClient.get('publish/videos?dateStart=' + dateLiteral3);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?dateEnd=' + dateLiteral3);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         return webServiceClient.get('publish/videos?dateStart=' + dateLiteral2 + '&dateEnd=' + dateLiteral3);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?dateStart=03/25/2016');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 0, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -396,11 +396,11 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos?categories=1').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?categories[]=2&categories[]=3');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -437,11 +437,11 @@ describe('Web service /videos', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos?groups=' + group1Id).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/videos?groups[]=' + group1Id + '&groups[]=' + group2Id);
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -487,14 +487,14 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?sortBy=title').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), addedVideos.length);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[1].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[0].id);
 
         return webServiceClient.get('publish/videos?sortBy=title&sortOrder=asc');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), addedVideos.length);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[1].id);
@@ -513,14 +513,14 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?sortBy=description').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[1].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[0].id);
 
         return webServiceClient.get('publish/videos?sortBy=description&sortOrder=asc');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[1].id);
@@ -539,14 +539,14 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?sortBy=date').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[1].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[0].id);
 
         return webServiceClient.get('publish/videos?sortBy=date&sortOrder=asc');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[1].id);
@@ -565,14 +565,14 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?sortBy=state').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[1].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[0].id);
 
         return webServiceClient.get('publish/videos?sortBy=state&sortOrder=asc');
       }).then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.equal(protractor.promise.fulfilled(videos[0].id), addedVideos[0].id);
         assert.eventually.equal(protractor.promise.fulfilled(videos[1].id), addedVideos[1].id);
@@ -617,7 +617,7 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?page=1&limit=1').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1);
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1);
@@ -639,7 +639,7 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?limit=1').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 1);
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1);
@@ -661,7 +661,7 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?page=1').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 2);
         assert.eventually.isUndefined(protractor.promise.fulfilled(results.pagination));
         deferred.fulfill();
@@ -679,7 +679,7 @@ describe('Web service /videos', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/videos?limit=1&page=10').then(function(results) {
-        var videos = results.videos;
+        var videos = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(videos.length), 0);
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1);

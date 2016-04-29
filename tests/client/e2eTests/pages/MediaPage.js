@@ -18,7 +18,7 @@ function MediaPage(model) {
   MediaPage.super_.call(this, model);
 
   // Page path
-  this.path = 'be/publish/medias';
+  this.path = 'be/publish/medias-list';
 
   // Element finders specific to this page
   this.pageTitleElement = element(by.binding('MEDIAS.TITLE'));

@@ -5,7 +5,8 @@
   /**
    * Defines the properties controller for the properties page.
    */
-  function PropertiesController($scope, $filter, entityService, publishService) {
+  function PropertiesController($scope, $filter, entityService, publishService, publishName) {
+    var entityType = 'properties';
     var TEXT_TYPE = 'text';
     var LIST_TYPE = 'list';
     var BOOLEAN_TYPE = 'boolean';
@@ -31,9 +32,9 @@
      * @param {Function} reload The reload Function to force reloading the table
      */
     function removeRows(selected, reload) {
-      entityService.removeEntity('property', selected.join(','))
+      entityService.removeEntity(entityType, publishName, selected.join(','))
         .then(function() {
-          publishService.cacheClear('properties');
+          publishService.cacheClear(entityType);
           $scope.$emit('setAlert', 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
           reload();
         });
@@ -45,9 +46,9 @@
      * @param {Object} property Property data
      */
     function addProperty(property) {
-      return entityService.addEntity('property', property)
+      return entityService.addEntity(entityType, publishName, property)
         .then(function() {
-          publishService.cacheClear('properties');
+          publishService.cacheClear(entityType);
         });
     }
 
@@ -67,8 +68,8 @@
       if (property.type === LIST_TYPE && property.listValues)
         propertyInfo.values = property.listValues;
 
-      return entityService.updateEntity('property', property.id, propertyInfo).then(function() {
-        publishService.cacheClear('properties');
+      return entityService.updateEntity(entityType, publishName, property.id, propertyInfo).then(function() {
+        publishService.cacheClear(entityType);
       });
     }
 
@@ -78,18 +79,19 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('create-property');
-    $scope.rights.edit = $scope.checkAccess('update-property');
-    $scope.rights.delete = $scope.checkAccess('delete-property');
+    $scope.rights.add = $scope.checkAccess('create-' + entityType);
+    $scope.rights.edit = $scope.checkAccess('update-' + entityType);
+    $scope.rights.delete = $scope.checkAccess('delete-' + entityType);
 
     /*
      *
      * DATATABLE
      */
     var scopeDataTable = $scope.tableContainer = {};
+    scopeDataTable.pluginName = publishName;
     var filterTypeOptions = angular.copy(supportedTypes);
     filterTypeOptions.unshift({name: $filter('translate')('UI.EMPTY'), value: ''});
-    scopeDataTable.entityType = 'property';
+    scopeDataTable.entityType = entityType;
     scopeDataTable.filterBy = [
       {
         key: 'name',
@@ -139,7 +141,8 @@
      */
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
-    scopeEditForm.entityType = 'property';
+    scopeEditForm.entityType = entityType;
+    scopeEditForm.pluginName = publishName;
     scopeEditForm.fields = [
       {
 
@@ -297,6 +300,6 @@
   }
 
   app.controller('PropertiesController', PropertiesController);
-  PropertiesController.$inject = ['$scope', '$filter', 'entityService', 'publishService'];
+  PropertiesController.$inject = ['$scope', '$filter', 'entityService', 'publishService', 'publishName'];
 
 })(angular.module('ov.publish'));

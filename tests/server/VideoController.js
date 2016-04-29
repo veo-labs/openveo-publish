@@ -5,8 +5,8 @@ var assert = require('chai').assert;
 var openVeoAPI = require('@openveo/api');
 var applicationStorage = openVeoAPI.applicationStorage;
 
-// videoController.js
-describe('videoController', function() {
+// VideoController.js
+describe('VideoController', function() {
   var request,
     response,
     videoController,
@@ -29,7 +29,8 @@ describe('videoController', function() {
     var FakeVideoDatabase = require('./database/FakeVideoDatabase.js');
     applicationStorage.setDatabase(new FakeVideoDatabase());
 
-    videoController = process.requirePublish('app/server/controllers/videoController.js');
+    var VideoController = process.requirePublish('app/server/controllers/VideoController.js');
+    videoController = new VideoController();
     applicationStorage.setPlugins([{
       name: 'player'
     }]);
@@ -156,7 +157,7 @@ describe('videoController', function() {
         done();
       };
 
-      videoController.getVideoAction(request, response, function() {
+      videoController.getEntityAction(request, response, function() {
         assert.ok(false);
       });
 
@@ -164,7 +165,7 @@ describe('videoController', function() {
 
     it('Should return an HTTP code 400 if id is not found in url parameters', function(done) {
 
-      videoController.getVideoAction(request, response, function(error) {
+      videoController.getEntityAction(request, response, function(error) {
         assert.isDefined(error);
         assert.equal(error.httpCode, 400);
         done();
@@ -176,7 +177,7 @@ describe('videoController', function() {
         id: 'error'
       };
 
-      videoController.getVideoAction(request, response, function(error) {
+      videoController.getEntityAction(request, response, function(error) {
         assert.isDefined(error);
         assert.equal(error.httpCode, 500);
         done();

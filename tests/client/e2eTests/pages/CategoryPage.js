@@ -16,7 +16,7 @@ function CategoryPage(model) {
   CategoryPage.super_.call(this);
 
   // Page path
-  this.path = 'be/publish/categories';
+  this.path = 'be/publish/categories-list';
 
   // Element finders specific to this page
   this.pageTitleElement = element(by.binding('CATEGORIES.TITLE'));

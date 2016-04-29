@@ -65,7 +65,7 @@ describe('Web service /category', function() {
       page.refresh();
 
       webServiceClient.get('publish/categories/' + addedTree.tree[0].id).then(function(results) {
-        var category = results.category;
+        var category = results.entity;
         assert.eventually.isDefined(protractor.promise.fulfilled(category));
         assert.eventually.equal(protractor.promise.fulfilled(category.id), addedTree.tree[0].id);
         deferred.fulfill();
@@ -96,7 +96,7 @@ describe('Web service /category', function() {
       page.refresh();
 
       webServiceClient.get('publish/categories/unkown').then(function(results) {
-        assert.eventually.isUndefined(protractor.promise.fulfilled(results.category));
+        assert.eventually.isUndefined(protractor.promise.fulfilled(results.entity));
         deferred.fulfill();
       }).catch(function(error) {
         assert.eventually.ok(protractor.promise.fulfilled(false), error.message);

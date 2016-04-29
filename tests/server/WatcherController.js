@@ -4,8 +4,8 @@
 var path = require('path');
 var assert = require('chai').assert;
 
-// watcherController.js
-describe('watcherController', function() {
+// WatcherController.js
+describe('WatcherController', function() {
   var watcherController,
     request,
     response;
@@ -20,7 +20,8 @@ describe('watcherController', function() {
     };
 
     process.rootPublish = path.join(__dirname);
-    watcherController = process.requirePublish('../../app/server/controllers/watcherController.js');
+    var WatcherController = process.requirePublish('../../app/server/controllers/WatcherController.js');
+    watcherController = new WatcherController();
   });
 
   // Restore rootPublish path after tests

@@ -16,7 +16,7 @@ describe('MediaService', function() {
 
   it('Should be able to ask server for a video by its id', function(done) {
     $httpBackend.when('GET', '/publish/getVideo/5').respond(200, {
-      video: {}
+      entity: {}
     });
     $httpBackend.expectGET('/publish/getVideo/5');
     mediaService.getMedia('5', function(video) {

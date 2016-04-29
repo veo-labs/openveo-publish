@@ -13,7 +13,7 @@ function PropertyPage(model) {
   PropertyPage.super_.call(this, model);
 
   // Page path
-  this.path = 'be/publish/properties';
+  this.path = 'be/publish/properties-list';
 
   // Element finders specific to this page
   this.pageTitleElement = element(by.binding('PROPERTIES.TITLE'));

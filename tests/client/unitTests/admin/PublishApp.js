@@ -28,22 +28,22 @@ describe('PublishApp', function() {
   });
 
   it('Should register routes to medias, watcher, media, properties and categories', function() {
-    assert.isDefined($route.routes['/publish/medias']);
+    assert.isDefined($route.routes['/publish/medias-list']);
     assert.isDefined($route.routes['/publish/watcher']);
     assert.isDefined($route.routes['/publish/media/:mediaId']);
-    assert.isDefined($route.routes['/publish/properties']);
-    assert.isDefined($route.routes['/publish/categories']);
+    assert.isDefined($route.routes['/publish/properties-list']);
+    assert.isDefined($route.routes['/publish/categories-list']);
   });
 
   it('Should be able to route to medias page after retrieving the list of medias', function() {
-    $httpBackend.expectGET('/be/getTaxonomies?query=categories');
-    $httpBackend.expectGET('/be/crud/property');
+    $httpBackend.expectGET('/be/taxonomies?query=categories');
+    $httpBackend.expectGET('/be/publish/properties');
     $httpBackend.expectGET('/be/publish/getPlatforms');
     $httpBackend.expectGET('/publish/be/views/medias.html');
 
-    $location.path('/publish/medias');
+    $location.path('/publish/medias-list');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/medias');
+    assert.equal($location.path(), '/publish/medias-list');
   });
 
   it('Should be able to route to watcher page after retrieving the watcher status', function() {
@@ -58,18 +58,18 @@ describe('PublishApp', function() {
   it('Should be able to route to properties page', function() {
     $httpBackend.expectGET('/publish/be/views/properties.html');
 
-    $location.path('/publish/properties');
+    $location.path('/publish/properties-list');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/properties');
+    assert.equal($location.path(), '/publish/properties-list');
   });
 
   it('Should be able to route to categories page after retrieving the list of categories', function() {
-    $httpBackend.expectGET('/be/getTaxonomies?query=categories');
+    $httpBackend.expectGET('/be/taxonomies?query=categories');
     $httpBackend.expectGET('/publish/be/views/categories.html');
 
-    $location.path('/publish/categories');
+    $location.path('/publish/categories-list');
     $httpBackend.flush();
-    assert.equal($location.path(), '/publish/categories');
+    assert.equal($location.path(), '/publish/categories-list');
   });
 
 });

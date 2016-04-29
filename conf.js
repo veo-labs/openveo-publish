@@ -3,37 +3,31 @@
 module.exports = {
   routes: {
     public: {
-      'get /video/*': 'app/server/controllers/videoController.displayVideoAction',
-      'get /getVideo/:id': 'app/server/controllers/videoController.getVideoReadyAction'
+      'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
+      'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
     },
     private: {
-      'get /watcherStatus': 'app/server/controllers/watcherController.getStatusAction',
-      'post /stopWatcher': 'app/server/controllers/watcherController.stopAction',
-      'post /startWatcher': 'app/server/controllers/watcherController.startAction',
-      'post /retryVideo/:ids': 'app/server/controllers/watcherController.retryVideoAction',
-      'post /startUpload/:ids/:platform': 'app/server/controllers/watcherController.startUploadAction',
-      'post /publishVideo/:id': 'app/server/controllers/videoController.publishVideoAction',
-      'post /unpublishVideo/:id': 'app/server/controllers/videoController.unpublishVideoAction',
-      'get /getPlatforms': 'app/server/controllers/videoController.getPlatformsAction',
-      'get /configuration/all': 'app/server/controllers/configurationController.getConfigurationAllAction',
+      'get /watcherStatus': 'app/server/controllers/WatcherController.getStatusAction',
+      'post /stopWatcher': 'app/server/controllers/WatcherController.stopAction',
+      'post /startWatcher': 'app/server/controllers/WatcherController.startAction',
+      'post /retryVideo/:ids': 'app/server/controllers/WatcherController.retryVideoAction',
+      'post /startUpload/:ids/:platform': 'app/server/controllers/WatcherController.startUploadAction',
+      'post /publishVideo/:id': 'app/server/controllers/VideoController.publishVideoAction',
+      'post /unpublishVideo/:id': 'app/server/controllers/VideoController.unpublishVideoAction',
+      'get /getPlatforms': 'app/server/controllers/VideoController.getPlatformsAction',
+      'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
       'get /configuration/googleOAuthAssociation':
-      'app/server/controllers/configurationController.handleGoogleOAuthCodeAction'
+      'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction'
     },
     ws: {
-      'get /videos/:id': 'app/server/controllers/videoController.getVideoAction',
-      'get /videos': 'app/server/controllers/videoController.getVideoByPropertiesAction',
-      'get /properties/:id': 'app/server/controllers/propertyController.getPropertyAction',
-      'get /properties': 'app/server/controllers/propertyController.getPropertiesAction',
-      'get /propertiesTypes': 'app/server/controllers/propertyController.getPropertyTypesAction',
-      'get /categories/:id': 'app/server/controllers/categoryController.getCategoryAction',
-      'get /categories': 'app/server/controllers/categoryController.getCategoriesAction',
-      'post /statistics/:entity/:type/:id': 'app/server/controllers/statisticsController.statisticsAction'
+      'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
+      'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction'
     }
   },
   entities: {
-    category: 'app/server/models/CategoryModel',
-    property: 'app/server/models/PropertyModel',
-    video: 'app/server/models/VideoModel'
+    categories: 'app/server/controllers/CategoryController',
+    properties: 'app/server/controllers/PropertyController',
+    videos: 'app/server/controllers/VideoController'
   },
   webServiceScopes: [
     {
@@ -65,18 +59,18 @@ module.exports = {
       name: 'WS_SCOPES.INCREASE_VIEW_NAME',
       description: 'WS_SCOPES.INCREASE_VIEW_DESCRIPTION',
       paths: [
-        'post /statistics/*'
+        'post /publish/statistics*'
       ]
     }
   ],
   permissions: [
     {
       id: 'access-videos-page',
-      name: 'PERMISSIONS.ACCESS_VIDEO_PAGE_NAME'
+      name: 'PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
     },
     {
       id: 'access-properties-page',
-      name: 'PERMISSIONS.ACCESS_PROPERTY_PAGE_NAME'
+      name: 'PERMISSIONS.ACCESS_PROPERTIES_PAGE_NAME'
     },
     {
       id: 'access-categories-page',
@@ -111,10 +105,10 @@ module.exports = {
       ]
     },
     {
-      label: 'PERMISSIONS.GROUP_VIDEO',
+      label: 'PERMISSIONS.GROUP_VIDEOS',
       permissions: [
         {
-          id: 'publish-video',
+          id: 'publish-videos',
           name: 'PERMISSIONS.PUBLISH_VIDEO_NAME',
           description: 'PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION',
           paths: [
@@ -123,17 +117,17 @@ module.exports = {
           ]
         },
         {
-          id: 'chapter-video',
+          id: 'chapter-videos',
           name: 'PERMISSIONS.EDIT_CHAPTER_NAME',
           description: 'PERMISSIONS.EDIT_CHAPTER_DESCRIPTION'
         },
         {
-          id: 'retry-video',
+          id: 'retry-videos',
           name: 'PERMISSIONS.RETRY_VIDEO_NAME',
           description: 'PERMISSIONS.RETRY_VIDEO_DESCRIPTION'
         },
         {
-          id: 'upload-video',
+          id: 'upload-videos',
           name: 'PERMISSIONS.UPLOAD_VIDEO_NAME',
           description: 'PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION'
         }
@@ -148,17 +142,17 @@ module.exports = {
         subMenu: [
           {
             label: 'MENU.VIDEOS',
-            path: 'publish/medias',
+            path: 'publish/medias-list',
             permission: 'access-videos-page'
           },
           {
             label: 'MENU.CATEGORIES',
-            path: 'publish/categories',
+            path: 'publish/categories-list',
             permission: 'access-categories-page'
           },
           {
             label: 'MENU.PROPERTIES',
-            path: 'publish/properties',
+            path: 'publish/properties-list',
             permission: 'access-properties-page'
           },
           {

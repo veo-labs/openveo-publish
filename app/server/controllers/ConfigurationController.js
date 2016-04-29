@@ -4,6 +4,7 @@
  * @module publish-controllers
  */
 
+var util = require('util');
 var path = require('path');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
@@ -11,11 +12,26 @@ var googleOAuthHelper = process.requirePublish('app/server/providers/videoPlatfo
 var errors = process.requirePublish('app/server/httpErrors.js');
 var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
+var Controller = openVeoAPI.controllers.Controller;
+
+/**
+ * Provides route actions for all requests relative to publish configuration.
+ *
+ * @class ConfigurationController
+ * @constructor
+ * @extends Controller
+ */
+function ConfigurationController() {
+  Controller.call(this);
+}
+
+module.exports = ConfigurationController;
+util.inherits(ConfigurationController, Controller);
 
 /**
  * Retrieves publish plugin configurations.
  */
-module.exports.getConfigurationAllAction = function(request, response, next) {
+ConfigurationController.prototype.getConfigurationAllAction = function(request, response, next) {
   var configurations = {};
 
   async.series([
@@ -58,7 +74,7 @@ module.exports.getConfigurationAllAction = function(request, response, next) {
  * Redirects action that will be called by google when the user associate our application,
  * a code will be in the parameters.
  */
-module.exports.handleGoogleOAuthCodeAction = function(request, response) {
+ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response) {
   var code = request.query.code;
   process.logger.debug('Code received ', code);
   googleOAuthHelper.persistTokenWithCode(code, function() {

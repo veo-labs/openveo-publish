@@ -4,16 +4,27 @@
  * @module statistics-controllers
  */
 
+var util = require('util');
+var openVeoAPI = require('@openveo/api');
+var errors = process.requirePublish('app/server/httpErrors.js');
+var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var Controller = openVeoAPI.controllers.Controller;
+
+var videoModel = new VideoModel();
+
 /**
  * Provides route actions for all requests relative to statistics.
  *
- * @class statisticsController
+ * @class StatisticsController
+ * @constructor
+ * @extends Controller
  */
+function StatisticsController() {
+  Controller.call(this);
+}
 
-var errors = process.requirePublish('app/server/httpErrors.js');
-
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var videoModel = new VideoModel();
+module.exports = StatisticsController;
+util.inherits(StatisticsController, Controller);
 
 /**
  * Route statistics.
@@ -22,9 +33,8 @@ var videoModel = new VideoModel();
  * before executing the stat function.
  *
  * @method statisticsAction
- * @static
  */
-module.exports.statisticsAction = function(request, response, next) {
+StatisticsController.prototype.statisticsAction = function(request, response, next) {
   switch (request.params.entity) {
     case 'video':
       switch (request.params.type) {

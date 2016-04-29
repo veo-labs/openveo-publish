@@ -54,7 +54,7 @@ describe('Web service /properties', function() {
       page.refresh();
 
       webServiceClient.get('publish/properties').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), propertiesToAdd.length);
         deferred.fulfill();
       }).catch(function(error) {
@@ -90,7 +90,7 @@ describe('Web service /properties', function() {
     var deferred = protractor.promise.defer();
 
     webServiceClient.get('publish/properties').then(function(results) {
-      var properties = results.properties;
+      var properties = results.entities;
       var pagination = results.pagination;
       assert.eventually.equal(protractor.promise.fulfilled(properties.length), 0, 'Unexpected results');
       assert.eventually.isUndefined(protractor.promise.fulfilled(pagination), 'Unexpected pagination');
@@ -126,7 +126,7 @@ describe('Web service /properties', function() {
       page.refresh();
 
       webServiceClient.get('publish/properties?types=list').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 1, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -187,15 +187,15 @@ describe('Web service /properties', function() {
       page.refresh();
 
       webServiceClient.get('publish/properties?query=' + encodeURIComponent('property')).then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         return webServiceClient.get('publish/properties?query=' + encodeURIComponent('2'));
       }).then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 1, 'Wrong number of results');
         return webServiceClient.get('publish/properties?query=' + encodeURIComponent('"get property description"'));
       }).then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         deferred.fulfill();
       }).catch(function(error) {
@@ -238,7 +238,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?sortBy=name').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(properties[0].id), addedProperties[1].id,
                                 'First property is wrong');
@@ -247,7 +247,7 @@ describe('Web service /properties', function() {
 
         return webServiceClient.get('publish/properties?sortBy=name&sortOrder=asc');
       }).then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(properties[0].id), addedProperties[0].id,
                                 'First property is wrong');
@@ -269,7 +269,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?sortBy=description').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(properties[0].id), addedProperties[1].id,
                                 'First property is wrong');
@@ -278,7 +278,7 @@ describe('Web service /properties', function() {
 
         return webServiceClient.get('publish/properties?sortBy=description&sortOrder=asc');
       }).then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(properties[0].id), addedProperties[0].id,
                                 'First property is wrong');
@@ -327,7 +327,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?page=1&limit=1').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 1, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1, 'Wrong limit');
@@ -349,7 +349,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?limit=1').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 1, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1, 'Wrong limit');
@@ -371,7 +371,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?page=1').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 2, 'Wrong number of results');
         assert.eventually.isUndefined(protractor.promise.fulfilled(pagination), 'Unexpected pagination');
@@ -390,7 +390,7 @@ describe('Web service /properties', function() {
       var deferred = protractor.promise.defer();
 
       webServiceClient.get('publish/properties?limit=1&page=10').then(function(results) {
-        var properties = results.properties;
+        var properties = results.entities;
         var pagination = results.pagination;
         assert.eventually.equal(protractor.promise.fulfilled(properties.length), 0, 'Wrong number of results');
         assert.eventually.equal(protractor.promise.fulfilled(pagination.limit), 1, 'Wrong limit');

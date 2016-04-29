@@ -58,7 +58,7 @@ describe('PublishService', function() {
   });
 
   it('Should be able to ask server for the list of properties', function() {
-    $httpBackend.expectGET('/be/crud/property');
+    $httpBackend.expectGET('/be/publish/properties');
     publishService.loadProperties();
     $httpBackend.flush();
   });

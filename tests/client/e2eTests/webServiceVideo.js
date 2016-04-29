@@ -53,7 +53,7 @@ describe('Web service /video', function() {
       page.refresh();
 
       webServiceClient.get('publish/videos/' + addedVideos[0].id).then(function(results) {
-        var video = results.video;
+        var video = results.entity;
         assert.eventually.isDefined(protractor.promise.fulfilled(video));
         assert.eventually.equal(protractor.promise.fulfilled(video.id), addedVideos[0].id);
         deferred.fulfill();
@@ -73,7 +73,7 @@ describe('Web service /video', function() {
     var deferred = protractor.promise.defer();
 
     webServiceClient.get('publish/videos/unkown').then(function(results) {
-      assert.eventually.isUndefined(protractor.promise.fulfilled(results.video));
+      assert.eventually.isUndefined(protractor.promise.fulfilled(results.entity));
       deferred.fulfill();
     }).catch(function(error) {
       assert.eventually.ok(protractor.promise.fulfilled(false), error.message);

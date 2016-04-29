@@ -8,7 +8,7 @@
    * @module ov.publish
    * @class publishService
    */
-  function PublishService($http, $q, entityService, jsonPath) {
+  function PublishService($http, $q, entityService, jsonPath, publishName) {
     var basePath = '/be/';
     var properties;
     var taxonomyCategory;
@@ -27,7 +27,7 @@
      * @method retryMedia
      */
     function retryMedia(id) {
-      entityService.deleteCache('video');
+      entityService.deleteCache('videos', publishName);
       return $http.post(basePath + 'publish/retryVideo/' + id);
     }
 
@@ -39,7 +39,7 @@
      * @method publishMedia
      */
     function publishMedia(id) {
-      entityService.deleteCache('video');
+      entityService.deleteCache('videos', publishName);
       return $http.post(basePath + 'publish/publishVideo/' + id);
     }
 
@@ -51,7 +51,7 @@
      * @method unpublishMedia
      */
     function unpublishMedia(id) {
-      entityService.deleteCache('video');
+      entityService.deleteCache('videos', publishName);
       return $http.post(basePath + 'publish/unpublishVideo/' + id);
     }
 
@@ -93,10 +93,9 @@
      */
     function loadProperties() {
       if (!properties) {
-        return entityService.getAllEntities('property').success(function(propertiesObj) {
+        return entityService.getAllEntities('properties', publishName).success(function(propertiesObj) {
           properties = propertiesObj.entities;
         });
-
       }
 
       return $q.when({
@@ -155,7 +154,7 @@
      * @method startMediaUpload
      */
     function startMediaUpload(id, platform) {
-      entityService.deleteCache('video');
+      entityService.deleteCache('videos', publishName);
       return $http.post(basePath + 'publish/startUpload/' + id + '/' + platform);
     }
 
@@ -169,12 +168,12 @@
       if (!taxonomyCategory) {
 
         // Get taxonomy "categories" from server
-        return $http.get(basePath + 'getTaxonomies?query=categories').success(function(results) {
-          taxonomyCategory = results.taxonomies && results.taxonomies[0];
+        return $http.get(basePath + 'taxonomies?query=categories').then(function(results) {
+          taxonomyCategory = results.data.entities && results.data.entities[0];
           categoriesByKey = {};
           categoriesOptions = [];
           var categoriestmp = jsonPath(taxonomyCategory, '$..*[?(@.id)]');
-          if (categoriestmp)
+          if (categoriestmp) {
             categoriestmp.map(function(obj) {
               var children = jsonPath(obj, '$..*[?(@.id)].id');
               var rubric = {
@@ -186,7 +185,12 @@
               categoriesOptions.push(rubric);
               return obj;
             });
+          }
+          return $q.when({
+            data: taxonomyCategory
+          });
         });
+
       }
       return $q.when({
         data: taxonomyCategory
@@ -232,7 +236,7 @@
      */
     function loadMedia(id) {
       if (!mediaChapter[id]) {
-        return entityService.getEntity('video', id).success(function(obj) {
+        return entityService.getEntity('videos', publishName, id).success(function(obj) {
           mediaChapter[id] = obj;
         });
       }
@@ -304,6 +308,6 @@
   }
 
   app.factory('publishService', PublishService);
-  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath'];
+  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath', 'publishName'];
 
 })(angular.module('ov.publish'));

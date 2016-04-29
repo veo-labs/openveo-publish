@@ -77,7 +77,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/medias with authentication.
     // Also retrieve the list of medias
-    $routeProvider.when('/publish/medias', {
+    $routeProvider.when('/publish/medias-list', {
       templateUrl: '/publish/be/views/medias.html',
       controller: 'MediaController',
       title: 'MEDIAS.PAGE_TITLE',
@@ -92,8 +92,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
         platforms: ['publishService', function(publishService) {
           return publishService.loadPlatforms();
         }],
-        groups: ['entityService', function(entityService) {
-          return entityService.getAllEntities('group');
+        groups: ['entityService', function(entityService, publishName) {
+          return entityService.getAllEntities('groups');
         }]
       }
     });
@@ -148,7 +148,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/properties with authentication.
     // Also retrieve the list of properties
-    $routeProvider.when('/publish/properties', {
+    $routeProvider.when('/publish/properties-list', {
       templateUrl: '/publish/be/views/properties.html',
       controller: 'PropertiesController',
       title: 'PROPERTIES.PAGE_TITLE',
@@ -157,7 +157,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
     // Add route /publish/categories with authentication.
     // Also retrieve the list of categories
-    $routeProvider.when('/publish/categories', {
+    $routeProvider.when('/publish/categories-list', {
       templateUrl: '/publish/be/views/categories.html',
       controller: 'CategoriesController',
       title: 'CATEGORIES.PAGE_TITLE',
@@ -186,6 +186,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
   app.filter('status', StatusFilter);
   app.filter('category', CategoryFilter);
+  app.constant('publishName', 'publish');
 
   // Filter to display content in the table (cf. dataTable.html)
   StatusFilter.$inject = ['$filter'];

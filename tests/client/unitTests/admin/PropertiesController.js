@@ -63,8 +63,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/be/crud/property/1').respond(200);
-      $httpBackend.expectDELETE('/be/crud/property/1');
+      $httpBackend.when('DELETE', '/be/publish/properties/1').respond(200);
+      $httpBackend.expectDELETE('/be/publish/properties/1');
 
       scope.tableContainer.actions[0].callback(scope.test.rows[0], done);
 
@@ -75,8 +75,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('POST', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('DELETE', '/be/crud/property/1,2').respond(200);
-      $httpBackend.expectDELETE('/be/crud/property/1,2');
+      $httpBackend.when('DELETE', '/be/publish/properties/1,2').respond(200);
+      $httpBackend.expectDELETE('/be/publish/properties/1,2');
 
       scope.tableContainer.actions[0].global([scope.test.rows[0].id, scope.test.rows[1].id], done);
 
@@ -92,8 +92,8 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('PUT', /.*/).respond(200, '');
-      $httpBackend.when('POST', '/be/crud/property/1').respond(200);
-      $httpBackend.expectPOST('/be/crud/property/1');
+      $httpBackend.when('POST', '/be/publish/properties/1').respond(200);
+      $httpBackend.expectPOST('/be/publish/properties/1');
 
       scope.editFormContainer.onSubmit(scope.test.rows[0]).then(done(), function() {
         assert.notOk(true);
@@ -111,10 +111,10 @@ describe('PropertiesController', function() {
       $httpBackend.when('DELETE', /.*/).respond(200, '');
       $httpBackend.when('GET', /.*/).respond(200, '');
       $httpBackend.when('POST', /.*/).respond(200, '');
-      $httpBackend.when('PUT', '/be/crud/property').respond(200, {
+      $httpBackend.when('PUT', '/be/publish/properties').respond(200, {
         entity: {}
       });
-      $httpBackend.expectPUT('/be/crud/property');
+      $httpBackend.expectPUT('/be/publish/properties');
 
       scope.addFormContainer.onSubmit({}).then(
         done(),

@@ -17,7 +17,9 @@
   platforms,
   groups,
   tableReloadEventService,
-  i18nService) {
+  i18nService,
+  publishName) {
+    var entityType = 'videos';
 
     $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
@@ -29,10 +31,10 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.publish = $scope.checkAccess('publish-video');
-    $scope.rights.chapter = $scope.checkAccess('chapter-video');
-    $scope.rights.retry = $scope.checkAccess('retry-video');
-    $scope.rights.upload = $scope.checkAccess('upload-video');
+    $scope.rights.publish = $scope.checkAccess('publish-' + entityType);
+    $scope.rights.chapter = $scope.checkAccess('chapter-' + entityType);
+    $scope.rights.retry = $scope.checkAccess('retry-' + entityType);
+    $scope.rights.upload = $scope.checkAccess('upload-' + entityType);
 
     /*
      * FORM EDIT
@@ -40,11 +42,13 @@
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
     scopeEditForm.pendingEdition = false;
+    scopeEditForm.pluginName = publishName;
 
     /*
      * DATATABLE
      */
     var scopeDataTable = $scope.tableContainer = {};
+    scopeDataTable.pluginName = publishName;
 
     /**
      * Gets all categories and add a value for "none".
@@ -112,7 +116,7 @@
     var pollMediasPromise = $interval(function() {
       if (!scopeEditForm.pendingEdition) {
         $scope.$emit('setAlert', 'info', $filter('translate')('MEDIAS.RELOAD'), 4000);
-        entityService.deleteCache(scopeDataTable.entityType);
+        entityService.deleteCache(entityType, publishName);
         tableReloadEventService.broadcast();
       }
     }, 30000);
@@ -181,7 +185,7 @@
      * @param {Function} reload Function to reload the datatable
      */
     function removeRows(selected, reload) {
-      entityService.removeEntity('video', selected.join(','))
+      entityService.removeEntity(entityType, publishName, selected.join(','))
         .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.REMOVE_SUCCESS'), 4000);
           reload();
@@ -194,7 +198,7 @@
      * @param {Object} media Media data
      */
     function saveMedia(media) {
-      return entityService.updateEntity('video', media.id, {
+      return entityService.updateEntity(entityType, publishName, media.id, {
         title: media.title,
         description: media.description,
         properties: media.properties,
@@ -217,7 +221,7 @@
     /*
      * FORM EDIT
      */
-    scopeEditForm.entityType = 'video';
+    scopeEditForm.entityType = entityType;
 
     var categoriesfield = getSelectableCategories('UI.NONE');
     scopeEditForm.fieldsBase = [
@@ -264,7 +268,7 @@
      *
      * DATATABLE
      */
-    scopeDataTable.entityType = 'video';
+    scopeDataTable.entityType = entityType;
     scopeDataTable.cellTheme = '/publish/be/views/partial/publishCells.html';
 
     scopeDataTable.init = {
@@ -523,7 +527,8 @@
     'platforms',
     'groups',
     'tableReloadEventService',
-    'i18nService'
+    'i18nService',
+    'publishName'
   ];
 
 })(angular.module('ov.publish'));

@@ -15,7 +15,7 @@
      */
     var getMedia = function(mediaId, callback) {
       return $http.get('/publish/getVideo/' + mediaId).then(function(response) {
-        callback(response.data.video);
+        callback(response.data.entity);
       }, function() {
         callback();
       });

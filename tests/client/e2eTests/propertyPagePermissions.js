@@ -65,7 +65,7 @@ describe('Property page', function() {
       var data = {
         name: 'Test'
       };
-      page.sendRequest('be/crud/property', 'put', data).then(function(response) {
+      page.sendRequest('be/publish/properties', 'put', data).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -106,7 +106,7 @@ describe('Property page', function() {
         name: 'Test edition'
       };
 
-      page.sendRequest('be/crud/property/whatever', 'post', data).then(function(response) {
+      page.sendRequest('be/publish/properties/whatever', 'post', data).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -143,7 +143,7 @@ describe('Property page', function() {
     });
 
     it('should not be able to remove property by requesting the server directly', function() {
-      page.sendRequest('be/crud/property/whatever', 'delete').then(function(response) {
+      page.sendRequest('be/publish/properties/whatever', 'delete').then(function(response) {
         assert.equal(response.status, 403);
       });
     });

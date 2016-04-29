@@ -5,8 +5,9 @@
   /**
    * Defines the categories controller for the categories page.
    */
-  function CategoriesController($scope, $filter, entityService, categories) {
-    $scope.categoryTaxonomy = categories.data.taxonomies[0];
+  function CategoriesController($scope, $filter, entityService, categories, publishName) {
+    var entityType = 'categories';
+    $scope.categoryTaxonomy = categories.data || {};
 
     /**
      * Handles success when a category is added or updated.
@@ -43,7 +44,7 @@
     $scope.newitem = {
       items: []
     };
-    $scope.list = $scope.categoryTaxonomy.tree;
+    $scope.list = $scope.categoryTaxonomy.tree || [];
     if ($scope.list.length > 0)
       $scope.listback = angular.copy($scope.list);
     else
@@ -79,7 +80,7 @@
 
       // If no categories exist : Do create
       if ($scope.categoryTaxonomy.id === undefined) {
-        entityService.addEntity('category', {
+        entityService.addEntity('taxonomies', null, {
           name: 'categories',
           tree: $scope.list
         }).success(function(data) {
@@ -88,12 +89,13 @@
       } else {
 
         // Else : Do update
-        entityService.updateEntity('category', $scope.categoryTaxonomy.id, {
+        entityService.updateEntity('taxonomies', null, $scope.categoryTaxonomy.id, {
           tree: $scope.list
         }).success(function(data) {
           data.entity = {id: $scope.categoryTaxonomy.id};
           successCb(data);
         }).error(errorCb);
+
       }
     };
 
@@ -103,13 +105,13 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('create-category');
-    $scope.rights.edit = $scope.checkAccess('update-category');
-    $scope.rights.delete = $scope.checkAccess('delete-category');
+    $scope.rights.add = $scope.checkAccess('create-' + entityType);
+    $scope.rights.edit = $scope.checkAccess('update-' + entityType);
+    $scope.rights.delete = $scope.checkAccess('delete-' + entityType);
 
   }
 
   app.controller('CategoriesController', CategoriesController);
-  CategoriesController.$inject = ['$scope', '$filter', 'entityService', 'categories'];
+  CategoriesController.$inject = ['$scope', '$filter', 'entityService', 'categories', 'publishName'];
 
 })(angular.module('ov.publish'));

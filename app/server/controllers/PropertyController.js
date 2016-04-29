@@ -4,55 +4,35 @@
  * @module publish-controllers
  */
 
-/**
- * Provides route actions for all requests relative to properties.
- *
- * @class propertyController
- */
-
+var util = require('util');
 var openVeoAPI = require('@openveo/api');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var errors = process.requirePublish('app/server/httpErrors.js');
+var EntityController = openVeoAPI.controllers.EntityController;
 
-var propertyModel = new PropertyModel();
+/**
+ * Provides route actions for all requests relative to properties.
+ *
+ * @class PropertyController
+ * @constructor
+ * @extends EntityController
+ */
+function PropertyController() {
+  EntityController.call(this, PropertyModel);
+}
+
+module.exports = PropertyController;
+util.inherits(PropertyController, EntityController);
 
 /**
  * Gets the list of custom property types.
  *
  * @method getPropertyTypesAction
- * @static
  */
-module.exports.getPropertyTypesAction = function(request, response, next) {
+PropertyController.prototype.getPropertyTypesAction = function(request, response, next) {
   response.send({
     types: PropertyModel.availableTypes
   });
-};
-
-/**
- * Gets a property.
- *
- * Expects one GET parameter :
- *  - **id** The id of the property
- *
- * @method getPropertyAction
- * @static
- */
-module.exports.getPropertyAction = function(request, response, next) {
-  if (request.params.id) {
-    propertyModel.getOne(request.params.id, null, function(error, property) {
-      if (error)
-        next(errors.GET_PROPERTY_ERROR);
-      else
-        response.send({
-          property: property
-        });
-    });
-  } else {
-
-    // Missing type and / or id of the property
-    next(errors.GET_PROPERTY_MISSING_PARAMETERS);
-
-  }
 };
 
 /**
@@ -66,10 +46,10 @@ module.exports.getPropertyAction = function(request, response, next) {
  *  - **sortBy** To sort properties by name or description (default is name)
  *  - **sortOrder** Sort order (either asc or desc)
  *
- * @method getPropertiesAction
- * @static
+ * @method getEntitiesAction
  */
-module.exports.getPropertiesAction = function(request, response, next) {
+PropertyController.prototype.getEntitiesAction = function(request, response, next) {
+  var model = new this.Entity(request.user);
   var orderedProperties = ['name', 'description'];
   var params;
 
@@ -111,7 +91,7 @@ module.exports.getPropertiesAction = function(request, response, next) {
     };
   }
 
-  propertyModel.getPaginatedFilteredEntities(
+  model.getPaginatedFilteredEntities(
     filter,
     params.limit,
     params.page,
@@ -123,7 +103,7 @@ module.exports.getPropertiesAction = function(request, response, next) {
         next(errors.GET_PROPERTIES_ERROR);
       } else {
         response.send({
-          properties: properties,
+          entities: properties,
           pagination: pagination
         });
       }

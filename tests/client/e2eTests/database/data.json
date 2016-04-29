@@ -22,24 +22,24 @@
       "name": "publish-properties-no-write",
       "permissions": [
         "access-properties-page",
-        "update-property",
-        "delete-property"
+        "update-properties",
+        "delete-properties"
       ]
     },
     "publishPropertiesNoUpdate": {
       "name": "publish-properties-no-update",
       "permissions": [
         "access-properties-page",
-        "create-property",
-        "delete-property"
+        "create-properties",
+        "delete-properties"
       ]
     },
     "publishPropertiesNoDelete": {
       "name": "publish-properties-no-delete",
       "permissions": [
         "access-properties-page",
-        "create-property",
-        "update-property"
+        "create-properties",
+        "update-properties"
       ]
     },
     "publishWatcherNoManage": {
@@ -52,24 +52,24 @@
       "name": "publish-categories-no-write",
       "permissions": [
         "access-categories-page",
-        "update-category",
-        "delete-category"
+        "update-categories",
+        "delete-categories"
       ]
     },
     "publishCategoriesNoUpdate": {
       "name": "publish-categories-no-update",
       "permissions": [
         "access-categories-page",
-        "create-category",
-        "delete-category"
+        "create-categories",
+        "delete-categories"
       ]
     },
     "publishCategoriesNoDelete": {
       "name": "publish-categories-no-delete",
       "permissions": [
         "access-categories-page",
-        "create-category",
-        "update-category"
+        "create-categories",
+        "update-categories"
       ]
     },
     "publishCategoriesNoManage": {
@@ -82,9 +82,9 @@
       "name": "publish-medias",
       "permissions": [
         "access-videos-page",
-        "create-video",
-        "update-video",
-        "delete-video"
+        "create-videos",
+        "update-videos",
+        "delete-videos"
       ]
     },
     "publishMediasGroup": {

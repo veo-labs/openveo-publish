@@ -6,24 +6,29 @@
     var basePath = '/be/';
     var entityCache = {};
 
-    var addEntity = function(entityType, data) {
-      return $http.put(basePath + 'crud/' + entityType, data);
+    var addEntity = function(entityType, pluginName, data) {
+      var pluginPath = (!pluginName) ? '' : pluginName + '/';
+      return $http.put(basePath + pluginPath + entityType, data);
     };
 
-    var updateEntity = function(entityType, id, data) {
-      return $http.post(basePath + 'crud/' + entityType + '/' + id, data);
+    var updateEntity = function(entityType, pluginName, id, data) {
+      var pluginPath = (!pluginName) ? '' : pluginName + '/';
+      return $http.post(basePath + pluginPath + entityType + '/' + id, data);
     };
 
-    var removeEntity = function(entityType, id) {
-      return $http.delete(basePath + 'crud/' + entityType + '/' + id);
+    var removeEntity = function(entityType, pluginName, id) {
+      var pluginPath = (!pluginName) ? '' : pluginName + '/';
+      return $http.delete(basePath + pluginPath + entityType + '/' + id);
     };
 
-    var getAllEntities = function(entityType) {
-      return $http.get(basePath + 'crud/' + entityType);
+    var getAllEntities = function(entityType, pluginName) {
+      var pluginPath = (!pluginName) ? '' : pluginName + '/';
+      return $http.get(basePath + pluginPath + entityType);
     };
 
-    var deleteCache = function(entity) {
-      delete entityCache[entity];
+    var deleteCache = function(entityType, pluginName) {
+      if (!pluginName) pluginName = 'core';
+      if (entityCache[pluginName]) delete entityCache[pluginName][entityType];
     };
 
     return {

@@ -13,7 +13,8 @@
           entityService,
           i18nService,
           ovMultirangeViews,
-          media) {
+          media,
+          publishName) {
 
     var orderBy = $filter('orderBy');
 
@@ -334,7 +335,7 @@
           orderBy(objToSave[collectionName], '+value', false);
         }
       }
-      entityService.updateEntity('video', $scope.media.id, objToSave).success(function() {
+      entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
 
       }).error(function(data, status) {
         $scope.$emit('setAlert', 'danger', $filter('translate')('CHAPTER.SAVE_ERROR'), 4000);
@@ -431,7 +432,8 @@
     'entityService',
     'i18nService',
     'ovMultirangeViews',
-    'media'
+    'media',
+    'publishName'
   ];
 
 })(angular.module('ov.publish'));

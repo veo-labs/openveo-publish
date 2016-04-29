@@ -4,17 +4,11 @@
  * @module publish-controllers
  */
 
-/**
- * Provides route actions for all requests relative to categories.
- *
- * @class categoryController
- */
-
 var util = require('util');
+var openVeoAPI = require('@openveo/api');
 var CategoryModel = process.requirePublish('app/server/models/CategoryModel.js');
 var errors = process.requirePublish('app/server/httpErrors.js');
-
-var categoryModel = new CategoryModel();
+var EntityController = openVeoAPI.controllers.EntityController;
 
 /**
  * Finds a category in a list of categories and sub categories.
@@ -42,28 +36,43 @@ function getCategory(tree, categoryId) {
 }
 
 /**
+ * Provides route actions for all requests relative to categories.
+ *
+ * @class CategoryController
+ * @constructor
+ * @extends EntityController
+ */
+function CategoryController() {
+  EntityController.call(this, CategoryModel);
+}
+
+module.exports = CategoryController;
+util.inherits(CategoryController, EntityController);
+
+/**
  * Gets a category.
  *
  * Expects one GET parameter :
  *  - **id** The id of the category
  *
- * @method getCategoryAction
- * @static
+ * @method getEntityAction
  */
-module.exports.getCategoryAction = function(request, response, next) {
+CategoryController.prototype.getEntityAction = function(request, response, next) {
   if (request.params.id) {
-    categoryModel.getByName('categories', function(error, categories) {
+    var model = new this.Entity(request.user);
+
+    model.getByName('categories', function(error, categories) {
       if (error) {
         next(errors.GET_CATEGORY_ERROR);
       } else {
         response.send({
-          category: categories && getCategory(categories[0].tree, request.params.id)
+          entity: categories && getCategory(categories[0].tree, request.params.id)
         });
       }
     });
   } else {
 
-    // Missing type and / or id of the category
+    // Missing id of the category
     next(errors.GET_CATEGORY_MISSING_PARAMETERS);
 
   }
@@ -72,16 +81,17 @@ module.exports.getCategoryAction = function(request, response, next) {
 /**
  * Gets list of categories.
  *
- * @method getCategoriesAction
- * @static
+ * @method getEntitiesAction
  */
-module.exports.getCategoriesAction = function(request, response, next) {
-  categoryModel.getByName('categories', function(error, categories) {
+CategoryController.prototype.getEntitiesAction = function(request, response, next) {
+  var model = new this.Entity(request.user);
+
+  model.getByName('categories', function(error, categories) {
     if (error) {
       next(errors.GET_CATEGORY_ERROR);
     } else {
       response.send({
-        category: categories[0].tree
+        entities: categories[0].tree
       });
     }
   });

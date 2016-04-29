@@ -78,7 +78,7 @@ describe('Category page', function() {
           }
         ]
       };
-      page.sendRequest('be/crud/category', 'put', data).then(function(response) {
+      page.sendRequest('be/publish/categories', 'put', data).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -125,7 +125,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/crud/category/' + page.treeId, 'post', initialTree).then(function(response) {
+      page.sendRequest('be/publish/categories/' + page.treeId, 'post', initialTree).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -172,7 +172,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/crud/category/' + page.treeId, 'delete').then(function(response) {
+      page.sendRequest('be/publish/categories/' + page.treeId, 'delete').then(function(response) {
         assert.equal(response.status, 403);
       });
     });

@@ -5,15 +5,26 @@
  * @module publish-controllers
  */
 
+var util = require('util');
+var async = require('async');
+var openVeoAPI = require('@openveo/api');
+var errors = process.requirePublish('app/server/httpErrors.js');
+var watcherManager = process.requirePublish('app/server/watcher/watcherManager.js');
+var Controller = openVeoAPI.controllers.Controller;
+
 /**
  * Provides route actions for all requests relative to the watcher.
  *
- * @class watcherController
+ * @class WatcherController
+ * @constructor
+ * @extends Controller
  */
+function WatcherController() {
+  Controller.call(this);
+}
 
-var async = require('async');
-var errors = process.requirePublish('app/server/httpErrors.js');
-var watcherManager = process.requirePublish('app/server/watcher/watcherManager.js');
+module.exports = WatcherController;
+util.inherits(WatcherController, Controller);
 
 /**
  * Retries to publish a video on error.
@@ -22,9 +33,8 @@ var watcherManager = process.requirePublish('app/server/watcher/watcherManager.j
  *  - **ids** The list of video ids to retry
  *
  * @method retryVideoAction
- * @static
  */
-module.exports.retryVideoAction = function(request, response, next) {
+WatcherController.prototype.retryVideoAction = function(request, response, next) {
   if (request.params.ids) {
     var ids = request.params.ids.split(',');
 
@@ -59,9 +69,8 @@ module.exports.retryVideoAction = function(request, response, next) {
  *  - **platform** The name of the platform to upload to
  *
  * @method startUploadAction
- * @static
  */
-module.exports.startUploadAction = function(request, response, next) {
+WatcherController.prototype.startUploadAction = function(request, response, next) {
   if (request.params.ids && request.params.platform) {
     var ids = request.params.ids.split(',');
 
@@ -106,9 +115,8 @@ module.exports.startUploadAction = function(request, response, next) {
  *     //  - 3 Stopped
  *
  * @method getStatusAction
- * @static
  */
-module.exports.getStatusAction = function(request, response) {
+WatcherController.prototype.getStatusAction = function(request, response) {
   response.send({
     status: watcherManager.getStatus()
   });
@@ -129,9 +137,8 @@ module.exports.getStatusAction = function(request, response) {
  *     //  - 3 Stopped
  *
  * @method stopAction
- * @static
  */
-module.exports.stopAction = function(request, response) {
+WatcherController.prototype.stopAction = function(request, response) {
   watcherManager.stop();
   response.send({
     status: watcherManager.getStatus()
@@ -153,9 +160,8 @@ module.exports.stopAction = function(request, response) {
  *     //  - 3 Stopped
  *
  * @method startAction
- * @static
  */
-module.exports.startAction = function(request, response) {
+WatcherController.prototype.startAction = function(request, response) {
   watcherManager.start();
   response.send({
     status: watcherManager.getStatus()
