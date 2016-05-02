@@ -10,11 +10,11 @@ As expected by OpenVeo, Publish defines a module **ov.publish**.
 
 Publish main module defines the following routes :
 
-- **/publish/videos** to access the catalogue page
+- **/publish/videos-list** to access the catalogue page
 - **/publish/video/:videoId** to access video edition page
 - **/publish/watcher** to access watcher page
-- **/publish/properties** to access custom properties page
-- **/publish/categories** to access categories page
+- **/publish/properties-list** to access custom properties page
+- **/publish/categories-list** to access categories page
 - **/publish/configuration** to access publish configuration page
 
 **Nb:** Available services / filters defined in **ov.publish** module are described in the [API](/api/back-end/modules/ov.publish.html).
