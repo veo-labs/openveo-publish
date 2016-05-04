@@ -6,7 +6,7 @@ var db = openVeoAPI.applicationStorage.getDatabase();
 
 
 module.exports.update = function(callback) {
-  process.logger.info('Publish 1.3.0 migration launched.');
+  process.logger.info('Publish 2.0.0 migration launched.');
 
   // Prefix collection with the module name : publish
   db.renameCollection('properties', 'publish_properties', function(error, value) {
@@ -68,7 +68,7 @@ module.exports.update = function(callback) {
           callback(error);
           return;
         }
-        process.logger.info('Publish 1.3.0 migration done.');
+        process.logger.info('Publish 2.0.0 migration done.');
         callback();
       });
     }
