@@ -9,22 +9,19 @@ module.exports.update = function(callback) {
   process.logger.info('Publish 1.3.0 migration launched.');
 
   // Prefix collection with the module name : publish
-  db.renameCollection('test', 'publish_properties', function(error, value) {
-    console.log("properties: " + error);
+  db.renameCollection('properties', 'publish_properties', function(error, value) {
     if (error) {
       callback(error);
       return;
     }
   });
   db.renameCollection('configurations', 'publish_configurations', function(error, value) {
-    console.log("configurations: " + error);
     if (error) {
       callback(error);
       return;
     }
   });
   db.renameCollection('videos', 'publish_videos', function(error, value) {
-    console.log("videos: " + error);
     if (error) {
       callback(error);
       return;
