@@ -16,7 +16,7 @@ var openVeoAPI = require('@openveo/api');
  * @param {Database} database The database to interact with
  */
 function VideoProvider(database) {
-  openVeoAPI.EntityProvider.call(this, database, 'videos');
+  openVeoAPI.EntityProvider.call(this, database, 'publish_videos');
 }
 
 module.exports = VideoProvider;

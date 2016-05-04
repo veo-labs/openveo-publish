@@ -16,7 +16,7 @@ var openVeoAPI = require('@openveo/api');
  * @param Database database The database to interact with
  */
 function PropertyProvider(database) {
-  openVeoAPI.EntityProvider.call(this, database, 'properties');
+  openVeoAPI.EntityProvider.call(this, database, 'publish_properties');
 }
 
 module.exports = PropertyProvider;
