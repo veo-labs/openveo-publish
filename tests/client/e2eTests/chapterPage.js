@@ -379,7 +379,7 @@ describe('Chapter page', function() {
 
   });
 
-  it.only('should be able to zoom in / out the time line', function() {
+  it('should be able to zoom in / out the time line', function() {
 
     // By default zoom in must be enabled and zoom out disabled
     assert.eventually.ok(page.zoomInButtonElement.isEnabled());
