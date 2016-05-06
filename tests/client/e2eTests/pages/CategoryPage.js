@@ -19,12 +19,12 @@ function CategoryPage(model) {
   this.path = 'be/publish/categories-list';
 
   // Element finders specific to this page
-  this.pageTitleElement = element(by.binding('CATEGORIES.TITLE'));
-  this.pageDescriptionElement = element(by.binding('CATEGORIES.INFO'));
+  this.pageTitleElement = element(by.binding('PUBLISH.CATEGORIES.TITLE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.CATEGORIES.INFO'));
   this.addFieldElement = element(by.model('newitem.title'));
   this.addButtonElement = element(by.css('button.add'));
-  this.saveButtonElement = element(by.binding('UI.FORM_SAVE'));
-  this.cancelButtonElement = element(by.binding('UI.FORM_CANCEL'));
+  this.saveButtonElement = element(by.binding('CORE.UI.FORM_SAVE'));
+  this.cancelButtonElement = element(by.binding('CORE.UI.FORM_CANCEL'));
   this.treeElement = element(by.css('.angular-ui-tree'));
 
   // Category tree id to add a tree of categories by passing the user agent

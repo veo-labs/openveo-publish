@@ -56,7 +56,7 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.edit = $scope.checkAccess('manage-watcher');
+    $scope.rights.edit = $scope.checkAccess('publish-manage-watcher');
 
     /**
      * Starts the watcher.

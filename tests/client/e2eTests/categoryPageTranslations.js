@@ -27,20 +27,20 @@ describe('Category page translations', function() {
       return page.selectLanguage(languages[index]).then(function() {
 
         // Page translations
-        assert.eventually.equal(page.getTitle(), page.translations.CATEGORIES.PAGE_TITLE);
-        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.CATEGORIES.TITLE);
-        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.CATEGORIES.INFO);
+        assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.CATEGORIES.PAGE_TITLE);
+        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.PUBLISH.CATEGORIES.TITLE);
+        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CATEGORIES.INFO);
         assert.eventually.equal(page.addFieldElement.getAttribute('placeholder'),
-                                page.translations.CATEGORIES.NEW_ITEM);
+                                page.translations.PUBLISH.CATEGORIES.NEW_ITEM);
 
         // Add form
         page.setAddFieldMouseOver();
-        assert.eventually.equal(page.popoverElement.getText(), page.translations.CATEGORIES.NAME_ELEMENT);
+        assert.eventually.equal(page.popoverElement.getText(), page.translations.PUBLISH.CATEGORIES.NAME_ELEMENT);
 
         page.setAddButtonMouseOver();
-        assert.eventually.equal(page.popoverElement.getText(), page.translations.CATEGORIES.ADD_ELEMENT);
-        assert.eventually.equal(page.saveButtonElement.getText(), page.translations.UI.FORM_SAVE);
-        assert.eventually.equal(page.cancelButtonElement.getText(), page.translations.UI.FORM_CANCEL);
+        assert.eventually.equal(page.popoverElement.getText(), page.translations.PUBLISH.CATEGORIES.ADD_ELEMENT);
+        assert.eventually.equal(page.saveButtonElement.getText(), page.translations.CORE.UI.FORM_SAVE);
+        assert.eventually.equal(page.cancelButtonElement.getText(), page.translations.CORE.UI.FORM_CANCEL);
 
         return browser.waitForAngular();
       }).then(function() {

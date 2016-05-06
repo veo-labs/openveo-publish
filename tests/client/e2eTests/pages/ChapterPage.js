@@ -19,13 +19,13 @@ function ChapterPage(mediaId) {
   this.path = 'be/publish/media/' + this.mediaId;
 
   // Element finders specific to this page
-  this.pageDescriptionElement = element(by.binding('CHAPTER.INFO'));
-  this.backButtonElement = element(by.binding('UI.BACK'));
-  this.timeHeaderElement = element(by.binding('CHAPTER.HEAD_TIME'));
-  this.titleHeaderElement = element(by.binding('CHAPTER.HEAD_TITLE'));
-  this.newButtonElement = element(by.binding('UI.FORM_NEW'));
-  this.editButtonElement = element(by.binding('UI.FORM_EDIT'));
-  this.removeButtonElement = element(by.binding('UI.REMOVE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.CHAPTER.INFO'));
+  this.backButtonElement = element(by.binding('CORE.UI.BACK'));
+  this.timeHeaderElement = element(by.binding('PUBLISH.CHAPTER.HEAD_TIME'));
+  this.titleHeaderElement = element(by.binding('PUBLISH.CHAPTER.HEAD_TITLE'));
+  this.newButtonElement = element(by.binding('CORE.UI.FORM_NEW'));
+  this.editButtonElement = element(by.binding('CORE.UI.FORM_EDIT'));
+  this.removeButtonElement = element(by.binding('CORE.UI.REMOVE'));
   this.beginCutButtonElement = element(by.css('.pull-left .glyphicon-log-out')).element(by.xpath('..'));
   this.endCutButtonElement = element(by.css('.pull-left .glyphicon-log-in')).element(by.xpath('..'));
   this.zoomInButtonElement = element(by.css('.glyphicon-zoom-in')).element(by.xpath('..'));
@@ -130,21 +130,21 @@ ChapterPage.prototype.getAddFormFields = function(form) {
   // Time field
   fields.time = Field.get({
     type: 'time',
-    name: this.translations.CHAPTER.FORM_TIME,
+    name: this.translations.PUBLISH.CHAPTER.FORM_TIME,
     baseElement: form
   });
 
   // Title field
   fields.title = Field.get({
     type: 'text',
-    name: this.translations.CHAPTER.FORM_TITLE,
+    name: this.translations.PUBLISH.CHAPTER.FORM_TITLE,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'textarea',
-    name: this.translations.CHAPTER.FORM_DESCRIPTION,
+    name: this.translations.PUBLISH.CHAPTER.FORM_DESCRIPTION,
     baseElement: form
   });
 
@@ -573,7 +573,7 @@ ChapterPage.prototype.editChapter = function(name, data, cancel) {
  */
 ChapterPage.prototype.editCut = function(time, isBeginCut, cancel) {
   var self = this;
-  var cutTitle = isBeginCut ? this.translations.UI.BEGIN : this.translations.UI.END;
+  var cutTitle = isBeginCut ? this.translations.CORE.UI.BEGIN : this.translations.CORE.UI.END;
 
   // Get cut
   return this.getLine(cutTitle).then(function(cut) {

@@ -31,30 +31,6 @@ module.exports = {
   },
   webServiceScopes: [
     {
-      id: 'video',
-      name: 'WS_SCOPES.GET_VIDEO_NAME',
-      description: 'WS_SCOPES.GET_VIDEO_DESCRIPTON',
-      paths: [
-        'get /publish/videos*'
-      ]
-    },
-    {
-      id: 'property',
-      name: 'WS_SCOPES.GET_PROPERTY_NAME',
-      description: 'WS_SCOPES.GET_PROPERTY_DESCRIPTON',
-      paths: [
-        'get /publish/properties*'
-      ]
-    },
-    {
-      id: 'category',
-      name: 'WS_SCOPES.GET_CATEGORY_NAME',
-      description: 'WS_SCOPES.GET_CATEGORY_DESCRIPTON',
-      paths: [
-        'get /publish/categories*'
-      ]
-    },
-    {
       id: 'statistics',
       name: 'WS_SCOPES.INCREASE_VIEW_NAME',
       description: 'WS_SCOPES.INCREASE_VIEW_DESCRIPTION',
@@ -65,71 +41,71 @@ module.exports = {
   ],
   permissions: [
     {
-      id: 'access-videos-page',
-      name: 'PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
+      id: 'publish-access-videos-page',
+      name: 'PUBLISH.PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
     },
     {
-      id: 'access-properties-page',
-      name: 'PERMISSIONS.ACCESS_PROPERTIES_PAGE_NAME'
+      id: 'publish-access-properties-page',
+      name: 'PUBLISH.PERMISSIONS.ACCESS_PROPERTIES_PAGE_NAME'
     },
     {
-      id: 'access-categories-page',
-      name: 'PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME'
+      id: 'publish-access-categories-page',
+      name: 'PUBLISH.PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME'
     },
     {
-      id: 'access-watcher-page',
-      name: 'PERMISSIONS.ACCESS_WATCHER_PAGE_NAME'
+      id: 'publish-access-watcher-page',
+      name: 'PUBLISH.PERMISSIONS.ACCESS_WATCHER_PAGE_NAME'
     },
     {
-      id: 'manage-watcher',
-      name: 'PERMISSIONS.MANAGE_WATCHER_NAME',
-      description: 'PERMISSIONS.MANAGE_WATCHER_DESCRIPTION',
+      id: 'publish-manage-watcher',
+      name: 'PUBLISH.PERMISSIONS.MANAGE_WATCHER_NAME',
+      description: 'PUBLISH.PERMISSIONS.MANAGE_WATCHER_DESCRIPTION',
       paths: [
         'get /publish/stopWatcher*',
         'get /publish/startWatcher*'
       ]
     },
     {
-      id: 'access-conf-page',
-      name: 'PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME',
+      id: 'publish-access-conf-page',
+      name: 'PUBLISH.PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME',
       paths: [
         'get /publish/configuration/all'
       ]
     },
     {
-      id: 'manage-publish-config',
-      name: 'PERMISSIONS.MANAGE_PUBLISH_CONF_NAME',
-      description: 'PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION',
+      id: 'publish-manage-publish-config',
+      name: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_NAME',
+      description: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION',
       paths: [
         'get /publish/configuration/all'
       ]
     },
     {
-      label: 'PERMISSIONS.GROUP_VIDEOS',
+      label: 'PUBLISH.PERMISSIONS.GROUP_VIDEOS',
       permissions: [
         {
           id: 'publish-videos',
-          name: 'PERMISSIONS.PUBLISH_VIDEO_NAME',
-          description: 'PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION',
+          name: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_NAME',
+          description: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION',
           paths: [
             'get /publish/publishVideo*',
             'get /publish/unpublishVideo*'
           ]
         },
         {
-          id: 'chapter-videos',
-          name: 'PERMISSIONS.EDIT_CHAPTER_NAME',
-          description: 'PERMISSIONS.EDIT_CHAPTER_DESCRIPTION'
+          id: 'publish-chapter-videos',
+          name: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_NAME',
+          description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION'
         },
         {
-          id: 'retry-videos',
-          name: 'PERMISSIONS.RETRY_VIDEO_NAME',
-          description: 'PERMISSIONS.RETRY_VIDEO_DESCRIPTION'
+          id: 'publish-retry-videos',
+          name: 'PUBLISH.PERMISSIONS.RETRY_VIDEO_NAME',
+          description: 'PUBLISH.PERMISSIONS.RETRY_VIDEO_DESCRIPTION'
         },
         {
-          id: 'upload-videos',
-          name: 'PERMISSIONS.UPLOAD_VIDEO_NAME',
-          description: 'PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION'
+          id: 'publish-upload-videos',
+          name: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_NAME',
+          description: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION'
         }
       ]
     }
@@ -138,32 +114,32 @@ module.exports = {
     menu: [
       {
         weight: -100,
-        label: 'MENU.PUBLISH',
+        label: 'PUBLISH.MENU.PUBLISH',
         subMenu: [
           {
-            label: 'MENU.VIDEOS',
+            label: 'PUBLISH.MENU.VIDEOS',
             path: 'publish/medias-list',
-            permission: 'access-videos-page'
+            permission: 'publish-access-videos-page'
           },
           {
-            label: 'MENU.CATEGORIES',
+            label: 'PUBLISH.MENU.CATEGORIES',
             path: 'publish/categories-list',
-            permission: 'access-categories-page'
+            permission: 'publish-access-categories-page'
           },
           {
-            label: 'MENU.PROPERTIES',
+            label: 'PUBLISH.MENU.PROPERTIES',
             path: 'publish/properties-list',
-            permission: 'access-properties-page'
+            permission: 'publish-access-properties-page'
           },
           {
-            label: 'MENU.WATCHER',
+            label: 'PUBLISH.MENU.WATCHER',
             path: 'publish/watcher',
-            permission: 'access-watcher-page'
+            permission: 'publish-access-watcher-page'
           },
           {
-            label: 'MENU.CONFIGURATION',
+            label: 'PUBLISH.MENU.CONFIGURATION',
             path: 'publish/configuration',
-            permission: 'access-conf-page'
+            permission: 'publish-access-conf-page'
           }
         ]
       }

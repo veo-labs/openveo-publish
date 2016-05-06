@@ -14,11 +14,11 @@ function ConfigurationPage() {
   this.path = 'be/publish/configuration';
 
   // Element finders specific to this page
-  this.pageTitleElement = element(by.binding('CONFIGURATION.TITLE'));
-  this.pageDescriptionElement = element(by.binding('CONFIGURATION.INFO'));
-  this.youtubeConfigurationTitleElement = element(by.binding('CONFIGURATION.YOUTUBE_TITLE'));
-  this.youtubePeerLinkElement = element(by.binding('\'CONFIGURATION.YOUTUBE_PEER\''));
-  this.youtubePeerModifyLinkElement = element(by.binding('CONFIGURATION.YOUTUBE_MODIFY_PEER'));
+  this.pageTitleElement = element(by.binding('PUBLISH.CONFIGURATION.TITLE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.CONFIGURATION.INFO'));
+  this.youtubeConfigurationTitleElement = element(by.binding('PUBLISH.CONFIGURATION.YOUTUBE_TITLE'));
+  this.youtubePeerLinkElement = element(by.binding('\'PUBLISH.CONFIGURATION.YOUTUBE_PEER\''));
+  this.youtubePeerModifyLinkElement = element(by.binding('PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER'));
 }
 
 module.exports = ConfigurationPage;

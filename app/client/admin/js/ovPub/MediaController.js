@@ -31,10 +31,10 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.publish = $scope.checkAccess('publish-' + entityType);
-    $scope.rights.chapter = $scope.checkAccess('chapter-' + entityType);
-    $scope.rights.retry = $scope.checkAccess('retry-' + entityType);
-    $scope.rights.upload = $scope.checkAccess('upload-' + entityType);
+    $scope.rights.publish = $scope.checkAccess('publish-publish-' + entityType);
+    $scope.rights.chapter = $scope.checkAccess('publish-chapter-' + entityType);
+    $scope.rights.retry = $scope.checkAccess('publish-retry-' + entityType);
+    $scope.rights.upload = $scope.checkAccess('publish-upload-' + entityType);
 
     /*
      * FORM EDIT
@@ -70,7 +70,7 @@
      */
     function buildGroupOptions() {
       var options = [{
-        name: $filter('translate')('UI.NONE'),
+        name: $filter('translate')('CORE.UI.NONE'),
         value: null
       }];
 
@@ -100,7 +100,7 @@
      */
     function shareCode(media) {
       $scope.$emit('setAlert', 'info', [
-        $filter('translate')('MEDIAS.SHARECODE'),
+        $filter('translate')('PUBLISH.MEDIAS.SHARECODE'),
         '<br><br><div class="well well-sm"><code>',
         '&lt;iframe width="480" height="270" ',
         'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + media.link,
@@ -115,7 +115,7 @@
     // its status
     var pollMediasPromise = $interval(function() {
       if (!scopeEditForm.pendingEdition) {
-        $scope.$emit('setAlert', 'info', $filter('translate')('MEDIAS.RELOAD'), 4000);
+        $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.MEDIAS.RELOAD'), 4000);
         entityService.deleteCache(entityType, publishName);
         tableReloadEventService.broadcast();
       }
@@ -130,7 +130,7 @@
     function retryMedia(medias, reload) {
       publishService.retryMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.RETRY_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.RETRY_SUCCESS'), 4000);
           reload();
         });
     }
@@ -145,7 +145,7 @@
     function startMediaUpload(medias, platformName, reload) {
       publishService.startMediaUpload(medias.join(','), platformName)
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.UPLOAD_START_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.UPLOAD_START_SUCCESS'), 4000);
           reload();
         });
     }
@@ -159,7 +159,7 @@
     function publishMedia(medias, reload) {
       publishService.publishMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.PUBLISHED_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.PUBLISHED_SUCCESS'), 4000);
           reload();
         });
     }
@@ -173,7 +173,7 @@
     function unpublishMedia(medias, reload) {
       publishService.unpublishMedia(medias.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.UNPUBLISHED_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.UNPUBLISHED_SUCCESS'), 4000);
           reload();
         });
     }
@@ -187,7 +187,7 @@
     function removeRows(selected, reload) {
       entityService.removeEntity(entityType, publishName, selected.join(','))
         .then(function() {
-          $scope.$emit('setAlert', 'success', $filter('translate')('MEDIAS.REMOVE_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.REMOVE_SUCCESS'), 4000);
           reload();
         });
     }
@@ -223,13 +223,13 @@
      */
     scopeEditForm.entityType = entityType;
 
-    var categoriesfield = getSelectableCategories('UI.NONE');
+    var categoriesfield = getSelectableCategories('CORE.UI.NONE');
     scopeEditForm.fieldsBase = [
       {
         key: 'title',
         type: 'horizontalEditableInput',
         templateOptions: {
-          label: $filter('translate')('MEDIAS.ATTR_TITLE'),
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_TITLE'),
           required: true
         }
       },
@@ -237,7 +237,7 @@
         key: 'description',
         type: 'horizontalEditableInput',
         templateOptions: {
-          label: $filter('translate')('MEDIAS.ATTR_DESCRIPTION'),
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
           required: true
         }
       },
@@ -245,7 +245,7 @@
         key: 'category',
         type: 'horizontalEditableSelect',
         templateOptions: {
-          label: $filter('translate')('MEDIAS.ATTR_CATEGORY'),
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_CATEGORY'),
           options: categoriesfield
         }
       },
@@ -253,7 +253,7 @@
         key: 'groups',
         type: 'horizontalEditableSelect',
         templateOptions: {
-          label: $filter('translate')('MEDIAS.ATTR_GROUPS'),
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_GROUPS'),
           options: buildGroupOptions()
         },
         ngModelAttrs: {
@@ -275,26 +275,26 @@
       sortBy: 'date',
       sortOrder: 'dsc'
     };
-    var categoriesFilter = getSelectableCategories('UI.ALL');
+    var categoriesFilter = getSelectableCategories('CORE.UI.ALL');
     scopeDataTable.filterBy = [
       {
         key: 'title',
         value: '',
-        label: $filter('translate')('MEDIAS.TITLE_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.TITLE_FILTER')
       }, {
         key: 'description',
         value: '',
-        label: $filter('translate')('MEDIAS.DESCRIPTION_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.DESCRIPTION_FILTER')
       }, {
         key: 'date',
         type: 'date',
         value: '',
-        label: $filter('translate')('MEDIAS.DATE_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.DATE_FILTER')
       }, {
         key: 'category',
         type: 'select',
         value: null,
-        label: $filter('translate')('MEDIAS.CATEGORY_FILTER'),
+        label: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_FILTER'),
 
         /*
          * [{
@@ -314,35 +314,35 @@
     scopeDataTable.header = [
       {
         key: 'title',
-        name: $filter('translate')('MEDIAS.NAME_COLUMN'),
+        name: $filter('translate')('PUBLISH.MEDIAS.NAME_COLUMN'),
         class: ['col-xs-8 col-sm-5']
       },
       {
         key: 'date',
         type: 'date',
-        name: $filter('translate')('MEDIAS.DATE_COLUMN'),
+        name: $filter('translate')('PUBLISH.MEDIAS.DATE_COLUMN'),
         class: ['col-xs-1']
       },
       {
         key: 'category',
         type: 'category',
-        name: $filter('translate')('MEDIAS.CATEGORY_COLUMN'),
+        name: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_COLUMN'),
         class: ['hidden-xs col-sm-3']
       },
       {
         key: 'state',
         type: 'status',
-        name: $filter('translate')('MEDIAS.STATUS_COLUMN'),
+        name: $filter('translate')('PUBLISH.MEDIAS.STATUS_COLUMN'),
         class: ['col-xs-2']
       },
       {
         key: 'action',
-        name: $filter('translate')('UI.ACTIONS_COLUMN'),
+        name: $filter('translate')('CORE.UI.ACTIONS_COLUMN'),
         class: ['col-xs-1 col-sm-1']
       }];
     scopeDataTable.actions = [
       {
-        label: $filter('translate')('UI.VIEW'),
+        label: $filter('translate')('CORE.UI.VIEW'),
         condition: function(row) {
           return row.state == 11 || row.state == 12;
         },
@@ -351,7 +351,7 @@
         }
       },
       {
-        label: $filter('translate')('UI.SHARE'),
+        label: $filter('translate')('CORE.UI.SHARE'),
         condition: function(row) {
           return row.state == 12;
         },
@@ -360,7 +360,7 @@
         }
       },
       {
-        label: $filter('translate')('MEDIAS.PUBLISH'),
+        label: $filter('translate')('PUBLISH.MEDIAS.PUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
             $scope.checkContentAccess(row, 'update') &&
@@ -375,7 +375,7 @@
         }
       },
       {
-        label: $filter('translate')('MEDIAS.UNPUBLISH'),
+        label: $filter('translate')('PUBLISH.MEDIAS.UNPUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
             $scope.checkContentAccess(row, 'update') &&
@@ -390,7 +390,7 @@
         }
       },
       {
-        label: $filter('translate')('MEDIAS.CHAPTER_EDIT'),
+        label: $filter('translate')('PUBLISH.MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
           return $scope.rights.chapter &&
             $scope.checkContentAccess(row, 'update') &&
@@ -402,7 +402,7 @@
         }
       },
       {
-        label: $filter('translate')('MEDIAS.RETRY'),
+        label: $filter('translate')('PUBLISH.MEDIAS.RETRY'),
         condition: function(row) {
           return $scope.rights.retry && $scope.checkContentAccess(row, 'update') && row.state == 0 && !row.saving;
         },
@@ -411,7 +411,7 @@
         }
       },
       {
-        label: $filter('translate')('UI.REMOVE'),
+        label: $filter('translate')('CORE.UI.REMOVE'),
         condition: function(row) {
           return $scope.checkContentAccess(row, 'delete') &&
             !row.locked &&
@@ -432,7 +432,7 @@
     for (var i = 0; i < $scope.platforms.length; i++) {
       var platformName = $scope.platforms[i];
       scopeDataTable.actions.push({
-        label: $filter('translate')('MEDIAS.UPLOAD_' + platformName.toUpperCase()),
+        label: $filter('translate')('PUBLISH.MEDIAS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
           return $scope.rights.upload && $scope.checkContentAccess(row, 'update') && row.state == 6 && !row.saving;
         },
@@ -464,7 +464,7 @@
           // Build list options with list values
           var options = [{
             value: '',
-            name: $filter('translate')('UI.EMPTY')
+            name: $filter('translate')('CORE.UI.EMPTY')
           }];
 
           for (var i = 0; i < property.values.length; i++) {

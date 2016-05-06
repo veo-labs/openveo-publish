@@ -27,26 +27,26 @@ describe('Configuration page translations', function() {
       return page.selectLanguage(languages[index]).then(function() {
 
         // Page translations
-        assert.eventually.equal(page.getTitle(), page.translations.CONFIGURATION.PAGE_TITLE);
-        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.CONFIGURATION.TITLE);
-        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.CONFIGURATION.INFO);
+        assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.CONFIGURATION.PAGE_TITLE);
+        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.PUBLISH.CONFIGURATION.TITLE);
+        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CONFIGURATION.INFO);
 
         // Youtube block title
         page.youtubeConfigurationTitleElement.getText().then(function(title) {
-          assert.equal(title, page.translations.CONFIGURATION.YOUTUBE_TITLE.toUpperCase());
+          assert.equal(title, page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE.toUpperCase());
         });
         page.setMouseOverYoutubeTitle();
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.CONFIGURATION.YOUTUBE_INFO);
+          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_INFO);
 
         });
 
         // Youtube block with no associated account
         assert.eventually.equal(page.getYoutubeBlockText(),
-                              page.translations.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
-                              page.translations.CONFIGURATION.YOUTUBE_PEER
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
                              );
 
         // Youtube block with an associated account
@@ -62,8 +62,8 @@ describe('Configuration page translations', function() {
         page.refresh();
         assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());
         assert.eventually.equal(page.getYoutubeBlockText(),
-                                page.translations.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
-                                page.translations.CONFIGURATION.YOUTUBE_MODIFY_PEER
+                                page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
+                                page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
                                );
 
         configurationHelper.removeAllEntities();

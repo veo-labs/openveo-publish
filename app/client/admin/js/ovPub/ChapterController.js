@@ -139,7 +139,7 @@
       isInArray: undefined,
       range: {
         value: 0,
-        name: 'UI.BEGIN',
+        name: 'CORE.UI.BEGIN',
         description: '',
         type: 'begin'
       }
@@ -148,7 +148,7 @@
       isInArray: undefined,
       range: {
         value: 1,
-        name: 'UI.END',
+        name: 'CORE.UI.END',
         description: '',
         type: 'end'
       }
@@ -314,7 +314,7 @@
               $scope.endCut.range.value <= $scope.beginCut.range.value) {
         // Reset end
         $scope.endCut.range.value = 1;
-        $scope.$emit('setAlert', 'warning', $filter('translate')('CHAPTER.DELETE_END_CUT'), 8000);
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.DELETE_END_CUT'), 8000);
         toggleEnd(false);
 
         // the watch for endCut.isInArray will save everything
@@ -338,7 +338,7 @@
       entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
 
       }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('CHAPTER.SAVE_ERROR'), 4000);
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
         if (status === 401)
           $scope.$parent.logout();
       });

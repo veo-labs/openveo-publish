@@ -21,77 +21,77 @@
     "publishPropertiesNoWrite": {
       "name": "publish-properties-no-write",
       "permissions": [
-        "access-properties-page",
-        "update-properties",
-        "delete-properties"
+        "publish-access-properties-page",
+        "publish-update-properties",
+        "publish-delete-properties"
       ]
     },
     "publishPropertiesNoUpdate": {
       "name": "publish-properties-no-update",
       "permissions": [
-        "access-properties-page",
-        "create-properties",
-        "delete-properties"
+        "publish-access-properties-page",
+        "publish-add-properties",
+        "publish-delete-properties"
       ]
     },
     "publishPropertiesNoDelete": {
       "name": "publish-properties-no-delete",
       "permissions": [
-        "access-properties-page",
-        "create-properties",
-        "update-properties"
+        "publish-access-properties-page",
+        "publish-add-properties",
+        "publish-update-properties"
       ]
     },
     "publishWatcherNoManage": {
       "name": "publish-watcher-no-manage",
       "permissions": [
-        "access-watcher-page"
+        "publish-access-watcher-page"
       ]
     },
     "publishCategoriesNoWrite": {
       "name": "publish-categories-no-write",
       "permissions": [
-        "access-categories-page",
-        "update-categories",
-        "delete-categories"
+        "publish-access-categories-page",
+        "publish-update-categories",
+        "publish-delete-categories"
       ]
     },
     "publishCategoriesNoUpdate": {
       "name": "publish-categories-no-update",
       "permissions": [
-        "access-categories-page",
-        "create-categories",
-        "delete-categories"
+        "publish-access-categories-page",
+        "publish-add-categories",
+        "publish-delete-categories"
       ]
     },
     "publishCategoriesNoDelete": {
       "name": "publish-categories-no-delete",
       "permissions": [
-        "access-categories-page",
-        "create-categories",
-        "update-categories"
+        "publish-access-categories-page",
+        "publish-add-categories",
+        "publish-update-categories"
       ]
     },
     "publishCategoriesNoManage": {
       "name": "publish-categories-no-manage",
       "permissions": [
-        "access-categories-page"
+        "publish-access-categories-page"
       ]
     },
     "publishMedias": {
       "name": "publish-medias",
       "permissions": [
-        "access-videos-page",
-        "create-videos",
-        "update-videos",
-        "delete-videos"
+        "publish-access-videos-page",
+        "publish-add-videos",
+        "publish-update-videos",
+        "publish-delete-videos"
       ]
     },
     "publishMediasGroup": {
       "name": "publish-medias-group",
       "permissions": [
-        "access-videos-page",
-        "read-group-publishGroup1",
+        "publish-access-videos-page",
+        "get-group-publishGroup1",
         "update-group-publishGroup1",
         "delete-group-publishGroup1"
       ]
@@ -99,7 +99,7 @@
     "publishMediasGroupNoRead": {
       "name": "publish-medias-group-no-read",
       "permissions": [
-        "access-videos-page",
+        "publish-access-videos-page",
         "update-group-publishGroup1",
         "delete-group-publishGroup1"
       ]
@@ -107,30 +107,30 @@
     "publishMediasGroupNoUpdate": {
       "name": "publish-medias-group-no-update",
       "permissions": [
-        "access-videos-page",
-        "read-group-publishGroup1",
+        "publish-access-videos-page",
+        "get-group-publishGroup1",
         "delete-group-publishGroup1"
       ]
     },
     "publishMediasGroupNoDelete": {
       "name": "publish-medias-group-no-delete",
       "permissions": [
-        "access-videos-page",
-        "read-group-publishGroup1",
+        "publish-access-videos-page",
+        "get-group-publishGroup1",
         "update-group-publishGroup1"
       ]
     },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",
       "permissions": [
-        "chapter-video",
-        "read-group-publishGroup1"
+        "publish-chapter-video",
+        "get-group-publishGroup1"
       ]
     },
     "publishConfigurationNoManage": {
       "name": "publish-configuration-no-manage",
       "permissions": [
-        "access-conf-page"
+        "publish-access-conf-page"
       ]
     }
   },
@@ -241,15 +241,15 @@
   "applications": {
     "publishApplicationsVideos": {
       "name": "publish-applications-videos",
-      "scopes": [ "video" ]
+      "scopes": [ "publish-get-videos" ]
     },
     "publishApplicationsProperties": {
       "name": "publish-applications-properties",
-      "scopes": [ "property" ]
+      "scopes": [ "publish-get-properties" ]
     },
     "publishApplicationsCategories": {
       "name": "publish-applications-categories",
-      "scopes": [ "category" ]
+      "scopes": [ "publish-get-categories" ]
     },
     "publishApplicationsNoPermission": {
       "name": "publish-applications-guest",

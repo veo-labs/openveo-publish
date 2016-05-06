@@ -62,7 +62,7 @@ describe('Category page', function() {
       page.saveCategoryModifications();
       page.getAlertMessages().then(function(messages) {
         assert.equal(messages.length, 1);
-        assert.equal(messages[0], page.translations.ERROR.FORBIDDEN);
+        assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
       });
       page.closeAlerts();
     });
@@ -179,9 +179,9 @@ describe('Category page', function() {
 
   });
 
-  describe('without create / edit permissions', function() {
+  describe('without add / edit permissions', function() {
 
-    // Log with a user without create / edit permissions
+    // Log with a user without add / edit permissions
     before(function() {
       page.logAs(datas.users.publishCategoriesNoManage);
       page.load();

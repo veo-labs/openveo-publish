@@ -49,8 +49,8 @@ describe('Configuration page', function() {
     it('should display a specific message and link if no Google account is associated', function() {
       assert.eventually.ok(page.youtubePeerLinkElement.isPresent());
       assert.eventually.equal(page.getYoutubeBlockText(),
-                              page.translations.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
-                              page.translations.CONFIGURATION.YOUTUBE_PEER
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
                              );
     });
 
@@ -69,8 +69,8 @@ describe('Configuration page', function() {
 
       assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());
       assert.eventually.equal(page.getYoutubeBlockText(),
-                              page.translations.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
-                              page.translations.CONFIGURATION.YOUTUBE_MODIFY_PEER
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
+                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
                              );
     });
 

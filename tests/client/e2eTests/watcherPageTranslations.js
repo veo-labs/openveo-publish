@@ -25,19 +25,19 @@ describe('Watcher page translations', function() {
       return page.selectLanguage(languages[index]).then(function() {
 
         // Page translations
-        assert.eventually.equal(page.getTitle(), page.translations.WATCHER.PAGE_TITLE);
-        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.WATCHER.TITLE);
-        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.WATCHER.INFO);
+        assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.WATCHER.PAGE_TITLE);
+        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.PUBLISH.WATCHER.TITLE);
+        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.WATCHER.INFO);
 
         page.startWatcher();
 
-        assert.eventually.equal(page.startedAlertElement.getText(), page.translations.WATCHER.STARTED);
-        assert.eventually.equal(page.stopButtonElement.getText(), page.translations.WATCHER.STOP_BUTTON);
+        assert.eventually.equal(page.startedAlertElement.getText(), page.translations.PUBLISH.WATCHER.STARTED);
+        assert.eventually.equal(page.stopButtonElement.getText(), page.translations.PUBLISH.WATCHER.STOP_BUTTON);
 
         page.stopWatcher();
 
-        assert.eventually.equal(page.startButtonElement.getText(), page.translations.WATCHER.START_BUTTON);
-        assert.eventually.equal(page.stoppedAlertElement.getText(), page.translations.WATCHER.STOPPED);
+        assert.eventually.equal(page.startButtonElement.getText(), page.translations.PUBLISH.WATCHER.START_BUTTON);
+        assert.eventually.equal(page.stoppedAlertElement.getText(), page.translations.PUBLISH.WATCHER.STOPPED);
 
         return browser.waitForAngular();
       }).then(function() {

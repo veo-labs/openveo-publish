@@ -1,17 +1,17 @@
 <div class="pu-categories">
-  <h2 ng-bind="'CATEGORIES.TITLE' | translate"></h2>
-  <div class="well well-lg" ng-bind="'CATEGORIES.INFO' | translate"></div>
+  <h2 ng-bind="'PUBLISH.CATEGORIES.TITLE' | translate"></h2>
+  <div class="well well-lg" ng-bind="'PUBLISH.CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
     <div class="input-group" ng-if="rights.add || rights.edit">
-      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" uib-popover="{{'CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
+      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'PUBLISH.CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" uib-popover="{{'PUBLISH.CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
       <div class="input-group-btn">
-        <div  uib-popover="{{'CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
+        <div  uib-popover="{{'PUBLISH.CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
           <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
         </div>
       </div>
-    
+
     </div>
-    
+
     <!-- Nested list template -->
     <script type="text/ng-template" id="items_renderer.html">
       <div ui-tree-handle ng-if="!rights.edit" data-nodrag>
@@ -40,7 +40,7 @@
     </div>
   </div>
   <div class="col-md-6" ng-if="rights.add || rights.edit || rights.delete">
-    <button class="btn btn-primary" type="button" ng-click="saveCategory()"  ng-disabled="saveIsDisabled || saveIsEmpty" ng-bind="'UI.FORM_SAVE' | translate"></button>
-    <button class="btn btn-default" type="button" ng-click="resetCategory()"  ng-disabled="saveIsDisabled" ng-bind="'UI.FORM_CANCEL' | translate"></button>
+    <button class="btn btn-primary" type="button" ng-click="saveCategory()"  ng-disabled="saveIsDisabled || saveIsEmpty" ng-bind="'CORE.UI.FORM_SAVE' | translate"></button>
+    <button class="btn btn-default" type="button" ng-click="resetCategory()"  ng-disabled="saveIsDisabled" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
   </div>
 </div>

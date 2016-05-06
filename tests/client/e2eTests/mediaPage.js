@@ -251,19 +251,19 @@ describe('Media page', function() {
   });
 
   it('should be able to sort medias by name', function() {
-    return tableAssert.checkSort(page.translations.MEDIAS.NAME_COLUMN);
+    return tableAssert.checkSort(page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
   });
 
   it('should be able to sort medias by date', function() {
-    return tableAssert.checkSort(page.translations.MEDIAS.DATE_COLUMN);
+    return tableAssert.checkSort(page.translations.PUBLISH.MEDIAS.DATE_COLUMN);
   });
 
   it('should be able to sort medias by category', function() {
-    return tableAssert.checkSort(page.translations.MEDIAS.CATEGORY_COLUMN);
+    return tableAssert.checkSort(page.translations.PUBLISH.MEDIAS.CATEGORY_COLUMN);
   });
 
   it('should be able to sort medias by status', function() {
-    return tableAssert.checkSort(page.translations.MEDIAS.STATUS_COLUMN);
+    return tableAssert.checkSort(page.translations.PUBLISH.MEDIAS.STATUS_COLUMN);
   });
 
   it('should have buttons to change the number of items per page', function() {
@@ -279,49 +279,49 @@ describe('Media page', function() {
   });
 
   it('should be able to select lines', function() {
-    return tableAssert.checkLinesSelection(page.translations.MEDIAS.NAME_COLUMN);
+    return tableAssert.checkLinesSelection(page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
   });
 
   it('should be able to see, publish, access chapters or remove a media in ready state', function() {
     checkStateActions(VideoModel.READY_STATE, [
-      page.translations.UI.VIEW,
-      page.translations.MEDIAS.PUBLISH,
-      page.translations.MEDIAS.CHAPTER_EDIT,
-      page.translations.UI.REMOVE
+      page.translations.CORE.UI.VIEW,
+      page.translations.PUBLISH.MEDIAS.PUBLISH,
+      page.translations.PUBLISH.MEDIAS.CHAPTER_EDIT,
+      page.translations.CORE.UI.REMOVE
     ], [
-      page.translations.MEDIAS.PUBLISH,
-      page.translations.UI.REMOVE
+      page.translations.PUBLISH.MEDIAS.PUBLISH,
+      page.translations.CORE.UI.REMOVE
     ]);
   });
 
   it('should be able to see, share, access chapters or remove a media in published state', function() {
     checkStateActions(VideoModel.PUBLISHED_STATE, [
-      page.translations.UI.VIEW,
-      page.translations.MEDIAS.UNPUBLISH,
-      page.translations.MEDIAS.CHAPTER_EDIT,
-      page.translations.UI.REMOVE
+      page.translations.CORE.UI.VIEW,
+      page.translations.PUBLISH.MEDIAS.UNPUBLISH,
+      page.translations.PUBLISH.MEDIAS.CHAPTER_EDIT,
+      page.translations.CORE.UI.REMOVE
     ], [
-      page.translations.MEDIAS.UNPUBLISH,
-      page.translations.UI.REMOVE
+      page.translations.PUBLISH.MEDIAS.UNPUBLISH,
+      page.translations.CORE.UI.REMOVE
     ]);
   });
 
   it('should be able to remove or upload medias in waiting for upload state', function() {
     checkStateActions(VideoModel.WAITING_FOR_UPLOAD_STATE, [
-      page.translations.MEDIAS.UPLOAD_VIMEO,
-      page.translations.MEDIAS.UPLOAD_YOUTUBE,
-      page.translations.UI.REMOVE
+      page.translations.PUBLISH.MEDIAS.UPLOAD_VIMEO,
+      page.translations.PUBLISH.MEDIAS.UPLOAD_YOUTUBE,
+      page.translations.CORE.UI.REMOVE
     ], [
-      page.translations.UI.REMOVE
+      page.translations.CORE.UI.REMOVE
     ]);
   });
 
   it('should be able to remove or retry a media in error state', function() {
     checkStateActions(VideoModel.ERROR_STATE, [
-      page.translations.MEDIAS.RETRY,
-      page.translations.UI.REMOVE
+      page.translations.PUBLISH.MEDIAS.RETRY,
+      page.translations.CORE.UI.REMOVE
     ], [
-      page.translations.UI.REMOVE
+      page.translations.CORE.UI.REMOVE
     ]);
   });
 
@@ -366,7 +366,7 @@ describe('Media page', function() {
       var search = {name: linesToAdd[0].title};
 
       // Get all line values
-      page.getLineValues(page.translations.MEDIAS.NAME_COLUMN).then(function(values) {
+      page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
@@ -374,7 +374,7 @@ describe('Media page', function() {
         });
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -397,7 +397,7 @@ describe('Media page', function() {
       var search = {name: linesToAdd[0].title.slice(4, 2)};
 
       // Get all line values
-      page.getLineValues(page.translations.MEDIAS.NAME_COLUMN).then(function(values) {
+      page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
@@ -405,7 +405,7 @@ describe('Media page', function() {
         });
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -447,7 +447,7 @@ describe('Media page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -482,7 +482,7 @@ describe('Media page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -525,7 +525,7 @@ describe('Media page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -568,7 +568,7 @@ describe('Media page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -650,7 +650,7 @@ describe('Media page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.MEDIAS.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 
@@ -670,7 +670,7 @@ describe('Media page', function() {
 
       var search = {name: linesToAdd[0].title.toUpperCase()};
       page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.MEDIAS.NAME_COLUMN));
+      assert.isRejected(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
     });
 
     it('should be able to search by description in case sensitive', function() {
@@ -690,7 +690,7 @@ describe('Media page', function() {
 
       var search = {name: linesToAdd[0].description.toUpperCase()};
       page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.MEDIAS.NAME_COLUMN));
+      assert.isRejected(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
     });
 
     it('should be able to clear search', function() {
@@ -710,7 +710,7 @@ describe('Media page', function() {
       var search = {name: linesToAdd[0].title.toUpperCase()};
       page.search(search);
       page.clearSearch();
-      assert.isFulfilled(page.getLineValues(page.translations.MEDIAS.NAME_COLUMN));
+      assert.isFulfilled(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
     });
 
   });

@@ -16,9 +16,9 @@ function PropertyPage(model) {
   this.path = 'be/publish/properties-list';
 
   // Element finders specific to this page
-  this.pageTitleElement = element(by.binding('PROPERTIES.TITLE'));
-  this.pageDescriptionElement = element(by.binding('PROPERTIES.INFO'));
-  this.addFormLabelElement = element(by.binding('PROPERTIES.ADD_PROPERTY'));
+  this.pageTitleElement = element(by.binding('PUBLISH.PROPERTIES.TITLE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.PROPERTIES.INFO'));
+  this.addFormLabelElement = element(by.binding('PUBLISH.PROPERTIES.ADD_PROPERTY'));
 }
 
 module.exports = PropertyPage;
@@ -45,21 +45,21 @@ PropertyPage.prototype.getSearchFields = function(form) {
   // Name field
   fields.name = Field.get({
     type: 'text',
-    name: this.translations.PROPERTIES.TITLE_FILTER,
+    name: this.translations.PUBLISH.PROPERTIES.TITLE_FILTER,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'text',
-    name: this.translations.PROPERTIES.DESCRIPTION_FILTER,
+    name: this.translations.PUBLISH.PROPERTIES.DESCRIPTION_FILTER,
     baseElement: form
   });
 
   // Type field
   fields.type = Field.get({
     type: 'select',
-    name: this.translations.PROPERTIES.TYPE_FILTER,
+    name: this.translations.PUBLISH.PROPERTIES.TYPE_FILTER,
     baseElement: form
   });
 
@@ -78,28 +78,28 @@ PropertyPage.prototype.getAddFormFields = function(form) {
   // Name field
   fields.name = Field.get({
     type: 'text',
-    name: this.translations.PROPERTIES.ATTR_NAME,
+    name: this.translations.PUBLISH.PROPERTIES.ATTR_NAME,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'text',
-    name: this.translations.PROPERTIES.ATTR_DESCRIPTION,
+    name: this.translations.PUBLISH.PROPERTIES.ATTR_DESCRIPTION,
     baseElement: form
   });
 
   // Type field
   fields.type = Field.get({
     type: 'select',
-    name: this.translations.PROPERTIES.ATTR_TYPE,
+    name: this.translations.PUBLISH.PROPERTIES.ATTR_TYPE,
     baseElement: form
   });
 
   // Values field
   fields.listValues = Field.get({
     type: 'tags',
-    name: this.translations.PROPERTIES.ATTR_LIST_VALUES,
+    name: this.translations.PUBLISH.PROPERTIES.ATTR_LIST_VALUES,
     baseElement: form
   });
 
@@ -138,7 +138,7 @@ PropertyPage.prototype.addLine = function(name, data) {
     fields.type.setValue(data.type);
 
     // Set list values
-    if (data.type === self.translations.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
+    if (data.type === self.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
       fields.listValues.setValue(data.values);
 
     // Click the add button
@@ -169,7 +169,7 @@ PropertyPage.prototype.editProperty = function(name, data) {
     self.openLine(name);
 
     // Click on edit button
-    browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_EDIT')));
+    browserExt.click(self.lineDetailElement.element(by.binding('CORE.UI.FORM_EDIT')));
 
     // Set name
     if (data.name !== undefined)
@@ -184,10 +184,10 @@ PropertyPage.prototype.editProperty = function(name, data) {
       fields.type.setValue(data.type);
 
     // Set list values
-    if (data.type === self.translations.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
+    if (data.type === self.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE && data.values)
       fields.listValues.setValue(data.values);
 
     // Click on save button
-    return browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_SAVE')));
+    return browserExt.click(self.lineDetailElement.element(by.binding('CORE.UI.FORM_SAVE')));
   });
 };

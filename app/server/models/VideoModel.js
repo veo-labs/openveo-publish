@@ -678,8 +678,8 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
           videoInfo.timecodes.push({
             timecode: timecodes[i].timecode,
             image: {
-              small: '/' + videoInfo.id + '/' + timecodes[i].image + '?thumb=small',
-              large: '/' + videoInfo.id + '/' + timecodes[i].image
+              small: '/publish/' + videoInfo.id + '/' + timecodes[i].image + '?thumb=small',
+              large: '/publish/' + videoInfo.id + '/' + timecodes[i].image
             }
           });
         }

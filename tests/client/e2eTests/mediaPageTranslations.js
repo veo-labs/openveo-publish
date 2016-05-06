@@ -27,15 +27,17 @@ describe('Media page translations', function() {
 
     if (index < languages.length) {
       return page.selectLanguage(languages[index]).then(function() {
+        var coreTranslations = page.translations.CORE;
+        var publishTranslations = page.translations.PUBLISH;
 
         // Page translations
-        assert.eventually.equal(page.getTitle(), page.translations.MEDIAS.PAGE_TITLE);
-        assert.eventually.equal(page.pageTitleElement.getText(), page.translations.MEDIAS.TITLE);
-        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.MEDIAS.INFO);
+        assert.eventually.equal(page.getTitle(), publishTranslations.MEDIAS.PAGE_TITLE);
+        assert.eventually.equal(page.pageTitleElement.getText(), publishTranslations.MEDIAS.TITLE);
+        assert.eventually.equal(page.pageDescriptionElement.getText(), publishTranslations.MEDIAS.INFO);
 
         // Search engine translations
         page.searchLinkElement.getText().then(function(text) {
-          assert.equal(text.trim(), page.translations.UI.SEARCH_BY);
+          assert.equal(text.trim(), coreTranslations.UI.SEARCH_BY);
         });
 
         page.openSearchEngine();
@@ -44,27 +46,27 @@ describe('Media page translations', function() {
         var searchDescriptionField = searchFields.description;
         var searchDateField = searchFields.date;
         var searchCategoryField = searchFields.category;
-        assert.eventually.equal(searchNameField.getLabel(), page.translations.MEDIAS.TITLE_FILTER);
-        assert.eventually.equal(searchDescriptionField.getLabel(), page.translations.MEDIAS.DESCRIPTION_FILTER);
-        assert.eventually.equal(searchDateField.getLabel(), page.translations.MEDIAS.DATE_FILTER);
-        assert.eventually.equal(searchCategoryField.getLabel(), page.translations.MEDIAS.CATEGORY_FILTER);
+        assert.eventually.equal(searchNameField.getLabel(), publishTranslations.MEDIAS.TITLE_FILTER);
+        assert.eventually.equal(searchDescriptionField.getLabel(), publishTranslations.MEDIAS.DESCRIPTION_FILTER);
+        assert.eventually.equal(searchDateField.getLabel(), publishTranslations.MEDIAS.DATE_FILTER);
+        assert.eventually.equal(searchCategoryField.getLabel(), publishTranslations.MEDIAS.CATEGORY_FILTER);
         page.closeSearchEngine();
 
         // All actions translations
         page.setSelectAllMouseOver();
-        assert.eventually.equal(page.popoverElement.getAttribute('content'), page.translations.UI.SELECT_ALL);
+        assert.eventually.equal(page.popoverElement.getAttribute('content'), coreTranslations.UI.SELECT_ALL);
 
         page.selectAllLines();
         browserExt.click(page.actionsButtonElement);
-        var removeActionElement = page.actionsElement.element(by.cssContainingText('a', page.translations.UI.REMOVE));
+        var removeActionElement = page.actionsElement.element(by.cssContainingText('a', coreTranslations.UI.REMOVE));
         assert.eventually.ok(removeActionElement.isDisplayed(), 'Missing all remove action');
 
         // Headers translations
-        assert.eventually.ok(page.isTableHeader(page.translations.MEDIAS.NAME_COLUMN), 'Missing name column');
-        assert.eventually.ok(page.isTableHeader(page.translations.MEDIAS.DATE_COLUMN), 'Missing date column');
-        assert.eventually.ok(page.isTableHeader(page.translations.MEDIAS.CATEGORY_COLUMN), 'Missing category column');
-        assert.eventually.ok(page.isTableHeader(page.translations.MEDIAS.STATUS_COLUMN), 'Missing status column');
-        assert.eventually.ok(page.isTableHeader(page.translations.UI.ACTIONS_COLUMN), 'Missing actions column');
+        assert.eventually.ok(page.isTableHeader(publishTranslations.MEDIAS.NAME_COLUMN), 'Missing name column');
+        assert.eventually.ok(page.isTableHeader(publishTranslations.MEDIAS.DATE_COLUMN), 'Missing date column');
+        assert.eventually.ok(page.isTableHeader(publishTranslations.MEDIAS.CATEGORY_COLUMN), 'Missing category column');
+        assert.eventually.ok(page.isTableHeader(publishTranslations.MEDIAS.STATUS_COLUMN), 'Missing status column');
+        assert.eventually.ok(page.isTableHeader(coreTranslations.UI.ACTIONS_COLUMN), 'Missing actions column');
 
         return browser.waitForAngular();
       }).then(function() {
@@ -100,16 +102,16 @@ describe('Media page translations', function() {
       });
 
       // Get status header index
-      page.getTableHeaderIndex(page.translations.MEDIAS.STATUS_COLUMN).then(function(index) {
+      page.getTableHeaderIndex(page.translations.PUBLISH.MEDIAS.STATUS_COLUMN).then(function(index) {
         statusHeaderIndex = index;
         return page.getLineCells(linesToAdd[0].title);
       }).then(function(cells) {
 
         // Test media state label
         if (state === VideoModel.ERROR_STATE)
-          assert.equal(cells[statusHeaderIndex].indexOf(page.translations.MEDIAS['STATE_' + state]), 0);
+          assert.equal(cells[statusHeaderIndex].indexOf(page.translations.PUBLISH.MEDIAS['STATE_' + state]), 0);
         else
-          assert.equal(cells[statusHeaderIndex], page.translations.MEDIAS['STATE_' + state]);
+          assert.equal(cells[statusHeaderIndex], page.translations.PUBLISH.MEDIAS['STATE_' + state]);
       });
 
       // Remove lines

@@ -21,8 +21,8 @@ function MediaPage(model) {
   this.path = 'be/publish/medias-list';
 
   // Element finders specific to this page
-  this.pageTitleElement = element(by.binding('MEDIAS.TITLE'));
-  this.pageDescriptionElement = element(by.binding('MEDIAS.INFO'));
+  this.pageTitleElement = element(by.binding('PUBLISH.MEDIAS.TITLE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.MEDIAS.INFO'));
 
   // The list of available media properties
   this.properties = null;
@@ -72,28 +72,28 @@ MediaPage.prototype.getSearchFields = function(form) {
   // Name field
   fields.name = Field.get({
     type: 'text',
-    name: this.translations.MEDIAS.TITLE_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.TITLE_FILTER,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'text',
-    name: this.translations.MEDIAS.DESCRIPTION_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.DESCRIPTION_FILTER,
     baseElement: form
   });
 
   // Date field
   fields.date = Field.get({
     type: 'date',
-    name: this.translations.MEDIAS.DATE_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.DATE_FILTER,
     baseElement: form
   });
 
   // Category field
   fields.category = Field.get({
     type: 'select',
-    name: this.translations.MEDIAS.CATEGORY_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.CATEGORY_FILTER,
     baseElement: form
   });
 
@@ -112,21 +112,21 @@ MediaPage.prototype.getEditFormFields = function(form) {
   // Name field
   fields.name = Field.get({
     type: 'text',
-    name: this.translations.MEDIAS.ATTR_TITLE,
+    name: this.translations.PUBLISH.MEDIAS.ATTR_TITLE,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'text',
-    name: this.translations.MEDIAS.ATTR_DESCRIPTION,
+    name: this.translations.PUBLISH.MEDIAS.ATTR_DESCRIPTION,
     baseElement: form
   });
 
   // Category field
   fields.category = Field.get({
     type: 'select',
-    name: this.translations.MEDIAS.ATTR_CATEGORY,
+    name: this.translations.PUBLISH.MEDIAS.ATTR_CATEGORY,
     baseElement: form
   });
 
@@ -166,7 +166,7 @@ MediaPage.prototype.editMedia = function(name, data) {
     self.openLine(name);
 
     // Click on edit button
-    browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_EDIT')));
+    browserExt.click(self.lineDetailElement.element(by.binding('CORE.UI.FORM_EDIT')));
 
     // Set name
     if (data.name !== undefined)
@@ -199,7 +199,7 @@ MediaPage.prototype.editMedia = function(name, data) {
     }
 
     // Click on save button
-    return browserExt.click(self.lineDetailElement.element(by.binding('UI.FORM_SAVE')));
+    return browserExt.click(self.lineDetailElement.element(by.binding('CORE.UI.FORM_SAVE')));
   });
 };
 

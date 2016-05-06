@@ -47,7 +47,7 @@ describe('Property page', function() {
   it('should be able to add / remove a text property', function() {
     var name = 'test add / remove text property';
     var description = 'test add / remove text property description';
-    var type = page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE;
+    var type = page.translations.PUBLISH.PROPERTIES.FORM_ADD_TEXT_TYPE;
     page.addLine(name, {type: type, description: description});
     assert.isFulfilled(page.getLine(name));
     assert.eventually.equal(page.getLineFieldText(name, 'description'), description);
@@ -58,7 +58,7 @@ describe('Property page', function() {
   it('should be able to add / remove a list property', function() {
     var name = 'test add / remove list property';
     var description = 'test add / remove list property description';
-    var type = page.translations.PROPERTIES.FORM_ADD_LIST_TYPE;
+    var type = page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE;
     var values = ['value1', 'value2', 'value3'];
     page.addLine(name, {type: type, description: description, values: values});
     assert.isFulfilled(page.getLine(name));
@@ -71,7 +71,7 @@ describe('Property page', function() {
   it('should be able to add / remove a boolean property', function() {
     var name = 'test add / remove boolean property';
     var description = 'test add / remove boolean property description';
-    var type = page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE;
+    var type = page.translations.PUBLISH.PROPERTIES.FORM_ADD_BOOLEAN_TYPE;
     page.addLine(name, {type: type, description: description});
     assert.isFulfilled(page.getLine(name));
     assert.eventually.equal(page.getLineFieldText(name, 'description'), description);
@@ -86,7 +86,7 @@ describe('Property page', function() {
     assert.isRejected(page.addLine(null, {}));
     assert.isRejected(page.addLine(name, {}));
     assert.isRejected(page.addLine(name, {description: description}));
-    assert.isRejected(page.addLine(name, {type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE}));
+    assert.isRejected(page.addLine(name, {type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_TEXT_TYPE}));
   });
 
   it('should not be able to add a boolean property without name, description or type', function() {
@@ -96,13 +96,13 @@ describe('Property page', function() {
     assert.isRejected(page.addLine(null, {}));
     assert.isRejected(page.addLine(name, {}));
     assert.isRejected(page.addLine(name, {description: description}));
-    assert.isRejected(page.addLine(name, {type: page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE}));
+    assert.isRejected(page.addLine(name, {type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_BOOLEAN_TYPE}));
   });
 
   it('should not be able to add a list property without values', function() {
     assert.isRejected(page.addLine('test add without all info', {
       description: 'test add without all info description',
-      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE
+      type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE
     }));
   });
 
@@ -122,7 +122,7 @@ describe('Property page', function() {
     // Create line
     page.addLine(name, {
       description: description,
-      type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+      type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_TEXT_TYPE
     });
 
     // Edit property with a new name and new description
@@ -140,7 +140,7 @@ describe('Property page', function() {
     // Create line
     page.addLine(name, {
       description: description,
-      type: page.translations.PROPERTIES.FORM_ADD_BOOLEAN_TYPE
+      type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_BOOLEAN_TYPE
     });
 
     // Edit property with a new name and new description
@@ -159,7 +159,7 @@ describe('Property page', function() {
     // Create line
     page.addLine(name, {
       description: description,
-      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE,
+      type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE,
       values: ['value1']
     });
 
@@ -168,7 +168,7 @@ describe('Property page', function() {
       name: newName,
       description: newDescription,
       values: newValues,
-      type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE
+      type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE
     });
     assert.isFulfilled(page.getLine(newName));
     assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
@@ -180,7 +180,7 @@ describe('Property page', function() {
   });
 
   it('should be able to sort properties by name', function() {
-    return tableAssert.checkSort(page.translations.PROPERTIES.NAME_COLUMN);
+    return tableAssert.checkSort(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
   });
 
   it('should have buttons to change the number of items per page', function() {
@@ -196,7 +196,7 @@ describe('Property page', function() {
   });
 
   it('should be able to select lines', function() {
-    return tableAssert.checkLinesSelection(page.translations.PROPERTIES.NAME_COLUMN);
+    return tableAssert.checkLinesSelection(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
   });
 
   describe('Search', function() {
@@ -220,7 +220,7 @@ describe('Property page', function() {
       var search = {name: linesToAdd[0].name};
 
       // Get all line values before search
-      return page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN).then(function(values) {
+      return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
@@ -228,7 +228,7 @@ describe('Property page', function() {
         });
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
       });
     });
 
@@ -248,7 +248,7 @@ describe('Property page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
       });
     });
 
@@ -268,7 +268,7 @@ describe('Property page', function() {
           expectedValues.push(filteredDatas[i].cells[1]);
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
       });
     });
 
@@ -277,7 +277,7 @@ describe('Property page', function() {
       var search = {name: linesToAdd[1].name.slice(0, 2)};
 
       // Get all line values before search
-      return page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN).then(function(values) {
+      return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
@@ -285,16 +285,16 @@ describe('Property page', function() {
         });
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
       });
     });
 
     it('should be able to search by type', function() {
       var expectedValues;
-      var search = {type: page.translations.PROPERTIES.FORM_ADD_LIST_TYPE};
+      var search = {type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE};
 
       // Get all line values before search
-      return page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN).then(function(values) {
+      return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
@@ -306,7 +306,7 @@ describe('Property page', function() {
         });
 
       }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PROPERTIES.NAME_COLUMN);
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
       });
     });
 
@@ -314,14 +314,14 @@ describe('Property page', function() {
       var search = {name: linesToAdd[1].name.toUpperCase()};
 
       page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN));
+      assert.isRejected(page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN));
     });
 
     it('should be able to clear search', function() {
       var search = {name: linesToAdd[0].name};
       page.search(search);
       page.clearSearch();
-      assert.isFulfilled(page.getLineValues(page.translations.PROPERTIES.NAME_COLUMN));
+      assert.isFulfilled(page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN));
     });
 
   });

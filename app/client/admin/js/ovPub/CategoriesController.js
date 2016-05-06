@@ -16,7 +16,7 @@
       $scope.categoryTaxonomy.id = data.entity.id;
       $scope.saveIsDisabled = $scope.list.length == 0;
       $scope.listback = angular.copy($scope.list);
-      $scope.$emit('setAlert', 'success', $filter('translate')('CATEGORIES.SAVE_SUCCESS'), 4000);
+      $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.CATEGORIES.SAVE_SUCCESS'), 4000);
     }
 
     /**
@@ -56,7 +56,7 @@
 
     $scope.newSubItem = function() {
       if (isAddFieldEmpty()) {
-        $scope.$emit('setAlert', 'warning', $filter('translate')('CATEGORIES.EMPTY'), 4000);
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CATEGORIES.EMPTY'), 4000);
       } else {
         $scope.newitem.id = String(Date.now());
         $scope.list.push(angular.copy($scope.newitem));
@@ -68,7 +68,7 @@
     };
     $scope.resetCategory = function() {
       $scope.list = angular.copy($scope.listback);
-      $scope.$emit('setAlert', 'info', $filter('translate')('CATEGORIES.RESET'), 4000);
+      $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.CATEGORIES.RESET'), 4000);
     };
 
     $scope.$watchCollection('list', function() {
@@ -105,9 +105,9 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('create-' + entityType);
-    $scope.rights.edit = $scope.checkAccess('update-' + entityType);
-    $scope.rights.delete = $scope.checkAccess('delete-' + entityType);
+    $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
+    $scope.rights.edit = $scope.checkAccess('publish-update-' + entityType);
+    $scope.rights.delete = $scope.checkAccess('publish-delete-' + entityType);
 
   }
 

@@ -13,15 +13,15 @@
     var supportedTypes = [
       {
         value: TEXT_TYPE,
-        name: $filter('translate')('PROPERTIES.FORM_ADD_TEXT_TYPE')
+        name: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_TEXT_TYPE')
       },
       {
         value: LIST_TYPE,
-        name: $filter('translate')('PROPERTIES.FORM_ADD_LIST_TYPE')
+        name: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE')
       },
       {
         value: BOOLEAN_TYPE,
-        name: $filter('translate')('PROPERTIES.FORM_ADD_BOOLEAN_TYPE')
+        name: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_BOOLEAN_TYPE')
       }
     ];
 
@@ -35,7 +35,7 @@
       entityService.removeEntity(entityType, publishName, selected.join(','))
         .then(function() {
           publishService.cacheClear(entityType);
-          $scope.$emit('setAlert', 'success', $filter('translate')('PROPERTIES.REMOVE_SUCCESS'), 4000);
+          $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.PROPERTIES.REMOVE_SUCCESS'), 4000);
           reload();
         });
     }
@@ -79,9 +79,9 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('create-' + entityType);
-    $scope.rights.edit = $scope.checkAccess('update-' + entityType);
-    $scope.rights.delete = $scope.checkAccess('delete-' + entityType);
+    $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
+    $scope.rights.edit = $scope.checkAccess('publish-update-' + entityType);
+    $scope.rights.delete = $scope.checkAccess('publish-delete-' + entityType);
 
     /*
      *
@@ -90,40 +90,40 @@
     var scopeDataTable = $scope.tableContainer = {};
     scopeDataTable.pluginName = publishName;
     var filterTypeOptions = angular.copy(supportedTypes);
-    filterTypeOptions.unshift({name: $filter('translate')('UI.EMPTY'), value: ''});
+    filterTypeOptions.unshift({name: $filter('translate')('CORE.UI.EMPTY'), value: ''});
     scopeDataTable.entityType = entityType;
     scopeDataTable.filterBy = [
       {
         key: 'name',
         value: '',
-        label: $filter('translate')('PROPERTIES.TITLE_FILTER')
+        label: $filter('translate')('PUBLISH.PROPERTIES.TITLE_FILTER')
       },
       {
         key: 'description',
         value: '',
-        label: $filter('translate')('PROPERTIES.DESCRIPTION_FILTER')
+        label: $filter('translate')('PUBLISH.PROPERTIES.DESCRIPTION_FILTER')
       },
       {
         key: 'type',
         type: 'select',
         value: '',
-        label: $filter('translate')('PROPERTIES.TYPE_FILTER'),
+        label: $filter('translate')('PUBLISH.PROPERTIES.TYPE_FILTER'),
         options: filterTypeOptions
       }
     ];
     scopeDataTable.header = [{
       key: 'name',
-      name: $filter('translate')('PROPERTIES.NAME_COLUMN'),
+      name: $filter('translate')('PUBLISH.PROPERTIES.NAME_COLUMN'),
       class: ['col-xs-11']
     },
     {
       key: 'action',
-      name: $filter('translate')('UI.ACTIONS_COLUMN'),
+      name: $filter('translate')('CORE.UI.ACTIONS_COLUMN'),
       class: ['col-xs-1']
     }];
 
     scopeDataTable.actions = [{
-      label: $filter('translate')('UI.REMOVE'),
+      label: $filter('translate')('CORE.UI.REMOVE'),
       warningPopup: true,
       condition: function(row) {
         return $scope.rights.delete && !row.locked && !row.saving;
@@ -151,7 +151,7 @@
         key: 'name',
         type: 'horizontalEditableInput',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_NAME'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_NAME'),
           required: true
         }
       },
@@ -159,7 +159,7 @@
         key: 'description',
         type: 'horizontalEditableInput',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_DESCRIPTION'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_DESCRIPTION'),
           required: true
         },
         expressionProperties: {
@@ -170,7 +170,7 @@
         key: 'type',
         type: 'horizontalEditableSelect',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_TYPE'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_TYPE'),
           required: true,
           options: supportedTypes
         }
@@ -179,7 +179,7 @@
         key: 'listValues',
         type: 'horizontalEditableTags',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_LIST_VALUES'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_LIST_VALUES'),
           required: true,
           inputOptions: {
             type: 'editableInput'
@@ -235,18 +235,18 @@
         key: 'name',
         type: 'horizontalInput',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_NAME'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_NAME'),
           required: true,
-          description: $filter('translate')('PROPERTIES.FORM_ADD_NAME_DESC')
+          description: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_NAME_DESC')
         }
       },
       {
         key: 'description',
         type: 'horizontalInput',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_DESCRIPTION'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_DESCRIPTION'),
           required: true,
-          description: $filter('translate')('PROPERTIES.FORM_ADD_DESCRIPTION_DESC')
+          description: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_DESCRIPTION_DESC')
         },
         expressionProperties: {
           'templateOptions.disabled': '!model.name' // disabled when username is blank
@@ -256,9 +256,9 @@
         key: 'type',
         type: 'horizontalSelect',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_TYPE'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_TYPE'),
           required: true,
-          description: $filter('translate')('PROPERTIES.FORM_ADD_TYPE_DESC'),
+          description: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_TYPE_DESC'),
           options: supportedTypes
         },
         expressionProperties: {
@@ -269,8 +269,8 @@
         key: 'listValues',
         type: 'horizontalTags',
         templateOptions: {
-          label: $filter('translate')('PROPERTIES.ATTR_LIST_VALUES'),
-          description: $filter('translate')('PROPERTIES.FORM_ADD_LIST_VALUES_DESC'),
+          label: $filter('translate')('PUBLISH.PROPERTIES.ATTR_LIST_VALUES'),
+          description: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_LIST_VALUES_DESC'),
           required: true
         },
         hideExpression: 'model.type !== "' + LIST_TYPE + '"'

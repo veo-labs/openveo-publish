@@ -92,7 +92,7 @@ describe('Property page', function() {
       // Create line
       page.addLine(name, {
         description: 'Test edition description',
-        type: page.translations.PROPERTIES.FORM_ADD_TEXT_TYPE
+        type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_TEXT_TYPE
       });
 
       assert.isRejected(page.editProperty(name, {name: 'Another name', description: 'Another description'}));

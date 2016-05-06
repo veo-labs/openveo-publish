@@ -91,8 +91,8 @@ describe('Chapter page', function() {
       var promises = [];
 
       // Get both time and title header indexes to avoid hard coding it
-      promises.push(page.getTableHeaderIndex(page.translations.CHAPTER.HEAD_TIME));
-      promises.push(page.getTableHeaderIndex(page.translations.CHAPTER.HEAD_TITLE));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TIME));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TITLE));
       promises.push(page.getLineDetails(expectedChapter.title));
 
       return protractor.promise.all(promises).then(function(results) {
@@ -124,11 +124,11 @@ describe('Chapter page', function() {
   function checkCut(expectedTime, isBegin) {
     return browser.waitForAngular().then(function() {
       var promises = [];
-      var cutTitle = isBegin ? page.translations.UI.BEGIN : page.translations.UI.END;
+      var cutTitle = isBegin ? page.translations.CORE.UI.BEGIN : page.translations.CORE.UI.END;
 
       // Get both time and title header indexes to avoid hard coding it
-      promises.push(page.getTableHeaderIndex(page.translations.CHAPTER.HEAD_TIME));
-      promises.push(page.getTableHeaderIndex(page.translations.CHAPTER.HEAD_TITLE));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TIME));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TITLE));
       promises.push(page.getLineDetails(cutTitle, 'cut'));
 
       return protractor.promise.all(promises).then(function(results) {
@@ -261,13 +261,13 @@ describe('Chapter page', function() {
 
   it('should be able to cut the beginning of the media', function() {
     page.addCut(0.1, true);
-    assert.isFulfilled(page.getLine(page.translations.UI.BEGIN));
+    assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
     page.removeCut(true);
   });
 
   it('should be able to cut the end of the media', function() {
     page.addCut(0.8, false);
-    assert.isFulfilled(page.getLine(page.translations.UI.END));
+    assert.isFulfilled(page.getLine(page.translations.CORE.UI.END));
     page.removeCut(false);
   });
 
@@ -360,8 +360,8 @@ describe('Chapter page', function() {
     page.addCut(0.8, true);
 
     // Begin cut should live, not the end cut
-    assert.isFulfilled(page.getLine(page.translations.UI.BEGIN));
-    assert.isRejected(page.getLine(page.translations.UI.END));
+    assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
+    assert.isRejected(page.getLine(page.translations.CORE.UI.END));
 
   });
 
@@ -374,8 +374,8 @@ describe('Chapter page', function() {
     page.addCut(0.2, false);
 
     // Begin cut should live, not the end cut
-    assert.isFulfilled(page.getLine(page.translations.UI.BEGIN));
-    assert.isRejected(page.getLine(page.translations.UI.END));
+    assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
+    assert.isRejected(page.getLine(page.translations.CORE.UI.END));
 
   });
 

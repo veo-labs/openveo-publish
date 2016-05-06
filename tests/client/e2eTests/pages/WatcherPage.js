@@ -16,14 +16,14 @@ function WatcherPage() {
   this.path = 'be/publish/watcher';
 
   // Element finders specific to this page
-  this.pageTitleElement = element(by.binding('WATCHER.TITLE'));
-  this.pageDescriptionElement = element(by.binding('WATCHER.INFO'));
-  this.startingAlertElement = element(by.binding('WATCHER.STARTING'));
-  this.startedAlertElement = element(by.binding('WATCHER.STARTED'));
-  this.stoppingAlertElement = element(by.binding('WATCHER.STOPPING'));
-  this.stoppedAlertElement = element(by.binding('WATCHER.STOPPED'));
-  this.startButtonElement = element(by.binding('WATCHER.START_BUTTON'));
-  this.stopButtonElement = element(by.binding('WATCHER.STOP_BUTTON'));
+  this.pageTitleElement = element(by.binding('PUBLISH.WATCHER.TITLE'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.WATCHER.INFO'));
+  this.startingAlertElement = element(by.binding('PUBLISH.WATCHER.STARTING'));
+  this.startedAlertElement = element(by.binding('PUBLISH.WATCHER.STARTED'));
+  this.stoppingAlertElement = element(by.binding('PUBLISH.WATCHER.STOPPING'));
+  this.stoppedAlertElement = element(by.binding('PUBLISH.WATCHER.STOPPED'));
+  this.startButtonElement = element(by.binding('PUBLISH.WATCHER.START_BUTTON'));
+  this.stopButtonElement = element(by.binding('PUBLISH.WATCHER.STOP_BUTTON'));
 }
 
 module.exports = WatcherPage;

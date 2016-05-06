@@ -19,7 +19,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
    */
   function StatusFilter($filter) {
     return function(input, errorCode) {
-      var label = $filter('translate')('MEDIAS.STATE_' + input);
+      var label = $filter('translate')('PUBLISH.MEDIAS.STATE_' + input);
       var type = 'label-danger';
 
       // Media is published
@@ -80,8 +80,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/medias-list', {
       templateUrl: '/publish/be/views/medias.html',
       controller: 'MediaController',
-      title: 'MEDIAS.PAGE_TITLE',
-      access: 'access-videos-page',
+      title: 'PUBLISH.MEDIAS.PAGE_TITLE',
+      access: 'publish-access-videos-page',
       resolve: {
         categories: ['publishService', function(publishService) {
           return publishService.loadTaxonomyCategory();
@@ -103,8 +103,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/media/:mediaId', {
       templateUrl: '/publish/be/views/chapter.html',
       controller: 'ChapterController',
-      title: 'CHAPTER.PAGE_TITLE',
-      access: 'chapter-video',
+      title: 'PUBLISH.CHAPTER.PAGE_TITLE',
+      access: 'publish-chapter-video',
       resolve: {
         media: ['$q', 'publishService', 'alertService', '$route', '$filter',
           function($q, publishService, alertService, $route, $filter) {
@@ -117,7 +117,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
                   deferred.resolve.apply(deferred, arguments);
                 else {
                   publishService.cacheClear('chapter');
-                  alertService.add('danger', $filter('translate')('MEDIAS.NOT_READY'), 8000);
+                  alertService.add('danger', $filter('translate')('PUBLISH.MEDIAS.NOT_READY'), 8000);
                   deferred.reject({redirect: '/publish/medias'});
                 }
               } else
@@ -137,8 +137,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/watcher', {
       templateUrl: '/publish/be/views/watcher.html',
       controller: 'WatcherController',
-      title: 'WATCHER.PAGE_TITLE',
-      access: 'access-watcher-page',
+      title: 'PUBLISH.WATCHER.PAGE_TITLE',
+      access: 'publish-access-watcher-page',
       resolve: {
         watcherStatus: ['publishService', function(publishService) {
           return publishService.getWatcherStatus();
@@ -151,8 +151,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/properties-list', {
       templateUrl: '/publish/be/views/properties.html',
       controller: 'PropertiesController',
-      title: 'PROPERTIES.PAGE_TITLE',
-      access: 'access-properties-page'
+      title: 'PUBLISH.PROPERTIES.PAGE_TITLE',
+      access: 'publish-access-properties-page'
     });
 
     // Add route /publish/categories with authentication.
@@ -160,8 +160,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/categories-list', {
       templateUrl: '/publish/be/views/categories.html',
       controller: 'CategoriesController',
-      title: 'CATEGORIES.PAGE_TITLE',
-      access: 'access-categories-page',
+      title: 'PUBLISH.CATEGORIES.PAGE_TITLE',
+      access: 'publish-access-categories-page',
       resolve: {
         categories: ['publishService', function(publishService) {
           return publishService.loadTaxonomyCategory();
@@ -174,8 +174,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     $routeProvider.when('/publish/configuration', {
       templateUrl: '/publish/be/views/configuration.html',
       controller: 'ConfigurationController',
-      title: 'CONFIGURATION.PAGE_TITLE',
-      access: 'access-conf-page',
+      title: 'PUBLISH.CONFIGURATION.PAGE_TITLE',
+      access: 'publish-access-conf-page',
       resolve: {
         publishConf: ['publishService', function(publishService) {
           return publishService.getConfiguration();
