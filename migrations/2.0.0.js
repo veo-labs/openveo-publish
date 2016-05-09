@@ -27,6 +27,90 @@ module.exports.update = function(callback) {
       return;
     }
   });
+
+  // Rename permissions names
+  db.get('core_roles', {}, null, null, function(error, value) {
+    if (error) {
+      callback(error);
+      return;
+    }
+
+    // No need to change anything
+    if (!value || !value.length) callback();
+
+    var permissions = [];
+
+    value.forEach(function(role) {
+      if (role.permissions) {
+        permissions = [];
+        role['permissions'].forEach(function(permission) {
+          switch(permission) {
+            case 'create-property':
+              permissions.push('publish-add-properties');
+              break;
+            case 'update-property':
+              permissions.push('publish-update-properties');
+              break;
+            case 'delete-property':
+              permissions.push('publish-delete-properties');
+              break;
+            case 'create-video':
+              permissions.push('publish-add-videos');
+              break;
+            case 'update-video':
+              permissions.push('publish-update-videos');
+              break;
+            case 'delete-video':
+              permissions.push('publish-delete-videos');
+              break;
+            case 'access-videos-page':
+              permissions.push('publish-access-videos-page');
+              break;
+            case 'access-properties-page':
+              permissions.push('publish-access-properties-page');
+              break;
+            case 'access-categories-page':
+              permissions.push('publish-access-categories-page');
+              break;
+            case 'access-watcher-page':
+              permissions.push('publish-access-watcher-page');
+              break;
+            case 'manage-watcher':
+              permissions.push('publish-manage-watcher');
+              break;
+            case 'access-conf-page':
+              permissions.push('publish-access-conf-page');
+              break;
+            case 'manage-publish-config':
+              permissions.push('publish-manage-publish-config');
+              break;
+            case 'publish-video':
+              permissions.push('publish-publish-videos');
+              break;
+            case 'chapter-video':
+              permissions.push('publish-chapter-videos');
+              break;
+            case 'retry-video':
+              permissions.push('publish-retry-videos');
+              break;
+            case 'upload-video':
+              permissions.push('publish-upload-videos');
+              break;
+            default:
+              permissions.push(permission);
+              break;
+          }
+        });
+
+        db.update('core_roles', {id: role.id}, {permissions: permissions}, function(error) {
+          if (error) {
+            callback(error);
+            return;
+          }
+        });
+      }
+    });
+  });
   
   db.get('publish_videos', {}, null, null, function(error, value) {
     if (error) {
