@@ -17,7 +17,7 @@ var openVeoAPI = require('@openveo/api');
 function ConfigurationModel() {
   openVeoAPI.EntityModel.call(
           this,
-          new openVeoAPI.EntityProvider(openVeoAPI.applicationStorage.getDatabase(), 'configurations')
+          new openVeoAPI.EntityProvider(openVeoAPI.applicationStorage.getDatabase(), 'publish_configurations')
           );
 }
 

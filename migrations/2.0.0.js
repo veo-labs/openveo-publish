@@ -6,8 +6,29 @@ var db = openVeoAPI.applicationStorage.getDatabase();
 
 
 module.exports.update = function(callback) {
-  process.logger.info('Publish 1.3.0 migration launched.');
-  db.get('videos', {}, null, null, function(error, value) {
+  process.logger.info('Publish 2.0.0 migration launched.');
+
+  // Prefix collection with the module name : publish
+  db.renameCollection('properties', 'publish_properties', function(error, value) {
+    if (error) {
+      callback(error);
+      return;
+    }
+  });
+  db.renameCollection('configurations', 'publish_configurations', function(error, value) {
+    if (error) {
+      callback(error);
+      return;
+    }
+  });
+  db.renameCollection('videos', 'publish_videos', function(error, value) {
+    if (error) {
+      callback(error);
+      return;
+    }
+  });
+  
+  db.get('publish_videos', {}, null, null, function(error, value) {
     if (error) {
       callback(error);
       return;
@@ -25,7 +46,7 @@ module.exports.update = function(callback) {
           // backup files property in sources property
           if (!video.sources) {
             series.push(function(callback) {
-              db.update('videos', {id: video.id}, {sources: {files: video.files}}, function(error) {
+              db.update('publish_videos', {id: video.id}, {sources: {files: video.files}}, function(error) {
                 callback(error);
               });
             });
@@ -34,7 +55,7 @@ module.exports.update = function(callback) {
           // delete files property
           if (video.files) {
             series.push(function(callback) {
-              db.removeProp('videos', 'files', {id: video.id}, function(error) {
+              db.removeProp('publish_videos', 'files', {id: video.id}, function(error) {
                 callback(error);
               });
             });
@@ -47,7 +68,7 @@ module.exports.update = function(callback) {
           callback(error);
           return;
         }
-        process.logger.info('Publish 1.3.0 migration done.');
+        process.logger.info('Publish 2.0.0 migration done.');
         callback();
       });
     }
