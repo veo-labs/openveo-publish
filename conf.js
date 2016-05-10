@@ -84,7 +84,7 @@ module.exports = {
       label: 'PUBLISH.PERMISSIONS.GROUP_VIDEOS',
       permissions: [
         {
-          id: 'publish-videos',
+          id: 'publish-publish-videos',
           name: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_NAME',
           description: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION',
           paths: [
