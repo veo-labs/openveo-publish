@@ -121,7 +121,7 @@ VideoPackage.prototype.generateThumb = function() {
   }).on('error', function(error) {
     self.setError(new VideoPackageError(error.message, errors.GENERATE_THUMB_ERROR));
   }).on('end', function() {
-    self.videoModel.updateThumbnail(self.mediaPackage.id, '/' + self.mediaPackage.id + '/thumbnail.jpg');
+    self.videoModel.updateThumbnail(self.mediaPackage.id, '/publish/' + self.mediaPackage.id + '/thumbnail.jpg');
     self.fsm.transition();
   });
 };
