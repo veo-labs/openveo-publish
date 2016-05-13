@@ -145,6 +145,15 @@ module.exports.update = function(callback) {
             });
           }
         }
+
+        // prefix thumbnail video url with publish
+        if (video.thumbnail && video.thumbnail.indexOf('/publish/') == -1) {
+          series.push(function(callback) {
+            db.update('publish_videos', {id: video.id}, {thumbnail: '/publish/' + video.thumbnail}, function(error) {
+              callback(error);
+            });
+          });
+        }
       });
 
       async.series(series, function(error) {
