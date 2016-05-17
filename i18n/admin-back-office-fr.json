@@ -23,15 +23,7 @@
     "UPDATE_PROPERTIES_NAME" : "Mettre à jour les propriétés",
     "UPDATE_PROPERTIES_DESCRIPTION" : "Mettre à jour les propriétés personnalisées (type, nom, description etc.)",
     "DELETE_PROPERTIES_NAME" : "Supprimer les propriétés",
-    "DELETE_PROPERTIES_DESCRIPTION" : "Supprimer une ou plusieurs propriétés personnalisées",
-    "GET_CATEGORIES_NAME" : "Récupérer les catégories",
-    "GET_CATEGORIES_DESCRIPTION" : "Récupérer la liste des termes de la taxonomie \"catégories\"",
-    "ADD_CATEGORIES_NAME" : "Ajouter des catégories",
-    "ADD_CATEGORIES_DESCRIPTION" : "Ajouter de nouvelles catégories",
-    "UPDATE_CATEGORIES_NAME" : "Mettre à jour les catégories",
-    "UPDATE_CATEGORIES_DESCRIPTION" : "Mettre à jour les catégories (nom de la catégorie)",
-    "DELETE_CATEGORIES_NAME" : "Supprimer les catégories",
-    "DELETE_CATEGORIES_DESCRIPTION" : "Supprimer une ou plusieurs catégories de la taxonomie"
+    "DELETE_PROPERTIES_DESCRIPTION" : "Supprimer une ou plusieurs propriétés personnalisées"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Ajouter des propriétés",
@@ -46,12 +38,6 @@
     "UPDATE_VIDEOS_DESCRIPTION" : "Editer les vidéos",
     "DELETE_VIDEOS_NAME" : "Supprimer les vidéos",
     "DELETE_VIDEOS_DESCRIPTION" : "Supprimer les vidéos",
-    "ADD_CATEGORIES_NAME" : "Ajouter des catégories",
-    "ADD_CATEGORIES_DESCRIPTION" : "Ajouter des catégories de médias",
-    "UPDATE_CATEGORIES_NAME" : "Editer les catégories",
-    "UPDATE_CATEGORIES_DESCRIPTION" : "Editer les catégories de médias",
-    "DELETE_CATEGORIES_NAME" : "Supprimer les catégories",
-    "DELETE_CATEGORIES_DESCRIPTION" : "Supprimer les catégories de médias",
     "MANAGE_WATCHER_NAME" : "Gérer le watcher",
     "MANAGE_WATCHER_DESCRIPTION" : "Démarrer / Arrêter le watcher",
     "MANAGE_PUBLISH_CONF_NAME" : "Gérer la configuration de Publish",
@@ -70,8 +56,7 @@
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
     "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo",
     "GROUP_PROPERTIES" : "Propriétés",
-    "GROUP_VIDEOS" : "Vidéos",
-    "GROUP_CATEGORIES" : "Catégories"
+    "GROUP_VIDEOS" : "Vidéos"
   },
   "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Vidéos",

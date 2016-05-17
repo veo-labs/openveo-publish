@@ -25,7 +25,6 @@ module.exports = {
     }
   },
   entities: {
-    categories: 'app/server/controllers/CategoryController',
     properties: 'app/server/controllers/PropertyController',
     videos: 'app/server/controllers/VideoController'
   },

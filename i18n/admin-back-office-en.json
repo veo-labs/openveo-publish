@@ -23,15 +23,7 @@
     "UPDATE_PROPERTIES_NAME" : "Update properties",
     "UPDATE_PROPERTIES_DESCRIPTION" : "Update custom properties (type, name, description etc.)",
     "DELETE_PROPERTIES_NAME" : "Delete properties",
-    "DELETE_PROPERTIES_DESCRIPTION" : "Delete one or several custom properties",
-    "GET_CATEGORIES_NAME" : "Get categories",
-    "GET_CATEGORIES_DESCRIPTION" : "Get the tree of the taxonomy \"categories\"",
-    "ADD_CATEGORIES_NAME" : "Add categories",
-    "ADD_CATEGORIES_DESCRIPTION" : "Add new categories",
-    "UPDATE_CATEGORIES_NAME" : "Update categories",
-    "UPDATE_CATEGORIES_DESCRIPTION" : "Update categories (name of the category)",
-    "DELETE_CATEGORIES_NAME" : "Delete categories",
-    "DELETE_CATEGORIES_DESCRIPTION" : "Delete one or several categories from the taxonomy"
+    "DELETE_PROPERTIES_DESCRIPTION" : "Delete one or several custom properties"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Add properties",
@@ -46,12 +38,6 @@
     "UPDATE_VIDEOS_DESCRIPTION" : "Edit videos",
     "DELETE_VIDEOS_NAME" : "Remove videos",
     "DELETE_VIDEOS_DESCRIPTION" : "Remove videos",
-    "ADD_CATEGORIES_NAME" : "Add categories",
-    "ADD_CATEGORIES_DESCRIPTION" : "Add new media categories",
-    "UPDATE_CATEGORIES_NAME" : "Edit categories",
-    "UPDATE_CATEGORIES_DESCRIPTION" : "Edit media categories",
-    "DELETE_CATEGORIES_NAME" : "Remove categories",
-    "DELETE_CATEGORIES_DESCRIPTION" : "Remove media categories",
     "MANAGE_WATCHER_NAME" : "Manage watcher",
     "MANAGE_WATCHER_DESCRIPTION" : "Start / Stop the watcher",
     "MANAGE_PUBLISH_CONF_NAME" : "Manage Publish configuration",
@@ -70,8 +56,7 @@
     "UPLOAD_VIDEO_NAME": "Launch video upload",
     "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload",
     "GROUP_PROPERTIES" : "Properties",
-    "GROUP_VIDEOS" : "Videos",
-    "GROUP_CATEGORIES" : "Categories"
+    "GROUP_VIDEOS" : "Videos"
   },
   "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Videos",
