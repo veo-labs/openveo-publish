@@ -9,3 +9,9 @@ From OpenVeo root directory :
 
     cd publish
     npm install
+
+# Remove installed peer dependencies
+
+From OpenVeo Publish root directory :
+
+    rm -Rf node_modules/@openveo
