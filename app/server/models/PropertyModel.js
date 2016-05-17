@@ -12,7 +12,6 @@ var async = require('async');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 
-
 /**
  * Defines a PropertyModel class to manipulate custom properties.
  *
@@ -67,7 +66,7 @@ PropertyModel.prototype.add = function(data, callback) {
     return callback(new Error('Invalid property type ' + data.type));
 
   var property = {
-    id: shortid.generate(),
+    id: data.id || shortid.generate(),
     name: data.name,
     description: data.description,
     type: data.type

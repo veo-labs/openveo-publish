@@ -27,12 +27,15 @@ properties | Object | No | - | A list of properties with the property id as the 
 
 HTTP Status Code | Details
 ---- | ----
-500 | An error occured on the server side
 200 | Got the list of videos (even if the list is empty)
+500 | An error occured on the server side
+400 | Wrong list of parameters
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
 
 ```json
 {
-  "videos" : [
+  "entities" : [
     {
       "id" : 1444396683105, // Id of the video
       "state" : 12, // Video state
@@ -126,13 +129,15 @@ video_id | String | Yes | - | The id of the video to fetch
 
 HTTP Status Code | Details
 ---- | ----
+200 | Got the video
 500 | An error occured on the server side
 400 | The id of the video is missing
-200 | Got the video
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
 
 ```json
 {
-  "video" : {
+  "entity" : {
     "id" : 1444396683105, // Id of the video
     "state" : 12, // Video state
     "date" : 1425916390000, // Date in timestamp
@@ -205,6 +210,72 @@ HTTP Status Code | Details
 }
 ```
 
+---
+
+Add video information.
+
+    PUT WEB_SERVICE_URL/publish/videos
+
+HTTP Status Code | Details
+---- | ----
+200 | The video has been added
+500 | An error occured on the server side
+400 | Wrong PUT parameters
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "entity" : {
+    "id" : 1444396683105, // Id of the video
+    "state" : 12, // Video state
+    ...
+  }
+}
+```
+
+---
+
+Update a video.
+
+    POST WEB_SERVICE_URL/publish/videos/{video_id}
+
+HTTP Status Code | Details
+---- | ----
+200 | The video has been updated
+500 | An error occured on the server side
+400 | Missing the video id
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "error": null,
+  "status": "ok"
+}
+```
+
+---
+
+Delete a video.
+
+    DELETE WEB_SERVICE_URL/videos/{video_id}
+
+HTTP Status Code | Details
+---- | ----
+200 | The video has been deleted
+500 | An error occured on the server side
+400 | Missing the video id
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "error": null,
+  "status": "ok"
+}
+```
+
 ## Properties
 
 Get custom properties.
@@ -222,12 +293,15 @@ limit | Number | No | - | To limit the number of properties per page. If not spe
 
 HTTP Status Code | Details
 ---- | ----
-500 | An error occured on the server side
 200 | Got the list of properties (even if the list is empty)
+500 | An error occured on the server side
+400 | Wrong list of parameters
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
 
 ```json
 {
-  "properties": [
+  "entities": [
     {
       "id": "4JMy6htjpe",
       "name": "Property name",
@@ -263,13 +337,15 @@ property_id | String | Yes | - | The id of the property to fetch
 
 HTTP Status Code | Details
 ---- | ----
+200 | Got the property
 500 | An error occured on the server side
 400 | The id of the property is missing
-200 | Got the property
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
 
 ```json
 {
-  "property": {
+  "entity": {
     "id": "NyiBTYjTe",
     "name": "Property name",
     "description": "Property description",
@@ -297,29 +373,69 @@ HTTP Status Code | Details
 }
 ```
 
+---
 
-## Categories
+Add a property.
 
-Get information about a category.
-
-    GET WEB_SERVICE_URL/publish/categories/{category_id}
-
-Name | Type | Required | Default | Details
----- | ---- | ---- | ---- | ----
-category_id | String | Yes | - | The id of the category to fetch
+    PUT WEB_SERVICE_URL/publish/properties
 
 HTTP Status Code | Details
 ---- | ----
+200 | The property has been added
 500 | An error occured on the server side
-400 | The id of the category is missing
-200 | Got the category
+400 | Wrong PUT parameters
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
 
 ```json
 {
-  "category": {
-    "id": "123456",
-    "title": "Category title",
-    "items": [ ]
+  "entity": {
+    "id": "NyiBTYjTe",
+    "name": "Property name",
+    "description": "Property description",
+    "type": "text"
   }
+}
+```
+
+---
+
+Update a property.
+
+    POST WEB_SERVICE_URL/publish/properties/{property_id}
+
+HTTP Status Code | Details
+---- | ----
+200 | The property has been updated
+500 | An error occured on the server side
+400 | Missing the property id
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "error": null,
+  "status": "ok"
+}
+```
+
+---
+
+Delete a property.
+
+    DELETE WEB_SERVICE_URL/publish/properties/{property_id}
+
+HTTP Status Code | Details
+---- | ----
+200 | The property has been deleted
+500 | An error occured on the server side
+400 | Missing the property id
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "error": null,
+  "status": "ok"
 }
 ```

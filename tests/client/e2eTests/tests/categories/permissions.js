@@ -3,9 +3,9 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
-var CategoryModel = process.requirePublish('app/server/models/CategoryModel.js');
+var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
-var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
+var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
 var assert = chai.assert;
@@ -78,7 +78,7 @@ describe('Category page', function() {
           }
         ]
       };
-      page.sendRequest('be/publish/categories', 'put', data).then(function(response) {
+      page.sendRequest('be/taxonomies', 'put', data).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -125,7 +125,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/publish/categories/' + page.treeId, 'post', initialTree).then(function(response) {
+      page.sendRequest('be/taxonomies/' + page.treeId, 'post', initialTree).then(function(response) {
         assert.equal(response.status, 403);
       });
     });
@@ -172,7 +172,7 @@ describe('Category page', function() {
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
-      page.sendRequest('be/publish/categories/' + page.treeId, 'delete').then(function(response) {
+      page.sendRequest('be/taxonomies/' + page.treeId, 'delete').then(function(response) {
         assert.equal(response.status, 403);
       });
     });

@@ -172,18 +172,6 @@ describe('VideoController', function() {
       });
     });
 
-    it('Should return an HTTP code 500 if something wen\'t wrong', function(done) {
-      request.params = {
-        id: 'error'
-      };
-
-      videoController.getEntityAction(request, response, function(error) {
-        assert.isDefined(error);
-        assert.equal(error.httpCode, 500);
-        done();
-      });
-    });
-
   });
 
 });

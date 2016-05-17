@@ -241,11 +241,11 @@
   "applications": {
     "publishApplicationsVideos": {
       "name": "publish-applications-videos",
-      "scopes": [ "publish-get-videos" ]
+      "scopes": [ "publish-get-videos", "publish-add-videos", "publish-update-videos", "publish-delete-videos" ]
     },
     "publishApplicationsProperties": {
       "name": "publish-applications-properties",
-      "scopes": [ "publish-get-properties" ]
+      "scopes": [ "publish-get-properties", "publish-add-properties", "publish-update-properties", "publish-delete-properties" ]
     },
     "publishApplicationsCategories": {
       "name": "publish-applications-categories",

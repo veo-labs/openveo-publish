@@ -1,10 +1,10 @@
 {
-  "propertyPage": "e2eTests/propertyPage*.js",
-  "watcherPage": "e2eTests/watcherPage*.js",
-  "categoryPage": "e2eTests/categoryPage*.js",
-  "mediaPage": "e2eTests/mediaPage*.js",
-  "chapterPage": "e2eTests/chapterPage*.js",
-  "configurationPage": "e2eTests/configurationPage*.js",
-  "publishWebService": "e2eTests/webService*.js",
-  "publish" : "e2eTests/*.js"
+  "publishCategories": "e2eTests/tests/categories/*.js",
+  "publishChapters": "e2eTests/tests/chapters/*.js",
+  "publishConfiguration": "e2eTests/tests/configuration/*.js",
+  "publishMedias": "e2eTests/tests/medias/*.js",
+  "publishProperties": "e2eTests/tests/properties/*.js",
+  "publishWatcher": "e2eTests/tests/watcher/*.js",
+  "publishWebService": "e2eTests/tests/**/webService.js",
+  "publish": "e2eTests/tests/**/*.js"
 }

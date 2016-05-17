@@ -3,7 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
-var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
+var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
 var assert = chai.assert;

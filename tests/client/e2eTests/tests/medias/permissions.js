@@ -5,7 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
-var datas = process.requirePublish('tests/client/e2eTests/database/data.json');
+var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
 var assert = chai.assert;

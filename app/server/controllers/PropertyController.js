@@ -50,7 +50,6 @@ PropertyController.prototype.getPropertyTypesAction = function(request, response
  */
 PropertyController.prototype.getEntitiesAction = function(request, response, next) {
   var model = new this.Entity(request.user);
-  var orderedProperties = ['name', 'description'];
   var params;
 
   try {
@@ -59,15 +58,11 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
       types: {type: 'array<string>'},
       limit: {type: 'number', gt: 0},
       page: {type: 'number', gt: 0, default: 1},
-      sortBy: {type: 'string', in: orderedProperties, default: 'name'},
+      sortBy: {type: 'string', in: ['name', 'description'], default: 'name'},
       sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
     });
   } catch (error) {
-    return response.status(500).send({
-      error: {
-        message: error.message
-      }
-    });
+    return next(errors.GET_PROPERTIES_WRONG_PARAMETERS);
   }
 
   // Build sort
@@ -97,13 +92,13 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
     params.page,
     sort,
     null,
-    function(error, properties, pagination) {
+    function(error, entities, pagination) {
       if (error) {
-        process.logger.error(error);
+        process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
         next(errors.GET_PROPERTIES_ERROR);
       } else {
         response.send({
-          entities: properties,
+          entities: entities,
           pagination: pagination
         });
       }

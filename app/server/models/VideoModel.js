@@ -145,7 +145,8 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     timecodes: videoPackage.timecodes,
     chapters: videoPackage.chapters,
     cut: videoPackage.cut || [],
-    sources: videoPackage.sources || []
+    sources: videoPackage.sources || [],
+    views: videoPackage.views || 0
   };
 
   data.metadata = {
@@ -777,6 +778,8 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.cut = data.cut;
   if (data.chapters)
     info.chapters = data.chapters;
+  if (data.views)
+    info.views = data.views;
   if (data.groups) {
     info['metadata.groups'] = data.groups.filter(function(group) {
       return group ? true : false;

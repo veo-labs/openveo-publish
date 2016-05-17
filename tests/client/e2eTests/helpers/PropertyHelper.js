@@ -1,6 +1,7 @@
 'use strict';
 
 var util = require('util');
+var shortid = require('shortid');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
 
@@ -13,6 +14,17 @@ var Helper = e2e.helpers.Helper;
  */
 function PropertyHelper(model) {
   PropertyHelper.super_.call(this, model);
+  this.textSearchProperties = ['name', 'description'];
+  this.sortProperties = [
+    {
+      name: 'name',
+      type: 'string'
+    },
+    {
+      name: 'description',
+      type: 'string'
+    }
+  ];
 }
 
 module.exports = PropertyHelper;
@@ -44,4 +56,39 @@ PropertyHelper.prototype.addEntitiesAuto = function(name, total, offset) {
   }
 
   return this.addEntities(entities);
+};
+
+/**
+ * Gets entity object example to use with web service put /entityName.
+ *
+ * If the entity managed by the Helper is registered to be tested automatically by the core, it needs to implement
+ * this method which will be used to perform a put /entityName.
+ *
+ * @method getAddExample
+ * @return {Object} The data to add
+ */
+PropertyHelper.prototype.getAddExample = function() {
+  return {
+    id: shortid.generate(),
+    name: 'Property example',
+    description: 'Property example description',
+    type: 'text'
+  };
+};
+
+/**
+ * Gets entity object example to use with web service post /entityName.
+ *
+ * If the entity managed by the Helper is registered to be tested automatically by the core, it needs to implement
+ * this method which will be used to perform a post /entityName.
+ *
+ * @method getUpdateExample
+ * @return {Object} The data to perform the update
+ */
+PropertyHelper.prototype.getUpdateExample = function() {
+  return {
+    name: 'Property example new name',
+    description: 'Property example new description',
+    type: 'boolean'
+  };
 };

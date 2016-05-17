@@ -1,0 +1,18 @@
+{
+  "entities": [
+    {
+      "name": "properties",
+      "model": "app/server/models/PropertyModel.js",
+      "helper": "tests/client/e2eTests/helpers/PropertyHelper.js",
+      "application": "publish-applications-properties",
+      "webServicePath": "/publish/properties"
+    },
+    {
+      "name": "videos",
+      "model": "app/server/models/VideoModel.js",
+      "helper": "tests/client/e2eTests/helpers/MediaHelper.js",
+      "application": "publish-applications-videos",
+      "webServicePath": "/publish/videos"
+    }
+  ]
+}

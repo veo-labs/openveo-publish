@@ -3,6 +3,7 @@
 var util = require('util');
 var path = require('path');
 var async = require('async');
+var shortid = require('shortid');
 var openVeoAPI = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
@@ -16,6 +17,8 @@ var publicDirectory = path.normalize(process.rootPublish + '/assets/player/video
  * Each function is inserting in protractor's control flow.
  *
  * @param {VideoModel} model The entity model that will be used by the Helper
+ * @param {Array} properties A list of properties to associate to videos to create
+ * @param {Array} categories A list of categories to associate to videos to create
  */
 function MediaHelper(model, properties, categories) {
   MediaHelper.super_.call(this, model);
@@ -25,6 +28,30 @@ function MediaHelper(model, properties, categories) {
 
   // The list of available media categories
   this.categories = categories || [];
+
+  this.textSearchProperties = ['title', 'description'];
+  this.sortProperties = [
+    {
+      name: 'title',
+      type: 'string'
+    },
+    {
+      name: 'description',
+      type: 'string'
+    },
+    {
+      name: 'date',
+      type: 'number'
+    },
+    {
+      name: 'state',
+      type: 'number'
+    },
+    {
+      name: 'views',
+      type: 'number'
+    }
+  ];
 }
 
 module.exports = MediaHelper;
@@ -255,4 +282,85 @@ MediaHelper.prototype.setProperties = function(properties) {
  */
 MediaHelper.prototype.setCategories = function(categories) {
   this.categories = categories;
+};
+
+/**
+ * Gets entity object example to use with web service put /entityName.
+ *
+ * If the entity managed by the Helper is registered to be tested automatically by the core, it needs to implement
+ * this method which will be used to perform a put /entityName.
+ *
+ * @method getAddExample
+ * @return {Object} The data to add
+ */
+MediaHelper.prototype.getAddExample = function() {
+  return {
+    id: shortid.generate(),
+    title: 'Video example',
+    description: 'Video example description',
+    category: '1445433239636',
+    properties: [{property1: 'property1 value'}],
+    cut: [
+      {
+        value: 0.1,
+        name: 'UI.BEGIN',
+        description: '',
+        type: 'begin'
+      },
+      {
+        value: 0.2,
+        name: 'UI.END',
+        description: '',
+        type: 'end'
+      }
+    ],
+    chapters: [
+      {
+        name: 'Chapter example',
+        description: 'Chapter example description',
+        value: 0.1
+      }
+    ],
+    views: 0
+  };
+};
+
+/**
+ * Gets entity object example to use with web service post /entityName.
+ *
+ * If the entity managed by the Helper is registered to be tested automatically by the core, it needs to implement
+ * this method which will be used to perform a post /entityName.
+ *
+ * @method getUpdateExample
+ * @return {Object} The data to perform the update
+ */
+MediaHelper.prototype.getUpdateExample = function() {
+  return {
+    title: 'Video example new title',
+    description: 'Video example new description',
+    category: '1445433239640',
+    properties: [{property2: 'property2 value'}],
+    cut: [
+      {
+        value: 0.3,
+        name: 'UI.BEGIN',
+        description: '',
+        type: 'begin'
+      },
+      {
+        value: 0.4,
+        name: 'UI.END',
+        description: '',
+        type: 'end'
+      }
+    ],
+    chapters: [
+      {
+        name: 'Chapter example new name',
+        description: 'Chapter example new description',
+        value: 0.2
+      }
+    ],
+    views: 100
+  };
 };

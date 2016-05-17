@@ -9,7 +9,7 @@ var Helper = e2e.helpers.Helper;
  *
  * Each function is inserting in protractor's control flow.
  *
- * @param {CategoryModel} model The entity model that will be used by the Helper
+ * @param {TaxonomyModel} model The entity model that will be used by the Helper
  */
 function CategoryHelper(model) {
   CategoryHelper.super_.call(this, model);

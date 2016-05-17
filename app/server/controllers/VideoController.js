@@ -171,11 +171,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
     });
   } catch (error) {
-    return response.status(500).send({
-      error: {
-        message: error.message
-      }
-    });
+    return next(errors.GET_VIDEOS_WRONG_PARAMETERS);
   }
 
   // Build sort
@@ -230,7 +226,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   model.getPaginatedFilteredEntities(filter, params.limit, params.page, sort, true,
     function(error, entities, pagination) {
       if (error) {
-        process.logger.error(error);
+        process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
         next((error instanceof AccessError) ? errors.GET_VIDEOS_FORBIDDEN : errors.GET_VIDEOS_ERROR);
       } else {
         response.send({
