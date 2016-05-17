@@ -164,7 +164,6 @@
     "ADD_ELEMENT" : "Ajouter une nouvelle rubrique",
     "RESET": "Les changements ont été annulés",
     "SAVE_SUCCESS" : "Les rubriques ont été enregistrées",
-    "SAVE_FAIL" : "Une erreur est survenue. L'enregistrement des rubriques a échoué.",
     "EMPTY" : "Vous ne pouvez pas ajouter une catégorie vide."
   },
   "CHAPTER" : {
