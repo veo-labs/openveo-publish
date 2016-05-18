@@ -23,7 +23,9 @@
     "UPDATE_PROPERTIES_NAME" : "Mettre à jour les propriétés",
     "UPDATE_PROPERTIES_DESCRIPTION" : "Mettre à jour les propriétés personnalisées (type, nom, description etc.)",
     "DELETE_PROPERTIES_NAME" : "Supprimer les propriétés",
-    "DELETE_PROPERTIES_DESCRIPTION" : "Supprimer une ou plusieurs propriétés personnalisées"
+    "DELETE_PROPERTIES_DESCRIPTION" : "Supprimer une ou plusieurs propriétés personnalisées",
+    "INCREASE_VIEW_NAME" : "Ajouter des vues à une vidéo",
+    "INCREASE_VIEW_DESCRIPTION" : "Ajouter un nombre de vue sur une vidéo"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Ajouter des propriétés",

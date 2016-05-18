@@ -23,7 +23,9 @@
     "UPDATE_PROPERTIES_NAME" : "Update properties",
     "UPDATE_PROPERTIES_DESCRIPTION" : "Update custom properties (type, name, description etc.)",
     "DELETE_PROPERTIES_NAME" : "Delete properties",
-    "DELETE_PROPERTIES_DESCRIPTION" : "Delete one or several custom properties"
+    "DELETE_PROPERTIES_DESCRIPTION" : "Delete one or several custom properties",
+    "INCREASE_VIEW_NAME" : "Increase video views",
+    "INCREASE_VIEW_DESCRIPTION" : "Increase views count on video"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Add properties",

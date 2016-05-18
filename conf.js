@@ -30,9 +30,9 @@ module.exports = {
   },
   webServiceScopes: [
     {
-      id: 'statistics',
-      name: 'WS_SCOPES.INCREASE_VIEW_NAME',
-      description: 'WS_SCOPES.INCREASE_VIEW_DESCRIPTION',
+      id: 'publish-statistics',
+      name: 'PUBLISH.WS_SCOPES.INCREASE_VIEW_NAME',
+      description: 'PUBLISH.WS_SCOPES.INCREASE_VIEW_DESCRIPTION',
       paths: [
         'post /publish/statistics*'
       ]
