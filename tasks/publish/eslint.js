@@ -10,7 +10,8 @@ module.exports = {
       'backup.js',
       'tasks/**/*.js',
       'tests/**/*.js',
-      'app/**/*.js'
+      'app/**/*.js',
+      'migrations/**/*.js'
     ]
   }
 
