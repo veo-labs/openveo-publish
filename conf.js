@@ -155,10 +155,10 @@ module.exports = {
     },
     scriptFiles: {
       base: [
-        '/publish/lib/openveo-player/lib/video.js/dist/video.min.js',
-        '/publish/lib/openveo-player/lib/dash.js/dist/dash.all.js',
-        '/publish/lib/openveo-player/lib/videojs-contrib-dash/src/js/videojs-dash.js',
-        '/publish/lib/openveo-player/lib/videojs.hls.min/index.js',
+        '/publish/lib/video.js/dist/video.min.js',
+        '/publish/lib/dash.js/dist/dash.all.js',
+        '/publish/lib/videojs-contrib-dash/src/js/videojs-dash.js',
+        '/publish/lib/videojs-contrib-hls/index.js',
         '/publish/lib/openveo-player/dist/openveo-player.min.js'
       ],
       dev: [
@@ -178,7 +178,7 @@ module.exports = {
     cssFiles: [
       '/publish/be/css/publish.css',
       '/publish/lib/openveo-player/dist/openveo-player.css',
-      '/publish/lib/openveo-player/lib/video.js/dist/video-js.min.css'
+      '/publish/lib/video.js/dist/video-js.min.css'
     ]
   },
   custom: {
@@ -188,10 +188,10 @@ module.exports = {
         '/publish/lib/angular-animate/angular-animate.min.js',
         '/publish/lib/angular-cookies/angular-cookies.min.js',
         '/publish/lib/openveo-player/dist/openveo-player.min.js',
-        '/publish/lib/openveo-player/lib/video.js/dist/video.min.js',
-        '/publish/lib/openveo-player/lib/dash.js/dist/dash.all.js',
-        '/publish/lib/openveo-player/lib/videojs-contrib-dash/src/js/videojs-dash.js',
-        '/publish/lib/openveo-player/lib/videojs.hls.min/index.js'
+        '/publish/lib/video.js/dist/video.min.js',
+        '/publish/lib/dash.js/dist/dash.all.js',
+        '/publish/lib/videojs-contrib-dash/src/js/videojs-dash.js',
+        '/publish/lib/videojs-contrib-hls/index.js'
       ],
       publishPlayer: {
         dev: [
@@ -207,7 +207,7 @@ module.exports = {
     cssFiles: [
       '/publish/be/css/player_page.css',
       '/publish/lib/openveo-player/dist/openveo-player.css',
-      '/publish/lib/openveo-player/lib/video.js/dist/video-js.min.css'
+      '/publish/lib/video.js/dist/video-js.min.css'
     ]
   },
   viewsFolders: [
