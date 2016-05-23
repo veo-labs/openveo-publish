@@ -85,6 +85,8 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
                 // res is an hash with { error: stderr || null, data: stdout }
                 if (res.error)
                   callback(res.error);
+                else if (err)
+                  callback(err);
                 else {
                   mediaId = tmpId;
                   callback();
