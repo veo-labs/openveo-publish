@@ -43,9 +43,21 @@ Open **~/.openveo/publish/videoPlatformConf.json**
        "redirectUrl": "http://SERVER_HOST_NAME:SERVER_PORT/be/publish/configuration/googleOAuthAssosiation"
      },
      "privacy": "public" // (public, private or unlisted; default: public)
+  },
+  "wowza":{
+    "protocol": "sftp", // (ftp, sftp, ftps)
+    "host": "HOST", //server host where the video will be uploaded
+    "port": "PORT", //server host port
+    "user": "USERNAME", // server username
+    "pwd": "PASSWORD", // server password 
+    "vodFilePath": "/files/", // path where the video will be uploaded
+    "streamPath": "https://HOST/APP_NAME" // stream path exposed by wowza to access video, APP_NAME defined in wowza
   }
 }
 ```
+
+**Nb :** To upload videos on **Wowza**, you need to install **lfpt** package on your system with the following command :
+**sudo apt-get install lftp**
 
 # Configure the logger
 
@@ -70,17 +82,19 @@ Open **~/.openveo/publish/watcherConf.json**
 {
   "hotFolders" : [ // List of folders to watch
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
+      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot1" // Path to the hot folder
     },
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
+      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot2" // Path to the hot folder
     },
     {
-      "type" : "youtube", // Video platform to upload to for this hot folder (only vimeo or youtube is supported)
+      "type" : "youtube", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot3" // Path to the hot folder
-    }
+    },
+      "type" : "wowza", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
+      "path" : "/user/box/hot4" // Path to the hot folder
     ...
   ]
 }
