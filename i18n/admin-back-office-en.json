@@ -72,6 +72,7 @@
     "RETRY" : "Retry",
     "UPLOAD_VIMEO" : "Upload to Vimeo",
     "UPLOAD_YOUTUBE" : "Upload to Youtube",
+    "UPLOAD_WOWZA" : "Upload to Wowza",
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
     "SHARECODE" : "To share the video, copy the HTML code below and paste it in your page :",

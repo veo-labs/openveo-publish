@@ -72,6 +72,7 @@
     "RETRY" : "Réessayer",
     "UPLOAD_VIMEO" : "Envoyer sur Vimeo",
     "UPLOAD_YOUTUBE" : "Envoyer sur Youtube",
+    "UPLOAD_WOWZA" : "Envoyer sur Wowza",
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
     "CHAPTER_EDIT": "Chapitre",
