@@ -90,11 +90,7 @@ VideoProvider.prototype.getOne = function(id, filter, callback) {
 
   this.database.get(this.collection, filter,
     {
-      _id: 0,
-      originalPackagePath: 0,
-      packageType: 0,
-      lastState: 0,
-      lastTransition: 0
+      _id: 0
     },
   1, function(error, entities) {
     if (entities && entities.length)
