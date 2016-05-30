@@ -1,3 +1,19 @@
+# 2.0.0 / 2016-05-30
+
+- Upload to Wowza plateform
+- Change sources format to play adaptive streaming sources
+- Update Webservices for publish entities
+- Add Properties type (boolean, list)
+- Refactoring taxonomy category by using core taxonomy entities
+- Update plugin interface due to API dependencies
+- Add Statistics views count 
+- Update entities by using new Models from API (Entity and ContentEntity)
+- Add Groups and Owner to content entities
+- Update Controllers from API Controller interface
+- Add migration script
+- Avoid collision between core and other plugin
+- Update dependencies
+
 # 1.2.0 / 2016-02-19
 
 - Update AngularJS from version 1.4.1 to 1.4.7

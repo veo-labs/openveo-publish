@@ -24,7 +24,6 @@ Open **~/.openveo/publish/publishConf.json**
 
 # Configure video platform credentials
 
-Uploading to Vimeo requires oauth credentials.
 
 Open **~/.openveo/publish/videoPlatformConf.json**
 
@@ -51,13 +50,25 @@ Open **~/.openveo/publish/videoPlatformConf.json**
     "user": "USERNAME", // server username
     "pwd": "PASSWORD", // server password 
     "vodFilePath": "/files/", // path where the video will be uploaded
-    "streamPath": "https://HOST/APP_NAME" // stream path exposed by wowza to access video, APP_NAME defined in wowza
+    "streamPath": "https://HOST/APP_NAME" // stream path exposed by wowza to access video, HOST and APP_NAME are defined in wowza
   }
 }
 ```
 
-**Nb :** To upload videos on **Wowza**, you need to install **lfpt** package on your system with the following command :
-**sudo apt-get install lftp**
+To upload videos on Vimeo, publish requires oauth credentials.
+
+To upload videos on Youtube, publish requires googleOAuth credentials.
+
+To upload videos on **Wowza**, you need to install **lfpt** package on your system
+
+- [LFTP Homepage]( http://lftp.yar.ru/)
+
+- [LFTP on Windows](https://nwgat.ninja/lftp-for-windows/)
+
+On **Ubuntu**, you can install lftp package by executing the command:
+
+    sudo apt-get install lftp
+ 
 
 # Configure the logger
 
@@ -83,18 +94,20 @@ Open **~/.openveo/publish/watcherConf.json**
   "hotFolders" : [ // List of folders to watch
     {
       "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
-      "path" : "/user/box/hot1" // Path to the hot folder
-    },
-    {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot2" // Path to the hot folder
     },
     {
       "type" : "youtube", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot3" // Path to the hot folder
     },
+    {
       "type" : "wowza", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot4" // Path to the hot folder
+    },
+    { 
+      // No video platform specified : let user choose on which platform the video will be uplaoded
+      "path" : "/user/box/hot1" // Path to the hot folder
+    },
     ...
   ]
 }
