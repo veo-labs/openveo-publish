@@ -1,8 +1,8 @@
-@import "bootstrap/override";
-
 // add support responsive
 @import "base/on-responsive";
 @import "base/browser-support";
+
+@import "base/colors";
 
 /**
  * Mixins / Helper / Function

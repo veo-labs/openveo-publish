@@ -1,5 +1,10 @@
 // setting mq configuration
 
+$screen-xs: 480px !default;
+$screen-sm: 768px !default;
+$screen-md: 992px !default;
+$screen-lg: 1300px !default;
+
 // mq breakpoints
 $mq-breakpoints: (
     mobile:  $screen-xs,
