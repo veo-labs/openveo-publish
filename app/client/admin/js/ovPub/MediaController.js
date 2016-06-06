@@ -13,9 +13,11 @@
   $interval,
   entityService,
   publishService,
+  utilService,
   properties,
   platforms,
   groups,
+  users,
   tableReloadEventService,
   i18nService,
   publishName) {
@@ -24,6 +26,7 @@
     $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
     $scope.groups = groups.data.entities;
+    $scope.users = users.data.entities;
 
     /*
      *
@@ -61,27 +64,6 @@
         value: null,
         name: $filter('translate')(label)
       }].concat(publishService.getCategoriesOptions());
-    }
-
-    /**
-     * Builds groups select options.
-     *
-     * @return {Array} The list of options
-     */
-    function buildGroupOptions() {
-      var options = [{
-        name: $filter('translate')('CORE.UI.NONE'),
-        value: null
-      }];
-
-      $scope.groups.forEach(function(group) {
-        options.push({
-          name: group.name,
-          value: group.id
-        });
-      });
-
-      return options;
     }
 
     /**
@@ -203,7 +185,8 @@
         description: media.description,
         properties: media.properties,
         category: media.category,
-        groups: media.groups
+        groups: media.groups,
+        user: media.user
       }).then(function() {
         scopeEditForm.pendingEdition = false;
       });
@@ -254,7 +237,7 @@
         type: 'horizontalEditableSelect',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_GROUPS'),
-          options: buildGroupOptions()
+          options: utilService.buildSelectOptions($scope.groups)
         },
         ngModelAttrs: {
           'true': {
@@ -446,6 +429,25 @@
     scopeEditForm.init = function(row) {
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
       row.groups = row.metadata.groups;
+      row.user = row.metadata.user;
+
+      if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == 0) {
+        var opt = utilService.buildSelectOptions($scope.users);
+        scopeEditForm.fields.push({
+          key: 'user',
+          type: 'horizontalEditableSelect',
+          templateOptions: {
+            label: $filter('translate')('CORE.UI.OWNER'),
+            options: opt
+          }
+        });
+      }
+
+      if ($scope.properties.length)
+        scopeEditForm.fields.push({
+          noFormControl: true,
+          template: '<hr>'
+        });
 
       // Create a formly field for each property
       angular.forEach($scope.properties, function(property, index) {
@@ -523,9 +525,11 @@
     '$interval',
     'entityService',
     'publishService',
+    'utilService',
     'properties',
     'platforms',
     'groups',
+    'users',
     'tableReloadEventService',
     'i18nService',
     'publishName'

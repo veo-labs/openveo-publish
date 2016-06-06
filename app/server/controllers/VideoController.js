@@ -164,6 +164,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       dateEnd: {type: 'date'},
       categories: {type: 'array<string>'},
       groups: {type: 'array<string>'},
+      user: {type: 'array<string>'},
       properties: {type: 'object', default: {}},
       limit: {type: 'number', gt: 0},
       page: {type: 'number', gt: 0, default: 1},
@@ -206,6 +207,13 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   if (params.groups && params.groups.length) {
     filter['metadata.groups'] = {
       $in: params.groups
+    };
+  }
+
+  // Add owner
+  if (params.user && params.user.length) {
+    filter['metadata.user'] = {
+      $in: params.user
     };
   }
 

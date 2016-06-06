@@ -19,4 +19,23 @@
       </div>
     </div>
   </div>
+
+  <div class="col-sd-12 col-md-4">
+    <div class="panel panel-default">
+      <div uib-popover="{{'PUBLISH.CONFIGURATION.UPLOAD_INFO' | translate}}" popover-trigger="mouseenter" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.UPLOAD_TITLE' | translate"></div>
+      <div class="panel-body">
+        <p>
+          {{ 'PUBLISH.CONFIGURATION.UPLOAD_DEFAULT_OWNER' | translate}}
+          <br>
+          <select ng-disabled="!rights.edit" class="form-control" ng-change="saveOptions()" ng-model="default.owner" ng-options="option.name for option in options.owners track by option.value"></select>
+        </p>
+        <p>
+          {{ 'PUBLISH.CONFIGURATION.UPLOAD_DEFAULT_GROUP' | translate}}
+          <br>
+          <select ng-disabled="!rights.edit" class="form-control" ng-change="saveOptions()" ng-model="default.group" ng-options="option.name for option in options.groups track by option.value"></select>
+        </p>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -150,8 +150,8 @@ VideoModel.prototype.add = function(videoPackage, callback) {
   };
 
   data.metadata = {
-    user: (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId(),
-    groups: videoPackage.groups || []
+    user: data.metadata.user || (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId(),
+    groups: data.metadata.groups || videoPackage.groups || []
   };
 
   this.provider.add(data, function(error, addedCount, videos) {
@@ -785,12 +785,18 @@ VideoModel.prototype.update = function(id, data, callback) {
       return group ? true : false;
     });
   }
+  if (data.user) {
+    info['metadata.user'] = data.user;
+  }
 
   this.provider.getOne(id, null, function(error, entity) {
     if (!error) {
-      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
+      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION)) {
+
+        // user is authorized to update but he must be owner to update owner
+        if (!self.isUserOwner(entity) && !self.isUserAdmin()) delete info['metadata.user'];
         self.provider.update(id, info, callback);
-      else
+      } else
         callback(new AccessError('User "' + self.user.id + '" can\'t edit video "' + id + '"'));
     } else
       callback(error);

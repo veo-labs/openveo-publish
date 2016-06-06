@@ -49,7 +49,7 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
 
     // Retrieve token information from database
     function(callback) {
-      self.confModel.get(null, function(error, result) {
+      self.confModel.get({googleOAuthTokens: {$ne: null}}, function(error, result) {
         if (error || !result || result.length < 1) {
           callback(error);
           return;

@@ -12,6 +12,7 @@ var StateMachine = require('javascript-state-machine');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
@@ -84,6 +85,14 @@ function Package(mediaPackage) {
    * @type Object
    */
   this.videoPlatformConf = videoPlatformConf;
+
+  /**
+   * Configuration model.
+   *
+   * @property videoModel
+   * @type VideoModel
+   */
+  this.defaultConfig = new ConfigurationModel();
 
   // Validate temporary directory
   if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
@@ -292,12 +301,20 @@ Package.prototype.initPackage = function() {
   this.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
   this.mediaPackage.date = Date.now();
 
-  // Save package information into database
-  this.videoModel.add(this.mediaPackage, function(error) {
-    if (error)
-      self.emit('error', new PackageError(error.message, errors.SAVE_PACKAGE_DATA_ERROR));
-    else
-      self.fsm.transition();
+  this.defaultConfig.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
+    if (!error && result && result.length >= 1) {
+      var conf = result[0].publishDefaultUpload;
+      self.mediaPackage.metadata.user = conf.owner ? conf.owner.id : null;
+      self.mediaPackage.metadata.groups = conf.group ? [conf.group.id] : [];
+    }
+
+    // Save package information into database
+    self.videoModel.add(self.mediaPackage, function(error) {
+      if (error)
+        self.emit('error', new PackageError(error.message, errors.SAVE_PACKAGE_DATA_ERROR));
+      else
+        self.fsm.transition();
+    });
   });
 };
 

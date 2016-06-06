@@ -15,6 +15,7 @@ describe('MediaController', function() {
     module('ov.publish');
     module('ov.entity');
     module('ov.tableForm');
+    module('ov.utilService');
   });
 
   // Dependencies injections
@@ -65,6 +66,14 @@ describe('MediaController', function() {
           entities: [{
             id: '1',
             name: 'Name 1'
+          }]
+        }
+      },
+      users: {
+        data: {
+          entities: [{
+            id: '10',
+            name: 'user 10'
           }]
         }
       }

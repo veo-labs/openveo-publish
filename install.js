@@ -270,6 +270,17 @@ function createWatcherConf(callback) {
         });
         callback();
       });
+    },
+    function(callback) {
+      if (!videoPlatformConf.wowza) return callback();
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'wowza');
+      rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
+        conf.hotFolders.push({
+          type: 'wowza',
+          path: (answer || defaultPath).replace(/\\/g, '/')
+        });
+        callback();
+      });
     }
   ], function(error, results) {
     if (error) {

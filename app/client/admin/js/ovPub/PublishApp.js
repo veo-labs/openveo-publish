@@ -92,8 +92,11 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
         platforms: ['publishService', function(publishService) {
           return publishService.loadPlatforms();
         }],
-        groups: ['entityService', function(entityService, publishName) {
+        groups: ['entityService', function(entityService) {
           return entityService.getAllEntities('groups');
+        }],
+        users: ['entityService', function(entityService) {
+          return entityService.getAllEntities('users');
         }]
       }
     });
@@ -179,6 +182,12 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       resolve: {
         publishConf: ['publishService', function(publishService) {
           return publishService.getConfiguration();
+        }],
+        groups: ['entityService', function(entityService) {
+          return entityService.getAllEntities('groups');
+        }],
+        users: ['entityService', function(entityService) {
+          return entityService.getAllEntities('users');
         }]
       }
     });

@@ -20,6 +20,7 @@ module.exports = function(config) {
       'assets/lib/ng-jsonpath/dist/ng-jsonpath.js',
       'tests/client/unitTests/front/player/playerApp.js',
       'tests/client/unitTests/admin/tableForm/tableForm.js',
+      'tests/client/unitTests/admin/util/utilService.js',
       'tests/client/unitTests/admin/route/RouteApp.js',
       'tests/client/unitTests/admin/i18n/I18nApp.js',
       'tests/client/unitTests/admin/entity/EntityApp.js',

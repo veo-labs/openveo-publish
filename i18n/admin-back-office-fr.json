@@ -179,6 +179,10 @@
     "YOUTUBE_PEER_ASSOCIATED_STATUS": "Un compte Google est bien associé.",
     "YOUTUBE_PEER_NOT_ASSOCIATED_STATUS": "Aucun compte Google associé.",
     "YOUTUBE_TITLE": "Youtube",
-    "YOUTUBE_MODIFY_PEER": "Changer le compte associé"
+    "YOUTUBE_MODIFY_PEER": "Changer le compte associé",
+    "UPLOAD_TITLE": "Upload",
+    "UPLOAD_INFO": "Vous pouvez définir les options par défaut de l'upload tel que le propriétaire ou le groupe par défaut d'une vidéo.",
+    "UPLOAD_DEFAULT_OWNER": "Propriétaire de la vidéo par défaut",
+    "UPLOAD_DEFAULT_GROUP": "Groupe de le vidéo par défaut"
   }
 }

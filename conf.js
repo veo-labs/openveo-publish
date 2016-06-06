@@ -17,7 +17,8 @@ module.exports = {
       'get /getPlatforms': 'app/server/controllers/VideoController.getPlatformsAction',
       'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
       'get /configuration/googleOAuthAssociation':
-      'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction'
+      'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
+      'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
     },
     ws: {
       'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
@@ -68,7 +69,8 @@ module.exports = {
       id: 'publish-access-conf-page',
       name: 'PUBLISH.PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME',
       paths: [
-        'get /publish/configuration/all'
+        'get /publish/configuration/all',
+        'post /publish/configuration/upload'
       ]
     },
     {

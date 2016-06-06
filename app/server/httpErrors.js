@@ -56,6 +56,11 @@ module.exports = {
     module: 'publish',
     message: 'Error updating statistics'
   },
+  SET_CONFIGURATION_ERROR: {
+    code: 0x008,
+    httpCode: 500,
+    module: 'publish'
+  },
 
   // Authentication errors
   GET_VIDEO_READY_FORBIDDEN: {

@@ -179,6 +179,10 @@
     "YOUTUBE_PEER_ASSOCIATED_STATUS": "Correctly associated to Google.",
     "YOUTUBE_PEER_NOT_ASSOCIATED_STATUS": "No Google account associated.",
     "YOUTUBE_TITLE": "Youtube",
-    "YOUTUBE_MODIFY_PEER": "Edit the association"
+    "YOUTUBE_MODIFY_PEER": "Edit the association",
+    "UPLOAD_TITLE": "Upload",
+    "UPLOAD_INFO": "You can to define default upload option as default owner or default group of a video.",
+    "UPLOAD_DEFAULT_OWNER": "Default video owner",
+    "UPLOAD_DEFAULT_GROUP": "Default video group"
   }
 }

@@ -417,7 +417,9 @@ TarPackage.prototype.validatePackage = function() {
     if (error)
       self.setError(new TarPackageError(error.message, errors.VALIDATION_ERROR));
     else {
-      self.mediaPackage.metadata = metadata;
+      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+      openVeoAPI.util.merge(self.mediaPackage.metadata, metadata);
+
       self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
 
       if (self.mediaPackage.metadata.date)

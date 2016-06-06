@@ -12,26 +12,28 @@ var googleOAuthHelper = process.requirePublish('app/server/providers/videoPlatfo
 var errors = process.requirePublish('app/server/httpErrors.js');
 var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
-var Controller = openVeoAPI.controllers.Controller;
+var EntityController = openVeoAPI.controllers.EntityController;
+var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 
 /**
  * Provides route actions for all requests relative to publish configuration.
  *
  * @class ConfigurationController
  * @constructor
- * @extends Controller
+ * @extends EntityController
  */
 function ConfigurationController() {
-  Controller.call(this);
+  EntityController.call(this, ConfigurationModel);
 }
 
 module.exports = ConfigurationController;
-util.inherits(ConfigurationController, Controller);
+util.inherits(ConfigurationController, EntityController);
 
 /**
  * Retrieves publish plugin configurations.
  */
 ConfigurationController.prototype.getConfigurationAllAction = function(request, response, next) {
+  var model = new this.Entity(request.user);
   var configurations = {};
 
   async.series([
@@ -60,8 +62,19 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
         });
       } else
         callback();
+    },
+    function(callback) {
+      configurations['publishDefaultUpload'] = {};
+      model.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
+        if (error || !result || result.length < 1) {
+          callback(error);
+          return;
+        } else {
+          configurations['publishDefaultUpload'] = result[0].publishDefaultUpload;
+        }
+        callback();
+      });
     }
-
   ], function(error, results) {
     if (error)
       next(errors.GET_CONFIGURATION_ERROR);
@@ -80,4 +93,60 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
   googleOAuthHelper.persistTokenWithCode(code, function() {
     response.redirect('/be/publish/configuration');
   });
+};
+
+/**
+ * Redirects action that will be called by google when the user associate our application,
+ * a code will be in the parameters.
+ */
+ConfigurationController.prototype.saveUploadConfiguration = function(request, response, next) {
+  var model = new this.Entity(request.user);
+  var configuration;
+  var body = request.body;
+  async.series([
+
+    // Retrieve token information from database
+    function(callback) {
+      model.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
+        if (error || !result || result.length < 1) {
+          callback(error);
+          return;
+        } else {
+          configuration = result[0];
+        }
+        callback();
+      });
+    }],
+
+    function(error) {
+      if (error) {
+        next(errors.SET_CONFIGURATION_ERROR);
+        return;
+      } else {
+        var cb = function(err, addedCount, data) {
+          if (err) {
+            process.logger.error('Error while saving configuration data', err);
+          } else {
+            process.logger.debug('Configuration data has been saved');
+          }
+          if (error)
+            next(errors.SET_CONFIGURATION_ERROR);
+          else
+            response.status(200).send();
+        };
+
+        var saveConf = {
+          publishDefaultUpload: {
+            owner: body.owner,
+            group: body.group
+          }
+        };
+
+        if (configuration && configuration.id)
+          model.update(configuration.id, saveConf, cb);
+        else
+          model.add(saveConf, cb);
+      }
+    }
+    );
 };

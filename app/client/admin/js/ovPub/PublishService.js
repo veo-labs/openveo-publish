@@ -246,6 +246,17 @@
     }
 
     /**
+     * Save upload configuration.
+     *
+     * @param {Object} data The upload configuration object
+     * @return {Promise} The HTTP promise
+     * @method saveUploadConfig
+     */
+    function saveUploadConfig(data) {
+      return $http.post(basePath + 'publish/configuration/upload/', data);
+    }
+
+    /**
      * Clears a publish service cache.
      *
      * @param {String} [type] The cache element to clear (**properties**, **categories** or **chapter**), null to
@@ -302,6 +313,7 @@
       stopWatcher: stopWatcher,
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
+      saveUploadConfig: saveUploadConfig,
       cacheClear: cacheClear
     };
 
