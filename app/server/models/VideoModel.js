@@ -150,8 +150,10 @@ VideoModel.prototype.add = function(videoPackage, callback) {
   };
 
   data.metadata = {
-    user: data.metadata.user || (this.user && this.user.id) || openVeoAPI.applicationStorage.getAnonymousUserId(),
-    groups: data.metadata.groups || videoPackage.groups || []
+    user: (videoPackage.metadata && videoPackage.metadata.user) ||
+      (this.user && this.user.id) ||
+      openVeoAPI.applicationStorage.getAnonymousUserId(),
+    groups: (videoPackage.metadata && videoPackage.metadata.groups) || videoPackage.groups || []
   };
 
   this.provider.add(data, function(error, addedCount, videos) {
