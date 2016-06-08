@@ -36,6 +36,9 @@ for (var i = 0; i < process.argv.length; i++) {
     case '--databaseConf':
       databaseConf = require(path.normalize(process.argv[i + 1])) || null;
       break;
+    case '--anonymousUserId':
+      openVeoAPI.applicationStorage.setAnonymousUserId(process.argv[i + 1] || '1');
+      break;
     default:
       break;
   }

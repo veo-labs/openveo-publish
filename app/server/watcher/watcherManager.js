@@ -37,7 +37,8 @@ module.exports.start = function() {
     // Executes watcher as a child process
     watcher = childProcess.fork(path.normalize(process.rootPublish + '/app/server/watcher/watcher.js'), [
       '--rootPublish', process.rootPublish,
-      '--databaseConf', path.normalize(path.join(configDir, 'core/databaseConf.json'))
+      '--databaseConf', path.normalize(path.join(configDir, 'core/databaseConf.json')),
+      '--anonymousUserId', openVeoAPI.applicationStorage.getAnonymousUserId()
     ]);
 
     // Listen to messages from child process

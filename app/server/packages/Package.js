@@ -304,8 +304,8 @@ Package.prototype.initPackage = function() {
   this.defaultConfig.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
     if (!error && result && result.length >= 1) {
       var conf = result[0].publishDefaultUpload;
-      self.mediaPackage.metadata.user = conf.owner ? conf.owner.id : null;
-      self.mediaPackage.metadata.groups = conf.group ? [conf.group.id] : [];
+      if (conf.owner && conf.owner.value) self.mediaPackage.user = conf.owner.value;
+      if (conf.group && conf.owner.value) self.mediaPackage.groups = [conf.group.value];
     }
 
     // Save package information into database
