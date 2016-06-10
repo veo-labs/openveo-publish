@@ -1,3 +1,8 @@
+# 2.0.1 / 2016-06-10
+
+- Add install process for wowza conf
+- Add default upload user and default upload group, anonymousId if none.
+
 # 2.0.0 / 2016-05-30
 
 - Upload to Wowza plateform
