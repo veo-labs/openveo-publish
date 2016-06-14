@@ -132,7 +132,7 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     description: videoPackage.description,
     state: videoPackage.state,
     date: videoPackage.date,
-    metadata: videoPackage.metadata,
+    metadata: videoPackage.metadata || {},
     type: videoPackage.type,
     errorCode: videoPackage.errorCode,
     category: videoPackage.category,
@@ -804,54 +804,61 @@ VideoModel.prototype.update = function(id, data, callback) {
 };
 
 /**
- * Publishes a video.
+ * Publishes videos.
  *
- * Change the state of the video to "published" only if its state is
+ * Change the state of the videos to "published" only if its state is
  * actually "ready".
  *
- * @method publishVideo
+ * @method publishVideos
  * @async
- * @param {String} id The id of the video
+ * @param {Array} ids The array ids of videos
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of published videos
  */
-VideoModel.prototype.publishVideo = function(id, callback) {
+VideoModel.prototype.publishVideo = function(ids, callback) {
   var self = this;
-  this.provider.getOne(id, null, function(error, entity) {
+  var idsToPublish = [];
+
+  this.provider.get({id: {$in: ids}}, function(error, entities) {
     if (!error) {
-      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
-        self.provider.updateVideoState(id, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
-      else
-        callback(new AccessError('User "' + self.user.id + '" can\'t publish video "' + id + '"'));
-    } else
-      callback(error);
+      for (var i = 0; i < entities.length; i++) {
+        if (self.isUserAuthorized(entities[i], openVeoAPI.ContentModel.UPDATE_OPERATION))
+          idsToPublish.push(entities[i].id);
+      }
+    }
+
+    self.provider.updateVideoState(ids, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
   });
 };
 
+
 /**
- * Unpublishes a video.
+ * Unpublishe videos.
  *
- * Change the state of the video to "ready" only if its state if
- * actually "published".
+ * Change the state of the videos to "unpublished" only if its state is
+ * actually "ready".
  *
- * @method unpublishVideo
+ * @method unpublishVideos
  * @async
- * @param {String} id The id of the video
+ * @param {Array} ids The array ids of videos
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of unpublished videos
  */
-VideoModel.prototype.unpublishVideo = function(id, callback) {
+VideoModel.prototype.unpublishVideo = function(ids, callback) {
   var self = this;
-  this.provider.getOne(id, null, function(error, entity) {
+  var idsToUnpublish = [];
+
+  this.provider.get({id: {$in: ids}}, function(error, entities) {
     if (!error) {
-      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION))
-        self.provider.updateVideoState(id, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
-      else
-        callback(new AccessError('User "' + self.user.id + '" can\'t unpublish video "' + id + '"'));
-    } else
-      callback(error);
+      for (var i = 0; i < entities.length; i++) {
+        if (self.isUserAuthorized(entities[i], openVeoAPI.ContentModel.UPDATE_OPERATION))
+          idsToUnpublish.push(entities[i].id);
+      }
+    }
+
+    self.provider.updateVideoState(ids, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
   });
 };
 
