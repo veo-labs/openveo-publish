@@ -12,20 +12,34 @@
          id="chapterPlayer"
          ></ov-player>
     </div>
-    <div class='col-sm-4 col-sm-pull-8'>
-      <table class="table table-striped table-condensed chapter-table">
+    <div class='col-sm-4 col-sm-pull-8' >
+      <table class="table table-striped table-condensed chapter-table" ng-show='ranges.length'>
         <thead>
           <tr><th class='col-sm-3 active'>{{ 'PUBLISH.CHAPTER.HEAD_TIME' | translate}}</th>
-            <th class='col-sm-9 active'>{{ 'PUBLISH.CHAPTER.HEAD_TITLE' | translate}}</th>
+            <th class='col-sm-8 active'>{{ 'PUBLISH.CHAPTER.HEAD_TITLE' | translate}}</th>
+            <th class='col-sm-1 active'>
+              <input type="checkbox" ng-model="checkAllSelected" ng-click="checkAll();$event.stopPropagation();">
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="row in ranges| orderBy:'+value'" ng-click="select(row)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
-            <td class="col-sm-3">{{ duration?((row.value*duration)*1000 | date:'H:mm:ss':'+0000'):'-:--:--' }}</td>
-            <td class="col-sm-9 chapter-title"><span ng-bind=" row.name | translate"></span></td>
+            <td class="col-sm-3">
+
+            {{ duration?((row.value*duration)*1000 | date:'H:mm:ss':'+0000'):'-:--:--' }}</td>
+            <td class="col-sm-8 chapter-title ">
+              <span ng-bind="row.name | translate"></span>
+            </td>
+            <td class="col-sm-1">
+              <input ng-if="!row.type" type="checkbox" ng-model="row.check" ng-click="checkRow(row.check);$event.stopPropagation();">
+            </td>
           </tr>
         </tbody>
       </table>
+      <div class="no-chapter" ng-if='!ranges.length'>
+        <span class="text" ng-bind-html="'PUBLISH.CHAPTER.NO_CHAPTER' | translate"></span>
+      </div>
+
       <div class="btn-group btn-group-justified" role="group">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-default" ng-click="openNew()">{{ 'CORE.UI.FORM_NEW' | translate}}</button>
@@ -34,10 +48,11 @@
           <button type="button" class="btn btn-default" ng-disabled="!selectRow" ng-click="openEdit()">{{ 'CORE.UI.FORM_EDIT' | translate}}</button>
         </div>
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" ng-disabled="!selectRow || !isCollapsed || (selectRow && selectRow.type)" ng-click="remove()">{{ 'CORE.UI.REMOVE' | translate}}</button>
+          <button type="button" class="btn btn-default" ng-disabled="!nbCheckRow || !isCollapsed || (selectRow && selectRow.type) || !ranges.length" ng-click="remove()">{{ 'CORE.UI.REMOVE' | translate}}</button>
         </div>
       </div>
     </div>
+
 
   </div>
 

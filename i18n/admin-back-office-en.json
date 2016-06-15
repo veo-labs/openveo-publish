@@ -168,7 +168,8 @@
     "DELETE_END_CUT": "End cut can't be before start cut. End cut will be deleted.",
     "ADD_BEGIN": "Add begin cut",
     "REMOVE_BEGIN": "Remove begin cut",
-    "SAVE_ERROR": "An error occured. Your changes could not be saved."
+    "SAVE_ERROR": "An error occured. Your changes could not be saved.",
+    "NO_CHAPTER": "No chapter. <br> Click \"New\" to add one."
   },
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",

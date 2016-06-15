@@ -168,7 +168,8 @@
     "DELETE_END_CUT": "La coupure de fin ne peut pas précéder la coupure de début. La coupure de fin est supprimée.",
     "ADD_BEGIN": "Couper le début",
     "REMOVE_BEGIN": "Enlever la coupe de début",
-    "SAVE_ERROR": "Une erreur est survenue. Vos modifications n'ont pas pu être sauvegardées."
+    "SAVE_ERROR": "Une erreur est survenue. Vos modifications n'ont pas pu être sauvegardées.",
+    "NO_CHAPTER": "Aucun chapitre. <br> Cliquez sur \"Nouveau\" pour en ajouter."
   },
   "CONFIGURATION": {
     "PAGE_TITLE": "Publish - Configuration",

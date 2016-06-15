@@ -119,6 +119,7 @@
 
     $scope.isCollapsed = true;
     $scope.selectRow = null;
+    $scope.checkAllSelected = false;
 
     // Copy of object to edit or add
     $scope.modelToEdit = {};
@@ -151,6 +152,27 @@
         name: 'CORE.UI.END',
         description: '',
         type: 'end'
+      }
+    };
+
+    $scope.nbCheckRow = 0;
+
+    // Check all chapters for removal
+    $scope.checkAll = function() {
+      for (var i = 0; i < $scope.media.chapters.length; i++) {
+        $scope.media.chapters[i].check = $scope.checkAllSelected;
+      }
+      $scope.nbCheckRow = $scope.checkAllSelected ? $scope.media.chapters.length : 0;
+    };
+
+    // Check a chapter for removal
+    $scope.checkRow = function(bool) {
+      if (!bool) {
+        $scope.checkAllSelected = false;
+        $scope.nbCheckRow--;
+      } else {
+        $scope.nbCheckRow++;
+        $scope.checkAllSelected = $scope.nbCheckRow == $scope.media.chapters.length;
       }
     };
 
@@ -209,9 +231,13 @@
     };
 
     $scope.remove = function() {
-      if ($scope.selectRow) {
-        $scope.media.chapters.splice($scope.media.chapters.indexOf($scope.selectRow), 1);
-        $scope.selectRow.select = false;
+      var chapters = $scope.media.chapters;
+      for (var i = 0; i < chapters.length; i++) {
+        if (chapters[i].check) {
+          chapters.splice(i, 1);
+          i--;
+        }
+        if ($scope.selectRow) $scope.selectRow.select = false;
         $scope.selectRow = null;
         $scope.saveChapter();
       }
@@ -330,6 +356,7 @@
             var element = angular.copy($scope.media[collectionName][i]);
             delete element['_depth'];
             delete element['select'];
+            delete element['check'];
             objToSave[collectionName].push(element);
           }
           orderBy(objToSave[collectionName], '+value', false);
