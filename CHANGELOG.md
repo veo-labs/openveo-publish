@@ -1,3 +1,9 @@
+# 2.0.2 / 2016-06-15
+
+- Fix critical issue while publishing and unpublishing video
+- Add migration process for default video metadata
+- Allow chapters to be selected and removed by group
+
 # 2.0.1 / 2016-06-10
 
 - Add install process for wowza conf
