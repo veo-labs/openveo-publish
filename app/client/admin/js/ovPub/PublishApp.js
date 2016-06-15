@@ -60,9 +60,9 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       // url slug : shortening the url to stuff that follows after "#"
       current = current.slice(current.lastIndexOf('/publish/') + 9, current.length);
       next = next.slice(next.lastIndexOf('/publish/') + 9, next.length);
-      if (current == 'medias' && next.lastIndexOf('media/') >= 0) {
+      if (current == 'medias-list' && next.lastIndexOf('media/') >= 0) {
         $rootScope.newAnimation = 'RL';
-      } else if (current.lastIndexOf('media/') >= 0 && next == 'medias') {
+      } else if (current.lastIndexOf('media/') >= 0 && next == 'medias-list') {
         $rootScope.newAnimation = 'LR';
       } else {
         $rootScope.newAnimation = '';
