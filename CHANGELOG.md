@@ -1,3 +1,7 @@
+# 2.0.3 / 2016-06-21
+
+- enhanced deployment forcing bower using https protocol instead of git
+
 # 2.0.2 / 2016-06-15
 
 - Fix critical issue while publishing and unpublishing video
