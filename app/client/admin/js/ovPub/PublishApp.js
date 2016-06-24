@@ -57,15 +57,19 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
   app.run(['$rootScope', function($rootScope) {
     $rootScope.$on('$locationChangeStart', function(event, next, current) {
-      // url slug : shortening the url to stuff that follows after "#"
-      current = current.slice(current.lastIndexOf('/publish/') + 9, current.length);
-      next = next.slice(next.lastIndexOf('/publish/') + 9, next.length);
-      if (current == 'medias-list' && next.lastIndexOf('media/') >= 0) {
-        $rootScope.newAnimation = 'RL';
-      } else if (current.lastIndexOf('media/') >= 0 && next == 'medias-list') {
-        $rootScope.newAnimation = 'LR';
-      } else {
-        $rootScope.newAnimation = '';
+
+      // Specific for publish plugin
+      if (current.lastIndexOf('publish') >= 0) {
+        // url slug : shortening the url to stuff that follows after "#"
+        current = current.slice(current.lastIndexOf('/publish/') + 9, current.length);
+        next = next.slice(next.lastIndexOf('/publish/') + 9, next.length);
+        if (current == 'medias-list' && next.lastIndexOf('media/') >= 0) {
+          $rootScope.newAnimation = 'RL';
+        } else if (current.lastIndexOf('media/') >= 0 && next == 'medias-list') {
+          $rootScope.newAnimation = 'LR';
+        } else {
+          $rootScope.newAnimation = '';
+        }
       }
     });
   }]);
