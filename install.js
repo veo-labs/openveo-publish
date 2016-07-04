@@ -128,6 +128,7 @@ function createVideoPlatformConf(callback) {
   var confFile = path.join(confDir, 'videoPlatformConf.json');
   var vimeoConf;
   var youtubeConf;
+  var wowzaConf;
 
   async.series([
     function(callback) {
@@ -217,6 +218,64 @@ function createVideoPlatformConf(callback) {
           callback();
         }
       );
+    },
+    function(callback) {
+      rl.question('Do you want to configure a Wowza account ? (y/N) :\n', function(answer) {
+        if (answer === 'y') wowzaConf = {
+          protocol: 'sftp',
+          port: '22'
+        };
+        callback(null);
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter Wowza file transfert protocol (0:sftp -default-, 1:ftp):\n', function(answer) {
+        if (answer && answer === '1') wowzaConf.protocol = 'ftp';
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter Wowza file transfert port (let empty to set port acccording to protocol):\n',
+      function(answer) {
+        if (answer) wowzaConf.port = answer;
+        else if (wowzaConf.protocol == 'ftp') wowzaConf.port = '21';
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter ftp/sftp user login:\n',
+      function(answer) {
+        wowzaConf.user = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter ftp/sftp user password:\n',
+      function(answer) {
+        wowzaConf.pwd = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter content path (path configured in wowza vod application relative to user - ' +
+        'Ex: /video/ for <USER_DIR>/video/):\n',
+      function(answer) {
+        wowzaConf.vodFilePath = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter wowza streaming path (access path of Wowza streaming application - Ex: http://<WOWZA-IP>:1935/vod):\n',
+      function(answer) {
+        wowzaConf.streamPath = answer;
+        callback();
+      });
     }
   ],
   function(error, results) {
@@ -227,6 +286,7 @@ function createVideoPlatformConf(callback) {
       var conf = {};
       if (vimeoConf) conf.vimeo = vimeoConf;
       if (youtubeConf) conf.youtube = youtubeConf;
+      if (wowzaConf) conf.wowza = wowzaConf;
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
     }
   });
