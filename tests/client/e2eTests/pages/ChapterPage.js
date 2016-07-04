@@ -449,6 +449,58 @@ ChapterPage.prototype.unselectLine = function(finder) {
 };
 
 /**
+ * Check a line.
+ *
+ * @param {String|ElementFinder} finder The name of the line (each column will be compared to this value)
+ * or the line element (tr element)
+ * @return {Promise} Promise resolving when the line is checked
+ */
+ChapterPage.prototype.checkLine = function(finder) {
+  var checkbox;
+
+  return this.getLine(finder).then(function(foundLine) {
+    return foundLine.element(by.css('input[type=checkbox]'));
+  }).then(function(input) {
+    checkbox = input;
+    return checkbox.isSelected();
+  }).then(function(selected) {
+
+    // Unselect line
+    if (selected)
+      browserExt.click(checkbox);
+
+    // Select line
+    return browserExt.click(checkbox);
+
+  });
+};
+
+/**
+ * Uncheck a line.
+ *
+ * @param {String|ElementFinder} finder The name of the line (each column will be compared to this value)
+ * or the line element (tr element)
+ * @return {Promise} Promise resolving when the line is unchecked
+ */
+ChapterPage.prototype.unCheckLine = function(finder) {
+  var checkbox;
+
+  return this.getLine(finder).then(function(foundLine) {
+    return foundLine.element(by.css('input[type=checkbox]'));
+  }).then(function(input) {
+    checkbox = input;
+    return checkbox.isSelected();
+  }).then(function(selected) {
+
+    // Unselect line
+    if (selected)
+      return browserExt.click(checkbox);
+    else
+      return protractor.promise.fulfilled();
+  });
+};
+
+/**
  * Removes a chapter.
  *
  * @param {String|ElementFinder} chapterFinder The name of the chapter (each column will be compared to this value)
@@ -461,7 +513,7 @@ ChapterPage.prototype.removeChapter = function(chapterFinder) {
   return this.getLine(chapterFinder).then(function(chapter) {
 
     // Select the chapter
-    self.selectLine(chapterFinder);
+    self.checkLine(chapterFinder);
 
     // Remove chapter
     return browserExt.click(self.removeButtonElement);

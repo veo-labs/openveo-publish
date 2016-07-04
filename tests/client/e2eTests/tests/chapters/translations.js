@@ -63,8 +63,6 @@ describe('Chapter page translations', function() {
         assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.CHAPTER.PAGE_TITLE);
         assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CHAPTER.INFO);
         assert.eventually.equal(page.backButtonElement.getText(), page.translations.CORE.UI.BACK);
-        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TIME);
-        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TITLE);
         assert.eventually.equal(page.newButtonElement.getText(), page.translations.CORE.UI.FORM_NEW);
         assert.eventually.equal(page.editButtonElement.getText(), page.translations.CORE.UI.FORM_EDIT);
         assert.eventually.equal(page.removeButtonElement.getText(), page.translations.CORE.UI.REMOVE);
@@ -93,6 +91,8 @@ describe('Chapter page translations', function() {
         var cutTimeField = cutEditFormFields.time;
         var cutTitleField = cutEditFormFields.title;
         page.addCut(0.1, true);
+        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TIME);
+        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TITLE);
         page.selectLine(page.translations.CORE.UI.BEGIN);
         browserExt.click(page.editButtonElement);
         assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TIME);
@@ -118,6 +118,8 @@ describe('Chapter page translations', function() {
 
         });
         page.addCut(0.8, false);
+        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TIME);
+        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TITLE);
         page.selectLine(page.translations.CORE.UI.END);
         browserExt.click(page.editButtonElement);
         assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TIME);
