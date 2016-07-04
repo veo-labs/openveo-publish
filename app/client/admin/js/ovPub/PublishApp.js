@@ -111,7 +111,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       templateUrl: '/publish/be/views/chapter.html',
       controller: 'ChapterController',
       title: 'PUBLISH.CHAPTER.PAGE_TITLE',
-      access: 'publish-chapter-video',
+      access: 'publish-chapter-videos',
       resolve: {
         media: ['$q', 'publishService', 'alertService', '$route', '$filter',
           function($q, publishService, alertService, $route, $filter) {

@@ -123,7 +123,7 @@
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",
       "permissions": [
-        "publish-chapter-video",
+        "publish-chapter-videos",
         "get-group-publishGroup1"
       ]
     },
