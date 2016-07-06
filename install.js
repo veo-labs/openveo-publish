@@ -102,22 +102,27 @@ function createConf(callback) {
  */
 function createLoggerConf(callback) {
   var confFile = path.join(confDir, 'loggerConf.json');
-  var defaultPath = path.join(os.tmpdir(), 'openveo', 'logs');
-  var conf = {
-    watcher: {
-      fileName: path.join(defaultPath, 'openveo-watcher.log').replace(/\\/g, '/'),
-      level: 'info',
-      maxFileSize: 1048576,
-      maxFiles: 2
-    }
-  };
 
   fs.exists(confFile, function(exists) {
     if (exists) {
       process.stdout.write(confFile + ' already exists\n');
       callback();
-    } else
-      fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
+    } else {
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'logs');
+      rl.question('Enter logger directory path for watcher process (default: ' + defaultPath + ') :\n',
+      function(answer) {
+        var conf = {
+          watcher: {
+            fileName: path.join((answer || defaultPath), 'openveo-watcher.log').replace(/\\/g, '/'),
+            level: 'info',
+            maxFileSize: 1048576,
+            maxFiles: 2
+          }
+        };
+
+        fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
+      });
+    }
   });
 }
 
