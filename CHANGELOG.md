@@ -1,3 +1,9 @@
+# 2.0.4 / 2016-07-07
+
+- Avoid conflict for transition view effects
+- Debug rights token for chapter edition
+- Add Wowza settings in install process
+
 # 2.0.3 / 2016-06-21
 
 - enhanced deployment forcing bower using https protocol instead of git
