@@ -1,0 +1,1060 @@
+{
+    "project": {
+        "name": "OpenVeo Publish AngularJS back end",
+        "description": "AngularJS OpenVeo Publish plugin back end documentation",
+        "version": "2.0.4"
+    },
+    "files": {
+        "app/client/admin/js/multirange/multirange.js": {
+            "name": "app/client/admin/js/multirange/multirange.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/CategoriesController.js": {
+            "name": "app/client/admin/js/ovPub/CategoriesController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/ChapterController.js": {
+            "name": "app/client/admin/js/ovPub/ChapterController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/ConfigurationController.js": {
+            "name": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/MediaController.js": {
+            "name": "app/client/admin/js/ovPub/MediaController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PropertiesController.js": {
+            "name": "app/client/admin/js/ovPub/PropertiesController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PublishApp.js": {
+            "name": "app/client/admin/js/ovPub/PublishApp.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PublishService.js": {
+            "name": "app/client/admin/js/ovPub/PublishService.js",
+            "modules": {
+                "ov.publish": 1
+            },
+            "classes": {
+                "publishService": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/WatcherController.js": {
+            "name": "app/client/admin/js/ovPub/WatcherController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/timePolyfill/time-polyfill.js": {
+            "name": "app/client/admin/js/timePolyfill/time-polyfill.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "ov.publish": {
+            "name": "ov.publish",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "publishService": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 5,
+            "description": "Defines a publish service to manage medias, watcher, categories and properties."
+        }
+    },
+    "classes": {
+        "publishService": {
+            "name": "publishService",
+            "shortname": "publishService",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ov.publish",
+            "namespace": "",
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 5,
+            "description": "Defines a publish service to manage medias, watcher, categories and properties."
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "app/client/admin/js/multirange/multirange.js",
+            "line": 336,
+            "description": "TODO\nDefines getter and setter on range data object.",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "multiplier",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 5,
+            "description": "Defines the categories controller for the categories page.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 12,
+            "description": "Handles success when a category is added or updated.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 22,
+            "description": "Handles error when a category is added or updated.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "Response data",
+                    "type": "Object"
+                },
+                {
+                    "name": "status",
+                    "description": "HTTP code",
+                    "type": "Number"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 32,
+            "description": "Checks that category name field is not empty.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 5,
+            "description": "Defines the categories controller for the categories page.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 21,
+            "description": "Reconstructs ranges with chapters and cut array.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 30,
+            "description": "Initializes chapters and start / end cuts.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 62,
+            "description": "Executes, safely, the given function in AngularJS process.",
+            "params": [
+                {
+                    "name": "functionToExecute",
+                    "description": "The function to execute as part of\nthe angular digest process.",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 83,
+            "description": "Gathers some parameters before calling init.",
+            "params": [
+                {
+                    "name": "duration",
+                    "description": "Media duration",
+                    "type": "Number"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 102,
+            "description": "Calling preinit with a duration chnage on the player, it sometimes fail so...",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 299,
+            "description": "Selects and unselect a provided cut.",
+            "params": [
+                {
+                    "name": "cut",
+                    "description": "The cut to toggle",
+                    "type": "Object"
+                },
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 318,
+            "description": "Selects or unselect the begin cut.",
+            "params": [
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ChapterController.js",
+            "line": 327,
+            "description": "Selects or unselect the ending cut.",
+            "params": [
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "line": 5,
+            "description": "Defines the configuration controller for the configuration page.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 5,
+            "description": "Defines the media controller for the medias page.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 56,
+            "description": "Gets all categories and add a value for \"none\".",
+            "params": [
+                {
+                    "name": "label",
+                    "description": "The label for \"no categories\"",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The list of categories",
+                "type": "Array"
+            },
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 69,
+            "description": "Opens a link in a new tab.",
+            "params": [
+                {
+                    "name": "link",
+                    "description": "Destination url",
+                    "type": "String"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 78,
+            "description": "Opens an alert to display HTML code to share the media.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "The media to share",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 106,
+            "description": "Retries a media which is on error.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of medias to work on",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 120,
+            "description": "Asks server to start uploading the media to the chosen platform.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of medias to work on",
+                    "type": "Array"
+                },
+                {
+                    "name": "platformName",
+                    "description": "The name of platform to upload to",
+                    "type": "String"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 135,
+            "description": "Publishes a list of medias.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of media ids to publish",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 149,
+            "description": "Unpublishes a list of medias.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of media ids to unpublish",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 163,
+            "description": "Removes a list of medias.",
+            "params": [
+                {
+                    "name": "selected",
+                    "description": "The list of media ids to remove",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 177,
+            "description": "Saves media information.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "Media data",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 195,
+            "description": "Routes to chapters edition.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "The media to edit",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 5,
+            "description": "Defines the properties controller for the properties page.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 28,
+            "description": "Removes a list of properties.",
+            "params": [
+                {
+                    "name": "selected",
+                    "description": "The list of property ids to remove",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "The reload Function to force reloading the table",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 43,
+            "description": "Adds a property.",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "Property data",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 55,
+            "description": "Saves property.",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "Property data",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishApp.js",
+            "line": 14,
+            "description": "Defines a filter to print status in cells.\n\nThis filter has one optional Number parameter which must be specified\nif the input is equal to 8 (error status), to precise the error code.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishApp.js",
+            "line": 45,
+            "description": "Filter to print Category in cells.",
+            "class": "publishService"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 20,
+            "description": "Retries a media.\n\nIf a media is on error, the upload / publication process has stopped and can be retried.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to retry",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "retryMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 34,
+            "description": "Publishes the given media.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to publish",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "publishMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 46,
+            "description": "Unpublishes the given media.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to unpublish",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "unpublishMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 58,
+            "description": "Gets watcher status.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getWatcherStatus",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 68,
+            "description": "Starts the watcher.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "startWatcher",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 78,
+            "description": "Stops the watcher.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "stopWatcher",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 88,
+            "description": "Loads all properties from server.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadProperties",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 108,
+            "description": "Gets list of properties.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getProperties",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 118,
+            "description": "Loads the list of available media platforms from server.",
+            "return": {
+                "description": "The promise used to retrieve platforms from server",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadPlatforms",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 138,
+            "description": "Gets the list of available platforms.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getPlatforms",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 148,
+            "description": "Asks server to start uploading a media waiting for manual upload.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to start uploading",
+                    "type": "String"
+                },
+                {
+                    "name": "platform",
+                    "description": "The media platform to upload to",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "startMediaUpload",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 161,
+            "description": "Loads taxonomy \"categories\".",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadTaxonomyCategory",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 200,
+            "description": "Gets the taxonomy \"categories\".",
+            "return": {
+                "description": "The taxonomy",
+                "type": "Object"
+            },
+            "itemtype": "method",
+            "name": "getTaxonomyCategory",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 210,
+            "description": "Gets the list of categories formatted for an HTMLSelect element.",
+            "return": {
+                "description": "The list of categories",
+                "type": "Array"
+            },
+            "itemtype": "method",
+            "name": "getCategoriesOptions",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 220,
+            "description": "Gets list of categories indexed by keys.",
+            "return": {
+                "description": "The list of categories",
+                "type": "Object"
+            },
+            "itemtype": "method",
+            "name": "getCategoriesByKey",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 230,
+            "description": "Loads a media by its id.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 248,
+            "description": "Save upload configuration.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The upload configuration object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "saveUploadConfig",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 259,
+            "description": "Clears a publish service cache.",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The cache element to clear (**properties**, **categories** or **chapter**), null to\nclear all caches",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "itemtype": "method",
+            "name": "cacheClear",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 288,
+            "description": "Retrieves publish plugin configuration.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getConfiguration",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/WatcherController.js",
+            "line": 5,
+            "description": "Defines the watcher controller for the watcher page.",
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/WatcherController.js",
+            "line": 11,
+            "description": "Enables or disables actions on the watcher if status is not\nstable (starting or stopping).",
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/WatcherController.js",
+            "line": 19,
+            "description": "Updates watcher status, if the status is in transition\nstate (starting or stopping) poll the server until the status\nis stable.",
+            "params": [
+                {
+                    "name": "status",
+                    "description": "The watcher status to set",
+                    "type": "Number"
+                }
+            ],
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/WatcherController.js",
+            "line": 61,
+            "description": "Starts the watcher.",
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/WatcherController.js",
+            "line": 71,
+            "description": "Stops the watcher.",
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/timePolyfill/time-polyfill.js",
+            "line": 7,
+            "description": "Configuration of the angular-time-polyfill module",
+            "params": [
+                {
+                    "name": "$provide",
+                    "description": "The $provide service",
+                    "type": "Type"
+                }
+            ],
+            "class": "",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/timePolyfill/time-polyfill.js",
+            "line": 12,
+            "description": "Executes when \"link\"ing a time input",
+            "params": [
+                {
+                    "name": "scope",
+                    "description": "The scope to be used by the directive for registering watches",
+                    "type": "Object"
+                },
+                {
+                    "name": "element",
+                    "description": "The element where the directive is to be used.",
+                    "type": "Object"
+                },
+                {
+                    "name": "attributes",
+                    "description": "Normalized list of attributes declared on this element",
+                    "type": "Object"
+                },
+                {
+                    "name": "controllers",
+                    "description": "The directive's required controller instance(s)",
+                    "type": "Array"
+                },
+                {
+                    "name": "$compile",
+                    "description": "The $ccompile service",
+                    "type": "Object"
+                },
+                {
+                    "name": "$filter",
+                    "description": "The $filter service",
+                    "type": "Object"
+                },
+                {
+                    "name": "$parse",
+                    "description": "The parse service",
+                    "type": "Object"
+                }
+            ],
+            "class": "",
+            "module": "ov.publish"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nTODO\nDefines getter and setter on range data object.",
+            "line": " app/client/admin/js/multirange/multirange.js:336"
+        },
+        {
+            "message": "Missing item type\nDefines the categories controller for the categories page.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:5"
+        },
+        {
+            "message": "Missing item type\nHandles success when a category is added or updated.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:12"
+        },
+        {
+            "message": "Missing item type\nHandles error when a category is added or updated.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:22"
+        },
+        {
+            "message": "Missing item type\nChecks that category name field is not empty.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:32"
+        },
+        {
+            "message": "Missing item type\nDefines the categories controller for the categories page.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:5"
+        },
+        {
+            "message": "Missing item type\nReconstructs ranges with chapters and cut array.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:21"
+        },
+        {
+            "message": "Missing item type\nInitializes chapters and start / end cuts.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:30"
+        },
+        {
+            "message": "Missing item type\nExecutes, safely, the given function in AngularJS process.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:62"
+        },
+        {
+            "message": "Missing item type\nGathers some parameters before calling init.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:83"
+        },
+        {
+            "message": "Missing item type\nCalling preinit with a duration chnage on the player, it sometimes fail so...",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:102"
+        },
+        {
+            "message": "Missing item type\nSelects and unselect a provided cut.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:299"
+        },
+        {
+            "message": "Missing item type\nSelects or unselect the begin cut.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:318"
+        },
+        {
+            "message": "Missing item type\nSelects or unselect the ending cut.",
+            "line": " app/client/admin/js/ovPub/ChapterController.js:327"
+        },
+        {
+            "message": "Missing item type\nDefines the configuration controller for the configuration page.",
+            "line": " app/client/admin/js/ovPub/ConfigurationController.js:5"
+        },
+        {
+            "message": "Missing item type\nDefines the media controller for the medias page.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:5"
+        },
+        {
+            "message": "Missing item type\nGets all categories and add a value for \"none\".",
+            "line": " app/client/admin/js/ovPub/MediaController.js:56"
+        },
+        {
+            "message": "Missing item type\nOpens a link in a new tab.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:69"
+        },
+        {
+            "message": "Missing item type\nOpens an alert to display HTML code to share the media.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:78"
+        },
+        {
+            "message": "Missing item type\nRetries a media which is on error.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:106"
+        },
+        {
+            "message": "Missing item type\nAsks server to start uploading the media to the chosen platform.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:120"
+        },
+        {
+            "message": "Missing item type\nPublishes a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:135"
+        },
+        {
+            "message": "Missing item type\nUnpublishes a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:149"
+        },
+        {
+            "message": "Missing item type\nRemoves a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:163"
+        },
+        {
+            "message": "Missing item type\nSaves media information.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:177"
+        },
+        {
+            "message": "Missing item type\nRoutes to chapters edition.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:195"
+        },
+        {
+            "message": "Missing item type\nDefines the properties controller for the properties page.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:5"
+        },
+        {
+            "message": "Missing item type\nRemoves a list of properties.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:28"
+        },
+        {
+            "message": "Missing item type\nAdds a property.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:43"
+        },
+        {
+            "message": "Missing item type\nSaves property.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:55"
+        },
+        {
+            "message": "Missing item type\nDefines a filter to print status in cells.\n\nThis filter has one optional Number parameter which must be specified\nif the input is equal to 8 (error status), to precise the error code.",
+            "line": " app/client/admin/js/ovPub/PublishApp.js:14"
+        },
+        {
+            "message": "Missing item type\nFilter to print Category in cells.",
+            "line": " app/client/admin/js/ovPub/PublishApp.js:45"
+        },
+        {
+            "message": "Missing item type\nDefines the watcher controller for the watcher page.",
+            "line": " app/client/admin/js/ovPub/WatcherController.js:5"
+        },
+        {
+            "message": "Missing item type\nEnables or disables actions on the watcher if status is not\nstable (starting or stopping).",
+            "line": " app/client/admin/js/ovPub/WatcherController.js:11"
+        },
+        {
+            "message": "Missing item type\nUpdates watcher status, if the status is in transition\nstate (starting or stopping) poll the server until the status\nis stable.",
+            "line": " app/client/admin/js/ovPub/WatcherController.js:19"
+        },
+        {
+            "message": "Missing item type\nStarts the watcher.",
+            "line": " app/client/admin/js/ovPub/WatcherController.js:61"
+        },
+        {
+            "message": "Missing item type\nStops the watcher.",
+            "line": " app/client/admin/js/ovPub/WatcherController.js:71"
+        },
+        {
+            "message": "Missing item type\nConfiguration of the angular-time-polyfill module",
+            "line": " app/client/admin/js/timePolyfill/time-polyfill.js:7"
+        },
+        {
+            "message": "Missing item type\nExecutes when \"link\"ing a time input",
+            "line": " app/client/admin/js/timePolyfill/time-polyfill.js:12"
+        }
+    ]
+}
