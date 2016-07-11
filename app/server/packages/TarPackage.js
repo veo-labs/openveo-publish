@@ -44,6 +44,7 @@ function TarPackageError(message, code) {
  *     {
  *       "id": "13465465", // Id of the package
  *       "type": "vimeo", // Platform type
+ *       "title": "2015-03-09_16-53-10_rich-media", // Package title
  *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
  *     }
  *

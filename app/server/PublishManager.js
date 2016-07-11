@@ -243,7 +243,8 @@ function isValidPackageType(type) {
  *     // video package object example
  *     {
  *       "type": "vimeo", // Platform type
- *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
+ *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar", // Package file
+ *       "title": "2015-03-09_16-53-10_rich-media"
  *     }
  *
  * @method publish
@@ -257,6 +258,9 @@ PublishManager.prototype.publish = function(mediaPackage) {
 
     // Defines transitions to perform depending on package extension
     mediaPackage.packageType = path.extname(mediaPackage.originalPackagePath).slice(1);
+
+    // Defines name
+    mediaPackage.title = path.basename(mediaPackage.originalPackagePath).split('.')[0];
 
     // Validate extension
     if (!isValidPackageType(mediaPackage.packageType))

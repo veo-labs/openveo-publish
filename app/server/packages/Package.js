@@ -291,6 +291,7 @@ Package.prototype.initPackage = function() {
   process.logger.debug('Init package ' + this.mediaPackage.id);
 
   var self = this;
+  this.mediaPackage.title = this.mediaPackage.title;
   this.mediaPackage.state = VideoModel.PENDING_STATE;
   this.mediaPackage.link = null;
   this.mediaPackage.mediaId = null;
