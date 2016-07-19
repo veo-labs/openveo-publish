@@ -1,3 +1,8 @@
+# 2.0.5 / 2016-07-19
+
+- Debug dash video by updating videojs dependencies
+- Use package name to create video entity on upload
+
 # 2.0.4 / 2016-07-07
 
 - Avoid conflict for transition view effects
