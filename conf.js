@@ -159,7 +159,7 @@ module.exports = {
       base: [
         '/publish/lib/video.js/dist/video.min.js',
         '/publish/lib/dash.js/dist/dash.all.js',
-        '/publish/lib/videojs-contrib-dash/src/js/videojs-dash.js',
+        '/publish/lib/videojs-contrib-dash/index.js',
         '/publish/lib/videojs-contrib-hls/index.js',
         '/publish/lib/openveo-player/dist/openveo-player.min.js'
       ],
@@ -192,7 +192,7 @@ module.exports = {
         '/publish/lib/openveo-player/dist/openveo-player.min.js',
         '/publish/lib/video.js/dist/video.min.js',
         '/publish/lib/dash.js/dist/dash.all.js',
-        '/publish/lib/videojs-contrib-dash/src/js/videojs-dash.js',
+        '/publish/lib/videojs-contrib-dash/index.js',
         '/publish/lib/videojs-contrib-hls/index.js'
       ],
       publishPlayer: {
