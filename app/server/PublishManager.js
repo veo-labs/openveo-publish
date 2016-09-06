@@ -114,13 +114,24 @@ module.exports = PublishManager;
  *
  * @method removeFromPending
  * @private
- * @param {Number} packageId The package id to remove
+ * @param {Object} mediaPackage The package to remove
  */
-function removeFromPending(packageId) {
+function removeFromPending(mediaPackage) {
+
   for (var i = 0; i < this.pendingPackages.length; i++) {
-    if (this.pendingPackages[i]['id'] === packageId)
+    if (this.pendingPackages[i]['id'] === mediaPackage.id) {
       this.pendingPackages.splice(i, 1);
+      break;
+    }
   }
+  for (var j = 0; j < this.pendingPackages.length; j++) {
+    if (this.pendingPackages[j]['originalFileName'] === mediaPackage.originalFileName) {
+      this.pendingPackages.splice(j, 1);
+      break;
+    }
+  }
+  process.logger.debug('Package ' + mediaPackage.id + ' from ' +
+   mediaPackage.originalFileName + ' is removed from pendingPackages');
 }
 
 /**
@@ -134,7 +145,7 @@ function removeFromPending(packageId) {
 function onError(error, mediaPackage) {
 
   // Remove video from pending videos
-  removeFromPending.call(this, mediaPackage.id);
+  removeFromPending.call(this, mediaPackage);
 
   // Publish pending package from FIFO queue
   if (this.queue.length)
@@ -157,7 +168,7 @@ function onError(error, mediaPackage) {
 function onComplete(mediaPackage) {
 
   // Remove package from pending packages
-  removeFromPending.call(this, mediaPackage.id);
+  removeFromPending.call(this, mediaPackage);
 
   // Publish pending package from FIFO queue
   if (this.queue.length)
@@ -203,11 +214,11 @@ function createMediaPackageManager(mediaPackage) {
 function addPackage(mediaPackage) {
   process.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
   var idAllreadyPending = this.pendingPackages.filter(function(pendingPackage) {
-    return mediaPackage.id === pendingPackage.id;
+    return mediaPackage.originalFileName === pendingPackage.originalFileName;
   });
 
   // Too much pending packages
-  if (this.pendingPackages.length >= maxConcurrentPublish || idAllreadyPending) {
+  if (this.pendingPackages.length >= maxConcurrentPublish || idAllreadyPending.length) {
 
     // Add package to queue
     this.queue.push(mediaPackage);
