@@ -55,6 +55,17 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     };
   }
 
+  /**
+   * Filter to print Multi Sources Media icon
+   */
+  function MultiSourcesFilter() {
+    return function(mediaIds) {
+      if (mediaIds.length)
+        return '<span title="multisource" class="glyphicon glyphicon-th-large" aria-hidden="true"></span>';
+      return '';
+    };
+  }
+
   app.run(['$rootScope', function($rootScope) {
     $rootScope.$on('$locationChangeStart', function(event, next, current) {
 
@@ -199,6 +210,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 
   app.filter('status', StatusFilter);
   app.filter('category', CategoryFilter);
+  app.filter('multisources', MultiSourcesFilter);
+
   app.constant('publishName', 'publish');
 
   // Filter to display content in the table (cf. dataTable.html)

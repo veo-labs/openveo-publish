@@ -301,6 +301,12 @@
         class: ['col-xs-8 col-sm-5']
       },
       {
+        key: 'mediaId',
+        type: 'multisources',
+        name: '',
+        class: ['hidden-xs col-sm-1']
+      },
+      {
         key: 'date',
         type: 'date',
         name: $filter('translate')('PUBLISH.MEDIAS.DATE_COLUMN'),
@@ -310,7 +316,7 @@
         key: 'category',
         type: 'category',
         name: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_COLUMN'),
-        class: ['hidden-xs col-sm-3']
+        class: ['hidden-xs col-sm-2']
       },
       {
         key: 'state',

@@ -1,2 +1,3 @@
 <span ng-if="entities.type && entities.type == 'category' && row[entities.key]">{{row[entities.key] | category}}</span>
 <span ng-if="entities.type && entities.type == 'status'" ng-bind-html="row[entities.key] | status:row.errorCode"></span>
+<span ng-if="entities.type && entities.type == 'multisources'" ng-bind-html="row[entities.key] | multisources"></span>
