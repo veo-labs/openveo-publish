@@ -316,12 +316,14 @@ Package.prototype.initPackage = function() {
               callback(error);
             else {
               var originalPackagePath = self.mediaPackage.originalPackagePath;
+              var originalPackageType = self.mediaPackage.packageType;
               self.mediaPackage = result[0];
               self.mediaPackage.errorCode = VideoModel.NO_ERROR;
               self.mediaPackage.state = VideoModel.PENDING_STATE;
               self.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
               self.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
               self.mediaPackage.originalPackagePath = originalPackagePath;
+              self.mediaPackage.packageType = originalPackageType;
               self.mediaPackage.date = Date.now();
               callback();
             }
