@@ -128,7 +128,7 @@ db.connect(function(error) {
 
           // Find the hot folder in which the file was added
           watcherConf.hotFolders.forEach(function(hotFolder) {
-            if (path.normalize(hotFolder.path).indexOf(dirName) === 0) {
+            if (path.normalize(dirName).indexOf(path.normalize(hotFolder.path)) === 0) {
               packageInfo = JSON.parse(JSON.stringify(hotFolder));
               return;
             }
