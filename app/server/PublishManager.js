@@ -260,7 +260,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
     mediaPackage.packageType = path.extname(mediaPackage.originalPackagePath).slice(1);
 
     // Defines name
-    mediaPackage.title = path.basename(mediaPackage.originalPackagePath).split('.')[0];
+    mediaPackage.title = mediaPackage.originalFileName;
 
     // Validate extension
     if (!isValidPackageType(mediaPackage.packageType))

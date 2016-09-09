@@ -118,6 +118,7 @@ db.connect(function(error) {
         // Files modification date hasn't change in 10 seconds
         // File is considered complete
         var fileExtension = path.extname(filePath).slice(1);
+        var fileName = path.basename(filePath).split('.')[0];
 
         // Only files with tar or mp4 extensions are accepted
         if (fileExtension === 'tar' || fileExtension === 'mp4') {
@@ -134,6 +135,7 @@ db.connect(function(error) {
           });
 
           packageInfo['originalPackagePath'] = filePath;
+          packageInfo['originalFileName'] = fileName;
           publishManager.publish(packageInfo);
         } else
           process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
