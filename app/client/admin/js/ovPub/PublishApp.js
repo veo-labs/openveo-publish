@@ -60,7 +60,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
    */
   function MultiSourcesFilter() {
     return function(mediaIds) {
-      if (mediaIds && Array.isArray(mediaIds) && mediaIds.length)
+      if (mediaIds && Array.isArray(mediaIds) && mediaIds.length > 1)
         return '<span title="multisource" class="glyphicon glyphicon-th-large" aria-hidden="true"></span>';
       return '';
     };
