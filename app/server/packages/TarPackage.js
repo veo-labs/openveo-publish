@@ -446,7 +446,9 @@ TarPackage.prototype.saveTimecodes = function() {
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
 
-  saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,
+  if (this.mediaPackage.timecodes)
+    self.fsm.transition();
+  else saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,
     'synchro.json'), function(error) {
       if (error && self.mediaPackage.metadata['rich-media'])
         self.setError(new TarPackageError(error.message, errors.SAVE_TIMECODE_ERROR));

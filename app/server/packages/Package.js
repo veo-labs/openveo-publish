@@ -8,6 +8,7 @@ var util = require('util');
 var fs = require('fs');
 var events = require('events');
 var path = require('path');
+var async = require('async');
 var StateMachine = require('javascript-state-machine');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
@@ -291,31 +292,60 @@ Package.prototype.initPackage = function() {
   process.logger.debug('Init package ' + this.mediaPackage.id);
 
   var self = this;
-  this.mediaPackage.state = VideoModel.PENDING_STATE;
-  this.mediaPackage.link = null;
-  this.mediaPackage.mediaId = null;
-  this.mediaPackage.errorCode = VideoModel.NO_ERROR;
-  this.mediaPackage.properties = [];
-  this.mediaPackage.metadata = this.mediaPackage.metadata || {};
-  this.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
-  this.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
-  this.mediaPackage.date = Date.now();
 
-  this.defaultConfig.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
-    if (!error && result && result.length >= 1) {
-      var conf = result[0].publishDefaultUpload;
-      if (conf.owner && conf.owner.value) self.mediaPackage.user = conf.owner.value;
-      if (conf.group && conf.owner.value) self.mediaPackage.groups = [conf.group.value];
-    }
-
-    // Save package information into database
-    self.videoModel.add(self.mediaPackage, function(error) {
+  async.series([
+    function(callback) {
+      self.defaultConfig.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
+        if (error)
+          callback(error);
+        else if (result && result.length >= 1) {
+          var conf = result[0].publishDefaultUpload;
+          if (conf.owner && conf.owner.value) self.mediaPackage.user = conf.owner.value;
+          if (conf.group && conf.owner.value) self.mediaPackage.groups = [conf.group.value];
+        }
+        callback();
+      });
+    },
+    function(callback) {
+      self.videoModel.get({originalFileName: self.mediaPackage.originalFileName, type: self.mediaPackage.type},
+        function(error, result) {
+          if (error)
+            callback(error);
+          else if (result && result.length >= 1) {
+            if (result[0].errorCode)
+              callback(error);
+            else {
+              var originalPackagePath = self.mediaPackage.originalPackagePath;
+              self.mediaPackage = result[0];
+              self.mediaPackage.errorCode = VideoModel.NO_ERROR;
+              self.mediaPackage.state = VideoModel.PENDING_STATE;
+              self.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
+              self.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
+              self.mediaPackage.originalPackagePath = originalPackagePath;
+              self.mediaPackage.date = Date.now();
+              callback();
+            }
+          } else {
+            self.mediaPackage.state = VideoModel.PENDING_STATE;
+            self.mediaPackage.link = null;
+            self.mediaPackage.mediaId = null;
+            self.mediaPackage.errorCode = VideoModel.NO_ERROR;
+            self.mediaPackage.properties = [];
+            self.mediaPackage.metadata = self.mediaPackage.metadata || {};
+            self.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
+            self.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
+            self.mediaPackage.date = Date.now();
+            self.videoModel.add(self.mediaPackage, callback);
+          }
+        }
+        );
+    }],
+    function(error) {
       if (error)
         self.emit('error', new PackageError(error.message, errors.SAVE_PACKAGE_DATA_ERROR));
       else
         self.fsm.transition();
     });
-  });
 };
 
 /**
@@ -388,8 +418,12 @@ Package.prototype.uploadMedia = function() {
     if (error)
       self.setError(new PackageError(error.message, errors.MEDIA_UPLOAD_ERROR));
     else {
-      self.mediaPackage.mediaId = mediaId;
-      self.videoModel.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id);
+      if (!self.mediaPackage.mediaId) {
+        self.mediaPackage.mediaId = [mediaId];
+        self.videoModel.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id);
+      } else {
+        self.mediaPackage.mediaId = self.mediaPackage.mediaId.concat([mediaId]);
+      }
       self.videoModel.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId);
       self.fsm.transition();
     }
@@ -413,8 +447,10 @@ Package.prototype.configureMedia = function() {
   var videoPlatformProvider = VideoPlatformProvider.getProvider(this.mediaPackage.type,
     this.videoPlatformConf[this.mediaPackage.type]);
 
+  var mediaId = this.mediaPackage.mediaId[this.mediaPackage.mediaId.length];
+
   // Configure media
-  videoPlatformProvider.configure(this.mediaPackage.mediaId, function(error) {
+  videoPlatformProvider.configure(mediaId, function(error) {
     if (error)
       self.setError(new PackageError(error.message, errors.MEDIA_CONFIGURE_ERROR));
     else

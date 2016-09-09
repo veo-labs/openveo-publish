@@ -202,9 +202,12 @@ function createMediaPackageManager(mediaPackage) {
  */
 function addPackage(mediaPackage) {
   process.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
+  var idAllreadyPending = this.pendingPackages.filter(function(pendingPackage) {
+    return mediaPackage.id === pendingPackage.id;
+  });
 
   // Too much pending packages
-  if (this.pendingPackages.length >= maxConcurrentPublish) {
+  if (this.pendingPackages.length >= maxConcurrentPublish || idAllreadyPending) {
 
     // Add package to queue
     this.queue.push(mediaPackage);

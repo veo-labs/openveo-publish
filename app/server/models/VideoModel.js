@@ -636,7 +636,6 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
             callback(error);
             return;
           }
-
           videoInfo.available = info.available;
           videoInfo.sources = info.sources;
 

@@ -118,6 +118,7 @@ db.connect(function(error) {
       });
 
       packageInfo['originalPackagePath'] = filePath;
+      packageInfo['originalFileName'] = pathDescriptor.name;
       publishManager.publish(packageInfo);
     } else
       process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');

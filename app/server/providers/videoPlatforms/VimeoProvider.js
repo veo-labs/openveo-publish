@@ -167,51 +167,69 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-VimeoProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, callback) {
-  if (!mediaId) {
+VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
+  if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
     return;
   }
   var self = this;
 
-  // Ask Vimeo for video information
-  this.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
-    var info = null;
-    var available = !expectedDefinition ? true : false;
+  var parallel = [];
+  var infos = {sources: [], available: true};
+  mediaIds.forEach(function(mediaId) {
+    parallel.push(function(cb) {
 
-    if (!error) {
-      info = {};
+      // Ask Vimeo for video information
+      self.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
+        var available = !expectedDefinition ? true : false;
 
-      // Got direct access to video files and formats
-      // Keep only files with supported quality (see qualitiesMap)
-      if (body.files) {
-        var files = [];
-        for (var j = 0; j < body.files.length; j++) {
-          var file = body.files[j];
+        if (!error) {
+          var info = {};
 
-          if (self.qualitiesMap[file.quality] != undefined) {
-            files.push({
-              quality: self.qualitiesMap[file.quality],
-              width: file.width,
-              height: file.height,
-              link: file.link_secure
-            });
+          // Got direct access to video files and formats
+          // Keep only files with supported quality (see qualitiesMap)
+          if (body.files) {
+            var files = [];
+            for (var j = 0; j < body.files.length; j++) {
+              var file = body.files[j];
 
-            // Vimeo set the video as "available" as soon as any definition has been transcoded not when all
-            // definitions have been transcoded
-            // Set the video as "available" as soon as the expected definition has been transcoded
-            // If video height is not standard, Vimeo eventually change its definition to something close, thus
-            // we add a factor error of 64 to deal with those cases
-            if (Math.abs(file.height - expectedDefinition) <= 64)
-              available = true;
+              if (self.qualitiesMap[file.quality] != undefined) {
+                files.push({
+                  quality: self.qualitiesMap[file.quality],
+                  width: file.width,
+                  height: file.height,
+                  link: file.link_secure
+                });
+
+                // Vimeo set the video as "available" as soon as any definition has been transcoded not when all
+                // definitions have been transcoded
+                // Set the video as "available" as soon as the expected definition has been transcoded
+                // If video height is not standard, Vimeo eventually change its definition to something close, thus
+                // we add a factor error of 64 to deal with those cases
+                if (Math.abs(file.height - expectedDefinition) < 64)
+                  available = true;
+              }
+            }
+            info.files = files;
           }
+
+          info.available = (body.status === 'available') && available;
+          infos.sources.push(info);
         }
-        info.sources = {files: files};
+
+        cb(error);
+      });
+    });
+  });
+
+  async.parallel(parallel, function(error) {
+    if (error)
+      callback(error);
+    else {
+      for (var i = 0; i < infos.sources.length; i++) {
+        infos.available = infos.available && infos.sources[i].available;
       }
-
-      info.available = (body.status === 'available') && available;
+      callback(null, infos);
     }
-
-    callback(error, info);
   });
 };

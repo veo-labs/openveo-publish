@@ -123,18 +123,19 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the video
  */
-WowzaProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, callback) {
+WowzaProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
   var self = this;
 
-  if (!mediaId) {
+  if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
     return;
   }
 
-  var info = {};
-  var basePath = self.wowzaConf.streamPath + '/' + mediaId;
-  info.sources = {
-    adaptive: [
+  var infos = {sources: [], available: true};
+  mediaIds.forEach(function(mediaId) {
+    var info = {};
+    var basePath = self.wowzaConf.streamPath + '/' + mediaId;
+    info.adaptive = [
       {
         mimeType: 'application/dash+xml',
         link: basePath + '.mp4/manifest.mpd'
@@ -147,9 +148,9 @@ WowzaProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, cal
         mimeType: 'application/f4m+xml',
         link: basePath + '.mp4/manifest.f4m'
       }
-    ]
-  };
-  info.available = true;
+    ];
+    infos.sources.push(info);
+  });
 
-  callback(null, info);
+  callback(null, infos);
 };
