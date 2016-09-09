@@ -1,3 +1,7 @@
+# 2.0.6 / 2016-09-09
+
+- Set media name according to package name on upload
+
 # 2.0.5 / 2016-07-19
 
 - Debug dash video by updating videojs dependencies
