@@ -229,7 +229,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   // Add custom properties
   if (params.properties) {
     Object.keys(params.properties).forEach(function(propertyId) {
-      filter['properties.' + propertyId] = params.properties[propertyId];
+      filter['properties.' + propertyId] = {$regex: '.*' + params.properties[propertyId] + '.*', $options: 'i'};
     });
   }
 
