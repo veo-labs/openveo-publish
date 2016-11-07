@@ -95,58 +95,32 @@ var db = openVeoAPI.Database.getDatabase(databaseConf);
 
 // Establish connection to the database
 db.connect(function(error) {
-
   var publishManager = new PublishManager(db);
 
   /**
-   * Publishes a package by its name after making sure the
-   * file is completely copied to the hot folder.
-   * Recursively check file every 10 seconds to know if it has changed
-   * or not to be sure file is complete before starting to publish
-   * it.
-   * TODO Find a better way to know if the file is complete
-   * @param String filePath The file of the path to publish
-   * @param fs.Stats lastStat Information about the file
+   * Publishes a package by its name.
+   *
+   * @param {String} filePath The file of the path to publish
    */
-  function publishPackage(filePath, lastStat) {
-    fs.stat(filePath, function(error, stat) {
+  function publishPackage(filePath) {
+    var pathDescriptor = path.parse(filePath);
 
-      if (error)
-        process.logger.error(error && error.message, {code: error.code});
-      else if (lastStat && stat.mtime.getTime() === lastStat.mtime.getTime()) {
+    // Only files with tar or mp4 extensions are accepted
+    if (pathDescriptor.ext === '.tar' || pathDescriptor.ext === '.mp4') {
+      var packageInfo = null;
 
-        // Files modification date hasn't change in 10 seconds
-        // File is considered complete
-        var fileExtension = path.extname(filePath).slice(1);
-        var fileName = path.basename(filePath).split('.')[0];
+      // Find the hot folder in which the file was added
+      watcherConf.hotFolders.forEach(function(hotFolder) {
+        if (path.normalize(pathDescriptor.dir).indexOf(path.normalize(hotFolder.path)) === 0) {
+          packageInfo = JSON.parse(JSON.stringify(hotFolder));
+          return;
+        }
+      });
 
-        // Only files with tar or mp4 extensions are accepted
-        if (fileExtension === 'tar' || fileExtension === 'mp4') {
-          process.logger.info('File ' + filePath + ' has been added to hot folder');
-          var dirName = path.dirname(filePath);
-          var packageInfo = null;
-
-          // Find the hot folder in which the file was added
-          watcherConf.hotFolders.forEach(function(hotFolder) {
-            if (path.normalize(dirName).indexOf(path.normalize(hotFolder.path)) === 0) {
-              packageInfo = JSON.parse(JSON.stringify(hotFolder));
-              return;
-            }
-          });
-
-          packageInfo['originalPackagePath'] = filePath;
-          packageInfo['originalFileName'] = fileName;
-          publishManager.publish(packageInfo);
-        } else
-          process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
-
-      } else {
-
-        // File modification date has changed, file is not complete yet
-        setTimeout(publishPackage, 10000, filePath, stat);
-
-      }
-    });
+      packageInfo['originalPackagePath'] = filePath;
+      publishManager.publish(packageInfo);
+    } else
+      process.logger.warn('File ' + filePath + ' is not a valid package file (mp4 or tar)');
   }
 
   // Connection to database failed
@@ -220,21 +194,29 @@ db.connect(function(error) {
 
       // Start watching the hot folders
       var watcher = chokidar.watch(hotFoldersPaths, {
-        persistent: true,
-        ignoreInitial: true
+        ignoreInitial: false,
+        followSymlinks: false,
+        awaitWriteFinish: {
+          stabilityThreshold: 10000
+        }
       });
 
       // Listen to files added to the hot folder
       watcher.on('add', function(filePath) {
+        process.logger.verbose('File detected : ' + filePath);
         publishPackage(filePath);
       });
 
       watcher.on('ready', function() {
-        process.logger.info('Initial scan complete. Ready for changes.');
+        process.logger.info('Initial scan complete');
 
         // If process is a child process
         if (process.connected)
           process.send({status: 'started'});
+
+        // Retry all packages in a non stable state
+        publishManager.retryAll();
+
       });
 
       watcher.on('error', function(error) {

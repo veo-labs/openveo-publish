@@ -243,38 +243,55 @@ function isValidPackageType(type) {
  *     // video package object example
  *     {
  *       "type": "vimeo", // Platform type
- *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar", // Package file
- *       "title": "2015-03-09_16-53-10_rich-media"
+ *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
  *     }
  *
  * @method publish
  * @param {Object} mediaPackage Package to publish
  */
 PublishManager.prototype.publish = function(mediaPackage) {
+  var self = this;
+
   if (mediaPackage && (typeof mediaPackage === 'object')) {
+    var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
 
     // Generate a package id
     mediaPackage.id = shortid.generate();
 
-    // Defines transitions to perform depending on package extension
-    mediaPackage.packageType = path.extname(mediaPackage.originalPackagePath).slice(1);
+    // Find out package type depending on package extension
+    mediaPackage.packageType = pathDescriptor.ext.slice(1);
 
-    // Defines name
-    mediaPackage.title = mediaPackage.originalFileName;
+    // Use file name as media title
+    mediaPackage.title = pathDescriptor.name;
 
     // Validate extension
     if (!isValidPackageType(mediaPackage.packageType))
       return this.emit('error', new PublishError('Package type is not valid (' + mediaPackage.packageType + ')',
                                                  errors.INVALID_PACKAGE_TYPE_ERROR));
 
-    var mediaPackageManager = createMediaPackageManager.call(this, mediaPackage);
-    mediaPackageManager.init(Package.PACKAGE_SUBMITTED_STATE, Package.INIT_TRANSITION);
+    this.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
+      if (error) {
+        self.emit('error', new PublishError('Getting medias with original package path "' +
+                                            mediaPackage.originalPackagePath + '" failed with message : ' +
+                                            error.message,
+                                                 errors.UNKNOWN_ERROR));
+      } else if (!videos || !videos.length) {
 
-    // Package can be added to pending packages
-    if (addPackage.call(this, mediaPackage))
-      mediaPackageManager.executeTransition(Package.INIT_TRANSITION);
+        // Package does not exist
+        // Publish it
+        var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+        mediaPackageManager.init(Package.PACKAGE_SUBMITTED_STATE, Package.INIT_TRANSITION);
+
+        // Package can be added to pending packages
+        if (addPackage.call(self, mediaPackage))
+          mediaPackageManager.executeTransition(Package.INIT_TRANSITION);
+
+      }
+
+    });
+
   } else
-    this.emit('error', new PublishError('mediaPackage argument must be an Object', errors.PACKAGE_NOT_DEFINED_ERROR));
+    this.emit('error', new PublishError('mediaPackage argument must be an Object', errors.UNKNOWN_ERROR));
 };
 
 /**
@@ -282,19 +299,24 @@ PublishManager.prototype.publish = function(mediaPackage) {
  *
  * @method retry
  * @param {String} packageId The id of the package on error
+ * @param {Boolean} forceRetry Force retrying a package no matter its state
  */
-PublishManager.prototype.retry = function(packageId) {
+PublishManager.prototype.retry = function(packageId, forceRetry) {
   if (packageId) {
     var self = this;
 
     // Retrieve package information
     this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
+      if (error) {
+        self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
+                                    errors.UNKNOWN_ERROR));
+      } else if (!mediaPackage) {
 
-      // Package does not exist
-      if (error || !mediaPackage) {
+        // Package does not exist
         self.emit('error', new PublishError('Cannot retry package ' + packageId + ' (not found)',
-                                            errors.PACKAGE_NOT_FOUND));
-      } else if (mediaPackage.state === VideoModel.ERROR_STATE) {
+                                            errors.PACKAGE_NOT_FOUND_ERROR));
+
+      } else if (mediaPackage.state === VideoModel.ERROR_STATE || forceRetry) {
 
         // Got package information
         // Package is indeed in error
@@ -319,6 +341,44 @@ PublishManager.prototype.retry = function(packageId) {
 };
 
 /**
+ * Retries publishing all packages in a non stable state.
+ *
+ * Stable states are :
+ * - VideoModel.ERROR_STATE
+ * - VideoModel.WAITING_FOR_UPLOAD_STATE
+ * - VideoModel.READY_STATE
+ * - VideoModel.PUBLISHED_STATE
+ *
+ * @method retryAll
+ */
+PublishManager.prototype.retryAll = function() {
+  var self = this;
+
+  // Retrieve all packages in a non stable state
+  this.videoModel.get({
+    state: {
+      $nin: [
+        VideoModel.ERROR_STATE,
+        VideoModel.WAITING_FOR_UPLOAD_STATE,
+        VideoModel.READY_STATE,
+        VideoModel.PUBLISHED_STATE
+      ]
+    }
+  }, function(error, mediaPackages) {
+    if (error)
+      return self.emit('error', new PublishError('Getting packages in non stable state failed with message : ' +
+                                                 error.message,
+                                            errors.UNKNOWN_ERROR));
+
+    mediaPackages.forEach(function(mediaPackage) {
+      self.retry(mediaPackage.id, true);
+    });
+
+  });
+
+};
+
+/**
  * Uploads a media blocked in waiting to upload state.
  *
  * @method upload
@@ -331,11 +391,15 @@ PublishManager.prototype.upload = function(packageId, platform) {
 
     // Retrieve package information
     this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
+      if (error) {
+        self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
+                                            errors.UNKNOWN_ERROR));
+      } else if (!mediaPackage) {
 
-      // Package does not exist
-      if (error || !mediaPackage) {
+        // Package does not exist
         self.emit('error', new PublishError('Cannot upload package ' + packageId + ' (not found)',
-                                            errors.PACKAGE_NOT_FOUND));
+                                            errors.PACKAGE_NOT_FOUND_ERROR));
+
       } else if (mediaPackage.state === VideoModel.WAITING_FOR_UPLOAD_STATE) {
 
         // Package is indeed waiting for upload

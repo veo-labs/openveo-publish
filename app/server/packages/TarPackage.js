@@ -75,12 +75,12 @@ function TarPackage(mediaPackage) {
   // Validate package timecode file name
   if (!this.publishConf.timecodeFileName || (typeof this.publishConf.timecodeFileName !== 'string'))
     this.emit('error', new TarPackageError('timecodeFileName in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION);
+      errors.INVALID_CONFIGURATION_ERROR);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
     this.emit('error', new TarPackageError('metadataFileName in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION);
+      errors.INVALID_CONFIGURATION_ERROR);
 
 }
 

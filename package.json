@@ -21,7 +21,7 @@
     "url": "https://github.com/veo-labs/openveo-publish.git"
   },
   "dependencies": {
-    "chokidar": "1.5.0",
+    "chokidar": "1.6.1",
     "javascript-state-machine": "2.3.5",
     "vimeo": "1.2.0",
     "googleapis": "5.2.1",

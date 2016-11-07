@@ -97,7 +97,7 @@ function Package(mediaPackage) {
   // Validate temporary directory
   if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
     this.emit('error', new PackageError('videoTmpDir in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION);
+      errors.INVALID_CONFIGURATION_ERROR);
 }
 
 util.inherits(Package, events.EventEmitter);
@@ -291,7 +291,6 @@ Package.prototype.initPackage = function() {
   process.logger.debug('Init package ' + this.mediaPackage.id);
 
   var self = this;
-  this.mediaPackage.title = this.mediaPackage.title;
   this.mediaPackage.state = VideoModel.PENDING_STATE;
   this.mediaPackage.link = null;
   this.mediaPackage.mediaId = null;

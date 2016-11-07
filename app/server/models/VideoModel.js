@@ -141,7 +141,6 @@ VideoModel.prototype.add = function(videoPackage, callback) {
     lastState: videoPackage.lastState,
     lastTransition: videoPackage.lastTransition,
     originalPackagePath: videoPackage.originalPackagePath,
-    originalFileName: videoPackage.originalFileName,
     mediaId: videoPackage.mediaId,
     timecodes: videoPackage.timecodes,
     chapters: videoPackage.chapters,
