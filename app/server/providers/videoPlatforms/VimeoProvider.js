@@ -201,8 +201,8 @@ VimeoProvider.prototype.getVideoInfo = function(mediaId, expectedDefinition, cal
             // definitions have been transcoded
             // Set the video as "available" as soon as the expected definition has been transcoded
             // If video height is not standard, Vimeo eventually change its definition to something close, thus
-            // we add a factor error of 10 to deal with those cases
-            if (Math.abs(file.height - expectedDefinition) < 10)
+            // we add a factor error of 64 to deal with those cases
+            if (Math.abs(file.height - expectedDefinition) <= 64)
               available = true;
           }
         }
