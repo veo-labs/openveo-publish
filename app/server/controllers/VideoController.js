@@ -83,7 +83,9 @@ VideoController.prototype.displayVideoAction = function(request, response, next)
  */
 VideoController.prototype.getPlatformsAction = function(request, response) {
   response.send({
-    platforms: Object.keys(platforms) || []
+    platforms: Object.keys(platforms) ? Object.keys(platforms).filter(function(value) {
+      return platforms[value];
+    }) : []
   });
 };
 

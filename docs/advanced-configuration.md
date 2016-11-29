@@ -93,16 +93,20 @@ Open **~/.openveo/publish/watcherConf.json**
 {
   "hotFolders" : [ // List of folders to watch
     {
-      "type" : "vimeo", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
+      "type" : "vimeo", // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot2" // Path to the hot folder
     },
     {
-      "type" : "youtube", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
+      "type" : "youtube", // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot3" // Path to the hot folder
     },
     {
-      "type" : "wowza", // Video platform to upload to for this hot folder (only vimeo, wowza or youtube is supported)
+      "type" : "wowza", // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot4" // Path to the hot folder
+    },
+    {
+      "type" : "local", // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
+      "path" : "/user/box/hot5" // Path to the hot folder
     },
     { 
       // No video platform specified : let user choose on which platform the video will be uplaoded

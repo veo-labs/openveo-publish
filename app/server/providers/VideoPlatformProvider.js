@@ -64,13 +64,16 @@ VideoPlatformProvider.getProvider = function(type, providerConf) {
       case 'wowza':
         var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
         return new WowzaProvider(providerConf);
+      case 'local':
+        var LocalProvider = process.requirePublish('app/server/providers/videoPlatforms/LocalProvider.js');
+        return new LocalProvider(providerConf);
 
       default:
         throw new Error('Unknown video plateform type');
     }
-
   }
 
+  return null;
 };
 
 /**

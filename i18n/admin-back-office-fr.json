@@ -73,6 +73,7 @@
     "UPLOAD_VIMEO" : "Envoyer sur Vimeo",
     "UPLOAD_YOUTUBE" : "Envoyer sur Youtube",
     "UPLOAD_WOWZA" : "Envoyer sur Wowza",
+    "UPLOAD_LOCAL" : "Envoyer sur la machine local",
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
     "CHAPTER_EDIT": "Chapitre",
