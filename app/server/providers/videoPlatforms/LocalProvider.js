@@ -52,6 +52,7 @@ util.inherits(LocalProvider, VideoPlatformProvider);
  *   - **Error** The error if an error occurred, null otherwise
  */
 LocalProvider.prototype.upload = function(videoFilePath, callback) {
+  var self = this;
 
   // Retrieve video tmp directory
   // e.g E:/openveo/node_modules/@openveo/publish/tmp/
@@ -62,8 +63,8 @@ LocalProvider.prototype.upload = function(videoFilePath, callback) {
     // Checks user quota
     function(callback) {
       var tmpId = shortid.generate();
-      var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + tmpId);
-      openVeoAPI.fileSystem.copy(videoFilePath, path.normalize(videoFinalDir + '/video.mp4'), function(error) {
+      var videoFinalPath = path.normalize(self.localConf.vodFilePath + tmpId + '/video.mp4');
+      openVeoAPI.fileSystem.copy(videoFilePath, path.normalize(videoFinalPath), function(error) {
         if (error) {
           process.logger.warn(error.message, {
             action: 'copyVideo',
@@ -108,7 +109,7 @@ LocalProvider.prototype.upload = function(videoFilePath, callback) {
  *   - **Object** Information about the video
  */
 LocalProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
-
+  var self = this;
   if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
     return;
@@ -117,7 +118,7 @@ LocalProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
   var infos = {sources: [], available: true};
   mediaIds.forEach(function(mediaId) {
     var info = {};
-    var basePath = '/publish/player/videos/' + mediaId + '/video.mp4';
+    var basePath = self.localConf.streamPath + mediaId + '/video.mp4';
     info.files = [{
       quality: 2, // 0 = mobile, 1 = sd, 2 = hd
       height: expectedDefinition,

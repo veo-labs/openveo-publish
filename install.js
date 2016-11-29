@@ -134,6 +134,7 @@ function createVideoPlatformConf(callback) {
   var vimeoConf;
   var youtubeConf;
   var wowzaConf;
+  var localConf;
 
   async.series([
     function(callback) {
@@ -230,7 +231,7 @@ function createVideoPlatformConf(callback) {
           protocol: 'sftp',
           port: '22'
         };
-        callback(null);
+        callback();
       });
     },
     function(callback) {
@@ -281,6 +282,32 @@ function createVideoPlatformConf(callback) {
         wowzaConf.streamPath = answer;
         callback();
       });
+    },
+
+    function(callback) {
+      rl.question('Do you want to configure Openveo to host video on local server ? (y/N) :\n', function(answer) {
+        if (answer === 'y') localConf = {
+          vodFilePath: path.join(__dirname, '/assets/player/videos/local'),
+          streamPath: '/publish/player/videos/local'
+        };
+        callback();
+      });
+    },
+    function(callback) {
+      if (!localConf) return callback();
+      rl.question('Enter content filesystem path (default: "' + localConf.vodFilePath + '" ):\n',
+      function(answer) {
+        if (answer !== '') localConf.vodFilePath = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!localConf) return callback();
+      rl.question('Enter file http access path (default: "' + localConf.streamPath + '"):\n',
+      function(answer) {
+        if (answer !== '') localConf.streamPath = answer;
+        callback();
+      });
     }
   ],
   function(error, results) {
@@ -292,6 +319,7 @@ function createVideoPlatformConf(callback) {
       if (vimeoConf) conf.vimeo = vimeoConf;
       if (youtubeConf) conf.youtube = youtubeConf;
       if (wowzaConf) conf.wowza = wowzaConf;
+      if (localConf) conf.local = localConf;
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
     }
   });
@@ -342,6 +370,17 @@ function createWatcherConf(callback) {
       rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
           type: 'wowza',
+          path: (answer || defaultPath).replace(/\\/g, '/')
+        });
+        callback();
+      });
+    },
+    function(callback) {
+      if (!videoPlatformConf.local) return callback();
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'local');
+      rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
+        conf.hotFolders.push({
+          type: 'local',
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();
