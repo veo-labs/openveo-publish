@@ -73,9 +73,9 @@ function TarPackage(mediaPackage) {
   Package.call(this, mediaPackage);
 
   // Validate package timecode file name
-  if (!this.publishConf.timecodeFileName || (typeof this.publishConf.timecodeFileName !== 'string'))
-    this.emit('error', new TarPackageError('timecodeFileName in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION_ERROR);
+  // if (!this.publishConf.timecodeFileName || (typeof this.publishConf.timecodeFileName !== 'string'))
+  //   this.emit('error', new TarPackageError('timecodeFileName in publishConf.json must be a String'),
+  //     errors.INVALID_CONFIGURATION_ERROR);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
@@ -313,7 +313,10 @@ function saveTimecodes(xmlTimecodeFilePath, destinationFilePath, callback) {
                   if (timecodeInfo['id'] && timecodeInfo['id'].length) {
                     formattedTimecodes.push({
                       timecode: parseInt(timecodeInfo['timecode'][0]),
-                      image: timecodeInfo['id'][0]
+                      type: 'image',
+                      data: {
+                        filename: timecodeInfo['id'][0]
+                      }
                     });
                   }
 
@@ -446,7 +449,7 @@ TarPackage.prototype.saveTimecodes = function() {
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
 
-  if (this.mediaPackage.timecodes)
+  if (this.mediaPackage.timecodes || !this.publishConf.timecodeFileName != '.session')
     self.fsm.transition();
   else saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,
     'synchro.json'), function(error) {

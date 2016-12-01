@@ -609,7 +609,6 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
 
           // Retreive video timecode file
           videoInfo = video;
-          videoInfo.timecodes = {};
           timecodesFilePath = path.normalize(
             process.rootPublish + '/assets/player/videos/' + videoInfo.id + '/synchro.json');
         }
@@ -619,9 +618,30 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
       });
     },
 
+    // Retrieve video timecodes
+    function(callback) {
+      if (timecodesFilePath) {
+        fs.exists(timecodesFilePath, function(exists) {
+          if (exists) {
+            try {
+              timecodes = require(timecodesFilePath);
+            } catch (e) {
+              callback(new Error(e.message));
+              return;
+            }
+          }
+          callback();
+        });
+      } else
+        callback();
+    },
+
     // Retrieve video information from video platform
     function(callback) {
       if (videoInfo && videoInfo.type && videoInfo.mediaId) {
+
+        // Get timecodes from metadata
+        if (!timecodes) timecodes = videoInfo.metadata.indexes;
 
         // Video information already retrieved
         if (videoInfo.available)
@@ -646,44 +666,46 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
 
       } else
         callback();
-    },
-
-    // Retrieve video timecodes
-    function(callback) {
-      if (timecodesFilePath) {
-        fs.exists(timecodesFilePath, function(exists) {
-          if (exists) {
-            try {
-              timecodes = require(timecodesFilePath);
-            } catch (e) {
-              callback(new Error(e.message));
-              return;
-            }
-          }
-          callback();
-        });
-      } else
-        callback();
     }
 
   ], function(error) {
     if (error || !videoInfo) {
       callback(error);
     } else {
-      videoInfo.timecodes = [];
 
       // Got timecodes for this video
       if (timecodes) {
+        videoInfo.timecodes = [];
+        var chapters = [];
 
         for (var i = 0; i < timecodes.length; i++) {
-          videoInfo.timecodes.push({
-            timecode: timecodes[i].timecode,
-            image: {
-              small: '/publish/' + videoInfo.id + '/' + timecodes[i].image + '?thumb=small',
-              large: '/publish/' + videoInfo.id + '/' + timecodes[i].image
-            }
-          });
+          var currentTc = timecodes[i];
+          var timecodeType = currentTc.type;
+
+          switch (timecodeType) {
+            case 'image':
+              videoInfo.timecodes.push({
+                timecode: currentTc.timecode,
+                image: {
+                  small: '/publish/' + videoInfo.id + '/' + currentTc.data.filename + '?thumb=small',
+                  large: '/publish/' + videoInfo.id + '/' + currentTc.data.filename
+                }
+              });
+              break;
+
+            case 'tag':
+              chapters.push({
+                value: currentTc.timecode / (videoInfo.metadata.duration * 1000),
+                name: 'Tag' + (chapters.length + 1)
+              });
+              break;
+            default:
+          }
         }
+
+        // Set chapters only if it exists chapter,
+        // else client side will automaticaly create chapter according to image timestamp.
+        if ((!videoInfo.chapters || !videoInfo.chapters.length) && chapters.length) videoInfo.chapters = chapters;
       }
       callback(null, videoInfo);
     }
