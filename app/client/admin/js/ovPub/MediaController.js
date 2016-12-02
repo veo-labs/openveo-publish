@@ -84,7 +84,7 @@
       $scope.$emit('setAlert', 'info', [
         $filter('translate')('PUBLISH.MEDIAS.SHARECODE'),
         '<br><br><div class="well well-sm"><code>',
-        '&lt;iframe width="480" height="270" ',
+        '&lt;iframe width="768" height="500" ',
         'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + media.link,
         '?fullscreen&lang=' + i18nService.getLanguage() + '"',
         ' frameborder="0"&gt;&lt;/iframe&gt;',
