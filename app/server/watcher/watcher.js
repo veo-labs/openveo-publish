@@ -190,7 +190,7 @@ db.connect(function(error) {
       process.send({action: 'upload'});
     });
 
-    async.filter(hotFoldersPaths, fs.exists, function(results) {
+    async.filter(hotFoldersPaths, fs.exists, function(error, results) {
       hotFoldersPaths = results;
 
       // Start watching the hot folders
