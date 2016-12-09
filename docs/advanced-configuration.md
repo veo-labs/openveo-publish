@@ -48,7 +48,7 @@ Open **~/.openveo/publish/videoPlatformConf.json**
     "host": "HOST", //server host where the video will be uploaded
     "port": "PORT", //server host port
     "user": "USERNAME", // server username
-    "pwd": "PASSWORD", // server password 
+    "pwd": "PASSWORD", // server password
     "vodFilePath": "/files/", // path where the video will be uploaded
     "streamPath": "https://HOST/APP_NAME" // stream path exposed by wowza to access video, HOST and APP_NAME are defined in wowza
   }
@@ -68,7 +68,7 @@ To upload videos on **Wowza**, you need to install **lfpt** package on your syst
 On **Ubuntu**, you can install lftp package by executing the command:
 
     sudo apt-get install lftp
- 
+
 
 # Configure the logger
 
@@ -85,7 +85,7 @@ Open **~/.openveo/publish/loggerConf.json**
 }
 ```
 
-# Configure the [watcher](/watcher)
+# Configure the [watcher](watcher.md)
 
 Open **~/.openveo/publish/watcherConf.json**
 
@@ -108,7 +108,7 @@ Open **~/.openveo/publish/watcherConf.json**
       "type" : "local", // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
       "path" : "/user/box/hot5" // Path to the hot folder
     },
-    { 
+    {
       // No video platform specified : let user choose on which platform the video will be uplaoded
       "path" : "/user/box/hot1" // Path to the hot folder
     },

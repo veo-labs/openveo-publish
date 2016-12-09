@@ -438,7 +438,7 @@ TarPackage.prototype.validatePackage = function() {
  *
  * This is a transition.
  *
- * @method preparePublicDirectory
+ * @method saveTimecodes
  * @private
  */
 TarPackage.prototype.saveTimecodes = function() {

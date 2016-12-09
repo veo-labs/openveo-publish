@@ -1,6 +1,6 @@
 # Introduction
 
-The Watcher is capable of listening to some directories specified during [plugin's configuration](/getting-started#configure-the-watcher).
+The Watcher is capable of listening to some directories specified during [plugin's configuration](getting-started.md#configure-the-watcher).
 
 Two types of files can be copied in these directories :
 
