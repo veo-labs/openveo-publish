@@ -259,7 +259,7 @@ HTTP Status Code | Details
 
 Delete a video.
 
-    DELETE WEB_SERVICE_URL/videos/{video_id}
+    DELETE WEB_SERVICE_URL/publish/videos/{video_id}
 
 HTTP Status Code | Details
 ---- | ----
