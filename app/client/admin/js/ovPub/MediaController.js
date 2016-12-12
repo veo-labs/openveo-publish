@@ -256,7 +256,8 @@
 
     scopeDataTable.init = {
       sortBy: 'date',
-      sortOrder: 'dsc'
+      sortOrder: 'dsc',
+      notSortBy: ['mediaId']
     };
     var categoriesFilter = getSelectableCategories('CORE.UI.ALL');
     scopeDataTable.filterBy = [
