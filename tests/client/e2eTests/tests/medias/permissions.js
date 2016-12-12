@@ -130,7 +130,7 @@ describe('Media page', function() {
       it('should not be able by users in the group without read permission', function() {
         page.logAs(datas.users.publishMediasGroupNoRead);
         page.load();
-        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title));
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'get').then(function(response) {
           assert.equal(response.status, 403, 'Expected video to be inaccessible');
@@ -141,7 +141,7 @@ describe('Media page', function() {
         page.logAs(datas.users.publishMedias2);
         page.load();
         assert.isFulfilled(page.getLine(anonymousLineToAdd.title), 'Expected media ' + anonymousLineToAdd.title);
-        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title));
 
         page.sendRequest('be/publish/videos/' + anonymousLineToAdd.id, 'get').then(function(response) {
           assert.equal(response.status, 200, 'Expected anonymous video to be accessible');
@@ -244,9 +244,9 @@ describe('Media page', function() {
 
         assert.isRejected(page.editMedia(ownerLineToAdd.title, {
           name: ownerLineNewTitle
-        }), 'Expected media ' + ownerLineNewTitle + ' not to be editable');
+        }));
 
-        assert.isRejected(page.getLine(ownerLineNewTitle), 'Unexpected media ' + ownerLineNewTitle);
+        assert.isRejected(page.getLine(ownerLineNewTitle));
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'post', {
           title: ownerLineNewTitle
@@ -264,8 +264,8 @@ describe('Media page', function() {
 
         page.removeLine(ownerLineToAdd.title);
         page.removeLine(anonymousLineToAdd.title);
-        assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
-        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+        assert.isRejected(page.getLine(anonymousLineToAdd.title));
+        assert.isRejected(page.getLine(ownerLineToAdd.title));
       });
 
       it('should be able by the owner by calling the server directly', function() {
@@ -287,8 +287,8 @@ describe('Media page', function() {
 
         page.removeLine(ownerLineToAdd.title);
         page.removeLine(anonymousLineToAdd.title);
-        assert.isRejected(page.getLine(anonymousLineToAdd.title), 'Unexpected media ' + anonymousLineToAdd.title);
-        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+        assert.isRejected(page.getLine(anonymousLineToAdd.title));
+        assert.isRejected(page.getLine(ownerLineToAdd.title));
       });
 
       it('should be able by the administrator by calling the server directly', function() {
@@ -309,7 +309,7 @@ describe('Media page', function() {
         page.load();
 
         page.removeLine(ownerLineToAdd.title);
-        assert.isRejected(page.getLine(ownerLineToAdd.title), 'Unexpected media ' + ownerLineToAdd.title);
+        assert.isRejected(page.getLine(ownerLineToAdd.title));
       });
 
       it('should be able by users in the group by calling the server directly', function() {
