@@ -26,6 +26,7 @@ var chokidar = require('chokidar');
 var openVeoAPI = require('@openveo/api');
 var configDir = openVeoAPI.fileSystem.getConfDir();
 var databaseConf;
+var exit = process.exit;
 
 for (var i = 0; i < process.argv.length; i++) {
 
@@ -136,7 +137,7 @@ db.connect(function(error) {
 
       // Exit process if disconnected from its parent
       process.on('disconnect', function() {
-        throw new Error('Watcher has been disconnected from its parent process');
+        exit();
       });
 
       // Handle messages from parent process
