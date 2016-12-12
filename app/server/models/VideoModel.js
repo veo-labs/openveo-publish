@@ -605,6 +605,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
         } else if (!error && !self.isUserAuthorized(video, openVeoAPI.ContentModel.READ_OPERATION)) {
           var userId = self.user.id;
           callback(new AccessError('User "' + userId + '" doesn\'t have access to video "' + id + '"'));
+          return;
         } else {
 
           // Retreive video timecode file
