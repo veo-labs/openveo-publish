@@ -20,7 +20,7 @@ module.exports.update = function(callback) {
         }
 
         // No need to change anything
-        if (!value || !value.length) callback();
+        if (!value || !value.length) return callback();
 
         else {
           var series = [];
