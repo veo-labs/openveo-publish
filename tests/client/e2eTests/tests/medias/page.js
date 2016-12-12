@@ -518,7 +518,7 @@ describe('Media page', function() {
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return new RegExp(search.date).test(data.cells[2]);
+          return new RegExp(search.date).test(data.cells[3]);
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -642,7 +642,7 @@ describe('Media page', function() {
         var filteredDatas = datas.filter(function(data) {
           return (search.name === data.cells[1]) &&
             (search.description === data.fields.description) &&
-            (search.date === data.cells[2]) &&
+            (search.date === data.cells[3]) &&
             (categories[0].title === data.fields.category);
         });
 
