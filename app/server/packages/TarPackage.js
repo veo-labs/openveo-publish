@@ -449,7 +449,7 @@ TarPackage.prototype.saveTimecodes = function() {
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
 
-  if (this.mediaPackage.timecodes || !this.publishConf.timecodeFileName != '.session')
+  if (this.mediaPackage.timecodes || this.publishConf.timecodeFileName === '.session')
     self.fsm.transition();
   else saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,
     'synchro.json'), function(error) {
