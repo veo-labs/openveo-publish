@@ -162,6 +162,8 @@ VideoPackage.prototype.getMetadata = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.GET_METADATA_STATE);
+
+  if (!this.mediaPackage.metadata) this.mediaPackage.metadata = {};
   this.mediaPackage.metadata['profile-settings'] = this.mediaPackage.metadata['profile-settings'] || {};
 
   if (this.mediaPackage.metadata['profile-settings']['video-height'])
