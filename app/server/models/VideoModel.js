@@ -711,7 +711,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
         if (!timecodes) timecodes = videoInfo.metadata.indexes;
 
         // Video information already retrieved
-        if (videoInfo.available)
+        if (videoInfo.available && videoInfo.sources.length == videoInfo.mediaId.length)
           return callback();
 
         var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type,
