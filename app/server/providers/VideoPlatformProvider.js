@@ -91,6 +91,21 @@ VideoPlatformProvider.prototype.upload = function() {
 };
 
 /**
+ * Remove a video from the platform.
+ *
+ * @method remove
+ * @async
+ * @param {Array} mediaIds Video media IDs array of videos to remove
+ * @param {Function} callback The function to call when the remove
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoPlatformProvider.prototype.remove = function() {
+  throw new Error('upload method not implemented for this video platform provider');
+};
+
+
+/**
  * Configure video on the platform.
  *
  * Depending on the platform, some video properties must be set after the

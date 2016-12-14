@@ -303,3 +303,53 @@ YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback)
   // sources and pictures are not necessary: youtube player manage its own data
   callback(null, {available: true, sources: [], pictures: [], mediaId: mediaId});
 };
+
+/**
+ * Removes a video from the Youtube platform.
+ *
+ * @method remove
+ * @async
+ * @param {Array} mediaIds Media Ids array of videos to remove
+ * @param {Function} callback The function to call when the remove
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+YoutubeProvider.prototype.remove = function(mediaIds, callback) {
+  if (!mediaIds) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var series = [];
+
+  series.push(function(callback) {
+    googleOAuthHelper.getFreshToken(function(error, tokens) {
+      if (error) {
+        callback(error);
+        return;
+      }
+      googleOAuthHelper.oauth2Client.setCredentials(tokens);
+      callback();
+    });
+  });
+
+  mediaIds.forEach(function(mediaId) {
+    series.push(function(callback) {
+      var deleteParam = {
+        id: mediaId,
+        part: 'id'
+      };
+      deleteParam.auth = googleOAuthHelper.oauth2Client;
+      youtube.videos.delete(deleteParam, function(error) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        callback();
+      });
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};

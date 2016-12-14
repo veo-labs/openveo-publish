@@ -233,3 +233,42 @@ VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
     }
   });
 };
+
+
+/**
+ * Removes a video from the Vimeo platform.
+ *
+ * @method remove
+ * @async
+ * @param {Array} mediaIds Media Ids array of videos to remove
+ * @param {Function} callback The function to call when the remove
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VimeoProvider.prototype.remove = function(mediaIds, callback) {
+  if (!mediaIds) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var self = this;
+  var parallel = [];
+
+  mediaIds.forEach(function(mediaId) {
+    parallel.push(function(callback) {
+      self.vimeo.request({method: 'DELETE', path: '/videos/' + mediaId}, function(error, body, statusCode, headers) {
+        if (error) {
+          callback(error);
+          return;
+        } else if (statusCode != 204) {
+          callback(new Error(statusCode));
+          return;
+        }
+        callback();
+      });
+    });
+  });
+
+  async.parallel(parallel, function(error) {
+    callback(error);
+  });
+};

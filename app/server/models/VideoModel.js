@@ -93,6 +93,72 @@ function removeDirectories(directories, callback) {
   });
 }
 
+
+/**
+ * Removes a All Data related to a list of video ID.
+ *
+ * @method removeAllDataRelatedToVideo
+ * @private
+ * @async
+ * @param {Array} videosToRemove The list of videos to remove
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+function removeAllDataRelatedToVideo(videosToRemove, callback) {
+  var parallel = [];
+
+  // Remove videos public directories
+  parallel.push(function(callback) {
+    var directories = [];
+
+    for (var i = 0; i < videosToRemove.length; i++)
+      directories.push(path.normalize(process.rootPublish + '/assets/player/videos/' + videosToRemove[i].id));
+
+    removeDirectories(directories, function(error) {
+      callback(error);
+    });
+  });
+
+  // Remove videos temporary directories
+  parallel.push(function(callback) {
+    var directories = [];
+
+    for (var i = 0; i < videosToRemove.length; i++)
+      directories.push(path.join(publishConf.videoTmpDir, videosToRemove[i].id));
+
+    removeDirectories(directories, function(error) {
+      callback(error);
+    });
+  });
+
+  videosToRemove.forEach(function(video) {
+    parallel.push(
+      function(callback) {
+        var videoPlatformProvider = VideoPlatformProvider.getProvider(video.type,
+          videoPlatformConf[video.type]);
+
+        // compatibility with old mediaId format
+        var mediaId = !Array.isArray(video.mediaId) ? [video.mediaId] : video.mediaId;
+        if (videoPlatformProvider) videoPlatformProvider.remove(mediaId, function(error, info) {
+          if (error) {
+            callback(error);
+            return;
+          }
+          callback();
+        });
+        else callback();
+      }
+    );
+  });
+
+  async.parallel(parallel, function(error) {
+    if (error)
+      callback(error);
+    else
+      callback(null);
+  });
+}
+
 /**
  * Adds a new video.
  *
@@ -727,51 +793,31 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
 VideoModel.prototype.remove = function(ids, callback) {
   var self = this;
   var idsToRemove = [];
-  async.parallel([
 
-    // Remove videos from database
-    function(callback) {
-      self.provider.get({id: {$in: ids}}, function(error, videos) {
-        if (!error) {
-          for (var i = 0; i < videos.length; i++) {
-            if (self.isUserAuthorized(videos[i], openVeoAPI.ContentModel.DELETE_OPERATION))
-              idsToRemove.push(videos[i].id);
-          }
-        }
-
-        self.provider.remove(idsToRemove, callback);
-      });
-    },
-
-    // Remove videos public directories
-    function(callback) {
-      var directories = [];
-
-      for (var i = 0; i < ids.length; i++)
-        directories.push(path.normalize(process.rootPublish + '/assets/player/videos/' + ids[i]));
-
-      removeDirectories(directories, function(error) {
-        callback(error);
-      });
-    },
-
-    // Remove videos temporary directories
-    function(callback) {
-      var directories = [];
-
-      for (var i = 0; i < ids.length; i++)
-        directories.push(path.join(publishConf.videoTmpDir, ids[i]));
-
-      removeDirectories(directories, function(error) {
-        callback(error);
-      });
+  self.provider.get({id: {$in: ids}}, function(error, videos) {
+    if (!error) {
+      for (var i = 0; i < videos.length; i++) {
+        if (self.isUserAuthorized(videos[i], openVeoAPI.ContentModel.DELETE_OPERATION))
+          idsToRemove.push(videos[i].id);
+      }
     }
 
-  ], function(error, results) {
-    if (error)
-      callback(error);
-    else
-      callback(null, results[0]);
+    // Remove videos from database
+    self.provider.remove(idsToRemove, function(error, results) {
+      if (error)
+        callback(error);
+      else {
+
+        // Only if videos are removed, we can remove all data related
+        removeAllDataRelatedToVideo(videos, function(error) {
+          if (error)
+            callback(error);
+          else {
+            callback(null, idsToRemove.length);
+          }
+        });
+      }
+    });
   });
 };
 

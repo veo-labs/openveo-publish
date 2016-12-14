@@ -154,3 +154,43 @@ WowzaProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
 
   callback(null, infos);
 };
+
+/**
+ * Remove a video from the wowza platform.
+ *
+ * @method remove
+ * @async
+ * @param {Array} mediaIds Media Ids array of videos to remove
+ * @param {Function} callback The function to call when the remove
+ * is done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+WowzaProvider.prototype.remove = function(mediaIds, callback) {
+  if (!mediaIds) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var self = this;
+  var series = [];
+  var videoFinalPath = path.normalize(self.wowzaConf.vodFilePath);
+
+  mediaIds.forEach(function(mediaId) {
+    series.push(function(callback) {
+      self.ftps.rm(videoFinalPath + mediaId + '.mp4').exec(function(error, res) {
+        if (error || res.error) {
+          process.logger.warn(error.message, {
+            action: 'RemoveVideo',
+            path: videoFinalPath
+          });
+          callback(error || res.error);
+        } else {
+          callback(null);
+        }
+      });
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};

@@ -5,7 +5,8 @@ var path = require('path');
 var fs = require('fs');
 var assert = require('chai').assert;
 var openVeoAPI = require('@openveo/api');
-var ut = require('@openveo/test').unit.generator;
+var applicationStorage = openVeoAPI.applicationStorage;
+var FakeVideoDatabase = require('./database/FakeVideoDatabase.js');
 
 // VideoModel.js
 describe('VideoModel', function() {
@@ -15,7 +16,7 @@ describe('VideoModel', function() {
   // Initializes tests
   beforeEach(function() {
     VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-    ut.generateSuccessDatabase();
+    applicationStorage.setDatabase(new FakeVideoDatabase());
     videoModel = new VideoModel();
 
     var videosDirectoryPath = path.normalize(path.join(__dirname, '/assets/player/videos/5'));

@@ -11,15 +11,22 @@ module.exports = FakeVideoDatabase;
 util.inherits(FakeVideoDatabase, Database);
 
 FakeVideoDatabase.prototype.get = function(collection, criteria, projection, limit, callback) {
-  if (criteria.id === 'error')
+  if (criteria && criteria.id === 'error')
     callback(new Error('Error'));
-  else if (criteria.id == 5)
+  else {
+    var id = 1;
+    if (criteria && criteria.id) {
+      if (criteria.id.$in) id = criteria.id.$in;
+      else id = criteria.id;
+    }
+
     callback(null, [{
+      id: id,
       state: 12,
-      files: []
+      files: [],
+      type: 'type'
     }]);
-  else
-    callback(null, [{}]);
+  }
 };
 
 FakeVideoDatabase.prototype.insert = function(collection, data, callback) {
@@ -27,7 +34,7 @@ FakeVideoDatabase.prototype.insert = function(collection, data, callback) {
 };
 
 FakeVideoDatabase.prototype.update = function(collection, criteria, data, callback) {
-  if (criteria.id === 'error' || criteria.id.$in[0] === 'error')
+  if (criteria.id === 'error' || (criteria.id.$in && criteria.id.$in[0] === 'error'))
     callback(new Error('Error'));
   else
     callback(null);
