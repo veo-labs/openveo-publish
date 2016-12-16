@@ -22,6 +22,25 @@ var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
+var rlSecure = false;
+
+/**
+ * Secure question to not show stdout
+ */
+function secureQuestion(query, callback) {
+  rlSecure = true;
+  rl.question(query, function(value) {
+    rl.history = rl.history.slice(1);
+    rlSecure = false;
+    callback(value);
+  });
+}
+
+// rewrite stdout in cas of secure rl
+process.stdin.on('data', function(char) {
+  if (rlSecure)
+    process.stdout.write('\x1B[2K\x1B[200D' + Array(rl.line.length + 1).join('*'));
+});
 
 /**
  * Creates conf directory if it does not exist.
@@ -160,14 +179,14 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!vimeoConf) return callback();
-      rl.question('Enter Vimeo Web Service client secret (available in your Vimeo account) :\n', function(answer) {
+      secureQuestion('Enter Vimeo Web Service client secret (available in your Vimeo account) :\n', function(answer) {
         vimeoConf.clientSecret = answer;
         callback();
       });
     },
     function(callback) {
       if (!vimeoConf) return callback();
-      rl.question('Enter Vimeo Web Service access token (available in your Vimeo account) :\n', function(answer) {
+      secureQuestion('Enter Vimeo Web Service access token (available in your Vimeo account) :\n', function(answer) {
         vimeoConf.accessToken = answer;
         callback();
       });
@@ -193,7 +212,7 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!youtubeConf) return callback();
-      rl.question('Enter Youtube API client secret (available in your Google Developper Console) :\n',
+      secureQuestion('Enter Youtube API client secret (available in your Google Developper Console) :\n',
       function(answer) {
         youtubeConf.googleOAuth.clientSecret = answer;
         callback();
@@ -228,9 +247,17 @@ function createVideoPlatformConf(callback) {
     function(callback) {
       rl.question('Do you want to configure a Wowza account ? (y/N) :\n', function(answer) {
         if (answer === 'y') wowzaConf = {
+          host: 'localhost',
           protocol: 'sftp',
           port: '22'
         };
+        callback();
+      });
+    },
+    function(callback) {
+      if (!wowzaConf) return callback();
+      rl.question('Enter Wowza host (default: ' + wowzaConf.host + '):\n', function(answer) {
+        if (answer) wowzaConf.host = answer;
         callback();
       });
     },
@@ -260,7 +287,7 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!wowzaConf) return callback();
-      rl.question('Enter ftp/sftp user password:\n',
+      secureQuestion('Enter ftp/sftp user password:\n',
       function(answer) {
         wowzaConf.pwd = answer;
         callback();
