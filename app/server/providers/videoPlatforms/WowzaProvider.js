@@ -84,7 +84,7 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
                 // err will be null (to respect async convention)
                 // res is an hash with { error: stderr || null, data: stdout }
                 if (res.error)
-                  callback(res.error);
+                  callback(new Error(res.error));
                 else if (err)
                   callback(err);
                 else {
