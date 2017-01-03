@@ -1,3 +1,10 @@
+# 2.1.0 / 2017-01-03
+
+- Add multi-sources video feature
+- Add local video upload
+- Add delete video from provider when user delete it in Openveo
+- Correct and improve watcher behavior
+
 # 2.0.6 / 2016-09-09
 
 - Set media name according to package name on upload
