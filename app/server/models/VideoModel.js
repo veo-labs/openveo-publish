@@ -718,8 +718,11 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
           videoPlatformConf[videoInfo.type]);
         var expectedDefinition = videoInfo.metadata['profile-settings']['video-height'];
 
+        // compatibility with old mediaId format
+        var mediaId = !Array.isArray(videoInfo.mediaId) ? [videoInfo.mediaId] : videoInfo.mediaId;
+
         // Get video availability and sources
-        videoPlatformProvider.getVideoInfo(videoInfo.mediaId, expectedDefinition, function(error, info) {
+        videoPlatformProvider.getVideoInfo(mediaId, expectedDefinition, function(error, info) {
           if (error) {
             callback(error);
             return;
