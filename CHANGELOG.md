@@ -1,3 +1,7 @@
+# 2.1.0 / 2017-01-09
+
+- Patch old mediaId format issue
+
 # 2.1.0 / 2017-01-03
 
 - Add multi-sources video feature
