@@ -744,7 +744,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
             case 'tag':
               chapters.push({
                 value: currentTc.timecode / (videoInfo.metadata.duration * 1000),
-                name: 'Tag' + (chapters.length + 1)
+                name: currentTc.data && currentTc.data.tagname ? currentTc.data.tagname : 'Tag' + (chapters.length + 1)
               });
               break;
             default:
