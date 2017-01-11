@@ -6,7 +6,6 @@
 
 var util = require('util');
 var path = require('path');
-var fs = require('fs');
 var async = require('async');
 var openVeoAPI = require('@openveo/api');
 
@@ -657,7 +656,6 @@ VideoModel.prototype.getOneReady = function(id, callback) {
 VideoModel.prototype.getOne = function(id, filter, callback) {
   var self = this;
   var videoInfo,
-    timecodesFilePath,
     timecodes;
 
   async.series([
@@ -676,8 +674,6 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
 
           // Retreive video timecode file
           videoInfo = video;
-          timecodesFilePath = path.normalize(
-            process.rootPublish + '/assets/player/videos/' + videoInfo.id + '/synchro.json');
         }
 
         callback();
@@ -685,30 +681,12 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
       });
     },
 
-    // Retrieve video timecodes
-    function(callback) {
-      if (timecodesFilePath) {
-        fs.exists(timecodesFilePath, function(exists) {
-          if (exists) {
-            try {
-              timecodes = require(timecodesFilePath);
-            } catch (e) {
-              callback(new Error(e.message));
-              return;
-            }
-          }
-          callback();
-        });
-      } else
-        callback();
-    },
-
     // Retrieve video information from video platform
     function(callback) {
       if (videoInfo && videoInfo.type && videoInfo.mediaId) {
 
         // Get timecodes from metadata
-        if (!timecodes) timecodes = videoInfo.metadata.indexes;
+        timecodes = videoInfo.metadata.indexes;
 
         // Video information already retrieved
         if (videoInfo.available && videoInfo.sources.length == videoInfo.mediaId.length)

@@ -271,8 +271,8 @@ function validatePackage(callback) {
  * @param {Function} callback The function to call when done
  *   - **Error** The error if an error occurred, null otherwise
  */
-function saveTimecodes(xmlTimecodeFilePath, destinationFilePath, callback) {
-
+function saveTimecodes(xmlTimecodeFilePath, tarPackage, callback) {
+  var formattedTimecodes = [];
   async.series([
     function(callback) {
 
@@ -299,51 +299,40 @@ function saveTimecodes(xmlTimecodeFilePath, destinationFilePath, callback) {
           },
           function(error, timecodes) {
 
-            var formattedTimecodes = [];
-
             // Transform timecode format to
             if (timecodes && timecodes.player && timecodes.player.synchro) {
 
               // Iterate through the list of timecodes
               // Change JSON organization to be more accessible
               timecodes.player.synchro.forEach(function(timecodeInfo) {
-
-                if (timecodeInfo['timecode'] && timecodeInfo['timecode'].length) {
-
-                  if (timecodeInfo['id'] && timecodeInfo['id'].length) {
-                    formattedTimecodes.push({
-                      timecode: parseInt(timecodeInfo['timecode'][0]),
-                      type: 'image',
-                      data: {
-                        filename: timecodeInfo['id'][0]
-                      }
-                    });
-                  }
-
+                if (timecodeInfo['id'] && timecodeInfo['id'].length) {
+                  formattedTimecodes.push({
+                    timecode: parseInt(timecodeInfo['timecode'][0]),
+                    type: 'image',
+                    data: {
+                      filename: timecodeInfo['id'][0]
+                    }
+                  });
                 }
               });
-
             }
-
-            callback(error, formattedTimecodes);
+            callback(error);
           });
         }
 
       });
 
     }
-  ], function(error, results) {
+  ], function(error) {
+
     if (error) {
       callback(error);
     } else {
-      fs.writeFile(destinationFilePath, JSON.stringify(results[1]),
-        {
-          encoding: 'utf8'
-        },
-        function(error) {
-          callback(error);
-        }
-      );
+      if (!tarPackage.mediaPackage.metadata) tarPackage.mediaPackage.metadata = {};
+      openVeoAPI.util.merge(tarPackage.mediaPackage.metadata, {indexes: formattedTimecodes});
+
+      tarPackage.videoModel.updateMetadata(tarPackage.mediaPackage.id, tarPackage.mediaPackage.metadata);
+      callback();
     }
   });
 
@@ -417,13 +406,15 @@ TarPackage.prototype.validatePackage = function() {
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.VALIDATING_STATE);
 
   // Validate package content
-  validatePackage.call(this, function(error, metadata) {
+  if (this.mediaPackage.metadata.indexes)
+    self.fsm.transition();
+  else validatePackage.call(this, function(error, metadata) {
     if (error)
       self.setError(new TarPackageError(error.message, errors.VALIDATION_ERROR));
     else {
       if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-      openVeoAPI.util.merge(self.mediaPackage.metadata, metadata);
 
+      openVeoAPI.util.merge(self.mediaPackage.metadata, metadata);
       self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
 
       if (self.mediaPackage.metadata.date)
@@ -449,15 +440,14 @@ TarPackage.prototype.saveTimecodes = function() {
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
 
-  if (this.mediaPackage.timecodes || this.publishConf.timecodeFileName === '.session')
+  if (this.mediaPackage.metadata.indexes)
     self.fsm.transition();
-  else saveTimecodes(path.join(extractDirectory, this.publishConf.timecodeFileName), path.join(videoFinalDir,
-    'synchro.json'), function(error) {
-      if (error && self.mediaPackage.metadata['rich-media'])
-        self.setError(new TarPackageError(error.message, errors.SAVE_TIMECODE_ERROR));
-      else
-        self.fsm.transition();
-    });
+  else saveTimecodes(path.join(extractDirectory, 'synchro.xml'), self, function(error) {
+    if (error && self.mediaPackage.metadata['rich-media'])
+      self.setError(new TarPackageError(error.message, errors.SAVE_TIMECODE_ERROR));
+    else
+      self.fsm.transition();
+  });
 };
 
 
