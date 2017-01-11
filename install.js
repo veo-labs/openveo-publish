@@ -106,7 +106,6 @@ function createConf(callback) {
         var conf = {
           videoTmpDir: (answer || defaultPath).replace(/\\/g, '/'),
           maxConcurrentPublish: 3,
-          timecodeFileName: 'synchro.xml',
           metadataFileName: '.session'
         };
 
