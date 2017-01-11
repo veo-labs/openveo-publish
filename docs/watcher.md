@@ -31,14 +31,38 @@ It can contain some optional properties :
 {
   "date": 1425916390, // The date the video was recorded (in Unix epoch time)
   "rich-media": true // true to indicates that video has associated images, false if only the video is in the package
+  "indexes": [  // An array specifying a list of timecodes, their own type and data associated.
+    { 
+      "timecode": 0, // timecode in ms
+      "type": "image", // timecode type (must be "image" or "tag")
+      "data": {  // related information to image timecode 
+        "filename": "slide_00000.jpeg" // filename of image timecode
+      }
+    },
+    {
+      "timecode": 9500, // timecode in ms
+      "type": "tag", // timecode type (must be "image" or "tag")
+      "data": { // Optional - related information for tag timecode
+        "tagname": "Very important moment" // tagname to display, if not defined, will be replaced by 'Tag N' where N is the number of the tag
+      } 
+    },
+    ...
+  ]
 }
 ```
+"indexes" property is used to map each a video timecode to an image or a chapter (Tag) and must be present if **rich-media** property is set to "true". In this exemple:
+
+- at time **0ms**, image **slide_00000.jpeg** will be displayed (**slide_00000.jpeg** file must be present in the package)
+- a chapter named "**Very important moment**" will be created and will redirect video at time **9500ms**.
 
 **Nb :** All extra properties are kept but won't be used directly by Publish.
 
-## synchro.xml file
+## synchro.xml file **(DEPRECATED)**
 
-**synchro.xml** file is used to map each images to a video timecode. If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
+** The use of this file is deprecated. 
+This file is used only if indexes information are not in .session file.**
+
+**synchro.xml** file is used to map each images to a video timecode . If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
 
 It is written in XML format and must respect the following structure :
 

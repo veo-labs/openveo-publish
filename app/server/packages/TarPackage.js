@@ -37,7 +37,6 @@ function TarPackageError(message, code) {
  *  - A video file
  *  - A list of image files
  *  - A .session file describing the package content
- *  - A synchro.xml file with the mapping image / video for a timecode.
  *
  * @example
  *     // tar package object example
@@ -55,15 +54,17 @@ function TarPackageError(message, code) {
  *       "rich-media": true, // true if package contains presentation images
  *       "filename": "video.mp4", // The name of the video file in the package
  *       "duration": 30 // Duration of the video in seconds
+ *       "indexes": [  // An array specifying a list of timecodes, their own type and data associated.
+ *         {
+ *           "timecode": 0, // timecode in ms
+ *           "type": "image", // timecode type (must be "image" or "tag")
+ *           "data": {  // related information to image timecode
+ *             "filename": "slide_00000.jpeg" // filename of image timecode
+ *           }
+ *         }
+ *       ]
  *     }
  *
- * @example
- *     <!-- "synchro.xml" file example contained in a tar package -->
- *     <?xml version="1.0"?>
- *     <player>
- *       <synchro id="slide_00000.jpeg" timecode="0"/>
- *       <synchro id="slide_00001.jpeg" timecode="1200"/>
- *     </player>
  *
  * @class TarPackage
  * @constructor
@@ -71,11 +72,6 @@ function TarPackageError(message, code) {
  */
 function TarPackage(mediaPackage) {
   Package.call(this, mediaPackage);
-
-  // Validate package timecode file name
-  // if (!this.publishConf.timecodeFileName || (typeof this.publishConf.timecodeFileName !== 'string'))
-  //   this.emit('error', new TarPackageError('timecodeFileName in publishConf.json must be a String'),
-  //     errors.INVALID_CONFIGURATION_ERROR);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
@@ -249,16 +245,16 @@ function validatePackage(callback) {
  *     [
  *       {
  *         "timecode": 0,
- *         "image": {
- *           "small": "slide_00000.jpeg",
- *           "large": "slide_00000.jpeg"
+ *         "type": "image"
+ *         "data": {
+ *           "filename": "slide_00000.jpeg"
  *         }
  *       },
  *       {
  *         "timecode": 1200,
- *         "image": {
- *           "small": "slide_00001.jpeg",
- *           "large": "slide_00001.jpeg"
+ *         "type": "image"
+ *         "data": {
+ *           "filename": "slide_00001.jpeg"
  *         }
  *       }
  *     ]
