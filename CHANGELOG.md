@@ -1,4 +1,9 @@
-# 2.1.0 / 2017-01-09
+# 2.1.2 / 2017-01-11
+
+- Patch old richmedia format compatibility
+- Add migration script to save existing content in the new format
+
+# 2.1.1 / 2017-01-09
 
 - Patch old mediaId format issue
 
