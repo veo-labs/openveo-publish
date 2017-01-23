@@ -1,12 +1,11 @@
 'use strict';
 
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
-var db = openVeoAPI.applicationStorage.getDatabase();
-
+var openVeoApi = require('@openveo/api');
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 2.0.0 migration launched.');
+  var db = openVeoApi.api.getCoreApi().getDatabase();
 
   async.series([
 

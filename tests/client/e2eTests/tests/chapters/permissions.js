@@ -3,9 +3,13 @@
 var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var openVeoApi = require('@openveo/api');
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
@@ -13,6 +17,7 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Chapter page', function() {
+  var coreApi = openVeoApi.api.getCoreApi();
   var page;
   var medias;
   var mediaId = 'test-chapters-page-permissions';
@@ -24,9 +29,11 @@ describe('Chapter page', function() {
 
     // Create a media content
     before(function() {
-      mediaHelper = new MediaHelper(new VideoModel());
+      var videoProvider = new VideoProvider(coreApi.getDatabase());
+      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
+      mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
       page = new ChapterPage(mediaId);
-      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
+      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED).then(
         function(mediasAdded) {
           medias = mediasAdded;
           return page.logAsAdmin();
@@ -59,10 +66,12 @@ describe('Chapter page', function() {
 
     // Create a media content
     before(function() {
+      var videoProvider = new VideoProvider(coreApi.getDatabase());
+      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
       var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
-      mediaHelper = new MediaHelper(new VideoModel(owner));
+      mediaHelper = new MediaHelper(new VideoModel(owner, videoProvider, propertyProvider));
       page = new ChapterPage(mediaId);
-      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE, 'publishGroup1').then(
+      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED, 'publishGroup1').then(
         function(mediasAdded) {
           medias = mediasAdded;
           return page.logAsAdmin();

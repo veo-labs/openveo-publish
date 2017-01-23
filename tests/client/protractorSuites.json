@@ -4,7 +4,6 @@
   "publishConfiguration": "e2eTests/tests/configuration/*.js",
   "publishMedias": "e2eTests/tests/medias/*.js",
   "publishProperties": "e2eTests/tests/properties/*.js",
-  "publishWatcher": "e2eTests/tests/watcher/*.js",
   "publishWebService": "e2eTests/tests/**/webService.js",
   "publish": "e2eTests/tests/**/*.js"
 }

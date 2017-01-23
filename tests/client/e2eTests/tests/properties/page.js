@@ -3,8 +3,11 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
+var openVeoApi = require('@openveo/api');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var TableAssert = e2e.asserts.TableAssert;
 
@@ -17,7 +20,9 @@ describe('Property page', function() {
 
   // Prepare page
   before(function() {
-    var propertyModel = new PropertyModel();
+    var coreApi = openVeoApi.api.getCoreApi();
+    var database = coreApi.getDatabase();
+    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
     propertyHelper = new PropertyHelper(propertyModel);
     page = new PropertyPage(propertyModel);
     tableAssert = new TableAssert(page, propertyHelper);
@@ -205,10 +210,10 @@ describe('Property page', function() {
     // Add lines
     beforeEach(function() {
       linesToAdd = [
-        {name: 'test search 0', description: 'test search', type: PropertyModel.TYPE_TEXT},
-        {name: 'test search 1', description: 'test search', type: PropertyModel.TYPE_TEXT},
-        {name: 'test search 2', description: 'test search', type: PropertyModel.TYPE_LIST, values: ['value1']},
-        {name: 'test search 3', description: 'test search', type: PropertyModel.TYPE_BOOLEAN}
+        {name: 'test search 0', description: 'test search', type: PropertyModel.TYPES.TEXT},
+        {name: 'test search 1', description: 'test search', type: PropertyModel.TYPES.TEXT},
+        {name: 'test search 2', description: 'test search', type: PropertyModel.TYPES.LIST, values: ['value1']},
+        {name: 'test search 3', description: 'test search', type: PropertyModel.TYPES.BOOLEAN}
       ];
 
       propertyHelper.addEntities(linesToAdd);
@@ -217,14 +222,14 @@ describe('Property page', function() {
 
     it('should be able to search by full name', function() {
       var expectedValues;
-      var search = {name: linesToAdd[0].name};
+      var search = {query: linesToAdd[0].name};
 
       // Get all line values before search
       return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
-          return element === search.name;
+          return element === search.query;
         });
 
       }).then(function() {
@@ -234,14 +239,14 @@ describe('Property page', function() {
 
     it('should be able to search by full description', function() {
       var expectedValues = [];
-      var search = {description: linesToAdd[0].description};
+      var search = {query: linesToAdd[0].description};
 
       // Get all line values before search
       return page.getAllLineDetails().then(function(datas) {
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return data.fields.description === search.description;
+          return data.fields.description === search.query;
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -252,16 +257,34 @@ describe('Property page', function() {
       });
     });
 
-    it('should be able to search by both description and name', function() {
+    it('should be able to search in name and description', function() {
       var expectedValues = [];
-      var search = {name: linesToAdd[0].name, description: linesToAdd[0].description};
+      var linesToAdd = [
+        {
+          name: 'first name',
+          description: 'first name description',
+          type: PropertyModel.TYPES.TEXT
+        },
+        {
+          name: 'second name',
+          description: 'second description after first',
+          type: PropertyModel.TYPES.TEXT
+        }
+      ];
+
+      // Add lines
+      propertyHelper.addEntities(linesToAdd);
+      page.refresh();
+
+      var search = {query: 'first'};
 
       // Get all line values before search
       return page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp('\\b' + search.query + '\\b');
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return data.fields.name === search.name && data.fields.description === search.description;
+          return regexp.test(data.fields.description) || regexp.test(data.fields.name);
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -272,21 +295,11 @@ describe('Property page', function() {
       });
     });
 
-    it('should be able to search by partial name', function() {
-      var expectedValues;
-      var search = {name: linesToAdd[1].name.slice(0, 2)};
+    it('should not be able to search by partial name', function() {
+      var search = {query: linesToAdd[1].name.slice(0, 2)};
 
-      // Get all line values before search
-      return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
-
-        // Predict values
-        expectedValues = values.filter(function(element) {
-          return new RegExp(search.name).test(element);
-        });
-
-      }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
-      });
+      page.search(search);
+      assert.isRejected(page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN));
     });
 
     it('should be able to search by type', function() {
@@ -299,7 +312,7 @@ describe('Property page', function() {
         // Predict values
         expectedValues = values.filter(function(element) {
           for (var i = 0; i < linesToAdd.length; i++) {
-            if (element === linesToAdd[i].name && linesToAdd[i].type === PropertyModel.TYPE_LIST)
+            if (element === linesToAdd[i].name && linesToAdd[i].type === PropertyModel.TYPES.LIST)
               return true;
           }
           return false;
@@ -310,15 +323,26 @@ describe('Property page', function() {
       });
     });
 
-    it('should be case sensitive', function() {
-      var search = {name: linesToAdd[1].name.toUpperCase()};
+    it('should be case insensitive', function() {
+      var expectedValues;
+      var search = {query: linesToAdd[1].name.toUpperCase()};
 
-      page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN));
+      // Get all line values before search
+      return page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN).then(function(values) {
+        var regexp = new RegExp(search.query, 'i');
+
+        // Predict values
+        expectedValues = values.filter(function(element) {
+          return regexp.test(element);
+        });
+
+      }).then(function() {
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
+      });
     });
 
     it('should be able to clear search', function() {
-      var search = {name: linesToAdd[0].name};
+      var search = {query: linesToAdd[0].name};
       page.search(search);
       page.clearSearch();
       assert.isFulfilled(page.getLineValues(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN));

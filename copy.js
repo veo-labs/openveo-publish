@@ -6,7 +6,6 @@ var path = require('path');
 var fs = require('fs');
 var async = require('async');
 var FTPS = require('ftps');
-var openVeoAPI = require('@openveo/api');
 
 var assetsDir = path.join(__dirname, 'assets', 'player', 'videos');
 var updateTmpDir = path.join(__dirname, '..', 'tmp', 'publish', 'videos');
@@ -44,13 +43,13 @@ function upload(callback) {
     function(callback) {
       process.stdout.write('send.\n');
       ftps.put('LICENSE', './files/LICENSE').exec(function (err, res) {
-  // err will be null (to respect async convention) 
-  // res is an hash with { error: stderr || null, data: stdout } 
+  // err will be null (to respect async convention)
+  // res is an hash with { error: stderr || null, data: stdout }
       process.stdout.write('sent.\n');
       console.log(res);
       callback(err);
     });
-      
+
     },
   ], function(error) {
     callback(error);

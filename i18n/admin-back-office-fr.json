@@ -102,8 +102,7 @@
     "UPLOAD_START_SUCCESS" : "L'envoi de la vidéo va démarrer.",
     "PUBLISHED_SUCCESS" : "L'application a été publiée.",
     "UNPUBLISHED_SUCCESS" : "La vidéo a été dépubliée.",
-    "TITLE_FILTER": "Nom de la vidéo",
-    "DESCRIPTION_FILTER": "Description",
+    "QUERY_FILTER": "Mots-clés",
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Rubrique",
     "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s.",
@@ -140,8 +139,7 @@
     "FORM_ADD_TYPE_DESC" : "Choisissez l'élément de formulaire qui sera utilisé pour saisir la valeur de la propriété",
     "FORM_ADD_LIST_VALUES_DESC" : "Ajouter des valeurs à la liste (valider avec la touche \"entrée\" pour ajouter une nouvelle valeur)",
     "REMOVE_SUCCESS" : "La propriété a été supprimée.",
-    "TITLE_FILTER": "Nom",
-    "DESCRIPTION_FILTER": "Description",
+    "QUERY_FILTER": "Mots-clés",
     "TYPE_FILTER": "Type"
   },
   "CATEGORIES" : {

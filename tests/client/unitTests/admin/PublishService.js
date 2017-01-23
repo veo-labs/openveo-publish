@@ -27,24 +27,6 @@ describe('PublishService', function() {
     $httpBackend.when('PUT', /.*/).respond(200, '');
   });
 
-  it('Should be able to ask server for watcher status', function() {
-    $httpBackend.expectGET('/be/publish/watcherStatus');
-    publishService.getWatcherStatus();
-    $httpBackend.flush();
-  });
-
-  it('Should be able to ask server to start watcher', function() {
-    $httpBackend.expectPOST('/be/publish/startWatcher');
-    publishService.startWatcher();
-    $httpBackend.flush();
-  });
-
-  it('Should be able to ask server to stop watcher', function() {
-    $httpBackend.expectPOST('/be/publish/stopWatcher');
-    publishService.stopWatcher();
-    $httpBackend.flush();
-  });
-
   it('Should be able to ask server to publish a media', function() {
     $httpBackend.expectPOST('/be/publish/publishVideo/5');
     publishService.publishMedia(5);

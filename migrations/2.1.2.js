@@ -2,8 +2,8 @@
 
 var async = require('async');
 var path = require('path');
-var openVeoAPI = require('@openveo/api');
-var db = openVeoAPI.applicationStorage.getDatabase();
+var openVeoApi = require('@openveo/api');
+var db = openVeoApi.api.getCoreApi().getDatabase();
 
 
 module.exports.update = function(callback) {

@@ -42,17 +42,10 @@ PropertyPage.prototype.onLoaded = function() {
 PropertyPage.prototype.getSearchFields = function(form) {
   var fields = {};
 
-  // Name field
-  fields.name = Field.get({
+  // Query field
+  fields.query = Field.get({
     type: 'text',
-    name: this.translations.PUBLISH.PROPERTIES.TITLE_FILTER,
-    baseElement: form
-  });
-
-  // Description field
-  fields.description = Field.get({
-    type: 'text',
-    name: this.translations.PUBLISH.PROPERTIES.DESCRIPTION_FILTER,
+    name: this.translations.PUBLISH.PROPERTIES.QUERY_FILTER,
     baseElement: form
   });
 

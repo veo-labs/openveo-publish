@@ -4,9 +4,13 @@ var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
+var openVeoApi = require('@openveo/api');
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var browserExt = e2e.browser;
 
 // Load assertion library
@@ -23,9 +27,12 @@ describe('Chapter page translations', function() {
 
   // Create a media content
   before(function() {
-    mediaHelper = new MediaHelper(new VideoModel());
+    var coreApi = openVeoApi.api.getCoreApi();
+    var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
+    mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
     page = new ChapterPage(mediaId);
-    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, VideoModel.PUBLISHED_STATE).then(
+    mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED).then(
       function(mediasAdded) {
         medias = mediasAdded;
         page.logAsAdmin();

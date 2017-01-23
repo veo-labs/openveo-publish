@@ -5,6 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
+var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
 
 // Load assertion library
 var assert = chai.assert;
@@ -15,7 +16,9 @@ describe('Configuration page', function() {
 
   // Prepare page
   before(function() {
-    configurationHelper = new ConfigurationHelper(new ConfigurationModel());
+    var coreApi = require('@openveo/api').api.getCoreApi();
+    var model = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
+    configurationHelper = new ConfigurationHelper(model);
     page = new ConfigurationPage();
     page.logAsAdmin();
     page.load();

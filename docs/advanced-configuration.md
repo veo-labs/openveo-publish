@@ -23,7 +23,6 @@ Open **~/.openveo/publish/publishConf.json**
 
 # Configure video platform credentials
 
-
 Open **~/.openveo/publish/videoPlatformConf.json**
 
 ```json
@@ -54,20 +53,9 @@ Open **~/.openveo/publish/videoPlatformConf.json**
 }
 ```
 
-To upload videos on Vimeo, publish requires oauth credentials.
-
-To upload videos on Youtube, publish requires googleOAuth credentials.
-
-To upload videos on **Wowza**, you need to install **lfpt** package on your system
-
-- [LFTP Homepage]( http://lftp.yar.ru/)
-
-- [LFTP on Windows](https://nwgat.ninja/lftp-for-windows/)
-
-On **Ubuntu**, you can install lftp package by executing the command:
-
-    sudo apt-get install lftp
-
+To upload videos on **Vimeo**, publish requires oauth credentials.<br/>
+To upload videos on **Youtube**, publish requires googleOAuth credentials.<br/>
+To upload videos on **Wowza**, you need to install **lfpt** on your system.<br/>
 
 # Configure the logger
 
@@ -79,7 +67,8 @@ Open **~/.openveo/publish/loggerConf.json**
     "fileName" : "/var/log/openveo-watcher.log", // Path to log file
     "level" : "info", // Log level
     "maxFileSize" : 1048576, // Maximum log file size (in Bytes)
-    "maxFiles" : 2 // Maximum number of files archived
+    "maxFiles" : 2, // Maximum number of files archived
+    "console" : false // false to deactivate logs in standard output
   }
 }
 ```
@@ -116,4 +105,4 @@ Open **~/.openveo/publish/watcherConf.json**
 }
 ```
 
-**Nb :** If **type** is missing for a hot folder, videos won't be automatically uploaded to the platform. Videos can be uploaded to the platform from the catalogue of videos in the back end.
+**Nb :** If **type** is missing for a hot folder, videos won't be automatically uploaded to a platform. Videos can be uploaded to a platform from the catalogue of videos in the back end.

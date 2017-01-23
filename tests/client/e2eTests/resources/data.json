@@ -42,12 +42,6 @@
         "publish-update-properties"
       ]
     },
-    "publishWatcherNoManage": {
-      "name": "publish-watcher-no-manage",
-      "permissions": [
-        "publish-access-watcher-page"
-      ]
-    },
     "publishCategoriesNoWrite": {
       "name": "publish-categories-no-write",
       "permissions": [
@@ -158,12 +152,6 @@
       "email": "publish-properties-no-delete@veo-labs.com",
       "password": "publish-properties-no-delete",
       "roles": [ "publishPropertiesNoDelete" ]
-    },
-    "publishWatcherNoManage": {
-      "name": "publish-watcher-no-manage",
-      "email": "publish-watcher-no-manage@veo-labs.com",
-      "password": "publish-watcher-no-manage",
-      "roles": [ "publishWatcherNoManage" ]
     },
     "publishCategoriesNoWrite": {
       "name": "publish-categories-no-write",

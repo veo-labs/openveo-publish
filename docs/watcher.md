@@ -1,19 +1,19 @@
 # Introduction
 
-The Watcher is capable of listening to some directories specified during [plugin's configuration](getting-started.md#configure-the-watcher).
+The Watcher is capable of listening to some directories specified in [plugin's configuration](advanced-configuration.md).
 
 Two types of files can be copied in these directories :
 
 - [tar files](#tar-files)
 - [mp4 files](#mp4-files)
 
-Soon after the file has been copied, it will appear in back end catalogue page where all videos are referenced.
+Soon after the file has been copied, it will appear in back end catalogue page where all medias are referenced.
 
 ![Back end catalogue video](images/screenshots/back-end-catalogue-video.jpg)
 
 # tar files
 
-tar files are used for videos with synchronized images. A valid tar file must contain a **video file**, a **.session** file, a **synchro.xml** file and a **list of images**.
+tar files are used for videos with synchronized images. A valid tar file must contain a **video file**, a **.session** file and a **list of images**.
 
 ## .session file
 
@@ -21,7 +21,21 @@ tar files are used for videos with synchronized images. A valid tar file must co
 
 ```json
 {
-  "filename": "video.mp4" // Name of the video file in the package
+  "filename": "video.mp4", // Name of the video file in the package
+  "indexes": [ // The list of indexes in the video
+    {
+      "type": "image", // Index type (could be "image" or "tag")
+      "timecode": 0, // Index time (in ms) from the beginning of the video
+      "data": { // Index data (only for "image" type)
+        "filename": "slide_00000.jpeg" // The name of the image file in the tar
+      }
+    },
+    {
+      "type": "tag", // Index type (could be "image" or "tag")
+      "timecode": 3208 // Index time (in ms) from the beginning of the video
+    },
+    ...
+  ]
 }
 ```
 
@@ -30,12 +44,12 @@ It can contain some optional properties :
 ```json
 {
   "date": 1425916390, // The date the video was recorded (in Unix epoch time)
-  "rich-media": true // true to indicates that video has associated images, false if only the video is in the package
+  "rich-media": true // true to indicates that video has associated images ("indexes" property must be present)
   "indexes": [  // An array specifying a list of timecodes, their own type and data associated.
-    { 
+    {
       "timecode": 0, // timecode in ms
       "type": "image", // timecode type (must be "image" or "tag")
-      "data": {  // related information to image timecode 
+      "data": {  // related information to image timecode
         "filename": "slide_00000.jpeg" // filename of image timecode
       }
     },
@@ -44,7 +58,7 @@ It can contain some optional properties :
       "type": "tag", // timecode type (must be "image" or "tag")
       "data": { // Optional - related information for tag timecode
         "tagname": "Very important moment" // tagname to display, if not defined, will be replaced by 'Tag N' where N is the number of the tag
-      } 
+      }
     },
     ...
   ]
@@ -59,7 +73,7 @@ It can contain some optional properties :
 
 ## synchro.xml file **(DEPRECATED)**
 
-** The use of this file is deprecated. 
+** The use of this file is deprecated.
 This file is used only if indexes information are not in .session file.**
 
 **synchro.xml** file is used to map each images to a video timecode . If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
@@ -84,7 +98,7 @@ It is written in XML format and must respect the following structure :
 
 ## List of images
 
-A list of images to synchronize with the video as defined in **synchro.xml**.
+A list of images to synchronize with the video as defined in **.session** file.
 
 ## Video file
 

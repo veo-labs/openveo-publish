@@ -2,8 +2,11 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var openVeoApi = require('@openveo/api');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -16,7 +19,9 @@ describe('Property page', function() {
 
   // Prepare page
   before(function() {
-    var propertyModel = new PropertyModel();
+    var coreApi = openVeoApi.api.getCoreApi();
+    var database = coreApi.getDatabase();
+    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
     propertyHelper = new PropertyHelper(propertyModel);
     page = new PropertyPage(propertyModel);
   });
@@ -134,7 +139,7 @@ describe('Property page', function() {
         {
           name: name,
           description: 'test delete without permission description',
-          type: PropertyModel.TYPE_TEXT
+          type: PropertyModel.TYPES.TEXT
         }
       ]);
       page.refresh();

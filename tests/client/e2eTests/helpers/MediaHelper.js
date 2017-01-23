@@ -4,10 +4,10 @@ var util = require('util');
 var path = require('path');
 var async = require('async');
 var shortid = require('shortid');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 
 var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/');
 
@@ -73,7 +73,7 @@ util.inherits(MediaHelper, Helper);
 MediaHelper.prototype.addEntitiesAuto = function(name, total, offset) {
   var entities = [];
   var date = new Date();
-  var states = [VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE];
+  var states = [STATES.READY, STATES.PUBLISHED];
   var categories = this.getCategories();
   offset = offset || 0;
 
@@ -120,7 +120,7 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
     var videoPublicDirectory = path.join(publicDirectory, mediaId);
 
     // Create video public directory
-    openVeoAPI.fileSystem.mkdir(videoPublicDirectory,
+    openVeoApi.fileSystem.mkdir(videoPublicDirectory,
       function(error) {
         if (error)
           throw error;
@@ -129,7 +129,7 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
           // Copy video file to public directory
           var mediaFile = path.join(mediaFilePath, mediaFileName);
           var finalFile = path.join(videoPublicDirectory, mediaFileName);
-          openVeoAPI.fileSystem.copy(mediaFile, finalFile, function(error) {
+          openVeoApi.fileSystem.copy(mediaFile, finalFile, function(error) {
             if (error)
               throw error;
 
@@ -190,7 +190,7 @@ MediaHelper.prototype.removeEntities = function(medias) {
       parallel.push(function(callback) {
 
         // Remove video directory
-        openVeoAPI.fileSystem.rmdir(path.join(publicDirectory, mediaId), function(error) {
+        openVeoApi.fileSystem.rmdir(path.join(publicDirectory, mediaId), function(error) {
           callback(error);
         });
 

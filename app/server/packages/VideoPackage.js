@@ -1,100 +1,126 @@
 'use strict';
 
 /**
- * @module publish-packages
+ * @module packages
  */
 
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
 var Package = process.requirePublish('app/server/packages/Package.js');
-var errors = process.requirePublish('app/server/packages/errors.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var openVeoAPI = require('@openveo/api');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var VideoPackageError = process.requirePublish('app/server/packages/VideoPackageError.js');
+var openVeoApi = require('@openveo/api');
 var ffmpeg = require('fluent-ffmpeg');
 
 // Accepted images files extensions in the package
 var acceptedImagesExtensions = ['jpeg', 'jpg', 'gif', 'bmp'];
 
 /**
- * Defines a custom error with an error code.
- *
- * @class VideoPackageError
- * @constructor
- * @extends Error
- * @param {String} message The error message
- * @param {String} code The error code
- */
-function VideoPackageError(message, code) {
-  this.name = 'VideoPackageError';
-  this.message = message || '';
-  this.code = code;
-}
-
-/**
- * Defines a VideoPackage class to manage publication of a video file.
+ * Defines a VideoPackage to manage publication of a video file.
  *
  * @class VideoPackage
- * @constructor
  * @extends Package
+ * @constructor
  * @param {Object} mediaPackage Information about the video
+ * @param {VideoModel} videoModel A video model
+ * @param {ConfigurationModel} configurationModel A configuration model
  */
-function VideoPackage(mediaPackage) {
-  Package.call(this, mediaPackage);
+function VideoPackage(mediaPackage, videoModel, configurationModel) {
+  VideoPackage.super_.call(this, mediaPackage, videoModel, configurationModel);
 }
 
 module.exports = VideoPackage;
 util.inherits(VideoPackage, Package);
 
-// VideoPackage states
-VideoPackage.THUMB_GENERATED_STATE = 'thumbGenerated';
-VideoPackage.COPIED_IMAGES_STATE = 'copiedImages';
-VideoPackage.METADATA_RETRIEVED_STATE = 'metadataRetrieved';
+/**
+ * Process states for video packages.
+ *
+ * @property STATES
+ * @type Object
+ * @static
+ * @final
+ */
+VideoPackage.STATES = {
+  THUMB_GENERATED: 'thumbGenerated',
+  COPIED_IMAGES: 'copiedImages',
+  METADATA_RETRIEVED: 'metadataRetrieved'
+};
+Object.freeze(VideoPackage.STATES);
 
-// VideoPackage transitions
-VideoPackage.GENERATE_THUMB_TRANSITION = 'generateThumb';
-VideoPackage.COPY_IMAGES_TRANSITION = 'copyImages';
-VideoPackage.GET_METADATA_TRANSITION = 'getMetadata';
+/**
+ * Video package process transitions (from one state to another).
+ *
+ * @property TRANSITIONS
+ * @type Object
+ * @static
+ * @final
+ */
+VideoPackage.TRANSITIONS = {
+  GENERATE_THUMB: 'generateThumb',
+  COPY_IMAGES: 'copyImages',
+  GET_METADATA: 'getMetadata'
+};
+Object.freeze(VideoPackage.TRANSITIONS);
 
+/**
+ * Define the order in which transitions will be executed for a video Package.
+ *
+ * @property stateTransitions
+ * @type Array
+ * @static
+ * @final
+ */
 VideoPackage.stateTransitions = [
-  Package.INIT_TRANSITION,
-  Package.COPY_PACKAGE_TRANSITION,
-  VideoPackage.GENERATE_THUMB_TRANSITION,
-  VideoPackage.GET_METADATA_TRANSITION,
-  Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-  Package.UPLOAD_MEDIA_TRANSITION,
-  Package.CONFIGURE_MEDIA_TRANSITION,
-  VideoPackage.COPY_IMAGES_TRANSITION,
-  Package.CLEAN_DIRECTORY_TRANSITION
+  Package.TRANSITIONS.INIT,
+  Package.TRANSITIONS.COPY_PACKAGE,
+  VideoPackage.TRANSITIONS.GENERATE_THUMB,
+  VideoPackage.TRANSITIONS.GET_METADATA,
+  Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+  Package.TRANSITIONS.UPLOAD_MEDIA,
+  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  VideoPackage.TRANSITIONS.COPY_IMAGES,
+  Package.TRANSITIONS.CLEAN_DIRECTORY
 ];
+Object.freeze(VideoPackage.stateTransitions);
 
+/**
+ * Define machine state authorized transitions depending on previous and next states.
+ *
+ * @property stateMachine
+ * @type Array
+ * @static
+ * @final
+ */
 VideoPackage.stateMachine = Package.stateMachine.concat([
   {
-    name: VideoPackage.GENERATE_THUMB_TRANSITION,
-    from: Package.PACKAGE_COPIED_STATE,
-    to: VideoPackage.THUMB_GENERATED_STATE
+    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    from: Package.STATES.PACKAGE_COPIED,
+    to: VideoPackage.STATES.THUMB_GENERATED
   },
   {
-    name: VideoPackage.GET_METADATA_TRANSITION,
+    name: VideoPackage.TRANSITIONS.GET_METADATA,
     from: Package.THUMB_GENERATED_STATE,
-    to: VideoPackage.METADATA_RETRIEVED_STATE
+    to: VideoPackage.STATES.METADATA_RETRIEVED
   },
   {
-    name: Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-    from: VideoPackage.METADATA_RETRIEVED_STATE,
-    to: Package.ORIGINAL_PACKAGE_REMOVED_STATE
+    name: Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+    from: VideoPackage.STATES.METADATA_RETRIEVED,
+    to: Package.STATES.ORIGINAL_PACKAGE_REMOVED
   },
   {
-    name: VideoPackage.COPY_IMAGES_TRANSITION,
-    from: Package.MEDIA_CONFIGURED_STATE,
-    to: VideoPackage.COPIED_IMAGES_STATE
+    name: VideoPackage.TRANSITIONS.COPY_IMAGES,
+    from: Package.STATES.MEDIA_CONFIGURED,
+    to: VideoPackage.STATES.COPIED_IMAGES
   },
   {
-    name: Package.CLEAN_DIRECTORY_TRANSITION,
-    from: VideoPackage.COPIED_IMAGES_STATE,
-    to: Package.DIRECTORY_CLEANED_STATE
+    name: Package.TRANSITIONS.CLEAN_DIRECTORY,
+    from: VideoPackage.STATES.COPIED_IMAGES,
+    to: Package.STATES.DIRECTORY_CLEANED
   }
 ]);
+Object.freeze(VideoPackage.stateMachine);
 
 /**
  * Generates a thumbnail for the video.
@@ -104,14 +130,13 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
  * This is a transition.
  *
  * @method generateThumb
- * @private
  */
 VideoPackage.prototype.generateThumb = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
 
   // Generate thumb
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.GENERATE_THUMB_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB);
 
   var destinationPath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   ffmpeg(filePath).screenshots({
@@ -119,7 +144,7 @@ VideoPackage.prototype.generateThumb = function() {
     filename: 'thumbnail.jpg',
     folder: destinationPath
   }).on('error', function(error) {
-    self.setError(new VideoPackageError(error.message, errors.GENERATE_THUMB_ERROR));
+    self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
   }).on('end', function() {
     self.videoModel.updateThumbnail(self.mediaPackage.id, '/publish/' + self.mediaPackage.id + '/thumbnail.jpg');
     self.fsm.transition();
@@ -132,19 +157,18 @@ VideoPackage.prototype.generateThumb = function() {
  * This is a transition.
  *
  * @method preparePublicDirectory
- * @private
  */
 VideoPackage.prototype.preparePublicDirectory = function() {
   var self = this;
   var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.PREPARING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.PREPARING);
 
   process.logger.debug('Prepare package public directory ' + publicDirectory);
 
-  openVeoAPI.fileSystem.mkdir(publicDirectory,
+  openVeoApi.fileSystem.mkdir(publicDirectory,
     function(error) {
       if (error && error.code !== 'EEXIST')
-        self.setError(new VideoPackageError(error.message, errors.CREATE_VIDEO_PUBLIC_DIR_ERROR));
+        self.setError(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
       else
         self.fsm.transition();
     });
@@ -156,12 +180,11 @@ VideoPackage.prototype.preparePublicDirectory = function() {
  * This is a transition.
  *
  * @method getMetadata
- * @private
  */
 VideoPackage.prototype.getMetadata = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.GET_METADATA_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.GET_METADATA);
 
   if (!this.mediaPackage.metadata) this.mediaPackage.metadata = {};
   this.mediaPackage.metadata['profile-settings'] = this.mediaPackage.metadata['profile-settings'] || {};
@@ -171,7 +194,7 @@ VideoPackage.prototype.getMetadata = function() {
   else {
     ffmpeg.ffprobe(filePath, function(error, metadata) {
       if (error || !metadata.streams)
-        self.setError(new VideoPackageError(error.message, errors.GET_METADATA_ERROR));
+        self.setError(new VideoPackageError(error.message, ERRORS.GET_METADATA));
       else {
 
         // Find video stream
@@ -187,7 +210,7 @@ VideoPackage.prototype.getMetadata = function() {
           self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
           self.fsm.transition();
         } else
-          self.setError(new VideoPackageError('No video stream found', errors.GET_METADATA_ERROR));
+          self.setError(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
       }
     });
   }
@@ -199,7 +222,6 @@ VideoPackage.prototype.getMetadata = function() {
  * This is a transition.
  *
  * @method copyImages
- * @private
  */
 VideoPackage.prototype.copyImages = function() {
   var self = this;
@@ -210,7 +232,7 @@ VideoPackage.prototype.copyImages = function() {
 
   fs.readdir(extractDirectory, function(error, files) {
     if (error)
-      self.setError(new VideoPackageError(error.message, errors.SCAN_FOR_IMAGES_ERROR));
+      self.setError(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
     else {
       var filesToCopy = [];
       files.forEach(function(file) {
@@ -224,7 +246,7 @@ VideoPackage.prototype.copyImages = function() {
       var filesLeftToCopy = filesToCopy.length;
       filesToCopy.forEach(function(file) {
 
-        openVeoAPI.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
+        openVeoApi.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
 
           if (error)
             process.logger.warn(error.message, {
@@ -250,8 +272,8 @@ VideoPackage.prototype.copyImages = function() {
  * Each package has its own way to be published, thus transitions stack
  * is different by package.
  *
- * @return {Array} The stack of transitions
  * @method getTransitions
+ * @return {Array} The stack of transitions
  */
 VideoPackage.prototype.getTransitions = function() {
   return VideoPackage.stateTransitions;
@@ -260,8 +282,8 @@ VideoPackage.prototype.getTransitions = function() {
 /**
  * Gets the list of transitions states corresponding to the package.
  *
- * @return {Array} The list of states/transitions
  * @method getStateMachine
+ * @return {Array} The list of states/transitions
  */
 VideoPackage.prototype.getStateMachine = function() {
   return VideoPackage.stateMachine;

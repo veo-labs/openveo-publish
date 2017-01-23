@@ -1,61 +1,49 @@
 'use strict';
 
 /**
- * @module publish-models
+ * @module models
  */
 
 var util = require('util');
 var path = require('path');
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
-
-var configDir = openVeoAPI.fileSystem.getConfDir();
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var openVeoApi = require('@openveo/api');
+var videoPlatformFactory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var AccessError = openVeoApi.errors.AccessError;
+var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
-var AccessError = openVeoAPI.errors.AccessError;
 
 /**
- * Defines a VideoModel class to manipulate videos.
+ * Defines a VideoModel to manipulate videos' entities.
  *
  * @class VideoModel
- * @constructor
  * @extends ContentModel
+ * @constructor
  * @param {Object} user The user the video belongs to
+ * @param {VideoProvider} videoProvider The video provider
+ * @param {PropertyProvider} propertyProvider The entity provider
  */
-function VideoModel(user) {
-  openVeoAPI.ContentModel.call(this, user, new VideoProvider(openVeoAPI.applicationStorage.getDatabase()));
+function VideoModel(user, videoProvider, propertyProvider) {
+  VideoModel.super_.call(this, user, videoProvider);
 
-  /**
-   * Property provider.
-   *
-   * @property propertyProvider
-   * @type PropertyProvider
-   */
-  this.propertyProvider = new PropertyProvider(openVeoAPI.applicationStorage.getDatabase());
+  Object.defineProperties(this, {
+
+    /**
+     * Property provider.
+     *
+     * @property propertyProvider
+     * @type PropertyProvider
+     * @final
+     */
+    propertyProvider: {value: propertyProvider}
+
+  });
 }
 
 module.exports = VideoModel;
-util.inherits(VideoModel, openVeoAPI.ContentModel);
-
-// States codes
-VideoModel.ERROR_STATE = 0;
-VideoModel.PENDING_STATE = 1;
-VideoModel.COPYING_STATE = 2;
-VideoModel.EXTRACTING_STATE = 3;
-VideoModel.VALIDATING_STATE = 4;
-VideoModel.PREPARING_STATE = 5;
-VideoModel.WAITING_FOR_UPLOAD_STATE = 6;
-VideoModel.UPLOADING_STATE = 7;
-VideoModel.CONFIGURING_STATE = 8;
-VideoModel.SAVING_TIMECODES_STATE = 9;
-VideoModel.COPYING_IMAGES_STATE = 10;
-VideoModel.READY_STATE = 11;
-VideoModel.PUBLISHED_STATE = 12;
-VideoModel.GENERATE_THUMB_STATE = 13;
-VideoModel.GET_METADATA_STATE = 14;
+util.inherits(VideoModel, openVeoApi.models.ContentModel);
 
 /**
  * Removes a list of directories.
@@ -77,7 +65,7 @@ function removeDirectories(directories, callback) {
    */
   function removeDirClosure(directory) {
     return function(callback) {
-      openVeoAPI.fileSystem.rmdir(directory, function(error) {
+      openVeoApi.fileSystem.rmdir(directory, function(error) {
         callback(error);
       });
     };
@@ -92,9 +80,8 @@ function removeDirectories(directories, callback) {
   });
 }
 
-
 /**
- * Removes a All Data related to a list of video ID.
+ * Removes a all data related to a list of video ID.
  *
  * @method removeAllDataRelatedToVideo
  * @private
@@ -133,7 +120,7 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
   videosToRemove.forEach(function(video) {
     parallel.push(
       function(callback) {
-        var videoPlatformProvider = VideoPlatformProvider.getProvider(video.type,
+        var videoPlatformProvider = videoPlatformFactory.get(video.type,
           videoPlatformConf[video.type]);
 
         // compatibility with old mediaId format
@@ -161,64 +148,67 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
 /**
  * Adds a new video.
  *
- * @example
- *     {
- *      "id" : 1422731934859,
- *      "state" : 1,
- *      "packageType" : "tar",
- *      "lastState" : "packageCopied",
- *      "lastTransition" : "initPackage",
- *      "properties" : [],
- *      "type" : "vimeo",
- *      "path" : "C:/Temp/",
- *      "originalPackagePath" : "C:/Temp/video-package.tar",
- *      "packagePath" : "E:/openveo/node_modules/@openveo/publish/tmp/1422731934859.tar",
- *      "metadata" : {
- *        "date": 1425916390,
- *        "rich-media": true,
- *        "filename": "video.mp4",
- *        "duration": 20
- *      }
- *    }
- *
  * @method add
  * @async
- * @param {Object} videoPackage Information about the video
+ * @param {Object} media Information about the video
+ * @param {String} media.id The media id
+ * @param {Boolean} [media.available] true if the media is available, false otherwise
+ * @param {String} [media.title] The media title
+ * @param {String} [media.description] The media description
+ * @param {Number} [media.state] The media state (see STATES class from module packages)
+ * @param {Date} [media.date] The media date
+ * @param {String} [media.type] The id of the associated media platform
+ * @param {Object} [media.metadata] Information about the media
+ * @param {String} [media.metadata.user] The id of the user the media belongs to
+ * @param {Array} [media.metadata.groups] The list of groups the media belongs to
+ * @param {Number} [media.errorCode] The media error code (see ERRORS class from module packages)
+ * @param {String} [media.category] The id of the category the media belongs to
+ * @param {Array} [media.properties] The list of properties' values for this media
+ * @param {String} [media.packageType] The type of package
+ * @param {String} [media.lastState] The last media state in publication process
+ * @param {String} [media.lastTransition] The last media transition in publication process
+ * @param {String} [media.originalPackagePath] Absolute path of the original package
+ * @param {String} [media.originalFileName] Original package name without the extension
+ * @param {String} [media.mediaId] Id the of media of the media platform
+ * @param {Object} [media.timecodes] The list of media timecodes
+ * @param {Object} [media.chapters] The list of media chapters
+ * @param {Array} [media.cut] Media begin and end cuts
+ * @param {Array} [media.sources] The list of media sources
+ * @param {Number} [media.views] The statistic number of views
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The total amount of items inserted
  *   - **Object** The inserted video
  */
-VideoModel.prototype.add = function(videoPackage, callback) {
+VideoModel.prototype.add = function(media, callback) {
+  var coreApi = openVeoApi.api.getCoreApi();
   var data = {
-    id: String(videoPackage.id),
-    available: videoPackage.available,
-    title: videoPackage.title,
-    description: videoPackage.description,
-    state: videoPackage.state,
-    date: videoPackage.date,
-    metadata: videoPackage.metadata || {},
-    type: videoPackage.type,
-    errorCode: videoPackage.errorCode,
-    category: videoPackage.category,
-    properties: videoPackage.properties || [],
-    packageType: videoPackage.packageType,
-    lastState: videoPackage.lastState,
-    lastTransition: videoPackage.lastTransition,
-    originalPackagePath: videoPackage.originalPackagePath,
-    originalFileName: videoPackage.originalFileName,
-    mediaId: videoPackage.mediaId,
-    timecodes: videoPackage.timecodes,
-    chapters: videoPackage.chapters,
-    cut: videoPackage.cut || [],
-    sources: videoPackage.sources || [],
-    views: videoPackage.views || 0
+    id: String(media.id),
+    available: media.available,
+    title: media.title,
+    description: media.description,
+    state: media.state,
+    date: media.date,
+    metadata: media.metadata || {},
+    type: media.type,
+    errorCode: media.errorCode,
+    category: media.category,
+    properties: media.properties || [],
+    packageType: media.packageType,
+    lastState: media.lastState,
+    lastTransition: media.lastTransition,
+    originalPackagePath: media.originalPackagePath,
+    originalFileName: media.originalFileName,
+    mediaId: media.mediaId,
+    timecodes: media.timecodes,
+    chapters: media.chapters,
+    cut: media.cut || [],
+    sources: media.sources || [],
+    views: media.views || 0
   };
 
-  data.metadata.user = videoPackage.user || (this.user && this.user.id) ||
-     openVeoAPI.applicationStorage.getAnonymousUserId();
-
-  data.metadata.groups = videoPackage.groups || [];
+  data.metadata.user = media.user || (this.user && this.user.id) || coreApi.getAnonymousUserId();
+  data.metadata.groups = media.groups || [];
 
   this.provider.add(data, function(error, addedCount, videos) {
     if (callback)
@@ -322,7 +312,7 @@ VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
  * @method updateMetadata
  * @async
  * @param {Number} id The id of the video to update
- * @param {String} metadata The metadata of the video in the video platform
+ * @param {Object} metadata The metadata of the video in the video platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of updated items
@@ -554,7 +544,9 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page
 };
 
 /**
- * Gets a video and verify that it is published.
+ * Gets a video.
+ *
+ * Only a ready video can be fetched.
  *
  * @method getOneReady
  * @async
@@ -567,83 +559,15 @@ VideoModel.prototype.getOneReady = function(id, callback) {
   this.getOne(id, null, function(error, video) {
     if (error)
       callback(error);
-    else if (video && (video.state === VideoModel.PUBLISHED_STATE || video.state === VideoModel.READY_STATE))
+    else if (video && (video.state === STATES.PUBLISHED || video.state === STATES.READY))
       callback(null, video);
     else
-      callback(new Error());
+      callback(new Error('Video is not ready'));
   });
 };
 
 /**
  * Gets a video.
- *
- * {
- *   "video" : {
- *      "id" : "1439286245225", // Openveo video id
- *      "metadata" : { // Metadata sent by the media encoder
- *        "profile" : "2",
- *        "audio-input" : "hdmi-camera",
- *        "date" : 1425916390,
- *        "format" : "camera",
- *        "rich-media" : true, // true if there are slides associated to the video
- *        "profile-settings" : {
- *          "video-bitrate" : 1000000,
- *          "id" : "2",
- *          "video-height" : 720,
- *          "audio-bitrate" : 128000,
- *          "name" : "HD"
- *        },
- *        "id" : "2015-03-09_16-53-10",
- *        "format-settings" : {
- *          "source" : "camera-scale-raw",
- *          "id" : "camera"
- *        },
- *        "storage-directory" : "/data/2015-03-09_16-53-10",
- *        "filename" : "video.mp4",
- *        "duration" : 30
- *      },
- *      "type" : "vimeo", // The video platform
- *      "errorCode" : -1, // The error code if status = 0
- *      "category" : null, // Category the video belongs to
- *      "properties" : [], // A list of custom properties
- *      "state" : 7, // Actual state in publishing process
- *      "link" : "/publish/video/1439286245225", // Link to the openveo player
- *      "mediaId" : "135956519", // Platform id of the video
- *      "timecodes" : { // The list of slides with timecodes
- *        "0" : {
- *          "image" : {
- *            "small" : "/publish/videos/1439286245225/slide_00000.jpeg",
- *            "large" : "/publish/videos/1439286245225/slide_00000.jpeg"
- *          }
- *        }
- *        ...
- *      },
- *      available : true,
- *      thumbnail : "/1439286245225/thumbnail.jpg",
- *      sources : {
- *        files : [ // Video original files
- *          {
- *            quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *            width : 640,
- *            height : 360,
- *            link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
- *          },
- *          ...
- *        ],
- *        adaptive : [ // list of streaming protocol for this video
- *          {
- *            link : 'http://streaming/platform/mp4:video.mp4/manifest.mpd'
- *            mimeType : 'application/dash+xml'
- *          },
- *          {
- *            link : 'http://streaming/platform/mp4:video.mp4/playlist.m3u8'
- *            mimeType : 'application/x-mpegURL'
- *          },
- *          ...
- *        ]
- *      }
- *   }
- * }
  *
  * @method getOne
  * @async
@@ -666,13 +590,13 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
         if (error || !video) {
           callback(error);
           return;
-        } else if (!error && !self.isUserAuthorized(video, openVeoAPI.ContentModel.READ_OPERATION)) {
+        } else if (!error && !self.isUserAuthorized(video, openVeoApi.models.ContentModel.READ_OPERATION)) {
           var userId = self.user.id;
           callback(new AccessError('User "' + userId + '" doesn\'t have access to video "' + id + '"'));
           return;
         } else {
 
-          // Retreive video timecode file
+          // Retreive video timecode file path
           videoInfo = video;
         }
 
@@ -692,7 +616,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
         if (videoInfo.available && videoInfo.sources.length == videoInfo.mediaId.length)
           return callback();
 
-        var videoPlatformProvider = VideoPlatformProvider.getProvider(videoInfo.type,
+        var videoPlatformProvider = videoPlatformFactory.get(videoInfo.type,
           videoPlatformConf[videoInfo.type]);
         var expectedDefinition = videoInfo.metadata['profile-settings']['video-height'];
 
@@ -778,7 +702,7 @@ VideoModel.prototype.remove = function(ids, callback) {
   self.provider.get({id: {$in: ids}}, function(error, videos) {
     if (!error) {
       for (var i = 0; i < videos.length; i++) {
-        if (self.isUserAuthorized(videos[i], openVeoAPI.ContentModel.DELETE_OPERATION))
+        if (self.isUserAuthorized(videos[i], openVeoApi.models.ContentModel.DELETE_OPERATION))
           idsToRemove.push(videos[i].id);
       }
     }
@@ -807,8 +731,17 @@ VideoModel.prototype.remove = function(ids, callback) {
  *
  * @method update
  * @async
- * @param {String} id The id of the video
- * @param {Object} data The video info
+ * @param {String} id The id of the media
+ * @param {Object} data The media info
+ * @param {String} [data.title] The media title
+ * @param {String} [data.description] The media description
+ * @param {Array} [data.properties] The media properties' values
+ * @param {String} [data.category] The category the media belongs to
+ * @param {Array} [data.cut] Begin and end cuts
+ * @param {Array} [data.chapters] The media chapters
+ * @param {Number} [data.views] The media number of views
+ * @param {Array} [data.groups] The list of groups the media belongs to
+ * @param {String} [data.user] The id of the user the media belongs to
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of updated items
@@ -822,7 +755,7 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.description = data.description;
   if (data.properties)
     info.properties = data.properties;
-  if (data.hasOwnProperty('category'))
+  if (data.category)
     info.category = data.category;
   if (data.cut)
     info.cut = data.cut;
@@ -835,16 +768,16 @@ VideoModel.prototype.update = function(id, data, callback) {
       return group ? true : false;
     });
   }
-  if (data.user) {
+  if (data.user)
     info['metadata.user'] = data.user;
-  }
 
   this.provider.getOne(id, null, function(error, entity) {
     if (!error) {
-      if (self.isUserAuthorized(entity, openVeoAPI.ContentModel.UPDATE_OPERATION)) {
+      if (self.isUserAuthorized(entity, openVeoApi.models.ContentModel.UPDATE_OPERATION)) {
 
-        // user is authorized to update but he must be owner to update owner
+        // user is authorized to update but he must be owner to update the owner
         if (!self.isUserOwner(entity) && !self.isUserAdmin()) delete info['metadata.user'];
+
         self.provider.update(id, info, callback);
       } else
         callback(new AccessError('User "' + self.user.id + '" can\'t edit video "' + id + '"'));
@@ -866,28 +799,28 @@ VideoModel.prototype.update = function(id, data, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of published videos
  */
-VideoModel.prototype.publishVideo = function(ids, callback) {
+VideoModel.prototype.publishVideos = function(ids, callback) {
   var self = this;
   var idsToPublish = [];
 
   this.provider.get({id: {$in: ids}}, function(error, entities) {
     if (!error) {
       for (var i = 0; i < entities.length; i++) {
-        if (self.isUserAuthorized(entities[i], openVeoAPI.ContentModel.UPDATE_OPERATION))
+        if (self.isUserAuthorized(entities[i], openVeoApi.models.ContentModel.UPDATE_OPERATION))
           idsToPublish.push(entities[i].id);
       }
-    }
 
-    self.provider.updateVideoState(ids, VideoModel.READY_STATE, VideoModel.PUBLISHED_STATE, callback);
+      self.provider.updateVideoState(idsToPublish, STATES.READY, STATES.PUBLISHED, callback);
+    } else
+      callback(error);
   });
 };
 
-
 /**
- * Unpublishe videos.
+ * Unpublishes videos.
  *
- * Change the state of the videos to "unpublished" only if its state is
- * actually "ready".
+ * Change the state of the videos to "ready" only if its state is
+ * actually "published".
  *
  * @method unpublishVideos
  * @async
@@ -896,19 +829,20 @@ VideoModel.prototype.publishVideo = function(ids, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of unpublished videos
  */
-VideoModel.prototype.unpublishVideo = function(ids, callback) {
+VideoModel.prototype.unpublishVideos = function(ids, callback) {
   var self = this;
   var idsToUnpublish = [];
 
   this.provider.get({id: {$in: ids}}, function(error, entities) {
     if (!error) {
       for (var i = 0; i < entities.length; i++) {
-        if (self.isUserAuthorized(entities[i], openVeoAPI.ContentModel.UPDATE_OPERATION))
+        if (self.isUserAuthorized(entities[i], openVeoApi.models.ContentModel.UPDATE_OPERATION))
           idsToUnpublish.push(entities[i].id);
       }
-    }
 
-    self.provider.updateVideoState(ids, VideoModel.PUBLISHED_STATE, VideoModel.READY_STATE, callback);
+      self.provider.updateVideoState(idsToUnpublish, STATES.PUBLISHED, STATES.READY, callback);
+    } else
+      callback(error);
   });
 };
 

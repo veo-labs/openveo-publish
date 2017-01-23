@@ -262,21 +262,19 @@
     var categoriesFilter = getSelectableCategories('CORE.UI.ALL');
     scopeDataTable.filterBy = [
       {
-        key: 'title',
+        key: 'query',
         value: '',
-        label: $filter('translate')('PUBLISH.MEDIAS.TITLE_FILTER')
-      }, {
-        key: 'description',
-        value: '',
-        label: $filter('translate')('PUBLISH.MEDIAS.DESCRIPTION_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.QUERY_FILTER')
       }, {
         key: 'date',
         type: 'date',
+        param: 'date',
         value: '',
         label: $filter('translate')('PUBLISH.MEDIAS.DATE_FILTER')
       }, {
         key: 'category',
         type: 'select',
+        param: 'categories',
         value: null,
         label: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_FILTER'),
 
@@ -434,9 +432,18 @@
     }
 
     scopeEditForm.init = function(row) {
+      var properties = {};
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
       row.groups = row.metadata.groups;
       row.user = row.metadata.user;
+
+      // Build properties
+      for (var propertyId in row.properties) {
+        if (row.properties[propertyId])
+          properties[propertyId] = row.properties[propertyId].value;
+      }
+
+      row.properties = properties;
 
       if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == 0) {
         var opt = utilService.buildSelectOptions($scope.users);
@@ -450,11 +457,12 @@
         });
       }
 
-      if ($scope.properties.length)
+      if ($scope.properties.length) {
         scopeEditForm.fields.push({
           noFormControl: true,
           template: '<hr>'
         });
+      }
 
       // Create a formly field for each property
       angular.forEach($scope.properties, function(property, index) {

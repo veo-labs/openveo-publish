@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module publish-packages
+ * @module packages
  */
 
 var util = require('util');
@@ -10,192 +10,193 @@ var events = require('events');
 var path = require('path');
 var async = require('async');
 var StateMachine = require('javascript-state-machine');
-var openVeoAPI = require('@openveo/api');
-var configDir = openVeoAPI.fileSystem.getConfDir();
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var openVeoApi = require('@openveo/api');
+var configDir = openVeoApi.fileSystem.getConfDir();
+var videoPlatformFactory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
-var errors = process.requirePublish('app/server/packages/errors.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var PackageError = process.requirePublish('app/server/packages/PackageError.js');
 
 /**
- * Defines a custom error with an error code.
+ * Fired when an error occurred while processing the package.
  *
- * @class PackageError
- * @constructor
- * @extends Error
- * @param {String} message The error message
- * @param {String} code The error code
+ * @event error
+ * @param {Error} The error
  */
-function PackageError(message, code) {
-  this.name = 'PackageError';
-  this.message = message || '';
-  this.code = code;
-}
 
 /**
- * Defines a Package class to manage publication of a media file.
+ * Fired when package processing has succeed.
  *
- * @example
- *     // media package object example
- *     {
- *       "type": "vimeo", // Platform type
- *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
- *     }
+ * @event complete
+ * @param {Object} The processed package
+ */
+
+/**
+ * Defines a Package to manage publication of a media file.
  *
  * @class Package
  * @constructor
  * @param {Object} mediaPackage Information about the media
- * Package emits the following events :
- *  - Event *error* An error occured
- *    - **Error** The error
- *  - Event *complete* A package was successfully published
- *    - **Object** The published package
+ * @param {VideoModel} videoModel A video model
+ * @param {ConfigurationModel} configurationModel A configuration model
  */
-function Package(mediaPackage) {
+function Package(mediaPackage, videoModel, configurationModel) {
 
-  /**
-   * Publish configuration object from publishConf.json file.
-   *
-   * @property publishConf
-   * @type Object
-   */
-  this.publishConf = publishConf;
+  Object.defineProperties(this, {
 
-  /**
-   * Video model.
-   *
-   * @property videoModel
-   * @type VideoModel
-   */
-  this.videoModel = new VideoModel();
+    /**
+     * Publish configuration.
+     *
+     * @property publishConf
+     * @type Object
+     * @final
+     */
+    publishConf: {value: publishConf},
 
-  /**
-   * Media package description object.
-   *
-   * @property mediaPackage
-   * @type Object
-   */
-  this.mediaPackage = mediaPackage;
+    /**
+     * Video model.
+     *
+     * @property videoModel
+     * @type VideoModel
+     * @final
+     */
+    videoModel: {value: videoModel},
 
-  /**
-   * Video platforms configuration object from videoPlatformConf.json file.
-   *
-   * @property publishConf
-   * @type Object
-   */
-  this.videoPlatformConf = videoPlatformConf;
+    /**
+     * Media package description object.
+     *
+     * @property mediaPackage
+     * @type Object
+     */
+    mediaPackage: {value: mediaPackage, writable: true},
 
-  /**
-   * Configuration model.
-   *
-   * @property videoModel
-   * @type VideoModel
-   */
-  this.defaultConfig = new ConfigurationModel();
+    /**
+     * Video platforms configuration object from videoPlatformConf.json file.
+     *
+     * @property videoPlatformConf
+     * @type Object
+     * @final
+     */
+    videoPlatformConf: {value: videoPlatformConf},
+
+    /**
+     * Configuration model.
+     *
+     * @property configurationModel
+     * @type ConfigurationModel
+     * @final
+     */
+    configurationModel: {value: configurationModel}
+
+  });
 
   // Validate temporary directory
   if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
     this.emit('error', new PackageError('videoTmpDir in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION_ERROR);
+      ERRORS.INVALID_CONFIGURATION);
 }
 
 util.inherits(Package, events.EventEmitter);
 module.exports = Package;
 
-// Package states
-Package.PACKAGE_SUBMITTED_STATE = 'packageSubmitted';
-Package.PACKAGE_INITIALIZED_STATE = 'packageInitialized';
-Package.PACKAGE_COPIED_STATE = 'packageCopied';
-Package.ORIGINAL_PACKAGE_REMOVED_STATE = 'originalPackageRemoved';
-Package.MEDIA_UPLOADED_STATE = 'mediaUploaded';
-Package.MEDIA_CONFIGURED_STATE = 'mediaConfigured';
-Package.DIRECTORY_CLEANED_STATE = 'directoryCleaned';
-
-// Package transitions (from one state to another)
-Package.INIT_TRANSITION = 'initPackage';
-Package.COPY_PACKAGE_TRANSITION = 'copyPackage';
-Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION = 'removeOriginalPackage';
-Package.UPLOAD_MEDIA_TRANSITION = 'uploadMedia';
-Package.CONFIGURE_MEDIA_TRANSITION = 'configureMedia';
-Package.CLEAN_DIRECTORY_TRANSITION = 'cleanDirectory';
-
-// Define the order in which transitions will be executed for a Package
-Package.stateTransitions = [
-  Package.INIT_TRANSITION,
-  Package.COPY_PACKAGE_TRANSITION,
-  Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-  Package.UPLOAD_MEDIA_TRANSITION,
-  Package.CONFIGURE_MEDIA_TRANSITION,
-  Package.CLEAN_DIRECTORY_TRANSITION
-];
-
-// Define machine state authorized transitions depending on previous and
-// next states
-Package.stateMachine = [
-  {
-    name: Package.INIT_TRANSITION,
-    from: Package.PACKAGE_SUBMITTED_STATE,
-    to: Package.PACKAGE_INITIALIZED_STATE
-  },
-  {
-    name: Package.COPY_PACKAGE_TRANSITION,
-    from: Package.PACKAGE_INITIALIZED_STATE,
-    to: Package.PACKAGE_COPIED_STATE
-  },
-  {
-    name: Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-    from: Package.PACKAGE_COPIED_STATE,
-    to: Package.ORIGINAL_PACKAGE_REMOVED_STATE
-  },
-  {
-    name: Package.UPLOAD_MEDIA_TRANSITION,
-    from: Package.ORIGINAL_PACKAGE_REMOVED_STATE,
-    to: Package.MEDIA_UPLOADED_STATE
-  },
-  {
-    name: Package.CONFIGURE_MEDIA_TRANSITION,
-    from: Package.MEDIA_UPLOADED_STATE,
-    to: Package.MEDIA_CONFIGURED_STATE
-  },
-  {
-    name: Package.CLEAN_DIRECTORY_TRANSITION,
-    from: Package.MEDIA_CONFIGURED_STATE,
-    to: Package.DIRECTORY_CLEANED_STATE
-  }
-];
+/**
+ * Package states.
+ *
+ * @property STATES
+ * @type Object
+ * @static
+ * @final
+ */
+Package.STATES = {
+  PACKAGE_SUBMITTED: 'packageSubmitted',
+  PACKAGE_INITIALIZED: 'packageInitialized',
+  PACKAGE_COPIED: 'packageCopied',
+  ORIGINAL_PACKAGE_REMOVED: 'originalPackageRemoved',
+  MEDIA_UPLOADED: 'mediaUploaded',
+  MEDIA_CONFIGURED: 'mediaConfigured',
+  DIRECTORY_CLEANED: 'directoryCleaned'
+};
+Object.freeze(Package.STATES);
 
 /**
- * Gets an instance of a Package depending on package file type (factory).
+ * Package transitions (from one state to another).
  *
- * @method getPackage
+ * @property TRANSITIONS
+ * @type Object
  * @static
- * @param {String} type The type of the package platform to instanciate
- * @param {Object} mediaPackage Information about the media
- * @return {Package} An instance of a Package sub class
+ * @final
  */
-Package.getPackage = function(type, mediaPackage) {
-  var self = this;
-  if (type) {
-
-    switch (type) {
-
-      case 'tar':
-        var TarPackage = process.requirePublish('app/server/packages/TarPackage.js');
-        return new TarPackage(mediaPackage);
-
-      case 'mp4':
-        var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
-        return new VideoPackage(mediaPackage);
-
-      default:
-        self.emit('error', new PackageError('Package type is not valid (' + mediaPackage.packageType + ')',
-          errors.INVALID_PACKAGE_TYPE_ERROR));
-    }
-
-  }
+Package.TRANSITIONS = {
+  INIT: 'initPackage',
+  COPY_PACKAGE: 'copyPackage',
+  REMOVE_ORIGINAL_PACKAGE: 'removeOriginalPackage',
+  UPLOAD_MEDIA: 'uploadMedia',
+  CONFIGURE_MEDIA: 'configureMedia',
+  CLEAN_DIRECTORY: 'cleanDirectory'
 };
+Object.freeze(Package.TRANSITIONS);
+
+/**
+ * Define the order in which transitions will be executed for a Package.
+ *
+ * @property stateTransitions
+ * @type Array
+ * @static
+ * @final
+ */
+Package.stateTransitions = [
+  Package.TRANSITIONS.INIT,
+  Package.TRANSITIONS.COPY_PACKAGE,
+  Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+  Package.TRANSITIONS.UPLOAD_MEDIA,
+  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  Package.TRANSITIONS.CLEAN_DIRECTORY
+];
+Object.freeze(Package.stateTransitions);
+
+/**
+ * Define machine state authorized transitions depending on previous and next states.
+ *
+ * @property stateMachine
+ * @type Array
+ * @static
+ * @final
+ */
+Package.stateMachine = [
+  {
+    name: Package.TRANSITIONS.INIT,
+    from: Package.STATES.PACKAGE_SUBMITTED,
+    to: Package.STATES.PACKAGE_INITIALIZED
+  },
+  {
+    name: Package.TRANSITIONS.COPY_PACKAGE,
+    from: Package.STATES.PACKAGE_INITIALIZED,
+    to: Package.STATES.PACKAGE_COPIED
+  },
+  {
+    name: Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+    from: Package.STATES.PACKAGE_COPIED,
+    to: Package.STATES.ORIGINAL_PACKAGE_REMOVED
+  },
+  {
+    name: Package.TRANSITIONS.UPLOAD_MEDIA,
+    from: Package.STATES.ORIGINAL_PACKAGE_REMOVED,
+    to: Package.STATES.MEDIA_UPLOADED
+  },
+  {
+    name: Package.TRANSITIONS.CONFIGURE_MEDIA,
+    from: Package.STATES.MEDIA_UPLOADED,
+    to: Package.STATES.MEDIA_CONFIGURED
+  },
+  {
+    name: Package.TRANSITIONS.CLEAN_DIRECTORY,
+    from: Package.STATES.MEDIA_CONFIGURED,
+    to: Package.STATES.DIRECTORY_CLEANED
+  }
+];
+Object.freeze(Package.stateMachine);
 
 /**
  * Creates a state machine to publish the package.
@@ -235,7 +236,7 @@ Package.prototype.init = function(initialState, initialTransition) {
     if (self[event])
       self[event]();
     else {
-      self.emit('error', new PackageError('Transition ' + event + ' does not exist', errors.TRANSITION_ERROR));
+      self.emit('error', new PackageError('Transition ' + event + ' does not exist', ERRORS.TRANSITION));
       return false;
     }
 
@@ -260,15 +261,15 @@ Package.prototype.executeTransition = function(transition) {
 
   // If no more transition or upload transition reached without platform type
   // The publication is considered done
-  if (!transition || (transition === Package.UPLOAD_MEDIA_TRANSITION && !this.mediaPackage.type)) {
+  if (!transition || (transition === Package.TRANSITIONS.UPLOAD_MEDIA && !this.mediaPackage.type)) {
 
     // Package has not been uploaded yet and request a manual upload
     // Change package state
-    if (transition === Package.UPLOAD_MEDIA_TRANSITION) {
+    if (transition === Package.TRANSITIONS.UPLOAD_MEDIA) {
       process.logger.debug('Package ' + this.mediaPackage.id + ' is waiting for manual upload');
-      this.videoModel.updateState(this.mediaPackage.id, VideoModel.WAITING_FOR_UPLOAD_STATE);
+      this.videoModel.updateState(this.mediaPackage.id, STATES.WAITING_FOR_UPLOAD);
     } else
-      this.videoModel.updateState(this.mediaPackage.id, VideoModel.READY_STATE);
+      this.videoModel.updateState(this.mediaPackage.id, STATES.READY);
 
     // Done, final state reached
     this.emit('complete', this.mediaPackage);
@@ -286,7 +287,6 @@ Package.prototype.executeTransition = function(transition) {
  * This is a transition.
  *
  * @method initPackage
- * @private
  */
 Package.prototype.initPackage = function() {
   process.logger.debug('Init package ' + this.mediaPackage.id);
@@ -295,7 +295,7 @@ Package.prototype.initPackage = function() {
 
   async.series([
     function(callback) {
-      self.defaultConfig.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
+      self.configurationModel.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
         if (error)
           callback(error);
         else if (result && result.length >= 1) {
@@ -318,24 +318,24 @@ Package.prototype.initPackage = function() {
               var originalPackagePath = self.mediaPackage.originalPackagePath;
               var originalPackageType = self.mediaPackage.packageType;
               self.mediaPackage = result[0];
-              self.mediaPackage.errorCode = VideoModel.NO_ERROR;
-              self.mediaPackage.state = VideoModel.PENDING_STATE;
-              self.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
-              self.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
+              self.mediaPackage.errorCode = ERRORS.NO_ERROR;
+              self.mediaPackage.state = STATES.PENDING;
+              self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
+              self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
               self.mediaPackage.originalPackagePath = originalPackagePath;
               self.mediaPackage.packageType = originalPackageType;
               self.mediaPackage.date = Date.now();
               callback();
             }
           } else {
-            self.mediaPackage.state = VideoModel.PENDING_STATE;
+            self.mediaPackage.state = STATES.PENDING;
             self.mediaPackage.link = null;
             self.mediaPackage.mediaId = null;
-            self.mediaPackage.errorCode = VideoModel.NO_ERROR;
+            self.mediaPackage.errorCode = ERRORS.NO_ERROR;
             self.mediaPackage.properties = [];
             self.mediaPackage.metadata = self.mediaPackage.metadata || {};
-            self.mediaPackage.lastState = Package.PACKAGE_INITIALIZED_STATE;
-            self.mediaPackage.lastTransition = Package.COPY_PACKAGE_TRANSITION;
+            self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
+            self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
             self.mediaPackage.date = Date.now();
             self.videoModel.add(self.mediaPackage, callback);
           }
@@ -344,7 +344,7 @@ Package.prototype.initPackage = function() {
     }],
     function(error) {
       if (error)
-        self.emit('error', new PackageError(error.message, errors.SAVE_PACKAGE_DATA_ERROR));
+        self.emit('error', new PackageError(error.message, ERRORS.SAVE_PACKAGE_DATA));
       else
         self.fsm.transition();
     });
@@ -356,7 +356,6 @@ Package.prototype.initPackage = function() {
  * This is a transition.
  *
  * @method copyPackage
- * @private
  */
 Package.prototype.copyPackage = function() {
   var self = this;
@@ -365,13 +364,13 @@ Package.prototype.copyPackage = function() {
   var destinationFilePath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id),
     this.mediaPackage.id + '.' + this.mediaPackage.packageType);
 
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.COPYING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.COPYING);
 
   // Copy package
   process.logger.debug('Copy ' + this.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
-  openVeoAPI.fileSystem.copy(this.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
+  openVeoApi.fileSystem.copy(this.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
     if (copyError)
-      self.setError(new PackageError(copyError.message, errors.COPY_ERROR));
+      self.setError(new PackageError(copyError.message, ERRORS.COPY));
     else
       self.fsm.transition();
   });
@@ -383,7 +382,6 @@ Package.prototype.copyPackage = function() {
  * This is a transition.
  *
  * @method removeOriginalPackage
- * @private
  */
 Package.prototype.removeOriginalPackage = function() {
   var self = this;
@@ -392,7 +390,7 @@ Package.prototype.removeOriginalPackage = function() {
   process.logger.debug('Remove original package ' + this.mediaPackage.originalPackagePath);
   fs.unlink(this.mediaPackage.originalPackagePath, function(error) {
     if (error)
-      self.setError(new PackageError(error.message, errors.UNLINK_ERROR));
+      self.setError(new PackageError(error.message, ERRORS.UNLINK));
     else
       self.fsm.transition();
   });
@@ -404,21 +402,20 @@ Package.prototype.removeOriginalPackage = function() {
  * This is a transition.
  *
  * @method uploadMedia
- * @private
  */
 Package.prototype.uploadMedia = function() {
   var self = this;
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.UPLOADING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.UPLOADING);
 
   // Get video plaform provider from package type
-  var videoPlatformProvider = VideoPlatformProvider.getProvider(this.mediaPackage.type,
+  var videoPlatformProvider = videoPlatformFactory.get(this.mediaPackage.type,
     this.videoPlatformConf[this.mediaPackage.type]);
 
   // Start uploading the media to the platform
   process.logger.debug('Upload media ' + this.mediaPackage.id);
   videoPlatformProvider.upload(this.getMediaFilePath(), function(error, mediaId) {
     if (error)
-      self.setError(new PackageError(error.message, errors.MEDIA_UPLOAD_ERROR));
+      self.setError(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
     else {
       if (!self.mediaPackage.mediaId) {
         self.mediaPackage.mediaId = [mediaId];
@@ -438,15 +435,14 @@ Package.prototype.uploadMedia = function() {
  * This is a transition.
  *
  * @method configureMedia
- * @private
  */
 Package.prototype.configureMedia = function() {
   var self = this;
   process.logger.debug('Configure media ' + this.mediaPackage.id);
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.CONFIGURING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.CONFIGURING);
 
   // Get video plaform provider from package type
-  var videoPlatformProvider = VideoPlatformProvider.getProvider(this.mediaPackage.type,
+  var videoPlatformProvider = videoPlatformFactory.get(this.mediaPackage.type,
     this.videoPlatformConf[this.mediaPackage.type]);
 
   var mediaId = this.mediaPackage.mediaId[this.mediaPackage.mediaId.length];
@@ -454,7 +450,7 @@ Package.prototype.configureMedia = function() {
   // Configure media
   videoPlatformProvider.configure(mediaId, function(error) {
     if (error)
-      self.setError(new PackageError(error.message, errors.MEDIA_CONFIGURE_ERROR));
+      self.setError(new PackageError(error.message, ERRORS.MEDIA_CONFIGURE));
     else
       self.fsm.transition();
   });
@@ -465,8 +461,7 @@ Package.prototype.configureMedia = function() {
  *
  * This is a transition.
  *
- * @method copyImages
- * @private
+ * @method cleanDirectory
  */
 Package.prototype.cleanDirectory = function() {
   var self = this;
@@ -474,9 +469,9 @@ Package.prototype.cleanDirectory = function() {
 
   // Remove package temporary directory
   process.logger.debug('Remove temporary directory ' + directoryToRemove);
-  openVeoAPI.fileSystem.rmdir(directoryToRemove, function(error) {
+  openVeoApi.fileSystem.rmdir(directoryToRemove, function(error) {
     if (error)
-      self.setError(new PackageError(error.message, errors.CLEAN_DIRECTORY_ERROR));
+      self.setError(new PackageError(error.message, ERRORS.CLEAN_DIRECTORY));
     else
       self.fsm.transition();
   });
@@ -488,8 +483,8 @@ Package.prototype.cleanDirectory = function() {
  * Each package has its own way to be published, thus transitions stack
  * is different by package.
  *
- * @return {Array} The stack of transitions
  * @method getTransitions
+ * @return {Array} The stack of transitions
  */
 Package.prototype.getTransitions = function() {
   return Package.stateTransitions;
@@ -498,8 +493,8 @@ Package.prototype.getTransitions = function() {
 /**
  * Gets the list of transitions states corresponding to the package.
  *
- * @return {Array} The list of states/transitions
  * @method getStateMachine
+ * @return {Array} The list of states/transitions
  */
 Package.prototype.getStateMachine = function() {
   return Package.stateMachine;
@@ -508,8 +503,8 @@ Package.prototype.getStateMachine = function() {
 /**
  * Gets the media file path of the package.
  *
- * @return {String} System path of the media file
  * @method getMediaFilePath
+ * @return {String} System path of the media file
  */
 Package.prototype.getMediaFilePath = function() {
   return path.join(this.publishConf.videoTmpDir,
@@ -521,15 +516,14 @@ Package.prototype.getMediaFilePath = function() {
 /**
  * Sets a package as in error.
  *
- * @param {PublishError} error The package error
  * @method setError
- * @private
+ * @param {PublishError} error The package error
  */
 Package.prototype.setError = function(error) {
 
   // An error occurred
   if (error) {
-    this.videoModel.updateState(this.mediaPackage.id, VideoModel.ERROR_STATE);
+    this.videoModel.updateState(this.mediaPackage.id, STATES.ERROR);
     this.videoModel.updateErrorCode(this.mediaPackage.id, error.code);
     this.emit('error', error);
   }

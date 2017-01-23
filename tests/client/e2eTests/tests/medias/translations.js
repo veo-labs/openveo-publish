@@ -3,8 +3,12 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
+var openVeoApi = require('@openveo/api');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var browserExt = e2e.browser;
 
@@ -42,12 +46,10 @@ describe('Media page translations', function() {
 
         page.openSearchEngine();
         var searchFields = page.getSearchFields(page.searchFormElement);
-        var searchNameField = searchFields.name;
-        var searchDescriptionField = searchFields.description;
+        var searchQueryField = searchFields.query;
         var searchDateField = searchFields.date;
         var searchCategoryField = searchFields.category;
-        assert.eventually.equal(searchNameField.getLabel(), publishTranslations.MEDIAS.TITLE_FILTER);
-        assert.eventually.equal(searchDescriptionField.getLabel(), publishTranslations.MEDIAS.DESCRIPTION_FILTER);
+        assert.eventually.equal(searchQueryField.getLabel(), publishTranslations.MEDIAS.QUERY_FILTER);
         assert.eventually.equal(searchDateField.getLabel(), publishTranslations.MEDIAS.DATE_FILTER);
         assert.eventually.equal(searchCategoryField.getLabel(), publishTranslations.MEDIAS.CATEGORY_FILTER);
         page.closeSearchEngine();
@@ -108,7 +110,7 @@ describe('Media page translations', function() {
       }).then(function(cells) {
 
         // Test media state label
-        if (state === VideoModel.ERROR_STATE)
+        if (state === STATES.ERROR)
           assert.equal(cells[statusHeaderIndex].indexOf(page.translations.PUBLISH.MEDIAS['STATE_' + state]), 0);
         else
           assert.equal(cells[statusHeaderIndex], page.translations.PUBLISH.MEDIAS['STATE_' + state]);
@@ -149,13 +151,17 @@ describe('Media page translations', function() {
   function checkStateTranslations(index) {
     index = index || 0;
     var languages = page.getLanguages();
+    var states = [];
+
+    for (var stateName in STATES)
+      states.push(STATES[stateName]);
 
     if (index < languages.length) {
       return page.selectLanguage(languages[index]).then(function() {
-        var states = page.getMediaStates();
 
         // Check states translations
         return checkStates(states);
+
       }).then(function() {
         return checkStateTranslations(++index);
       });
@@ -166,7 +172,10 @@ describe('Media page translations', function() {
 
   // Load page
   before(function() {
-    var videoModel = new VideoModel();
+    var coreApi = openVeoApi.api.getCoreApi();
+    var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
+    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
     mediaHelper = new MediaHelper(videoModel);
     page = new MediaPage(videoModel);
     page.logAsAdmin();
@@ -188,7 +197,7 @@ describe('Media page translations', function() {
     mediaHelper.addEntities([
       {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Test state'
       }
     ]);

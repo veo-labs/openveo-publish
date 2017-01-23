@@ -1,24 +1,26 @@
 'use strict';
 
 /**
- * @module publish-controllers
+ * @module controllers
  */
 
 var util = require('util');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
-var errors = process.requirePublish('app/server/httpErrors.js');
-var EntityController = openVeoAPI.controllers.EntityController;
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+var EntityController = openVeoApi.controllers.EntityController;
 
 /**
- * Provides route actions for all requests relative to properties.
+ * Defines a controller to handle actions relative to properties' routes.
  *
  * @class PropertyController
- * @constructor
  * @extends EntityController
+ * @constructor
  */
 function PropertyController() {
-  EntityController.call(this, PropertyModel);
+  PropertyController.super_.call(this, PropertyModel, PropertyProvider);
 }
 
 module.exports = PropertyController;
@@ -28,6 +30,10 @@ util.inherits(PropertyController, EntityController);
  * Gets the list of custom property types.
  *
  * @method getPropertyTypesAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
  */
 PropertyController.prototype.getPropertyTypesAction = function(request, response, next) {
   response.send({
@@ -38,22 +44,25 @@ PropertyController.prototype.getPropertyTypesAction = function(request, response
 /**
  * Gets a list of properties.
  *
- * Parameters :
- *  - **query** Search query to search on both properties name and description
- *  - **types** To filter properties by type
- *  - **page** The expected page
- *  - **limit** The expected limit
- *  - **sortBy** To sort properties by name or description (default is name)
- *  - **sortOrder** Sort order (either asc or desc)
- *
  * @method getEntitiesAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.query Request's query
+ * @param {String} request.query.query Search query to search on both properties name and description
+ * @param {Array} request.query.types To filter properties by type
+ * @param {String} request.query.page The expected page
+ * @param {String} request.query.limit The expected limit
+ * @param {String} request.query.sortBy To sort properties by name or description (default is name)
+ * @param {String} request.query.sortOrder Sort order (either asc or desc)
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
  */
 PropertyController.prototype.getEntitiesAction = function(request, response, next) {
-  var model = new this.Entity(request.user);
+  var model = this.getModel(request);
   var params;
 
   try {
-    params = openVeoAPI.util.shallowValidateObject(request.query, {
+    params = openVeoApi.util.shallowValidateObject(request.query, {
       query: {type: 'string'},
       types: {type: 'array<string>'},
       limit: {type: 'number', gt: 0},
@@ -62,7 +71,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
       sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
     });
   } catch (error) {
-    return next(errors.GET_PROPERTIES_WRONG_PARAMETERS);
+    return next(HTTP_ERRORS.GET_PROPERTIES_WRONG_PARAMETERS);
   }
 
   // Build sort
@@ -75,7 +84,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
   // Add search query
   if (params.query) {
     filter.$text = {
-      $search: params.query
+      $search: '"' + params.query + '"'
     };
   }
 
@@ -95,7 +104,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
     function(error, entities, pagination) {
       if (error) {
         process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
-        next(errors.GET_PROPERTIES_ERROR);
+        next(HTTP_ERRORS.GET_PROPERTIES_ERROR);
       } else {
         response.send({
           entities: entities,
@@ -104,4 +113,16 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
       }
     }
   );
+};
+
+/**
+ * Gets an instance of the property model.
+ *
+ * @method getModel
+ * @param {Object} request The HTTP request
+ * @return {PropertyModel} The PropertyModel instance
+ */
+PropertyController.prototype.getModel = function(request) {
+  var coreApi = openVeoApi.api.getCoreApi();
+  return new this.Model(new this.Provider(coreApi.getDatabase()), new VideoProvider(coreApi.getDatabase()));
 };

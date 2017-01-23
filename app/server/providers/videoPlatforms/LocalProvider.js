@@ -1,38 +1,28 @@
 'use strict';
 
 /**
- * @module publish-providers
+ * @module providers
  */
 
-// Module dependencies
 var path = require('path');
 var util = require('util');
 var async = require('async');
 var shortid = require('shortid');
-var openVeoAPI = require('@openveo/api');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var openVeoApi = require('@openveo/api');
+var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
 
 /**
- * Defines a LocalProvider class to interact with local platform
- * (https://local.com/).
- *
- * @example
- *     // providerConf example
- *     {
- *       "clientId" : "****",
- *       "clientSecret" : "****",
- *       "accessToken" : "****"
- *     }
+ * Defines a LocalProvider class to interact with local platform.
  *
  * @class LocalProvider
- * @constructor
  * @extends VideoPlatformProvider
+ * @constructor
  * @param {Object} providerConf A local configuration object
+ * @param {String} providerConf.vodFilePath TODO
+ * @param {String} providerConf.streamPath TODO
  */
 function LocalProvider(providerConf) {
-  VideoPlatformProvider.call(this, providerConf);
-
-  this.localConf = providerConf;
+  LocalProvider.super_.call(this, providerConf);
 }
 
 module.exports = LocalProvider;
@@ -54,8 +44,8 @@ LocalProvider.prototype.upload = function(videoFilePath, callback) {
 
   // Retrieve video tmp directory
   // e.g E:/openveo/node_modules/@openveo/publish/tmp/6xF1eG46/video.mp4
-  var videoFinalPath = path.normalize(self.localConf.vodFilePath + '/' + tmpId + '/video.mp4');
-  openVeoAPI.fileSystem.copy(videoFilePath, path.normalize(videoFinalPath), function(error) {
+  var videoFinalPath = path.normalize(self.conf.vodFilePath + '/' + tmpId + '/video.mp4');
+  openVeoApi.fileSystem.copy(videoFilePath, path.normalize(videoFinalPath), function(error) {
     if (error) {
       process.logger.warn(error.message, {
         action: 'copyVideo',
@@ -104,7 +94,7 @@ LocalProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
   var infos = {sources: [], available: true};
   mediaIds.forEach(function(mediaId) {
     var info = {};
-    var basePath = self.localConf.streamPath + '/' + mediaId + '/video.mp4';
+    var basePath = self.conf.streamPath + '/' + mediaId + '/video.mp4';
     info.files = [{
       quality: 2, // 0 = mobile, 1 = sd, 2 = hd
       height: expectedDefinition,
@@ -136,8 +126,8 @@ LocalProvider.prototype.remove = function(mediaIds, callback) {
 
   mediaIds.forEach(function(mediaId) {
     series.push(function(callback) {
-      var videoFinalPath = path.normalize(self.localConf.vodFilePath + '/' + mediaId);
-      openVeoAPI.fileSystem.rmdir(videoFinalPath, function(error) {
+      var videoFinalPath = path.normalize(self.conf.vodFilePath + '/' + mediaId);
+      openVeoApi.fileSystem.rmdir(videoFinalPath, function(error) {
         if (error) {
           process.logger.warn(error.message, {
             action: 'RemoveVideo',

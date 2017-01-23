@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module publish-packages
+ * @module packages
  */
 
 var path = require('path');
@@ -9,29 +9,15 @@ var fs = require('fs');
 var util = require('util');
 var async = require('async');
 var xml2js = require('xml2js');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
-var errors = process.requirePublish('app/server/packages/errors.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
 
 /**
- * Defines a custom error with an error code.
- *
- * @class TarPackageError
- * @constructor
- * @extends Error
- * @param {String} message The error message
- * @param {String} code The error code
- */
-function TarPackageError(message, code) {
-  this.name = 'TarPackageError';
-  this.message = message || '';
-  this.code = code;
-}
-
-/**
- * Defines a TarPackage class to manage publication of a tar file.
+ * Defines a TarPackage to manage publication of a tar file.
  *
  * A tar file may contain :
  *  - A video file
@@ -53,109 +39,151 @@ function TarPackageError(message, code) {
  *       "date": 1425916390, // Unix epoch time of the video record
  *       "rich-media": true, // true if package contains presentation images
  *       "filename": "video.mp4", // The name of the video file in the package
- *       "duration": 30 // Duration of the video in seconds
- *       "indexes": [  // An array specifying a list of timecodes, their own type and data associated.
+ *       "duration": 30, // Duration of the video in seconds
+ *       "indexes": [ // The list of indexes in the video
  *         {
- *           "timecode": 0, // timecode in ms
- *           "type": "image", // timecode type (must be "image" or "tag")
- *           "data": {  // related information to image timecode
- *             "filename": "slide_00000.jpeg" // filename of image timecode
+ *           "type": "image", // Index type (could be "image" or "tag")
+ *           "timecode": 0, // Index time (in ms) from the beginning of the video
+ *           "data": { // Index data (only for "image" type)
+ *             "filename": "slide_00000.jpeg" // The name of the image file in the tar
  *           }
- *         }
+ *         },
+ *         {
+ *           "type": "tag", // Index type (could be "image" or "tag")
+ *           "timecode": 3208 // Index time (in ms) from the beginning of the video
+ *         },
+ *         ...
  *       ]
  *     }
  *
- *
  * @class TarPackage
- * @constructor
  * @extends Package
+ * @constructor
+ * @param {Object} mediaPackage The media description object
+ * @param {VideoModel} videoModel A video model
+ * @param {ConfigurationModel} configurationModel A configuration model
  */
-function TarPackage(mediaPackage) {
-  Package.call(this, mediaPackage);
+function TarPackage(mediaPackage, videoModel, configurationModel) {
+  TarPackage.super_.call(this, mediaPackage, videoModel, configurationModel);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
     this.emit('error', new TarPackageError('metadataFileName in publishConf.json must be a String'),
-      errors.INVALID_CONFIGURATION_ERROR);
+      ERRORS.INVALID_CONFIGURATION);
 
 }
 
 module.exports = TarPackage;
 util.inherits(TarPackage, VideoPackage);
 
-// TarPackage states
-TarPackage.PACKAGE_EXTRACTED_STATE = 'packageExtracted';
-TarPackage.PACKAGE_VALIDATED_STATE = 'packageValidated';
-TarPackage.PUBLIC_DIR_PREPARED_STATE = 'publicDirectoryPrepared';
-TarPackage.TIMECODES_SAVED_STATE = 'timecodesSaved';
+/**
+ * Process states for tar packages.
+ *
+ * @property STATES
+ * @type Object
+ * @static
+ * @final
+ */
+TarPackage.STATES = {
+  PACKAGE_EXTRACTED: 'packageExtracted',
+  PACKAGE_VALIDATED: 'packageValidated',
+  PUBLIC_DIR_PREPARED: 'publicDirectoryPrepared',
+  TIMECODES_SAVED: 'timecodesSaved'
+};
+Object.freeze(TarPackage.STATES);
 
-// TarPackage transitions
-TarPackage.EXTRACT_PACKAGE_TRANSITION = 'extractPackage';
-TarPackage.VALIDATE_PACKAGE_TRANSITION = 'validatePackage';
-TarPackage.PREPARE_PACKAGE_TRANSITION = 'preparePublicDirectory';
-TarPackage.SAVE_TIMECODES_TRANSITION = 'saveTimecodes';
+/**
+ * Tar package process transitions (from one state to another).
+ *
+ * @property TRANSITIONS
+ * @type Object
+ * @static
+ * @final
+ */
+TarPackage.TRANSITIONS = {
+  EXTRACT_PACKAGE: 'extractPackage',
+  VALIDATE_PACKAGE: 'validatePackage',
+  PREPARE_PACKAGE: 'preparePublicDirectory',
+  SAVE_TIMECODES: 'saveTimecodes'
+};
+Object.freeze(TarPackage.TRANSITIONS);
 
-// Define the order in which transitions will be executed for a TarPackage
+/**
+ * Define the order in which transitions will be executed for a TarPackage.
+ *
+ * @property stateTransitions
+ * @type Array
+ * @static
+ * @final
+ */
 TarPackage.stateTransitions = [
-  Package.INIT_TRANSITION,
-  Package.COPY_PACKAGE_TRANSITION,
-  Package.REMOVE_ORIGINAL_PACKAGE_TRANSITION,
-  TarPackage.EXTRACT_PACKAGE_TRANSITION,
-  TarPackage.VALIDATE_PACKAGE_TRANSITION,
-  VideoPackage.GENERATE_THUMB_TRANSITION,
-  VideoPackage.GET_METADATA_TRANSITION,
-  TarPackage.PREPARE_PACKAGE_TRANSITION,
-  Package.UPLOAD_MEDIA_TRANSITION,
-  Package.CONFIGURE_MEDIA_TRANSITION,
-  TarPackage.SAVE_TIMECODES_TRANSITION,
-  VideoPackage.COPY_IMAGES_TRANSITION,
-  Package.CLEAN_DIRECTORY_TRANSITION
+  Package.TRANSITIONS.INIT,
+  Package.TRANSITIONS.COPY_PACKAGE,
+  Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+  TarPackage.TRANSITIONS.EXTRACT_PACKAGE,
+  TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
+  VideoPackage.TRANSITIONS.GENERATE_THUMB,
+  VideoPackage.TRANSITIONS.GET_METADATA,
+  TarPackage.TRANSITIONS.PREPARE_PACKAGE,
+  Package.TRANSITIONS.UPLOAD_MEDIA,
+  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  TarPackage.TRANSITIONS.SAVE_TIMECODES,
+  VideoPackage.TRANSITIONS.COPY_IMAGES,
+  Package.TRANSITIONS.CLEAN_DIRECTORY
 ];
+Object.freeze(TarPackage.stateTransitions);
 
-// Define machine state authorized transitions depending on previous and
-// next states
+/**
+ * Define machine state authorized transitions depending on previous and next states.
+ *
+ * @property stateMachine
+ * @type Array
+ * @static
+ * @final
+ */
 TarPackage.stateMachine = VideoPackage.stateMachine.concat([
   {
-    name: TarPackage.EXTRACT_PACKAGE_TRANSITION,
-    from: TarPackage.ORIGINAL_PACKAGE_REMOVED_STATE,
-    to: TarPackage.PACKAGE_EXTRACTED_STATE
+    name: TarPackage.TRANSITIONS.EXTRACT_PACKAGE,
+    from: Package.ORIGINAL_PACKAGE_REMOVED_STATE,
+    to: TarPackage.STATES.PACKAGE_EXTRACTED
   },
   {
-    name: VideoPackage.GENERATE_THUMB_TRANSITION,
-    from: TarPackage.PACKAGE_VALIDATED_STATE,
-    to: VideoPackage.THUMB_GENERATED_STATE
+    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    from: TarPackage.STATES.PACKAGE_VALIDATED,
+    to: VideoPackage.STATES.THUMB_GENERATED
   },
   {
-    name: TarPackage.PREPARE_PACKAGE_TRANSITION,
-    from: VideoPackage.METADATA_RETRIEVED_STATE,
-    to: TarPackage.PUBLIC_DIR_PREPARED_STATE
+    name: TarPackage.TRANSITIONS.PREPARE_PACKAGE,
+    from: VideoPackage.STATES.METADATA_RETRIEVED,
+    to: TarPackage.STATES.PUBLIC_DIR_PREPARED
   },
   {
-    name: TarPackage.VALIDATE_PACKAGE_TRANSITION,
-    from: TarPackage.PACKAGE_EXTRACTED_STATE,
-    to: TarPackage.PACKAGE_VALIDATED_STATE
+    name: TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
+    from: TarPackage.STATES.PACKAGE_EXTRACTED,
+    to: TarPackage.STATES.PACKAGE_VALIDATED
   },
   {
-    name: TarPackage.PREPARE_PACKAGE_TRANSITION,
-    from: TarPackage.PACKAGE_VALIDATED_STATE,
-    to: TarPackage.PUBLIC_DIR_PREPARED_STATE
+    name: TarPackage.TRANSITIONS.PREPARE_PACKAGE,
+    from: TarPackage.STATES.PACKAGE_VALIDATED,
+    to: TarPackage.STATES.PUBLIC_DIR_PREPARED
   },
   {
-    name: Package.UPLOAD_MEDIA_TRANSITION,
-    from: TarPackage.PUBLIC_DIR_PREPARED_STATE,
-    to: Package.MEDIA_UPLOADED_STATE
+    name: Package.TRANSITIONS.UPLOAD_MEDIA,
+    from: TarPackage.STATES.PUBLIC_DIR_PREPARED,
+    to: Package.STATES.MEDIA_UPLOADED
   },
   {
-    name: TarPackage.SAVE_TIMECODES_TRANSITION,
-    from: TarPackage.MEDIA_CONFIGURED_STATE,
-    to: TarPackage.TIMECODES_SAVED_STATE
+    name: TarPackage.TRANSITIONS.SAVE_TIMECODES,
+    from: Package.STATES.MEDIA_CONFIGURED,
+    to: TarPackage.STATES.TIMECODES_SAVED
   },
   {
-    name: VideoPackage.COPY_IMAGES_TRANSITION,
-    from: TarPackage.TIMECODES_SAVED_STATE,
-    to: VideoPackage.COPIED_IMAGES_STATE
+    name: VideoPackage.TRANSITIONS.COPY_IMAGES,
+    from: TarPackage.STATES.TIMECODES_SAVED,
+    to: VideoPackage.STATES.COPIED_IMAGES
   }
 ]);
+Object.freeze(TarPackage.stateMachine);
 
 /**
  * Validates package content.
@@ -183,7 +211,7 @@ function validatePackage(callback) {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
   // Read package information file
-  openVeoAPI.fileSystem.getJSONFileContent(path.join(extractDirectory, this.publishConf.metadataFileName),
+  openVeoApi.fileSystem.getJSONFileContent(path.join(extractDirectory, this.publishConf.metadataFileName),
     function(error, packageInformation) {
 
       // Failed reading file or parsing JSON
@@ -325,7 +353,7 @@ function saveTimecodes(xmlTimecodeFilePath, tarPackage, callback) {
       callback(error);
     } else {
       if (!tarPackage.mediaPackage.metadata) tarPackage.mediaPackage.metadata = {};
-      openVeoAPI.util.merge(tarPackage.mediaPackage.metadata, {indexes: formattedTimecodes});
+      openVeoApi.util.merge(tarPackage.mediaPackage.metadata, {indexes: formattedTimecodes});
 
       tarPackage.videoModel.updateMetadata(tarPackage.mediaPackage.id, tarPackage.mediaPackage.metadata);
       callback();
@@ -337,8 +365,8 @@ function saveTimecodes(xmlTimecodeFilePath, tarPackage, callback) {
 /**
  * Gets the stack of transitions corresponding to the package.
  *
- * @return {Array} The stack of transitions
  * @method getTransitions
+ * @return {Array} The stack of transitions
  */
 TarPackage.prototype.getTransitions = function() {
   return TarPackage.stateTransitions;
@@ -360,24 +388,23 @@ TarPackage.prototype.getStateMachine = function() {
  * This is a transition.
  *
  * @method extractPackage
- * @private
  */
 TarPackage.prototype.extractPackage = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
   // Extract package
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.EXTRACTING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.EXTRACTING);
 
   // Copy destination
   var packagePath = path.join(extractDirectory, this.mediaPackage.id + '.tar');
 
   process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
-  openVeoAPI.fileSystem.extract(packagePath, extractDirectory, function(error) {
+  openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
 
     // Extraction failed
     if (error) {
-      self.setError(new TarPackageError(error.message, errors.EXTRACT_ERROR));
+      self.setError(new TarPackageError(error.message, ERRORS.EXTRACT));
     } else {
 
       // Extraction done
@@ -394,23 +421,22 @@ TarPackage.prototype.extractPackage = function() {
  * This is a transition.
  *
  * @method validatePackage
- * @private
  */
 TarPackage.prototype.validatePackage = function() {
   var self = this;
   process.logger.debug('Validate package ' + this.mediaPackage.originalPackagePath);
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.VALIDATING_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.VALIDATING);
 
   // Validate package content
   if (this.mediaPackage.metadata.indexes)
     self.fsm.transition();
   else validatePackage.call(this, function(error, metadata) {
     if (error)
-      self.setError(new TarPackageError(error.message, errors.VALIDATION_ERROR));
+      self.setError(new TarPackageError(error.message, ERRORS.VALIDATION));
     else {
       if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
 
-      openVeoAPI.util.merge(self.mediaPackage.metadata, metadata);
+      openVeoApi.util.merge(self.mediaPackage.metadata, metadata);
       self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
 
       if (self.mediaPackage.metadata.date)
@@ -426,7 +452,6 @@ TarPackage.prototype.validatePackage = function() {
  * This is a transition.
  *
  * @method saveTimecodes
- * @private
  */
 TarPackage.prototype.saveTimecodes = function() {
   var self = this;
@@ -434,13 +459,13 @@ TarPackage.prototype.saveTimecodes = function() {
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
   process.logger.debug('Save timecodes to ' + videoFinalDir);
-  this.videoModel.updateState(this.mediaPackage.id, VideoModel.SAVING_TIMECODES_STATE);
+  this.videoModel.updateState(this.mediaPackage.id, STATES.SAVING_TIMECODES);
 
   if (this.mediaPackage.metadata.indexes)
     self.fsm.transition();
   else saveTimecodes(path.join(extractDirectory, 'synchro.xml'), self, function(error) {
     if (error && self.mediaPackage.metadata['rich-media'])
-      self.setError(new TarPackageError(error.message, errors.SAVE_TIMECODE_ERROR));
+      self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
     else
       self.fsm.transition();
   });
@@ -450,8 +475,8 @@ TarPackage.prototype.saveTimecodes = function() {
 /**
  * Gets the media file path of the package.
  *
- * @return {String} System path of the media file
  * @method getMediaFilePath
+ * @return {String} System path of the media file
  */
 TarPackage.prototype.getMediaFilePath = function() {
   return path.join(this.publishConf.videoTmpDir,

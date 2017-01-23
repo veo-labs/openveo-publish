@@ -1,6 +1,6 @@
 /**
- * publish-models module includes all publish models.
+ * Publish models.
  *
- * @module publish-models
- * @main publish-models
+ * @module models
+ * @main models
  */

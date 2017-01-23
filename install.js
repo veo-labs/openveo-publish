@@ -1,13 +1,12 @@
 'use strict';
 
-// Module dependencies
 var readline = require('readline');
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
-var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
+var openVeoApi = require('@openveo/api');
+var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
 
 var exit = process.exit;
 
@@ -46,7 +45,7 @@ process.stdin.on('data', function(char) {
  * Creates conf directory if it does not exist.
  */
 function createConfDir(callback) {
-  openVeoAPI.fileSystem.mkdir(confDir, callback);
+  openVeoApi.fileSystem.mkdir(confDir, callback);
 }
 
 /**
@@ -54,7 +53,7 @@ function createConfDir(callback) {
  */
 function createVideoTmpDir(callback) {
   var conf = require(path.join(confDir, 'publishConf.json'));
-  openVeoAPI.fileSystem.mkdir(conf.videoTmpDir, callback);
+  openVeoApi.fileSystem.mkdir(conf.videoTmpDir, callback);
 }
 
 /**
@@ -72,7 +71,7 @@ function createHotFolder(callback) {
    */
   function createFunction(hotFolderPath) {
     return function(callback) {
-      openVeoAPI.fileSystem.mkdir(hotFolderPath, callback);
+      openVeoApi.fileSystem.mkdir(hotFolderPath, callback);
     };
   }
 

@@ -1,6 +1,6 @@
 /**
- * publish-packages module includes all packages types which can be published.
+ * All packages types which can be processed.
  *
- * @module publish-packages
- * @main publish-packages
+ * @module packages
+ * @main packages
  */

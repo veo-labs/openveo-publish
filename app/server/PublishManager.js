@@ -1,123 +1,150 @@
 'use strict';
 
 /**
- * Defines the PublishManager which handles all the process in
- * package publication. Package is copied, extracted, interpreted
- * and video is sent to the specified video provider.
- *
- * @example
- *     var openVeoAPI = require("@openveo/api");
- *     var PublishManager = process.requirePublish("app/server/PublishManager.js");
- *     var db = openVeoAPI.applicationStorage.getDatabase();
- *
- *     var publishManager = new PublishManager(db);
- *
- *     // Listen to errors dispatched by the publish manager
- *     publishManager.on("error", function(error){
- *       // Do something
- *     });
- *
- *     // Listen to complete publications dispatched by the publish manager
- *     publishManager.on("complete", function(mediaPackage){
- *       // Do something
- *     });
- *
- *     publishManager.publish({
- *       "type" : "vimeo", // The video platform to use
- *       "originalPackagePath" : "/tmp/video-package.tar" // Path of package to publish
- *     });
- *
- * @module publish-manager
+ * @module publish
  */
 
 var util = require('util');
 var events = require('events');
 var path = require('path');
 var shortid = require('shortid');
-var openVeoAPI = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
-var configDir = openVeoAPI.fileSystem.getConfDir();
-var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
-var errors = process.requirePublish('app/server/packages/errors.js');
-var maxConcurrentPublish = publishConf.maxConcurrentPublish || 3;
+var packageFactory = process.requirePublish('app/server/packages/packageFactory.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var PublishError = process.requirePublish('app/server/PublishError.js');
+
 var acceptedPackagesExtensions = ['tar', 'mp4'];
+var publishManager;
 
 /**
- * Defines a custom error with an error code.
+ * Fired when an error occurred while processing a package.
  *
- * @class PublishError
- * @constructor
- * @extends Error
- * @param {String} message The error message
- * @param {String} code The error code
+ * @event error
+ * @param {Error} The error
  */
-function PublishError(message, code) {
-  this.name = 'PublishError';
-  this.message = message || '';
-  this.code = code;
-}
-
-util.inherits(PublishError, Error);
 
 /**
- * Creates a PublishManager to retrieve, validate and publish
- * a package.
+ * Fired when a package process has succeed.
+ *
+ * @event complete
+ * @param {Object} The processed package
+ */
+
+/**
+ * Fired when a media in error restarts.
+ *
+ * @event retry
+ * @param {Object} The media
+ */
+
+/**
+ * Fired when a media stuck in "waiting for upload" state starts uploading.
+ *
+ * @event upload
+ * @param {Object} The media
+ */
+
+/**
+ * Defines the PublishManager which handles the media publication's process.
+ *
+ * Media publications are handled in parallel. Media publication's process can be
+ * different regarding the type of the media.
+ *
+ * @example
+ *     var coreApi = require('@openveo/api').api.getCoreApi();
+ *     var database = coreApi.getDatabase();
+ *     var PublishManager = process.requirePublish('app/server/PublishManager.js');
+ *     var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
+ *     var publishManager = new PublishManager(videoModel, 5);
+ *
+ *     // Listen publish manager's errors
+ *     publishManager.on('error', function(error) {
+ *       // Do something
+ *     });
+ *
+ *     // Listen to publish manager's end of processing for a media
+ *     publishManager.on('complete', function(mediaPackage){
+ *       // Do something
+ *     });
+ *
+ *     // Listen to publish manager's event informing that a media processing is retrying
+ *     publishManager.on('retry', function(mediaPackage) {
+ *       // Do something
+ *     });
+ *
+ *     // Listen to publish manager's event informing that a media, waiting for upload, starts uploading
+ *     publishManager.on('upload', function(mediaPackage) {
+ *       // Do something
+ *     });
+ *
+ *     publishManager.publish({
+ *       type: 'youtube', // The media platform to use for this media
+ *       originalPackagePath: '/home/openveo/medias/media-package.tar', // Path of the media package
+ *       originalFileName: 'media-package' // File name without extension
+ *     });
  *
  * @class PublishManager
  * @constructor
- * @param {Database} database A database to store information about
- * the package
- * PublishManager emits the following events :
- *  - Event *error* An error occured
- *    - **Error** The error
- *  - Event *complete* A package was successfully published
- *    - **Object** The published package
- *  - Event *retry* A package in error restarts
- *    - **Object** The package
- *  - Event *upload* A package stuck in "waiting for upload" state starts upload process
- *    - **Object** The package
+ * @param {VideoModel} videoModel The videoModel
+ * @param {Number} [maxConcurrentPackage=3] The maximum number of medias to treat in parallel
  */
-function PublishManager(database) {
-  openVeoAPI.applicationStorage.setDatabase(database);
+function PublishManager(videoModel, maxConcurrentPackage) {
+  if (publishManager)
+    throw new Error('PublishManager already instanciated, use get method instead');
 
-  /**
-   * Packages waiting to be processed.
-   *
-   * @property queue
-   * @type Array
-   */
-  this.queue = [];
+  Object.defineProperties(this, {
 
-  /**
-   * Packages being processed.
-   *
-   * @property pendingPackages
-   * @type Array
-   */
-  this.pendingPackages = [];
+    /**
+     * Medias waiting to be processed.
+     *
+     * @property queue
+     * @type Array
+     * @final
+     */
+    queue: {value: []},
 
-  /**
-   * Video model.
-   *
-   * @property videoModel
-   * @type VideoModel
-   */
-  this.videoModel = new VideoModel();
+    /**
+     * Medias being processed.
+     *
+     * @property pendingPackages
+     * @type Array
+     * @final
+     */
+    pendingPackages: {value: []},
+
+    /**
+     * Video model.
+     *
+     * @property videoModel
+     * @type VideoModel
+     * @final
+     */
+    videoModel: {value: videoModel},
+
+    /**
+     * Maximum number of medias to treat in parallel.
+     *
+     * @property maxConcurrentPackage
+     * @type Number
+     * @final
+     */
+    maxConcurrentPackage: {value: maxConcurrentPackage || 3}
+
+  });
 }
 
 util.inherits(PublishManager, events.EventEmitter);
 module.exports = PublishManager;
 
 /**
- * Removes a package from pending packages.
+ * Removes a media from pending medias.
  *
  * @method removeFromPending
  * @private
- * @param {Object} mediaPackage The package to remove
+ * @param {Object} mediaPackage The media package to remove
  */
 function removeFromPending(mediaPackage) {
-
   for (var i = 0; i < this.pendingPackages.length; i++) {
     if (this.pendingPackages[i]['id'] === mediaPackage.id) {
       this.pendingPackages.splice(i, 1);
@@ -135,23 +162,23 @@ function removeFromPending(mediaPackage) {
 }
 
 /**
- * Handles Package error event.
+ * Handles media error event.
  *
  * @method onError
  * @private
- * @param {Error} error The dispatched errors
- * @param {Object} mediaPackage The package on error
+ * @param {Error} error The error
+ * @param {Object} mediaPackage The media on error
  */
 function onError(error, mediaPackage) {
 
-  // Remove video from pending videos
+  // Remove media from pending medias
   removeFromPending.call(this, mediaPackage);
 
-  // Publish pending package from FIFO queue
+  // Publish pending media from FIFO queue
   if (this.queue.length)
     this.publish(this.queue.shift(0));
 
-  // Add package id to the error message
+  // Add media id to the error message
   if (error)
     error.message += ' (' + mediaPackage.id + ')';
 
@@ -159,7 +186,7 @@ function onError(error, mediaPackage) {
 }
 
 /**
- * Handles Package complete event.
+ * Handles media complete event.
  *
  * @method onComplete
  * @private
@@ -178,23 +205,23 @@ function onComplete(mediaPackage) {
 }
 
 /**
- * Creates a media package manager corresponding to the package type.
+ * Creates a media package manager corresponding to the media type.
  *
  * @method createMediaPackageManager
  * @private
- * @param {Object} mediaPackage The media package to manage
- * @return {Package} A Package manager
+ * @param {Object} mediaPackage The media to manage
+ * @return {Package} A media package manager
  */
 function createMediaPackageManager(mediaPackage) {
   var self = this;
-  var mediaPackageManager = Package.getPackage(mediaPackage.packageType, mediaPackage);
+  var mediaPackageManager = packageFactory.get(mediaPackage.packageType, mediaPackage);
 
-  // Handle errors from package manager
+  // Handle errors from media package manager
   mediaPackageManager.on('error', function(error) {
     onError.call(self, error, mediaPackage);
   });
 
-  // Handle complete events from package manager
+  // Handle complete events from media package manager
   mediaPackageManager.on('complete', function(completePackage) {
     onComplete.call(self, completePackage);
   });
@@ -203,12 +230,12 @@ function createMediaPackageManager(mediaPackage) {
 }
 
 /**
- * Adds packages to the list of pending packages.
+ * Adds media package to the list of pending packages.
  *
  * @method addPackage
  * @private
- * @param {Object} mediaPackage The package to add to pending packages
- * @return {Boolean} true if the package is successfully to pending packages
+ * @param {Object} mediaPackage The media package to add to pending packages
+ * @return {Boolean} true if the media package is successfully added to pending packages
  * false if it has been added to queue
  */
 function addPackage(mediaPackage) {
@@ -218,7 +245,7 @@ function addPackage(mediaPackage) {
   });
 
   // Too much pending packages
-  if (this.pendingPackages.length >= maxConcurrentPublish || idAllreadyPending.length) {
+  if (this.pendingPackages.length >= this.maxConcurrentPackage || idAllreadyPending.length) {
 
     // Add package to queue
     this.queue.push(mediaPackage);
@@ -237,11 +264,11 @@ function addPackage(mediaPackage) {
 }
 
 /**
- * Tests if package is a valid one depending on the given type.
+ * Tests if media package is a valid one depending on the given type.
  *
  * @method isValidPackageType
  * @private
- * @param {String} type The package type
+ * @param {String} type The media package type
  * @return {Boolean} true if the package is valid false otherwise
  */
 function isValidPackageType(type) {
@@ -249,19 +276,30 @@ function isValidPackageType(type) {
 }
 
 /**
- * Publishes the given package.
+ * Gets an instance of the PublishManager.
  *
- * Package must be one of the supported type.
+ * @method get
+ * @static
+ * @param {VideoModel} videoModel The videoModel
+ * @param {Number} [maxConcurrentPackage] The maximum number of medias to treat in parallel
+ * @return {PublishManager} The PublishManager singleton instance
+ */
+PublishManager.get = function(videoModel, maxConcurrentPackage) {
+  if (!publishManager)
+    publishManager = new PublishManager(videoModel);
+
+  return publishManager;
+};
+
+/**
+ * Publishes the given media package.
  *
- * @example
- *     // video package object example
- *     {
- *       "type": "vimeo", // Platform type
- *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
- *     }
+ * Media package must be of one of the supported type.
  *
  * @method publish
- * @param {Object} mediaPackage Package to publish
+ * @param {Object} mediaPackage Media to publish
+ * @param {String} mediaPackage.originalPackagePath Package absolute path
+ * @param {String} mediaPackage.packageType The package type
  */
 PublishManager.prototype.publish = function(mediaPackage) {
   var self = this;
@@ -272,7 +310,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
     // Generate a package id
     mediaPackage.id = shortid.generate();
 
-    // Find out package type depending on package extension
+    // Find out media type depending on media extension
     mediaPackage.packageType = pathDescriptor.ext.slice(1);
 
     // Use file name as media title
@@ -280,36 +318,36 @@ PublishManager.prototype.publish = function(mediaPackage) {
 
     // Validate extension
     if (!isValidPackageType(mediaPackage.packageType))
-      return this.emit('error', new PublishError('Package type is not valid (' + mediaPackage.packageType + ')',
-                                                 errors.INVALID_PACKAGE_TYPE_ERROR));
+      return this.emit('error', new PublishError('Media package type is not valid (' + mediaPackage.packageType + ')',
+                                                 ERRORS.INVALID_PACKAGE_TYPE));
 
     this.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
       if (error) {
         self.emit('error', new PublishError('Getting medias with original package path "' +
                                             mediaPackage.originalPackagePath + '" failed with message : ' +
                                             error.message,
-                                                 errors.UNKNOWN_ERROR));
+                                                 ERRORS.UNKNOWN));
       } else if (!videos || !videos.length) {
 
-        // Package does not exist
+        // Media package does not exist
         // Publish it
         var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        mediaPackageManager.init(Package.PACKAGE_SUBMITTED_STATE, Package.INIT_TRANSITION);
+        mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
 
         // Package can be added to pending packages
         if (addPackage.call(self, mediaPackage))
-          mediaPackageManager.executeTransition(Package.INIT_TRANSITION);
+          mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
 
       }
 
     });
 
   } else
-    this.emit('error', new PublishError('mediaPackage argument must be an Object', errors.UNKNOWN_ERROR));
+    this.emit('error', new PublishError('mediaPackage argument must be an Object', ERRORS.UNKNOWN));
 };
 
 /**
- * Retries publishing a package which is on error.
+ * Retries publishing a media package which is on error.
  *
  * @method retry
  * @param {String} packageId The id of the package on error
@@ -323,18 +361,18 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
     this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
       if (error) {
         self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
-                                    errors.UNKNOWN_ERROR));
+                                    ERRORS.UNKNOWN));
       } else if (!mediaPackage) {
 
         // Package does not exist
         self.emit('error', new PublishError('Cannot retry package ' + packageId + ' (not found)',
-                                            errors.PACKAGE_NOT_FOUND_ERROR));
+                                            ERRORS.PACKAGE_NOT_FOUND));
 
-      } else if (mediaPackage.state === VideoModel.ERROR_STATE || forceRetry) {
+      } else if (mediaPackage.state === STATES.ERROR || forceRetry) {
 
         // Got package information
         // Package is indeed in error
-        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE, function() {
+        self.videoModel.updateState(mediaPackage.id, STATES.PENDING, function() {
 
           // Retry officially started
           self.emit('retry', mediaPackage);
@@ -358,10 +396,10 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
  * Retries publishing all packages in a non stable state.
  *
  * Stable states are :
- * - VideoModel.ERROR_STATE
- * - VideoModel.WAITING_FOR_UPLOAD_STATE
- * - VideoModel.READY_STATE
- * - VideoModel.PUBLISHED_STATE
+ * - STATES.ERROR
+ * - STATES.WAITING_FOR_UPLOAD
+ * - STATES.READY
+ * - STATES.PUBLISHED
  *
  * @method retryAll
  */
@@ -372,17 +410,17 @@ PublishManager.prototype.retryAll = function() {
   this.videoModel.get({
     state: {
       $nin: [
-        VideoModel.ERROR_STATE,
-        VideoModel.WAITING_FOR_UPLOAD_STATE,
-        VideoModel.READY_STATE,
-        VideoModel.PUBLISHED_STATE
+        STATES.ERROR,
+        STATES.WAITING_FOR_UPLOAD,
+        STATES.READY,
+        STATES.PUBLISHED
       ]
     }
   }, function(error, mediaPackages) {
     if (error)
       return self.emit('error', new PublishError('Getting packages in non stable state failed with message : ' +
                                                  error.message,
-                                            errors.UNKNOWN_ERROR));
+                                            ERRORS.UNKNOWN));
 
     mediaPackages.forEach(function(mediaPackage) {
       self.retry(mediaPackage.id, true);
@@ -393,7 +431,7 @@ PublishManager.prototype.retryAll = function() {
 };
 
 /**
- * Uploads a media blocked in waiting to upload state.
+ * Uploads a media blocked in "waiting to upload" state.
  *
  * @method upload
  * @param {String} packageId The id of the package waiting to be uploaded
@@ -407,17 +445,17 @@ PublishManager.prototype.upload = function(packageId, platform) {
     this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
       if (error) {
         self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
-                                            errors.UNKNOWN_ERROR));
+                                            ERRORS.UNKNOWN));
       } else if (!mediaPackage) {
 
         // Package does not exist
         self.emit('error', new PublishError('Cannot upload package ' + packageId + ' (not found)',
-                                            errors.PACKAGE_NOT_FOUND_ERROR));
+                                            ERRORS.PACKAGE_NOT_FOUND));
 
-      } else if (mediaPackage.state === VideoModel.WAITING_FOR_UPLOAD_STATE) {
+      } else if (mediaPackage.state === STATES.WAITING_FOR_UPLOAD) {
 
         // Package is indeed waiting for upload
-        self.videoModel.updateState(mediaPackage.id, VideoModel.PENDING_STATE, function() {
+        self.videoModel.updateState(mediaPackage.id, STATES.PENDING, function() {
 
           // Upload officially started
           self.emit('upload', mediaPackage);

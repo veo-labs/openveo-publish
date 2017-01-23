@@ -27,9 +27,8 @@ describe('PublishApp', function() {
     $httpBackend.when('POST', /.*/).respond(200, '');
   });
 
-  it('Should register routes to medias, watcher, media, properties and categories', function() {
+  it('Should register routes to medias, media, properties and categories', function() {
     assert.isDefined($route.routes['/publish/medias-list']);
-    assert.isDefined($route.routes['/publish/watcher']);
     assert.isDefined($route.routes['/publish/media/:mediaId']);
     assert.isDefined($route.routes['/publish/properties-list']);
     assert.isDefined($route.routes['/publish/categories-list']);
@@ -44,15 +43,6 @@ describe('PublishApp', function() {
     $location.path('/publish/medias-list');
     $httpBackend.flush();
     assert.equal($location.path(), '/publish/medias-list');
-  });
-
-  it('Should be able to route to watcher page after retrieving the watcher status', function() {
-    $httpBackend.expectGET('/be/publish/watcherStatus');
-    $httpBackend.expectGET('/publish/be/views/watcher.html');
-
-    $location.path('/publish/watcher');
-    $httpBackend.flush();
-    assert.equal($location.path(), '/publish/watcher');
   });
 
   it('Should be able to route to properties page', function() {

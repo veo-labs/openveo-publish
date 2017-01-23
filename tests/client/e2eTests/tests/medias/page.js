@@ -2,10 +2,14 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
@@ -26,9 +30,12 @@ describe('Media page', function() {
   var mediaHelper;
 
   before(function() {
-    var videoModel = new VideoModel();
+    var coreApi = openVeoApi.api.getCoreApi();
+    var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
+    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
     categoryHelper = new CategoryHelper(new CategoryModel());
-    propertyHelper = new PropertyHelper(new PropertyModel());
+    propertyHelper = new PropertyHelper(new PropertyModel(propertyProvider, videoProvider));
     mediaHelper = new MediaHelper(videoModel);
     page = new MediaPage(videoModel);
     tableAssert = new TableAssert(page, mediaHelper);
@@ -50,18 +57,18 @@ describe('Media page', function() {
         properties.push({
           name: propertyNames[i] + ' text',
           description: propertyNames[i] + ' text description',
-          type: PropertyModel.TYPE_TEXT
+          type: PropertyModel.TYPES.TEXT
         });
         properties.push({
           name: propertyNames[i] + ' list',
           description: propertyNames[i] + ' list description',
-          type: PropertyModel.TYPE_LIST,
+          type: PropertyModel.TYPES.LIST,
           values: ['tag1', 'tag2']
         });
         properties.push({
           name: propertyNames[i] + ' boolean',
           description: propertyNames[i] + ' boolean description',
-          type: PropertyModel.TYPE_BOOLEAN
+          type: PropertyModel.TYPES.BOOLEAN
         });
       }
 
@@ -182,7 +189,7 @@ describe('Media page', function() {
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Test remove',
         properties: getProperties()
       }
@@ -213,18 +220,18 @@ describe('Media page', function() {
 
     // Set custom properties values
     for (var i = 0; i < properties.length; i++) {
-      if (properties[i].type === PropertyModel.TYPE_TEXT)
+      if (properties[i].type === PropertyModel.TYPES.TEXT)
         propertiesById[properties[i].id] = 'test edition ' + properties[i].name + ' value';
-      else if (properties[i].type === PropertyModel.TYPE_LIST)
+      else if (properties[i].type === PropertyModel.TYPES.LIST)
         propertiesById[properties[i].id] = properties[i].values[0];
-      else if (properties[i].type === PropertyModel.TYPE_BOOLEAN)
+      else if (properties[i].type === PropertyModel.TYPES.BOOLEAN)
         propertiesById[properties[i].id] = true;
     }
 
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: name,
         properties: getProperties()
       }
@@ -283,7 +290,7 @@ describe('Media page', function() {
   });
 
   it('should be able to see, publish, access chapters or remove a media in ready state', function() {
-    checkStateActions(VideoModel.READY_STATE, [
+    checkStateActions(STATES.READY, [
       page.translations.CORE.UI.VIEW,
       page.translations.PUBLISH.MEDIAS.PUBLISH,
       page.translations.PUBLISH.MEDIAS.CHAPTER_EDIT,
@@ -295,7 +302,7 @@ describe('Media page', function() {
   });
 
   it('should be able to see, share, access chapters or remove a media in published state', function() {
-    checkStateActions(VideoModel.PUBLISHED_STATE, [
+    checkStateActions(STATES.PUBLISHED, [
       page.translations.CORE.UI.VIEW,
       page.translations.PUBLISH.MEDIAS.UNPUBLISH,
       page.translations.PUBLISH.MEDIAS.CHAPTER_EDIT,
@@ -307,7 +314,7 @@ describe('Media page', function() {
   });
 
   it('should be able to remove or upload medias in waiting for upload state', function() {
-    checkStateActions(VideoModel.WAITING_FOR_UPLOAD_STATE, [
+    checkStateActions(STATES.WAITING_FOR_UPLOAD, [
       page.translations.PUBLISH.MEDIAS.UPLOAD_VIMEO,
       page.translations.PUBLISH.MEDIAS.UPLOAD_YOUTUBE,
       page.translations.CORE.UI.REMOVE
@@ -317,7 +324,7 @@ describe('Media page', function() {
   });
 
   it('should be able to remove or retry a media in error state', function() {
-    checkStateActions(VideoModel.ERROR_STATE, [
+    checkStateActions(STATES.ERROR, [
       page.translations.PUBLISH.MEDIAS.RETRY,
       page.translations.CORE.UI.REMOVE
     ], [
@@ -326,17 +333,17 @@ describe('Media page', function() {
   });
 
   it('should not be able to perform any action if media is in a pending state', function() {
-    checkStateActions(VideoModel.PENDING_STATE, [], []);
-    checkStateActions(VideoModel.COPYING_STATE, [], []);
-    checkStateActions(VideoModel.EXTRACTING_STATE, [], []);
-    checkStateActions(VideoModel.VALIDATING_STATE, [], []);
-    checkStateActions(VideoModel.PREPARING_STATE, [], []);
-    checkStateActions(VideoModel.UPLOADING_STATE, [], []);
-    checkStateActions(VideoModel.CONFIGURING_STATE, [], []);
-    checkStateActions(VideoModel.SAVING_TIMECODES_STATE, [], []);
-    checkStateActions(VideoModel.COPYING_IMAGES_STATE, [], []);
-    checkStateActions(VideoModel.GENERATE_THUMB_STATE, [], []);
-    checkStateActions(VideoModel.GET_METADATA_STATE, [], []);
+    checkStateActions(STATES.PENDING, [], []);
+    checkStateActions(STATES.COPYING, [], []);
+    checkStateActions(STATES.EXTRACTING, [], []);
+    checkStateActions(STATES.VALIDATING, [], []);
+    checkStateActions(STATES.PREPARING, [], []);
+    checkStateActions(STATES.UPLOADING, [], []);
+    checkStateActions(STATES.CONFIGURING, [], []);
+    checkStateActions(STATES.SAVING_TIMECODES, [], []);
+    checkStateActions(STATES.COPYING_IMAGES, [], []);
+    checkStateActions(STATES.GENERATE_THUMB, [], []);
+    checkStateActions(STATES.GET_METADATA, [], []);
   });
 
   describe('Search', function() {
@@ -346,13 +353,13 @@ describe('Media page', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 0',
           properties: getProperties()
         },
         {
           id: '1',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 1',
           properties: getProperties()
         }
@@ -363,14 +370,14 @@ describe('Media page', function() {
       page.refresh();
 
       // Build search query
-      var search = {name: linesToAdd[0].title};
+      var search = {query: linesToAdd[0].title};
 
       // Get all line values
       page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN).then(function(values) {
 
         // Predict values
         expectedValues = values.filter(function(element) {
-          return element === search.name;
+          return element === search.query;
         });
 
       }).then(function() {
@@ -378,12 +385,11 @@ describe('Media page', function() {
       });
     });
 
-    it('should be able to search by partial name', function() {
-      var expectedValues;
+    it('should not be able to search by partial name', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 0',
           properties: getProperties()
         }
@@ -394,19 +400,10 @@ describe('Media page', function() {
       page.refresh();
 
       // Build search query
-      var search = {name: linesToAdd[0].title.slice(4, 2)};
+      var search = {query: linesToAdd[0].title.slice(0, 2)};
 
-      // Get all line values
-      page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN).then(function(values) {
-
-        // Predict values
-        expectedValues = values.filter(function(element) {
-          return new RegExp(search.name).test(element);
-        });
-
-      }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
-      });
+      page.search(search);
+      assert.isRejected(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
     });
 
     it('should be able to search by exact description', function() {
@@ -414,14 +411,14 @@ describe('Media page', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 0',
           description: 'Test search description 0',
           properties: getProperties()
         },
         {
           id: '1',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 1',
           description: 'Test search description 1',
           properties: getProperties()
@@ -433,49 +430,14 @@ describe('Media page', function() {
       page.refresh();
 
       // Build search query
-      var search = {description: linesToAdd[0].description};
+      var search = {query: linesToAdd[0].description};
 
       // Get all line details
       page.getAllLineDetails().then(function(datas) {
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return data.fields.description === search.description;
-        });
-
-        for (var i = 0; i < filteredDatas.length; i++)
-          expectedValues.push(filteredDatas[i].cells[1]);
-
-      }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
-      });
-    });
-
-    it('should be able to search by description', function() {
-      var expectedValues = [];
-      var linesToAdd = [
-        {
-          id: '0',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search 0',
-          description: 'Test search description 0',
-          properties: getProperties()
-        }
-      ];
-
-      // Add lines
-      mediaHelper.addEntities(linesToAdd);
-      page.refresh();
-
-      // Build search query
-      var search = {description: linesToAdd[0].description};
-
-      // Get all line details
-      page.getAllLineDetails().then(function(datas) {
-
-        // Predict values
-        var filteredDatas = datas.filter(function(data) {
-          return new RegExp(search.description).test(data.fields.description);
+          return data.fields.description === search.query;
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -491,14 +453,14 @@ describe('Media page', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 0',
           date: new Date('2016/01/20').getTime(),
           properties: getProperties()
         },
         {
           id: '1',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 1',
           date: new Date('2015/01/20').getTime(),
           properties: getProperties()
@@ -515,10 +477,11 @@ describe('Media page', function() {
 
       // Get all line details
       page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp(search.date);
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return new RegExp(search.date).test(data.cells[3]);
+          return regexp.test(data.cells[3]);
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -535,14 +498,14 @@ describe('Media page', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 0',
           properties: getProperties(),
           category: categories[0].id
         },
         {
           id: '1',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search 1',
           properties: getProperties(),
           category: categories[1].id
@@ -558,10 +521,11 @@ describe('Media page', function() {
 
       // Get all line details
       page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp(categories[0].title);
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return new RegExp(categories[0].title).test(data.fields.category);
+          return regexp.test(data.fields.category);
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -572,54 +536,46 @@ describe('Media page', function() {
       });
     });
 
-    it('should be able to search by name, description, date and category at the same time', function() {
+    it('should be able to search by name in case insensitive', function() {
+      var expectedValues;
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Test search',
+          properties: getProperties()
+        }
+      ];
+
+      // Add lines
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
+
+      var search = {query: linesToAdd[0].title.toUpperCase()};
+
+      // Get all line values
+      page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN).then(function(values) {
+        var regexp = new RegExp(search.query, 'i');
+
+        // Predict values
+        expectedValues = values.filter(function(element) {
+          return regexp.test(element);
+        });
+
+      }).then(function() {
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
+      });
+    });
+
+    it('should be able to search by description in case insensitive', function() {
       var expectedValues = [];
-      var categories = page.getCategories();
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search',
           description: 'Test search description',
-          date: new Date('2016/01/20').getTime(),
-          properties: getProperties(),
-          category: categories[0].id
-        },
-        {
-          id: '1',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search',
-          description: 'Test search description',
-          date: new Date('2016/01/20').getTime(),
-          properties: getProperties(),
-          category: categories[1].id
-        },
-        {
-          id: '2',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search',
-          description: 'Test search description',
-          date: new Date('2015/11/20').getTime(),
-          properties: getProperties(),
-          category: categories[0].id
-        },
-        {
-          id: '3',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search',
-          description: 'Different',
-          date: new Date('2016/01/20').getTime(),
-          properties: getProperties(),
-          category: categories[0].id
-        },
-        {
-          id: '4',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Different',
-          description: 'Test search description',
-          date: new Date('2016/01/20').getTime(),
-          properties: getProperties(),
-          category: categories[0].id
+          properties: getProperties()
         }
       ];
 
@@ -627,23 +583,15 @@ describe('Media page', function() {
       mediaHelper.addEntities(linesToAdd);
       page.refresh();
 
-      // Build search query
-      var search = {
-        name: linesToAdd[0].title,
-        description: linesToAdd[0].description,
-        date: '20/01/2016',
-        category: categories[0].id
-      };
+      var search = {query: linesToAdd[0].description.toUpperCase()};
 
-      // Get all line details
-      page.getAllLineDetails().then(function(datas) {
+      // Get all line values before search
+      return page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp(search.query, 'i');
 
         // Predict values
         var filteredDatas = datas.filter(function(data) {
-          return (search.name === data.cells[1]) &&
-            (search.description === data.fields.description) &&
-            (search.date === data.cells[3]) &&
-            (categories[0].title === data.fields.category);
+          return regexp.test(data.fields.description);
         });
 
         for (var i = 0; i < filteredDatas.length; i++)
@@ -654,12 +602,21 @@ describe('Media page', function() {
       });
     });
 
-    it('should be able to search by name in case sensitive', function() {
+    it('should be able to search in name and description', function() {
+      var expectedValues = [];
       var linesToAdd = [
         {
-          id: '0',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search',
+          id: '42',
+          state: STATES.PUBLISHED,
+          title: 'first name',
+          description: 'first name description',
+          properties: getProperties()
+        },
+        {
+          id: '43',
+          state: STATES.PUBLISHED,
+          title: 'second name',
+          description: 'second description after first',
           properties: getProperties()
         }
       ];
@@ -668,36 +625,30 @@ describe('Media page', function() {
       mediaHelper.addEntities(linesToAdd);
       page.refresh();
 
-      var search = {name: linesToAdd[0].title.toUpperCase()};
-      page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
-    });
+      var search = {query: 'first'};
 
-    it('should be able to search by description in case sensitive', function() {
-      var linesToAdd = [
-        {
-          id: '0',
-          state: VideoModel.PUBLISHED_STATE,
-          title: 'Test search',
-          description: 'Test search description',
-          properties: getProperties()
-        }
-      ];
+      // Get all line values before search
+      return page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp('\\b' + search.query + '\\b');
 
-      // Add lines
-      mediaHelper.addEntities(linesToAdd);
-      page.refresh();
+        // Predict values
+        var filteredDatas = datas.filter(function(data) {
+          return regexp.test(data.fields.description) || regexp.test(data.fields.title);
+        });
 
-      var search = {name: linesToAdd[0].description.toUpperCase()};
-      page.search(search);
-      assert.isRejected(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));
+        for (var i = 0; i < filteredDatas.length; i++)
+          expectedValues.push(filteredDatas[i].cells[1]);
+
+      }).then(function() {
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
+      });
     });
 
     it('should be able to clear search', function() {
       var linesToAdd = [
         {
           id: '0',
-          state: VideoModel.PUBLISHED_STATE,
+          state: STATES.PUBLISHED,
           title: 'Test search',
           properties: getProperties()
         }
@@ -707,7 +658,7 @@ describe('Media page', function() {
       mediaHelper.addEntities(linesToAdd);
       page.refresh();
 
-      var search = {name: linesToAdd[0].title.toUpperCase()};
+      var search = {query: linesToAdd[0].title.toUpperCase()};
       page.search(search);
       page.clearSearch();
       assert.isFulfilled(page.getLineValues(page.translations.PUBLISH.MEDIAS.NAME_COLUMN));

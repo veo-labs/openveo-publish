@@ -94,18 +94,14 @@
     scopeDataTable.entityType = entityType;
     scopeDataTable.filterBy = [
       {
-        key: 'name',
+        key: 'query',
         value: '',
-        label: $filter('translate')('PUBLISH.PROPERTIES.TITLE_FILTER')
-      },
-      {
-        key: 'description',
-        value: '',
-        label: $filter('translate')('PUBLISH.PROPERTIES.DESCRIPTION_FILTER')
+        label: $filter('translate')('PUBLISH.PROPERTIES.QUERY_FILTER')
       },
       {
         key: 'type',
         type: 'select',
+        param: 'types',
         value: '',
         label: $filter('translate')('PUBLISH.PROPERTIES.TYPE_FILTER'),
         options: filterTypeOptions

@@ -1,52 +1,58 @@
 'use strict';
 
 /**
- * @module publish-providers
+ * @module providers
  */
 
-// Module dependencies
 var path = require('path');
 var util = require('util');
 var async = require('async');
 var FTPS = require('ftps');
 var shortid = require('shortid');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
 
 /**
- * Defines a WowzaProvider class to interact with wowza platform
- * (https://wowza.com/).
- *
- * @example
- *     // providerConf example
- *     {
- *       "clientId" : "****",
- *       "clientSecret" : "****",
- *       "accessToken" : "****"
- *     }
+ * Defines a WowzaProvider class to interact with [wowza platform](https://wowza.com/).
  *
  * @class WowzaProvider
- * @constructor
  * @extends VideoPlatformProvider
+ * @constructor
  * @param {Object} providerConf A wowza configuration object
+ * @param {String} providerConf.host Server host
+ * @param {String} providerConf.user Wowza user
+ * @param {String} providerConf.pwd Wowza user password
+ * @param {String} [providerConf.protocol=ftp] Server protocol (ftp, frtp, sftp or ftps), protocol is added on
+ * beginning of host, ex : sftp://domain.com in this case
+ * @param {Number} [providerConf.port] Server port added to the end of the host, ex: sftp://domain.com:22 in this case
  */
 function WowzaProvider(providerConf) {
-  VideoPlatformProvider.call(this, providerConf);
+  WowzaProvider.super_.call(this, providerConf);
 
-  this.wowzaConf = providerConf;
+  Object.defineProperties(this, {
 
-  this.ftps = new FTPS({
-    host: providerConf.host, // required
-    username: providerConf.user, // required
-    password: providerConf.pwd, // required
-    protocol: providerConf.protocol, // optional, values : 'ftp', 'sftp', 'ftps',... default is 'ftp'
-    // protocol is added on beginning of host, ex : sftp://domain.com in this case
-    port: providerConf.port, // optional
-    // port is added to the end of the host, ex: sftp://domain.com:22 in this case
-    escape: true, // optional, used for escaping shell characters (space, $, etc.), default: true
-    retries: 2, // Optional, defaults to 1 (1 = no retries, 0 = unlimited retries)
-    timeout: 10,
-    requiresPassword: true, // Optional, defaults to true
-    autoConfirm: false // Optional, is used to auto confirm ssl questions on sftp or fish protocols, defaults to false
+    ftps: {
+      value: new FTPS({
+        host: this.conf.host,
+        username: this.conf.user,
+        password: this.conf.pwd,
+        protocol: this.conf.protocol,
+        port: this.conf.port,
+
+        // optional, used for escaping shell characters (space, $, etc.), default: true
+        escape: true,
+
+        // Optional, defaults to 1 (1 = no retries, 0 = unlimited retries)
+        retries: 2,
+        timeout: 10,
+
+        // Optional, defaults to true
+        requiresPassword: true,
+
+        // Optional, is used to auto confirm ssl questions on sftp or fish protocols, defaults to false
+        autoConfirm: false
+      })
+    }
+
   });
 }
 
@@ -78,7 +84,7 @@ WowzaProvider.prototype.upload = function(videoFilePath, callback) {
     // Checks user quota
     function(callback) {
       var tmpId = shortid.generate();
-      self.ftps.put(videoFilePath, self.wowzaConf.vodFilePath + tmpId + path.extname(videoFilePath))
+      self.ftps.put(videoFilePath, self.conf.vodFilePath + tmpId + path.extname(videoFilePath))
               .exec(function(err, res) {
 
                 // err will be null (to respect async convention)
@@ -134,7 +140,7 @@ WowzaProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
   var infos = {sources: [], available: true};
   mediaIds.forEach(function(mediaId) {
     var info = {};
-    var basePath = self.wowzaConf.streamPath + '/' + mediaId;
+    var basePath = self.conf.streamPath + '/' + mediaId;
     info.adaptive = [
       {
         mimeType: 'application/dash+xml',
@@ -156,7 +162,7 @@ WowzaProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
 };
 
 /**
- * Remove a video from the wowza platform.
+ * Removes a video from the wowza platform.
  *
  * @method remove
  * @async
@@ -172,17 +178,17 @@ WowzaProvider.prototype.remove = function(mediaIds, callback) {
   }
   var self = this;
   var series = [];
-  var videoFinalPath = path.normalize(self.wowzaConf.vodFilePath);
+  var videoFinalPath = path.normalize(self.conf.vodFilePath);
 
   mediaIds.forEach(function(mediaId) {
     series.push(function(callback) {
       self.ftps.rm(videoFinalPath + mediaId + '.mp4').exec(function(error, res) {
         if (error || res.error) {
-          process.logger.warn(error.message, {
+          process.logger.warn((error && error.message) || res.error, {
             action: 'RemoveVideo',
             path: videoFinalPath
           });
-          callback(error || res.error);
+          callback(error || new Error(res.error));
         } else {
           callback(null);
         }

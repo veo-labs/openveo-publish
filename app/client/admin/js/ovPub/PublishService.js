@@ -3,7 +3,7 @@
 (function(app) {
 
   /**
-   * Defines a publish service to manage medias, watcher, categories and properties.
+   * Defines a publish service to manage medias, categories and properties.
    *
    * @module ov.publish
    * @class publishService
@@ -53,36 +53,6 @@
     function unpublishMedia(id) {
       entityService.deleteCache('videos', publishName);
       return $http.post(basePath + 'publish/unpublishVideo/' + id);
-    }
-
-    /**
-     * Gets watcher status.
-     *
-     * @return {Promise} The HTTP promise
-     * @method getWatcherStatus
-     */
-    function getWatcherStatus() {
-      return $http.get(basePath + 'publish/watcherStatus');
-    }
-
-    /**
-     * Starts the watcher.
-     *
-     * @return {Promise} The HTTP promise
-     * @method startWatcher
-     */
-    function startWatcher() {
-      return $http.post(basePath + 'publish/startWatcher');
-    }
-
-    /**
-     * Stops the watcher.
-     *
-     * @return {Promise} The HTTP promise
-     * @method stopWatcher
-     */
-    function stopWatcher() {
-      return $http.post(basePath + 'publish/stopWatcher');
     }
 
     /**
@@ -308,9 +278,6 @@
       getCategoriesByKey: getCategoriesByKey,
       loadPlatforms: loadPlatforms,
       getPlatforms: getPlatforms,
-      getWatcherStatus: getWatcherStatus,
-      startWatcher: startWatcher,
-      stopWatcher: stopWatcher,
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
       saveUploadConfig: saveUploadConfig,

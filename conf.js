@@ -1,28 +1,27 @@
 'use strict';
 
 module.exports = {
-  routes: {
-    public: {
-      'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
-      'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
-    },
-    private: {
-      'get /watcherStatus': 'app/server/controllers/WatcherController.getStatusAction',
-      'post /stopWatcher': 'app/server/controllers/WatcherController.stopAction',
-      'post /startWatcher': 'app/server/controllers/WatcherController.startAction',
-      'post /retryVideo/:ids': 'app/server/controllers/WatcherController.retryVideoAction',
-      'post /startUpload/:ids/:platform': 'app/server/controllers/WatcherController.startUploadAction',
-      'post /publishVideo/:id': 'app/server/controllers/VideoController.publishVideoAction',
-      'post /unpublishVideo/:id': 'app/server/controllers/VideoController.unpublishVideoAction',
-      'get /getPlatforms': 'app/server/controllers/VideoController.getPlatformsAction',
-      'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
-      'get /configuration/googleOAuthAssociation':
-      'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
-      'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
-    },
-    ws: {
-      'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
-      'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction'
+  http: {
+    routes: {
+      public: {
+        'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
+        'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
+      },
+      private: {
+        'post /retryVideo/:ids': 'app/server/controllers/VideoController.retryVideosAction',
+        'post /startUpload/:ids/:platform': 'app/server/controllers/VideoController.startUploadAction',
+        'post /publishVideo/:ids': 'app/server/controllers/VideoController.publishVideosAction',
+        'post /unpublishVideo/:ids': 'app/server/controllers/VideoController.unpublishVideosAction',
+        'get /getPlatforms': 'app/server/controllers/VideoController.getPlatformsAction',
+        'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
+        'get /configuration/googleOAuthAssociation':
+        'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
+        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
+      },
+      ws: {
+        'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
+        'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction'
+      }
     }
   },
   entities: {
@@ -51,19 +50,6 @@ module.exports = {
     {
       id: 'publish-access-categories-page',
       name: 'PUBLISH.PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME'
-    },
-    {
-      id: 'publish-access-watcher-page',
-      name: 'PUBLISH.PERMISSIONS.ACCESS_WATCHER_PAGE_NAME'
-    },
-    {
-      id: 'publish-manage-watcher',
-      name: 'PUBLISH.PERMISSIONS.MANAGE_WATCHER_NAME',
-      description: 'PUBLISH.PERMISSIONS.MANAGE_WATCHER_DESCRIPTION',
-      paths: [
-        'get /publish/stopWatcher*',
-        'get /publish/startWatcher*'
-      ]
     },
     {
       id: 'publish-access-conf-page',
@@ -133,11 +119,6 @@ module.exports = {
             permission: 'publish-access-properties-page'
           },
           {
-            label: 'PUBLISH.MENU.WATCHER',
-            path: 'publish/watcher',
-            permission: 'publish-access-watcher-page'
-          },
-          {
             label: 'PUBLISH.MENU.CONFIGURATION',
             path: 'publish/configuration',
             permission: 'publish-access-conf-page'
@@ -166,7 +147,6 @@ module.exports = {
       dev: [
         '/publish/ovPub/PublishApp.js',
         '/publish/ovPub/MediaController.js',
-        '/publish/ovPub/WatcherController.js',
         '/publish/ovPub/PropertiesController.js',
         '/publish/ovPub/CategoriesController.js',
         '/publish/ovPub/ChapterController.js',

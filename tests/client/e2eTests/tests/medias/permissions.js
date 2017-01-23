@@ -2,8 +2,12 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var openVeoApi = require('@openveo/api');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -12,11 +16,14 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Media page', function() {
+  var coreApi = openVeoApi.api.getCoreApi();
   var page, mediaHelper;
 
   // Prepare page
   before(function() {
-    var videoModel = new VideoModel();
+    var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
+    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
     mediaHelper = new MediaHelper(videoModel);
     page = new MediaPage(videoModel);
   });
@@ -49,8 +56,10 @@ describe('Media page', function() {
     var mediaHelperWithUser;
 
     before(function() {
+      var videoProvider = new VideoProvider(coreApi.getDatabase());
+      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
       var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
-      var videoModelWithUser = new VideoModel(owner);
+      var videoModelWithUser = new VideoModel(owner, videoProvider, propertyProvider);
       mediaHelperWithUser = new MediaHelper(videoModelWithUser);
     });
 
@@ -58,14 +67,14 @@ describe('Media page', function() {
     beforeEach(function() {
       anonymousLineToAdd = {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Media 1',
         description: 'Media 1 description'
       };
 
       ownerLineToAdd = {
         id: '1',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Media 2',
         description: 'Media 2 description',
         groups: ['publishGroup1']

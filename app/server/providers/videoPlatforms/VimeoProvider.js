@@ -1,56 +1,57 @@
 'use strict';
 
 /**
- * @module publish-providers
+ * @module providers
  */
 
-// Module dependencies
 var path = require('path');
 var util = require('util');
 var fs = require('fs');
 var vimeoAPI = require('vimeo');
 var async = require('async');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/VideoPlatformProvider.js');
+var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
 
 /**
- * Defines a VimeoProvider class to interact with vimeo platform
- * (https://vimeo.com/).
- *
- * @example
- *     // providerConf example
- *     {
- *       "clientId" : "****",
- *       "clientSecret" : "****",
- *       "accessToken" : "****"
- *     }
+ * Defines a VimeoProvider class to interact with [vimeo platform](https://vimeo.com/).
  *
  * @class VimeoProvider
- * @constructor
  * @extends VideoPlatformProvider
+ * @constructor
  * @param {Object} providerConf A vimeo configuration object
+ * @param {String} providerConf.clientId Vimeo client id
+ * @param {String} providerConf.clientSecret Vimeo client secret
+ * @param {String} providerConf.accessToken Vimeo client access token
  */
 function VimeoProvider(providerConf) {
-  VideoPlatformProvider.call(this, providerConf);
+  VimeoProvider.super_.call(this, providerConf);
 
-  /**
-   * Vimeo client library.
-   *
-   * @property vimeo
-   * @type Vimeo
-   */
-  this.vimeo = new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken);
+  Object.defineProperties(this, {
 
-  /**
-   * List of accepted video qualities.
-   *
-   * @property qualitiesMap
-   * @type Object
-   */
-  this.qualitiesMap = {
-    sd: VideoPlatformProvider.SD_QUALITY,
-    mobile: VideoPlatformProvider.MOBILE_QUALITY,
-    hd: VideoPlatformProvider.HD_QUALITY
-  };
+    /**
+     * Vimeo client library.
+     *
+     * @property vimeo
+     * @type Vimeo
+     * @final
+     */
+    vimeo: {value: new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken)},
+
+    /**
+     * List of accepted video qualities.
+     *
+     * @property qualitiesMap
+     * @type Object
+     * @final
+     */
+    qualitiesMap: {
+      value: {
+        sd: VideoPlatformProvider.QUALITIES.SD,
+        mobile: VideoPlatformProvider.QUALITIES.MOBILE,
+        hd: VideoPlatformProvider.QUALITIES.HD
+      }
+    }
+
+  });
 }
 
 module.exports = VimeoProvider;

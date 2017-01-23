@@ -1,26 +1,26 @@
 'use strict';
 
 /**
- * @module publish-providers
+ * @module providers
  */
 
 var util = require('util');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 
 /**
- * Defines a PropertyProvider class to get and save custom properties.
+ * Defines a PropertyProvider to get and save custom properties.
  *
  * @class PropertyProvider
- * @constructor
  * @extends EntityProvider
- * @param Database database The database to interact with
+ * @constructor
+ * @param {Database} database The database to interact with
  */
 function PropertyProvider(database) {
-  openVeoAPI.EntityProvider.call(this, database, 'publish_properties');
+  PropertyProvider.super_.call(this, database, 'publish_properties');
 }
 
 module.exports = PropertyProvider;
-util.inherits(PropertyProvider, openVeoAPI.EntityProvider);
+util.inherits(PropertyProvider, openVeoApi.providers.EntityProvider);
 
 /**
  * Creates properties indexes.

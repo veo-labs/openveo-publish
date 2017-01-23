@@ -3,10 +3,14 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var openVeoTest = require('@openveo/test');
+var openVeoApi = require('@openveo/api');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
-var WatcherPage = process.requirePublish('tests/client/e2eTests/pages/WatcherPage.js');
+var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
@@ -46,16 +50,19 @@ describe('Web service /publish/videos', function() {
     var application = process.protractorConf.getWebServiceApplication(
       datas.applications.publishApplicationsVideos.name
     );
+    var coreApi = openVeoApi.api.getCoreApi();
+    var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     webServiceClient = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
-    mediaHelper = new MediaHelper(new VideoModel());
-    propertyHelper = new PropertyHelper(new PropertyModel());
-    page = new WatcherPage();
+    mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
+    propertyHelper = new PropertyHelper(new PropertyModel(propertyProvider, videoProvider));
+    page = new ConfigurationPage();
 
     for (var i = 0; i < propertyNames.length; i++) {
       properties.push({
         name: propertyNames[i],
         description: propertyNames[i] + ' description',
-        type: PropertyModel.TYPE_TEXT
+        type: PropertyModel.TYPES.TEXT
       });
     }
 
@@ -86,12 +93,12 @@ describe('Web service /publish/videos', function() {
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         properties: properties
       },
       {
         id: '1',
-        state: VideoModel.PUBLISHED_STATE
+        state: STATES.PUBLISHED
       }
     ];
 
@@ -141,17 +148,17 @@ describe('Web service /publish/videos', function() {
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.READY_STATE,
+        state: STATES.READY,
         title: 'Video title 1'
       },
       {
         id: '1',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Video title 2'
       },
       {
         id: '2',
-        state: VideoModel.ERROR_STATE,
+        state: STATES.ERROR,
         title: 'Video title 3'
       }
     ];
@@ -159,13 +166,13 @@ describe('Web service /publish/videos', function() {
     mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
       page.refresh();
 
-      webServiceClient.get('publish/videos?states=' + VideoModel.READY_STATE).then(function(results) {
+      webServiceClient.get('publish/videos?states=' + STATES.READY).then(function(results) {
         var videos = results.entities;
         check(function() {
           assert.equal(videos.length, 1, 'Wrong number of results');
         }, done, true);
-        return webServiceClient.get('publish/videos?states[]=' + VideoModel.READY_STATE + '&states[]=' +
-                                   VideoModel.PUBLISHED_STATE);
+        return webServiceClient.get('publish/videos?states[]=' + STATES.READY + '&states[]=' +
+                                   STATES.PUBLISHED);
       }).then(function(results) {
         var videos = results.entities;
         check(function() {
@@ -190,19 +197,19 @@ describe('Web service /publish/videos', function() {
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Video title 1',
         date: date1.getTime()
       },
       {
         id: '1',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Video title 2',
         date: date2.getTime()
       },
       {
         id: '2',
-        state: VideoModel.ERROR_STATE,
+        state: STATES.ERROR,
         title: 'Video title 3',
         date: date3.getTime()
       }
@@ -258,19 +265,19 @@ describe('Web service /publish/videos', function() {
     var linesToAdd = [
       {
         id: '0',
-        state: VideoModel.READY_STATE,
+        state: STATES.READY,
         title: 'Video title 1',
         category: '1'
       },
       {
         id: '1',
-        state: VideoModel.PUBLISHED_STATE,
+        state: STATES.PUBLISHED,
         title: 'Video title 2',
         category: '2'
       },
       {
         id: '2',
-        state: VideoModel.ERROR_STATE,
+        state: STATES.ERROR,
         title: 'Video title 3',
         category: '3'
       }

@@ -102,8 +102,7 @@
     "UPLOAD_START_SUCCESS" : "Video will be uploaded soon.",
     "PUBLISHED_SUCCESS" : "Application successfully published.",
     "UNPUBLISHED_SUCCESS" : "Video unpublished.",
-    "TITLE_FILTER": "Video's name",
-    "DESCRIPTION_FILTER": "Description",
+    "QUERY_FILTER": "Keywords",
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Category",
     "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s.",
@@ -140,8 +139,7 @@
     "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",
     "FORM_ADD_LIST_VALUES_DESC" : "Add values to the list (press \"enter\" to add a new value)",
     "REMOVE_SUCCESS" : "Property successfully removed.",
-    "TITLE_FILTER": "Name",
-    "DESCRIPTION_FILTER": "Description",
+    "QUERY_FILTER": "Keywords",
     "TYPE_FILTER": "Type"
   },
   "CATEGORIES" : {

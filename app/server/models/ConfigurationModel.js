@@ -1,25 +1,23 @@
 'use strict';
 
 /**
- * @module publish-models
+ * @module models
  */
 
 var util = require('util');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 
 /**
- * Defines a ConfigurationModel class to manipulate configurations.
+ * Defines a ConfigurationModel to manipulate configurations.
  *
  * @class ConfigurationModel
- * @constructor
  * @extends EntityModel
+ * @constructor
+ * @param {ConfigurationProvider} provider The entity provider
  */
-function ConfigurationModel() {
-  openVeoAPI.EntityModel.call(
-          this,
-          new openVeoAPI.EntityProvider(openVeoAPI.applicationStorage.getDatabase(), 'publish_configurations')
-          );
+function ConfigurationModel(provider) {
+  ConfigurationModel.super_.call(this, provider);
 }
 
 module.exports = ConfigurationModel;
-util.inherits(ConfigurationModel, openVeoAPI.EntityModel);
+util.inherits(ConfigurationModel, openVeoApi.models.EntityModel);

@@ -6,7 +6,7 @@ var path = require('path');
 var os = require('os');
 var fs = require('fs');
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 
 var assetsDir = path.join(__dirname, 'assets', 'player', 'videos');
 var backupDir = path.join(os.tmpdir(), 'openveo', 'publish', 'update', 'videos');
@@ -45,7 +45,7 @@ function verifyTmpIsEmpty(callback) {
       rl.question('Backup files already exists. Do you want to abort (Y/n)?\n', function(answer) {
         if (answer != 'n') exit(128);
         else
-          openVeoAPI.fileSystem.rmdir(backupDir, callback);
+          openVeoApi.fileSystem.rmdir(backupDir, callback);
       });
     } else callback();
   });
@@ -55,7 +55,7 @@ function verifyTmpIsEmpty(callback) {
  * Copies assets files to tmp.
  */
 function copyAssetsToTmp(callback) {
-  openVeoAPI.fileSystem.copy(assetsDir, backupDir, callback);
+  openVeoApi.fileSystem.copy(assetsDir, backupDir, callback);
 }
 
 /**
@@ -79,7 +79,7 @@ function verifyAssetIsEmpty(callback) {
       rl.question('Restored files already exists. Do you want to abort (Y/n)?\n', function(answer) {
         if (answer != 'n') exit(128);
         else
-          openVeoAPI.fileSystem.rmdir(assetsDir, callback);
+          openVeoApi.fileSystem.rmdir(assetsDir, callback);
       });
     } else callback();
   });
@@ -89,14 +89,14 @@ function verifyAssetIsEmpty(callback) {
  * Copies assets back from tmp directory.
  */
 function copyTmpToAssets(callback) {
-  openVeoAPI.fileSystem.copy(backupDir, assetsDir, callback);
+  openVeoApi.fileSystem.copy(backupDir, assetsDir, callback);
 }
 
 /**
  * Removes tmp directory if it exists.
  */
 function removeTmpDir(callback) {
-  openVeoAPI.fileSystem.rmdir(backupDir, callback);
+  openVeoApi.fileSystem.rmdir(backupDir, callback);
 }
 
 // Get args 'backup' or 'restore', default 'backup'

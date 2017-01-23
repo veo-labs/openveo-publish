@@ -15,7 +15,6 @@ module.exports = function(config) {
       'assets/lib/angular-route/angular-route.js',
       'assets/lib/angular-animate/angular-animate.js',
       'assets/lib/angular-cookies/angular-cookies.js',
-      'assets/lib/angular-animate/angular-animate.js',
       'assets/lib/angular-mocks/angular-mocks.js',
       'assets/lib/ng-jsonpath/dist/ng-jsonpath.js',
       'tests/client/unitTests/front/player/playerApp.js',

@@ -150,20 +150,6 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
       }
     });
 
-    // Add route /publish/watcher with authentication.
-    // Also retrieve the watcher status
-    $routeProvider.when('/publish/watcher', {
-      templateUrl: '/publish/be/views/watcher.html',
-      controller: 'WatcherController',
-      title: 'PUBLISH.WATCHER.PAGE_TITLE',
-      access: 'publish-access-watcher-page',
-      resolve: {
-        watcherStatus: ['publishService', function(publishService) {
-          return publishService.getWatcherStatus();
-        }]
-      }
-    });
-
     // Add route /publish/properties with authentication.
     // Also retrieve the list of properties
     $routeProvider.when('/publish/properties-list', {

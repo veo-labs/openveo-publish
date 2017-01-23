@@ -1,26 +1,26 @@
 'use strict';
 
 /**
- * @module publish-providers
+ * @module providers
  */
 
 var util = require('util');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 
 /**
- * Defines a VideoProvider class to get and save videos.
+ * Defines a VideoProvider to get and save videos.
  *
  * @class VideoProvider
- * @constructor
  * @extends EntityProvider
+ * @constructor
  * @param {Database} database The database to interact with
  */
 function VideoProvider(database) {
-  openVeoAPI.EntityProvider.call(this, database, 'publish_videos');
+  VideoProvider.super_.call(this, database, 'publish_videos');
 }
 
 module.exports = VideoProvider;
-util.inherits(VideoProvider, openVeoAPI.EntityProvider);
+util.inherits(VideoProvider, openVeoApi.providers.EntityProvider);
 
 /**
  * Updates video state.

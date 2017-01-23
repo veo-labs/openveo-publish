@@ -3,9 +3,12 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var openVeoTest = require('@openveo/test');
+var openVeoApi = require('@openveo/api');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
-var WatcherPage = process.requirePublish('tests/client/e2eTests/pages/WatcherPage.js');
+var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 var check = openVeoTest.util.check;
@@ -20,12 +23,15 @@ describe('Properties web service', function() {
   var propertyHelper;
 
   before(function() {
+    var coreApi = openVeoApi.api.getCoreApi();
     var application = process.protractorConf.getWebServiceApplication(
       datas.applications.publishApplicationsProperties.name
     );
+    var database = coreApi.getDatabase();
+    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
     webServiceClient = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
-    propertyHelper = new PropertyHelper(new PropertyModel());
-    page = new WatcherPage();
+    propertyHelper = new PropertyHelper(propertyModel);
+    page = new ConfigurationPage();
 
     page.logAsAdmin();
     page.load();
@@ -66,12 +72,12 @@ describe('Properties web service', function() {
         {
           name: 'Get property name 1',
           description: 'Get property description 1',
-          type: PropertyModel.TYPE_TEXT
+          type: PropertyModel.TYPES.TEXT
         },
         {
           name: 'Get property name 2',
           description: 'Get property description 2',
-          type: PropertyModel.TYPE_LIST,
+          type: PropertyModel.TYPES.LIST,
           values: ['tag1', 'tag2']
         }
       ];

@@ -1,6 +1,6 @@
 /**
- * publish-controllers module includes all publish controllers.
+ * Include all plugin's controllers to handle HTTP or socket messages.
  *
- * @module publish-controllers
- * @main publish-controllers
+ * @module controllers
+ * @main controllers
  */

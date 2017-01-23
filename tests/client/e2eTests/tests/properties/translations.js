@@ -3,8 +3,11 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
+var openVeoApi = require('@openveo/api');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var browserExt = e2e.browser;
 
@@ -32,7 +35,7 @@ describe('Property page translations', function() {
           {
             name: 'test translations',
             description: 'test translations description',
-            type: PropertyModel.TYPE_TEXT
+            type: PropertyModel.TYPES.TEXT
           }
         ]).then(function(addedLines) {
           lines = addedLines;
@@ -77,15 +80,11 @@ describe('Property page translations', function() {
           assert.equal(text.trim(), coreTranslations.UI.SEARCH_BY);
         });
 
-        page.openSearchEngine();
         var searchFields = page.getSearchFields(page.searchFormElement);
-        var searchNameField = searchFields.name;
-        var searchDescriptionField = searchFields.description;
+        var searchQueryField = searchFields.query;
         var searchTypeField = searchFields.type;
-        assert.eventually.equal(searchNameField.getLabel(), publishTranslations.PROPERTIES.TITLE_FILTER);
-        assert.eventually.equal(searchDescriptionField.getLabel(), publishTranslations.PROPERTIES.DESCRIPTION_FILTER);
+        assert.eventually.equal(searchQueryField.getLabel(), publishTranslations.PROPERTIES.QUERY_FILTER);
         assert.eventually.equal(searchTypeField.getLabel(), publishTranslations.PROPERTIES.TYPE_FILTER);
-        page.closeSearchEngine();
 
         // All actions translations
         page.setSelectAllMouseOver();
@@ -127,7 +126,9 @@ describe('Property page translations', function() {
 
   // Load page
   before(function() {
-    var propertyModel = new PropertyModel();
+    var coreApi = openVeoApi.api.getCoreApi();
+    var database = coreApi.getDatabase();
+    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
     propertyHelper = new PropertyHelper(propertyModel);
     page = new PropertyPage(propertyModel);
     page.logAsAdmin();

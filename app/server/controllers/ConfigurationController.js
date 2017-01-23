@@ -1,29 +1,30 @@
 'use strict';
 
 /**
- * @module publish-controllers
+ * @module controllers
  */
 
 var util = require('util');
 var path = require('path');
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
-var googleOAuthHelper = process.requirePublish('app/server/providers/videoPlatforms/youtube/googleOAuthHelper.js');
-var errors = process.requirePublish('app/server/httpErrors.js');
-var confDir = path.join(openVeoAPI.fileSystem.getConfDir(), 'publish');
+var openVeoApi = require('@openveo/api');
+var GoogleOAuthHelper = process.requirePublish('app/server/providers/videoPlatforms/youtube/GoogleOAuthHelper.js');
+var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
-var EntityController = openVeoAPI.controllers.EntityController;
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
+var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
+var EntityController = openVeoApi.controllers.EntityController;
 
 /**
- * Provides route actions for all requests relative to publish configuration.
+ * Defines a controller to handle actions relative to configuration's routes.
  *
  * @class ConfigurationController
- * @constructor
  * @extends EntityController
+ * @constructor
  */
 function ConfigurationController() {
-  EntityController.call(this, ConfigurationModel);
+  ConfigurationController.super_.call(this, ConfigurationModel, ConfigurationProvider);
 }
 
 module.exports = ConfigurationController;
@@ -31,9 +32,15 @@ util.inherits(ConfigurationController, EntityController);
 
 /**
  * Retrieves publish plugin configurations.
+ *
+ * @method getConfigurationAllAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
  */
 ConfigurationController.prototype.getConfigurationAllAction = function(request, response, next) {
-  var model = new this.Entity(request.user);
+  var model = this.getModel(request);
   var configurations = {};
 
   async.series([
@@ -42,7 +49,9 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     function(callback) {
       if (videoPlatformConf['youtube']) {
         var youtubeConf = configurations['youtube'] = {};
-
+        var coreApi = openVeoApi.api.getCoreApi();
+        var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
+        var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
         googleOAuthHelper.hasToken(function(error, hasToken) {
           if (error) {
             process.logger.error('Error while retrieving Google account token with message : ' + error.message);
@@ -77,7 +86,7 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     }
   ], function(error, results) {
     if (error)
-      next(errors.GET_CONFIGURATION_ERROR);
+      next(HTTP_ERRORS.GET_CONFIGURATION_ERROR);
     else
       response.send(configurations);
   });
@@ -86,9 +95,20 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
 /**
  * Redirects action that will be called by google when the user associate our application,
  * a code will be in the parameters.
+ *
+ * @method handleGoogleOAuthCodeAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.query Request's query
+ * @param {String} request.query.code Google authentication code
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
  */
-ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response) {
+ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response, next) {
   var code = request.query.code;
+  var coreApi = openVeoApi.api.getCoreApi();
+  var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase));
+  var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
   process.logger.debug('Code received ', code);
   googleOAuthHelper.persistTokenWithCode(code, function() {
     response.redirect('/be/publish/configuration');
@@ -96,11 +116,19 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
 };
 
 /**
- * Redirects action that will be called by google when the user associate our application,
- * a code will be in the parameters.
+ * Saves upload configuration.
+ *
+ * @method saveUploadConfiguration
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {String} request.body.owner The id of the owner for new uploaded medias
+ * @param {String} request.body.group The id of the group for new uploaded medias
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
  */
 ConfigurationController.prototype.saveUploadConfiguration = function(request, response, next) {
-  var model = new this.Entity(request.user);
+  var model = this.getModel(request);
   var configuration;
   var body = request.body;
   async.series([
@@ -120,7 +148,7 @@ ConfigurationController.prototype.saveUploadConfiguration = function(request, re
 
     function(error) {
       if (error) {
-        next(errors.SET_CONFIGURATION_ERROR);
+        next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
         return;
       } else {
         var cb = function(err, addedCount, data) {
@@ -130,7 +158,7 @@ ConfigurationController.prototype.saveUploadConfiguration = function(request, re
             process.logger.debug('Configuration data has been saved');
           }
           if (error)
-            next(errors.SET_CONFIGURATION_ERROR);
+            next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
           else
             response.status(200).send();
         };

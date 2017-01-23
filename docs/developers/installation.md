@@ -1,17 +1,26 @@
 # Clone project from git
 
-From OpenVeo root directory :
+From OpenVeo parent directory :
 
-    cd node_modules/@openveo
-    git clone git@github.com:veo-labs/openveo-publish.git publish
+    git clone git@github.com:veo-labs/openveo-publish.git
+
+You should have someting like this :
+
+```
+.
+├── openveo-core
+├── openveo-publish
+```
 
 # Install project's dependencies
 
-    cd publish
+    cd openveo-publish
     npm install
 
-# Remove installed peer dependencies
+# Link plugin to the core
 
-From OpenVeo Publish root directory :
+    cd openveo-publish
+    npm link
 
-    rm -Rf node_modules/@openveo
+    cd openveo-core
+    npm link @openveo/publish

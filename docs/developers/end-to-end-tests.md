@@ -2,7 +2,7 @@
 
 End to end tests are performed using [Protractor](http://www.protractortest.org/) and run from [OpenVeo core](https://github.com/veo-labs/openveo-core).
 
-You first have to install and configure tests as described in core documentation.
+You first have to install and configure tests as described in core's documentation.
 
 # Write tests
 

@@ -8,15 +8,18 @@ markdown_extensions:
 pages:
 - 'INTRODUCTION': 'index.md'
 - 'USERS':
+  - 'Prerequisites': 'prerequisites.md'
   - 'Getting started': 'getting-started.md'
   - 'Watcher': 'watcher.md'
-  - 'Web Service': 'web-service.md'
   - 'Advanced configuration': 'advanced-configuration.md'
-- 'DEVELOPERS':
+- 'PLUGINS DEVELOPERS':
+  - 'Web Service': 'pluginsDevelopers/web-service.md'
+  - 'API' : 'pluginsDevelopers/api.md'
+- 'PUBLISH DEVELOPERS':
   - 'Basics': 'developers/basics.md'
   - 'Installation': 'developers/installation.md'
   - 'Back end AngularJS': 'developers/back-end.md'
   - 'CSS / SASS / JS compilation': 'developers/compilation.md'
   - 'Unit tests': 'developers/unit-tests.md'
   - 'End to end tests': 'developers/end-to-end-tests.md'
-- 'API' : 'api.md'
+  - 'API': 'developers/api.md'

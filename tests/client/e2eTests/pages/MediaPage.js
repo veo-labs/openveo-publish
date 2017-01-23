@@ -5,7 +5,6 @@ var e2e = require('@openveo/test').e2e;
 var Field = e2e.fields.Field;
 var TablePage = e2e.pages.TablePage;
 var browserExt = e2e.browser;
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 
 /**
@@ -44,23 +43,6 @@ MediaPage.prototype.onLoaded = function() {
 };
 
 /**
- * Gets the list of media states as described in VideoModel.
- *
- * @return {Array} The list of media states
- */
-MediaPage.prototype.getMediaStates = function() {
-  var videoModelProperties = Object.keys(VideoModel);
-  var states = [];
-
-  for (var i = 0; i < videoModelProperties.length; i++) {
-    if (/_STATE$/.test(videoModelProperties[i]))
-      states.push(VideoModel[videoModelProperties[i]]);
-  }
-
-  return states;
-};
-
-/**
  * Gets search form fields.
  *
  * @param {ElementFinder} Search engine element
@@ -69,17 +51,10 @@ MediaPage.prototype.getMediaStates = function() {
 MediaPage.prototype.getSearchFields = function(form) {
   var fields = {};
 
-  // Name field
-  fields.name = Field.get({
+  // Query field
+  fields.query = Field.get({
     type: 'text',
-    name: this.translations.PUBLISH.MEDIAS.TITLE_FILTER,
-    baseElement: form
-  });
-
-  // Description field
-  fields.description = Field.get({
-    type: 'text',
-    name: this.translations.PUBLISH.MEDIAS.DESCRIPTION_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.QUERY_FILTER,
     baseElement: form
   });
 
@@ -186,8 +161,8 @@ MediaPage.prototype.editMedia = function(name, data) {
         var property = self.getProperty(propertyId);
         var fieldType = 'text';
 
-        if (property.type === PropertyModel.TYPE_LIST) fieldType = 'select';
-        if (property.type === PropertyModel.TYPE_BOOLEAN) fieldType = 'checkbox';
+        if (property.type === PropertyModel.TYPES.LIST) fieldType = 'select';
+        if (property.type === PropertyModel.TYPES.BOOLEAN) fieldType = 'checkbox';
 
         var propertyField = Field.get({
           type: fieldType,

@@ -1,11 +1,11 @@
 'use strict';
 
 var async = require('async');
-var openVeoAPI = require('@openveo/api');
-var db = openVeoAPI.applicationStorage.getDatabase();
-
+var openVeoApi = require('@openveo/api');
 
 module.exports.update = function(callback) {
+  var coreApi = openVeoApi.api.getCoreApi();
+  var db = coreApi.getDatabase();
   process.logger.info('Publish 2.0.2 migration launched.');
 
   async.series([
@@ -26,7 +26,7 @@ module.exports.update = function(callback) {
           var series = [];
           value.forEach(function(video) {
             var metadata = video.metadata || {};
-            metadata.user = metadata && metadata.user || openVeoAPI.applicationStorage.getAnonymousUserId();
+            metadata.user = metadata && metadata.user || coreApi.getAnonymousUserId();
             metadata.groups = metadata && metadata.groups || [];
 
             series.push(

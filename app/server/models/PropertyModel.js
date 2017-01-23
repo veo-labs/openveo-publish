@@ -1,58 +1,79 @@
 'use strict';
 
 /**
- * @module publish-models
+ * @module models
  */
 
 var util = require('util');
 var shortid = require('shortid');
-var openVeoAPI = require('@openveo/api');
+var openVeoApi = require('@openveo/api');
 var async = require('async');
 
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-
 /**
- * Defines a PropertyModel class to manipulate custom properties.
+ * Defines a PropertyModel to manipulate properties' entities.
  *
  * @class PropertyModel
- * @constructor
  * @extends EntityModel
+ * @param {PropertyProvider} propertyProvider The entity provider
+ * @param {VideoProvider} videoProvider The video provider
  */
-function PropertyModel() {
-  openVeoAPI.EntityModel.call(this, new PropertyProvider(openVeoAPI.applicationStorage.getDatabase()));
+function PropertyModel(propertyProvider, videoProvider) {
+  PropertyModel.super_.call(this, propertyProvider);
 
-  /**
-   * Video provider.
-   *
-   * @property videoProvider
-   * @type VideoProvider
-   */
-  this.videoProvider = new VideoProvider(openVeoAPI.applicationStorage.getDatabase());
+  Object.defineProperties(this, {
+
+    /**
+     * Video provider.
+     *
+     * @property videoProvider
+     * @type VideoProvider
+     * @final
+     */
+    videoProvider: {value: videoProvider}
+
+  });
 }
 
 module.exports = PropertyModel;
-util.inherits(PropertyModel, openVeoAPI.EntityModel);
+util.inherits(PropertyModel, openVeoApi.models.EntityModel);
 
-PropertyModel.TYPE_TEXT = 'text';
-PropertyModel.TYPE_LIST = 'list';
-PropertyModel.TYPE_BOOLEAN = 'boolean';
-PropertyModel.availableTypes = [PropertyModel.TYPE_TEXT, PropertyModel.TYPE_LIST, PropertyModel.TYPE_BOOLEAN];
+/**
+ * Property types.
+ *
+ * @property TYPES
+ * @type Object
+ * @static
+ * @final
+ */
+PropertyModel.TYPES = {
+  TEXT: 'text',
+  LIST: 'list',
+  BOOLEAN: 'boolean'
+};
+Object.freeze(PropertyModel.TYPES);
+
+/**
+ * The list of available property types.
+ *
+ * @property availableTypes
+ * @type Array
+ * @static
+ * @final
+ */
+PropertyModel.availableTypes = [PropertyModel.TYPES.TEXT, PropertyModel.TYPES.LIST, PropertyModel.TYPES.BOOLEAN];
+Object.freeze(PropertyModel.availableTypes);
 
 /**
  * Adds a new property.
  *
- * @example
- *     // data example
- *     {
- *       "name" : "Name of the property",
- *       "description" : "Description of the property",
- *       "type" : "Type of the property"
- *     }
- *
  * @method add
  * @async
  * @param {Object} data A property object
+ * @param {String} [data.id] The property id
+ * @param {String} data.name The property name
+ * @param {String} data.description The property description
+ * @param {String} data.type The property type (see PropertyModel.TYPES)
+ * @param {Array} [data.values] The list of values if data.type = PropertyModel.TYPES.LIST
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The total amount of items inserted
@@ -60,10 +81,10 @@ PropertyModel.availableTypes = [PropertyModel.TYPE_TEXT, PropertyModel.TYPE_LIST
  */
 PropertyModel.prototype.add = function(data, callback) {
   if (!data.name || !data.description || !data.type)
-    return callback(new Error('Requires name, description and type to add a property'));
+    return callback(new TypeError('Requires name, description and type to add a property'));
 
   if (PropertyModel.availableTypes.indexOf(data.type) < 0)
-    return callback(new Error('Invalid property type ' + data.type));
+    return callback(new TypeError('Invalid property type ' + data.type));
 
   var property = {
     id: data.id || shortid.generate(),
@@ -72,7 +93,7 @@ PropertyModel.prototype.add = function(data, callback) {
     type: data.type
   };
 
-  if (data.type === PropertyModel.TYPE_LIST)
+  if (data.type === PropertyModel.TYPES.LIST)
     property.values = data.values || [];
 
   this.provider.add(property, function(error, addedCount, properties) {
@@ -84,16 +105,14 @@ PropertyModel.prototype.add = function(data, callback) {
 /**
  * Updates property.
  *
- * @example
- *     // data example
- *     {
- *       "name" : "New property name"
- *     }
- *
  * @method update
  * @async
  * @param {String} id The id of the property
- * @param {Object} data The property with all fields or not
+ * @param {Object} data Information to update
+ * @param {Object} [data.name] The property name
+ * @param {Object} [data.description] The property description
+ * @param {Object} [data.type] The property type (see PropertyModel.TYPES)
+ * @param {Object} [data.values] The list of values if data.type = PropertyModel.TYPES.LIST
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of updated items
@@ -106,19 +125,20 @@ PropertyModel.prototype.update = function(id, data, callback) {
     property.description = data.description;
   if (data.type)
     property.type = data.type;
-  if (data.type === PropertyModel.TYPE_LIST)
+  if (data.type === PropertyModel.TYPES.LIST)
     property.values = data.values || [];
   else
     property.values = null;
+
   this.provider.update(id, property, callback);
 };
 
 /**
- * Removes a property.
+ * Removes properties.
  *
  * @method remove
  * @async
- * @param {String} ids The ids of the property
+ * @param {String} ids The ids of the properties to remove
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of removed properties
@@ -130,9 +150,7 @@ PropertyModel.prototype.remove = function(ids, callback) {
   // Remove property from database
   series.push(
     function(callback) {
-      self.provider.remove(ids, function(error, deletedCount) {
-        callback(error, deletedCount);
-      });
+      self.provider.remove(ids, callback);
     }
   );
 

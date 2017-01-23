@@ -1,6 +1,6 @@
 /**
- * publish-providers module includes all publish providers.
+ * All publish providers.
  *
- * @module publish-providers
- * @main publish-providers
+ * @module providers
+ * @main providers
  */
