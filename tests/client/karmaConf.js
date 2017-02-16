@@ -17,6 +17,7 @@ module.exports = function(config) {
       'assets/lib/angular-cookies/angular-cookies.js',
       'assets/lib/angular-mocks/angular-mocks.js',
       'assets/lib/ng-jsonpath/dist/ng-jsonpath.js',
+      'assets/lib/ng-file-upload/ng-file-upload.min.js',
       'tests/client/unitTests/front/player/playerApp.js',
       'tests/client/unitTests/admin/tableForm/tableForm.js',
       'tests/client/unitTests/admin/util/utilService.js',

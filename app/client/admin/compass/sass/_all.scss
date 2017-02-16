@@ -42,6 +42,10 @@
 }
 
 .pu-chapter{
+
+  .well .progress {
+    background-color: #eaeaea;
+  }
   .back-button{
     margin-right:20px;
   }
@@ -49,13 +53,18 @@
     margin-bottom:15px;
   }
   .chapter-table{
+    &>thead>tr>th{
+      background-size: 100%;
+      background-image:none;
+      background-color: $brand-primary;
+    }
     tr{
       width: 100%;
       display: inline-table;
     }
     tbody {
-      height: 358px;
-      max-height: 358px;
+      height: 319px;
+      max-height: 319px;
       overflow-y: auto;
       display: block;
       width: 100%;
@@ -64,7 +73,7 @@
       }
       tr {
         cursor:pointer;
-        transition: background-color 0.2s;
+
         &.selected{
           background-color: $brand-primary;
           color:white;
@@ -122,5 +131,61 @@
         text-align: center;
         width: 100%;
       }
+  }
+
+  .nav.nav-tabs{
+    margin: 0;
+    &>li{
+      &>a, &>a:hover, &>a:focus{
+        background-size: 100% 200%;
+        border: 0px none;
+      }
+      &.active>a{
+        color: #fff;
+        background-position-y:100%;
+        background-size: 100% 200%;
+        transition: all 0.2s ease;
+      }
+    }
+  }
+
+  &.chapters{
+    $brand-primary: #1FBBEB;
+    .table>thead>tr>th{
+      background-color: $brand-primary;
+    }
+    .ov-multirange-mk2-label.active span{
+      background-color: $brand-primary;
+      border-color: $brand-primary;
+    }
+    .chapter-table tbody tr.selected{
+      background-color: $brand-primary;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      background: $brand-primary;
+    }
+    .nav>li.active>a{
+      background-image: linear-gradient(to bottom, #ffffff 50%,$brand-primary 50%);
+    }
+  }
+  &.tags{
+    $brand-primary: #97BF0D;
+    .table>thead>tr>th{
+      background-color: $brand-primary;
+    }
+    .ov-multirange-mk2-label.active span{
+      background-color: $brand-primary;
+      border-color: $brand-primary;
+    }
+    .chapter-table tbody tr.selected{
+      background-color: $brand-primary;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      background: $brand-primary;
+    }
+
+    .nav>li.active>a{
+      background-image: linear-gradient(to bottom, #ffffff 50%,$brand-primary 50%);
+    }
   }
 }

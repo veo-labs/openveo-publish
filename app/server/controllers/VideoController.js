@@ -20,6 +20,7 @@ var pluginManager = openVeoApi.plugin.pluginManager;
 var AccessError = openVeoApi.errors.AccessError;
 var ContentController = openVeoApi.controllers.ContentController;
 
+var multer = require('multer');
 var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
 
 /**
@@ -449,4 +450,65 @@ VideoController.prototype.getModel = function(request) {
  */
 VideoController.prototype.getPublishManager = function() {
   return PublishManager.get();
+};
+
+
+/**
+ * Handles back office updateTags action to upload files and save associated tags.
+ *
+ * @method updateTagsAction
+ */
+VideoController.prototype.updateTagsAction = function(request, response, next) {
+  if (request.params.id) {
+    var entityId = request.params.id;
+    var model = new this.Entity(request.user);
+    var upload = multer({dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/'});
+    upload.single('file')(request, response, function(err) {
+      if (err || !request.body.info) {
+
+        // An error occurred when uploading
+        return response.end('Error uploading file.');
+      }
+      var data = JSON.parse(request.body.info);
+      var file = request.file;
+
+      model.updateTags(entityId, data, file, function(error, newtag) {
+        if (error)
+          next((error instanceof AccessError) ? errors.UPDATE_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
+        else
+          response.send(newtag);
+      });
+    });
+
+  } else {
+
+    // Missing type and / or id of the video
+    next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
+  }
+};
+
+
+/**
+ * Handles back office removeTags action to remove tags.
+ *
+ * @method removeTagsAction
+ */
+VideoController.prototype.removeTagsAction = function(request, response, next) {
+
+  if (request.params.id) {
+    var entityId = request.params.id;
+    var model = new this.Entity(request.user);
+    var data = request.body;
+
+    model.removeTags(entityId, data, function(error, deletedTag) {
+      if (error)
+        next((error instanceof AccessError) ? errors.UPDATE_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
+      else
+        response.send(deletedTag);
+    });
+  } else {
+
+    // Missing type and / or id of the video
+    next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
+  }
 };

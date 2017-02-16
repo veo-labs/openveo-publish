@@ -6,7 +6,9 @@
 
 var util = require('util');
 var path = require('path');
+var fs = require('fs');
 var async = require('async');
+
 var openVeoApi = require('@openveo/api');
 var videoPlatformFactory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
@@ -14,6 +16,8 @@ var AccessError = openVeoApi.errors.AccessError;
 var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
+
+var shortid = require('shortid');
 
 /**
  * Defines a VideoModel to manipulate videos' entities.
@@ -146,6 +150,42 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
 }
 
 /**
+ * Remove a list of file
+ *
+ * @method removeTagsFile
+ * @private
+ * @async
+ * @param  {Array} filePathArray The list of path file to delete
+ */
+function removeTagsFile(filePathArray) {
+  var series = [];
+  filePathArray.forEach(function(path) {
+    series.push(
+      function(callback) {
+        fs.stat(path, function(error, stats) {
+          if (error) {
+            process.logger.error(error);
+            return callback(error);
+          }
+
+          // delete file content
+          fs.unlink(path, function(error, data) {
+            if (error) {
+              process.logger.error(error);
+              return callback(error);
+            }
+
+            process.logger.info('Successfully deleted: ' + path);
+            callback();
+          });
+        });
+      }
+    );
+  });
+  async.series(series);
+}
+
+/**
  * Adds a new video.
  *
  * @method add
@@ -202,6 +242,7 @@ VideoModel.prototype.add = function(media, callback) {
     mediaId: media.mediaId,
     timecodes: media.timecodes,
     chapters: media.chapters,
+    tags: media.tags,
     cut: media.cut || [],
     sources: media.sources || [],
     views: media.views || 0
@@ -648,7 +689,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
       // Got timecodes for this video
       if (timecodes) {
         videoInfo.timecodes = [];
-        var chapters = [];
+        var tags = [];
 
         for (var i = 0; i < timecodes.length; i++) {
           var currentTc = timecodes[i];
@@ -666,18 +707,17 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
               break;
 
             case 'tag':
-              chapters.push({
+              tags.push({
                 value: currentTc.timecode / (videoInfo.metadata.duration * 1000),
-                name: currentTc.data && currentTc.data.tagname ? currentTc.data.tagname : 'Tag' + (chapters.length + 1)
+                name: currentTc.data && currentTc.data.tagname ? currentTc.data.tagname : 'Tag' + (tags.length + 1)
               });
               break;
             default:
           }
         }
 
-        // Set chapters only if it exists chapter,
-        // else client side will automaticaly create chapter according to image timestamp.
-        if ((!videoInfo.chapters || !videoInfo.chapters.length) && chapters.length) videoInfo.chapters = chapters;
+        // Set tags from timecode only if user has not allready edit tags
+        if ((!videoInfo.tags || !videoInfo.tags.length) && tags.length) videoInfo.tags = tags;
       }
       callback(null, videoInfo);
     }
@@ -761,6 +801,8 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.cut = data.cut;
   if (data.chapters)
     info.chapters = data.chapters;
+  if (data.tags)
+    info.tags = data.tags;
   if (data.views)
     info.views = data.views;
   if (data.groups) {
@@ -851,7 +893,7 @@ VideoModel.prototype.unpublishVideos = function(ids, callback) {
  *
  * @method increaseVideoViews
  * @async
- * @param {Number} id The id of the video to update
+ * @param {String} id The id of the video to update
  * @param {Number} views number to add to existing count (or to initialize)
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
@@ -859,4 +901,109 @@ VideoModel.prototype.unpublishVideos = function(ids, callback) {
  */
 VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
   this.provider.increase(id, {views: count}, callback);
+};
+
+/**
+ * Add/update video tags/chapters to existing tags/chapters
+ * Associate a file to a tag
+ *
+ * @method updateTags
+ * @async
+ * @param  {String}   id       The id of the video to update
+ * @param  {Object}   data     The list of tags to updates
+ * @param  {Object}   file     The file information to attach to the tag
+ * @param  {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The dataed pass in param
+ */
+VideoModel.prototype.updateTags = function(id, data, file, callback) {
+  var self = this;
+
+  this.provider.get({id: id}, function(error, entities) {
+    if (error || !entities || !entities[0]) {
+      return callback(error);
+    } else {
+      var items = data;
+      var entity = entities[0];
+      var tags = {};
+      Object.keys(items).forEach(function(key) {
+        var item = items[key][0];
+        if (!entity[key]) entity[key] = [];
+        tags[key] = entity[key];
+        var tag = tags[key];
+
+        // remove old file from filesystem;
+        if (item.file) removeTagsFile([item.file.path]);
+
+        if (file) item.file = file;
+
+        if (!item.id) {
+          item.id = shortid.generate();
+          tag.push(item);
+        } else {
+          for (var i = 0; i < tag.length; i++) {
+            if (tag[i].id == item.id) {
+              tag[i] = item;
+            }
+          }
+        }
+      });
+      self.update(id, tags, function(update) {
+        callback(null, items);
+      });
+    }
+  });
+};
+
+/**
+ * Remove video tags/chapters to existing tags/chapters
+ * Remove associated file
+ *
+ * @method removeTags
+ * @async
+ * @param  {String}   id       The id of the video to delete tag
+ * @param  {Object}   data     The list of tags to delete
+ * @param  {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The data passed in param
+ */
+VideoModel.prototype.removeTags = function(id, data, callback) {
+  var self = this;
+
+  this.provider.get({id: id}, function(error, entities) {
+    if (error || !entities || !entities[0]) {
+      return callback(error);
+    } else {
+      var items = data;
+      var entity = entities[0];
+      var tags = {};
+      Object.keys(items).forEach(function(key) {
+        var item = data[key];
+        var ids = item.map(function(el) {
+          return el.id;
+        });
+        var paths = item.filter(function(el) {
+          return el.file && el.file.path;
+        })
+        .map(function(el) {
+          return el.file.path;
+        });
+        tags[key] = entity[key];
+
+        // remove old file from filesystem;
+        if (paths && paths.length) removeTagsFile(paths);
+
+        for (var i = 0; i < tags[key].length; i++) {
+          if (ids.indexOf(tags[key][i].id) >= 0) {
+            process.logger.debug(tags[key][i].id + ' deleted');
+            tags[key].splice(i, 1);
+            i--;
+          }
+        }
+      });
+      self.update(id, tags, function(update) {
+        callback(null, items);
+      });
+    }
+  });
 };

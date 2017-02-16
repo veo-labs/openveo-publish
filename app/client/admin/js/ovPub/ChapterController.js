@@ -14,16 +14,19 @@
           i18nService,
           ovMultirangeViews,
           media,
-          publishName) {
+          publishName,
+          publishService) {
 
     var orderBy = $filter('orderBy');
+    var uploadAborted = false;
 
     /**
      * Reconstructs ranges with chapters and cut array.
      */
     function updateRange() {
-      $scope.ranges = ($scope.media.chapters ? $scope.media.chapters : [])
+      $scope.ranges = ($scope.media[$scope.selectedData.value] ? $scope.media[$scope.selectedData.value] : [])
               .concat(($scope.media.cut ? $scope.media.cut : []));
+
       orderBy($scope.ranges, '+value', false);
     }
 
@@ -35,19 +38,16 @@
       // If no chapter, add timecodes with empty values and sort them
       if (!$scope.media.chapters) {
         $scope.media.chapters = [];
-        var indexTimecodes = $scope.media.timecodes;
-        angular.forEach(indexTimecodes, function(obj) {
-          $scope.media.chapters.push({
-            value: obj.timecode / ($scope.duration * 1000),
-            name: '',
-            description: ''
-          });
-        });
       }
 
       // If no cut add it
       if (!$scope.media.cut) {
         $scope.media.cut = [];
+      }
+
+      // If no cut add it
+      if (!$scope.media.tags) {
+        $scope.media.tags = [];
       }
 
       $scope.slider = {
@@ -100,6 +100,185 @@
     }
 
     /**
+     *  TAG
+     */
+
+    /**
+     * Abort upload and delete file
+     *
+     */
+    function deleteUpload() {
+      if ($scope.upload) {
+        uploadAborted = true;
+        $scope.upload.abort();
+        $scope.file = null;
+      }
+    }
+
+    /**
+     * Clean object to save deleting all unecessary data
+     * @param  {String} collectionName object key of the properties to clean
+     * @param  {Bool} cleanAll condition if all Object has to be cleaned
+     * @return {Object} clean Object
+     */
+    function cleanObjectToSave(collectionName, cleanAll) {
+      var objToSave = {};
+      objToSave[collectionName] = [];
+      var tmpEl;
+      if (!cleanAll) {
+        if ($scope.media.hasOwnProperty(collectionName)) {
+          for (var i = 0; i < $scope.media[collectionName].length; i++) {
+            tmpEl = angular.copy($scope.media[collectionName][i]);
+            delete tmpEl['_depth'];
+            delete tmpEl['select'];
+            delete tmpEl['check'];
+            objToSave[collectionName].push(tmpEl);
+          }
+          orderBy(objToSave[collectionName], '+value', false);
+        }
+      } else {
+        tmpEl = angular.copy($scope.selectRow ? $scope.selectRow : $scope.modelToEdit);
+        delete tmpEl['_depth'];
+        delete tmpEl['select'];
+        delete tmpEl['check'];
+        objToSave[collectionName].push(tmpEl);
+      }
+
+      return objToSave;
+    }
+
+    /**
+     * Retreive element position in array by its id
+     * @param  {String} id The element id to search
+     * @return {Number} The position of this element, -1 otherwise
+     */
+    function searchPosition(id) {
+      var ids = $scope.media[$scope.selectedData.value].map(function(item) {
+        return item.id;
+      });
+      return ids.indexOf(id);
+    }
+
+    /**
+     * Save chapter and cut
+     */
+    function saveChapter() {
+      var objToSave = cleanObjectToSave($scope.selectedData.value, true);
+      $scope.upload = publishService.updateTags($scope.media.id, $scope.file, objToSave);
+
+      $scope.upload.then(function(resp) {
+
+        $scope.file = null;
+        $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
+        if (!$scope.selectRow) {
+          // ADD the new model
+          $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
+        } else {
+          var i = searchPosition($scope.modelToEdit.id);
+          $scope.media[$scope.selectedData.value][i] = $scope.modelToEdit;
+        }
+
+        if ($scope.selectRow) {
+          $scope.selectRow.select = false;
+          $scope.selectRow = null;
+        }
+        updateRange();
+        $scope.isCollapsed = true;
+      }, function(resp) {
+        if (resp.status > 0)
+          $scope.errorMsg = resp.status + ': ' + resp.data;
+
+        if ($scope.selectRow) {
+          $scope.selectRow.select = false;
+          $scope.selectRow = null;
+        }
+
+        // emit alert
+        if (uploadAborted) {
+          $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
+        } else {
+          $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
+          if (status === 401)
+            $scope.$parent.logout();
+        }
+      }, function(evt) {
+        if ($scope.file)
+          $scope.file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+      });
+    }
+
+    /*
+     * CUT
+     */
+
+    /**
+     * Selects and unselect a provided cut.
+     *
+     * @param {Object} cut The cut to toggle
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleCut(cut, addOrRemove) {
+      var index = $scope.media.cut.indexOf(cut);
+
+      // cuts will be updated by the watchCollection
+      if (index === -1 && addOrRemove !== false) {
+        $scope.media.cut.push(cut);
+      } else if (index !== -1 && addOrRemove !== true) {
+        cut.select = false;
+        $scope.media.cut.splice(index, 1);
+      }
+
+    }
+
+    /**
+     * Selects or unselect the begin cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleBegin(addOrRemove) {
+      toggleCut($scope.beginCut.range, addOrRemove);
+    }
+
+    /**
+     * Selects or unselect the ending cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleEnd(addOrRemove) {
+      toggleCut($scope.endCut.range, addOrRemove);
+    }
+
+    /**
+     * Save chapter and cut
+     */
+    function saveCut() {
+
+      // Validate if end is after begin
+      if ($scope.endCut.isInArray && $scope.beginCut.isInArray &&
+        $scope.endCut.range.value <= $scope.beginCut.range.value) {
+        // Reset end
+        $scope.endCut.range.value = 1;
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.DELETE_END_CUT'), 8000);
+        toggleEnd(false);
+
+        // the watch for endCut.isInArray will save everything
+        $scope.endCut.isInArray = false;
+        return;
+      }
+
+      // CALL SAVE HTTP
+      var objToSave = cleanObjectToSave('cut');
+      entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
+
+      }).error(function(data, status) {
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CUT.SAVE_ERROR'), 4000);
+        if (status === 401)
+          $scope.$parent.logout();
+      });
+    }
+
+
+    /**
      * Calling preinit with a duration chnage on the player, it sometimes fail so...
      */
     angular.element(myPlayer).on('durationChange', function(event, duration) {
@@ -114,6 +293,9 @@
     });
 
     // Init
+    $scope.dataId = ['chapters', 'tags'];
+    $scope.selectedData = {value: $scope.dataId[0]};
+
     $scope.media = media.data.entity;
     $scope.playerType = $scope.media.type == 'youtube' ? 'youtube' : 'html';
 
@@ -157,12 +339,18 @@
 
     $scope.nbCheckRow = 0;
 
+    $scope.$watch('selectedData.value', function() {
+      $scope.select(null);
+      $scope.cancel();
+      updateRange();
+    });
+
     // Check all chapters for removal
     $scope.checkAll = function() {
-      for (var i = 0; i < $scope.media.chapters.length; i++) {
-        $scope.media.chapters[i].check = $scope.checkAllSelected;
+      for (var i = 0; i < $scope.media[$scope.selectedData.value].length; i++) {
+        $scope.media[$scope.selectedData.value][i].check = $scope.checkAllSelected;
       }
-      $scope.nbCheckRow = $scope.checkAllSelected ? $scope.media.chapters.length : 0;
+      $scope.nbCheckRow = $scope.checkAllSelected ? $scope.media[$scope.selectedData.value].length : 0;
     };
 
     // Check a chapter for removal
@@ -172,7 +360,7 @@
         $scope.nbCheckRow--;
       } else {
         $scope.nbCheckRow++;
-        $scope.checkAllSelected = $scope.nbCheckRow == $scope.media.chapters.length;
+        $scope.checkAllSelected = $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length;
       }
     };
 
@@ -185,6 +373,7 @@
         $scope.selectRow.select = false;
         $scope.selectRow = null;
       }
+      deleteUpload();
       $scope.isCollapsed = false;
     };
 
@@ -201,25 +390,16 @@
       } else {
 
         // Close edit on toggle
+        $scope.file = null;
         $scope.cancel();
       }
     };
 
     // on Submit Edit Form
     $scope.submit = function() {
-      $scope.isCollapsed = true;
 
-      if (!$scope.selectRow) {
-
-        // ADD the new model
-        $scope.media.chapters.push($scope.modelToEdit);
-      } else {
-        $scope.selectRow.select = false;
-        $scope.selectRow = null;
-      }
-
-      // Save
-      $scope.saveChapter();
+       // Save
+      saveChapter();
     };
 
     // on cancel Edit Form
@@ -230,32 +410,22 @@
       $scope.isCollapsed = true;
     };
 
-    $scope.remove = function() {
-      var chapters = $scope.media.chapters;
-      for (var i = 0; i < chapters.length; i++) {
-        if (chapters[i].check) {
-          chapters.splice(i, 1);
-          i--;
-        }
-        if ($scope.selectRow) $scope.selectRow.select = false;
-        $scope.selectRow = null;
-        $scope.saveChapter();
-      }
-    };
-
     // Select or deselect a line by clicking
     $scope.select = function(object) {
       if ($scope.isCollapsed) {
         $scope.selectRow = null;
-        for (var i = 0; i < $scope.ranges.length; i++) {
-          if ($scope.ranges[i] === object && !$scope.ranges[i].select && !$scope.selectRow) {
-            $scope.ranges[i].select = true;
-            $scope.selectRow = $scope.ranges[i];
-          } else {
-            $scope.ranges[i].select = false;
+        if ($scope.ranges && $scope.ranges.length) {
+          for (var i = 0; i < $scope.ranges.length; i++) {
+            if ($scope.ranges[i] === object && !$scope.ranges[i].select && !$scope.selectRow) {
+              $scope.ranges[i].select = true;
+              $scope.selectRow = $scope.ranges[i];
+            } else {
+              $scope.ranges[i].select = false;
+            }
           }
         }
       } else { // if close by toggle, close edit form
+        $scope.file = null;
         $scope.cancel();
         $scope.select(object);
       }
@@ -286,91 +456,38 @@
 
       // we only save the chnage if the time of the selected row has changed
       if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
-        $scope.saveChapter();
+        if (range.type) saveCut();
+        else saveChapter();
       }
       if (range.select)
         $scope.selectRowInitialValue = range.value;
     };
 
-    /*
-     * CUT
-     */
-
-    /**
-     * Selects and unselect a provided cut.
-     *
-     * @param {Object} cut The cut to toggle
-     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
-     */
-    function toggleCut(cut, addOrRemove) {
-      var index = $scope.media.cut.indexOf(cut);
-
-      // cuts will be updated by the watchCollection
-      if (index === -1 && addOrRemove !== false) {
-        $scope.media.cut.push(cut);
-      } else if (index !== -1 && addOrRemove !== true) {
-        cut.select = false;
-        $scope.media.cut.splice(index, 1);
+    // remove chapter and tags
+    $scope.remove = function() {
+      var ranges = $scope.media[$scope.selectedData.value];
+      var tagsToRemove = {};
+      var rangesToRemove = tagsToRemove[$scope.selectedData.value] = [];
+      for (var i = 0; i < ranges.length; i++) {
+        if (ranges[i].check) rangesToRemove.push(ranges[i]);
       }
+      $scope.selectRow = null;
 
-    }
-
-    /**
-     * Selects or unselect the begin cut.
-     *
-     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
-     */
-    function toggleBegin(addOrRemove) {
-      toggleCut($scope.beginCut.range, addOrRemove);
-    }
-
-    /**
-     * Selects or unselect the ending cut.
-     *
-     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
-     */
-    function toggleEnd(addOrRemove) {
-      toggleCut($scope.endCut.range, addOrRemove);
-    }
-
-    // Save chapter and cut
-    $scope.saveChapter = function() {
-      // Validate if end is after begin
-      if ($scope.endCut.isInArray && $scope.beginCut.isInArray &&
-              $scope.endCut.range.value <= $scope.beginCut.range.value) {
-        // Reset end
-        $scope.endCut.range.value = 1;
-        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.DELETE_END_CUT'), 8000);
-        toggleEnd(false);
-
-        // the watch for endCut.isInArray will save everything
-        $scope.endCut.isInArray = false;
-        return;
-      }
-
-      // CALL SAVE HTTP
-      var objToSave = {chapters: [], cut: []};
-      for (var collectionName in objToSave) {
-        if ($scope.media.hasOwnProperty(collectionName)) {
-          for (var i = 0; i < $scope.media[collectionName].length; i++) {
-            var element = angular.copy($scope.media[collectionName][i]);
-            delete element['_depth'];
-            delete element['select'];
-            delete element['check'];
-            objToSave[collectionName].push(element);
+      publishService.removeTags($scope.media.id, tagsToRemove).then(function(resp) {
+        if ($scope.checkAllSelected) $scope.media[$scope.selectedData.value] = [];
+        else for (var i = 0; i < tagsToRemove[$scope.selectedData.value].length; i++) {
+          var id = tagsToRemove[$scope.selectedData.value][i]['id'];
+          var k = searchPosition(id);
+          if (k >= 0) {
+            $scope.media[$scope.selectedData.value].splice(k, 1);
           }
-          orderBy(objToSave[collectionName], '+value', false);
         }
-      }
-      entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
-
-      }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
-        if (status === 401)
-          $scope.$parent.logout();
+        updateRange();
       });
     };
+
     $scope.back = function() {
+      deleteUpload();
       $window.history.back();
     };
 
@@ -406,25 +523,26 @@
         $scope.selectRowInitialValue = newVal.value;
     });
 
+    // range depends on chapters and cut
+    $scope.$watchCollection('media.tags', updateRange);
+    $scope.$watchCollection('media.chapters', updateRange);
+    $scope.$watchCollection('media.cut', updateRange);
+
     // watching the button to toggle begin in and out of the cut array
     // we do the same for end
     // we do not toggle if previous value was undefined cause it means we are still initiating the controller
     $scope.$watch('beginCut.isInArray', function(newVal, oldVal) {
       if (newVal !== oldVal && oldVal !== undefined) {
         toggleBegin(newVal);
-        $scope.saveChapter();
+        saveCut();
       }
     });
     $scope.$watch('endCut.isInArray', function(newVal, oldVal) {
       if (newVal !== oldVal && oldVal !== undefined) {
         toggleEnd(newVal);
-        $scope.saveChapter();
+        saveCut();
       }
     });
-
-    // range depends on chapters and cut
-    $scope.$watchCollection('media.chapters', updateRange);
-    $scope.$watchCollection('media.cut', updateRange);
 
     // maintain the data consistency when cuts are moved/deleted and during initition of the controller
     $scope.$watchCollection('media.cut', function() {
@@ -447,6 +565,14 @@
       }
     });
 
+    $scope.$watch('isCollapsed', function(oldval, newVal) {
+      if (!newVal) deleteUpload();
+    });
+
+    $scope.$on('$destroy', function() {
+      deleteUpload();
+    });
+
     $scope.editTime = new Date(Date.UTC(1970, 0, 1, 0, 0, 0));
   }
 
@@ -460,7 +586,8 @@
     'i18nService',
     'ovMultirangeViews',
     'media',
-    'publishName'
+    'publishName',
+    'publishService'
   ];
 
 })(angular.module('ov.publish'));

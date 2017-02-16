@@ -77,7 +77,7 @@
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
     "SHARECODE" : "To share the video, copy the HTML code below and paste it in your page :",
-    "CHAPTER_EDIT": "Chapter",
+    "CHAPTER_EDIT": "Edit media",
     "ATTR_TITLE" : "Title",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Category",
@@ -154,9 +154,9 @@
     "EMPTY" : "An empty category could not be added."
   },
   "CHAPTER" : {
-    "PAGE_TITLE" : "Publish - Chapter",
-    "TITLE" : "Video - Chapter",
-    "INFO" : "Adding chapters allows a better organization of your content. For each chapter, a description can be added to explain the content or add extra information.",
+    "PAGE_TITLE" : "Publish - Rich media",
+    "TITLE" : "Rich Media Edition",
+    "INFO" : "Adding chapters ar tags allows a better organization of your content. For each chapter, a description can be added to explain the content or add extra information. With tags, you can pin important moment in your content and adding files to add informations.",
     "HEAD_TITLE": "Title",
     "HEAD_TIME": "Time",
     "FORM_TITLE": "Title",
@@ -168,7 +168,17 @@
     "ADD_BEGIN": "Add begin cut",
     "REMOVE_BEGIN": "Remove begin cut",
     "SAVE_ERROR": "An error occured. Your changes could not be saved.",
-    "NO_CHAPTER": "No chapter. <br> Click \"New\" to add one."
+    "NO_CHAPTERS": "No chapter. <br> Click \"New\" to add one.",
+    "NO_TAGS": "No tag. <br> Click \"New\" to add one.",
+    "UPLOAD_CANCELED": "Upload was canceled by user. File was not uploaded.",
+    "CONTEXT": {
+      "INDEX_TITLE": "Indexes",
+      "CHAPTERS_TITLE": "Chapters",
+      "TAGS_TITLE": "Tags"
+    },
+    "ADD_FILE": "Add a file",
+    "REPLACE_FILE": "Replace attached file",
+    "LARGE_FILE_ERROR": "File too large"
   },
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",

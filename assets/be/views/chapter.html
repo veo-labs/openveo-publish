@@ -1,7 +1,9 @@
-<div class="pu-chapter">
+<div class="pu-chapter" ng-class="selectedData.value">
   <h2>
-    <div class='btn btn-default back-button' ng-click='back()'><span class='glyphicon glyphicon-chevron-left'></span>{{'CORE.UI.BACK'| translate}}</div>
+     <div class='btn btn-default back-button' ng-click='back()'><span class='glyphicon glyphicon-chevron-left'></span>{{'CORE.UI.BACK'| translate}}</div>
+     <span ng-bind="'PUBLISH.CHAPTER.TITLE' | translate"></span>
   </h2>
+
   <div class="well well-lg" ng-bind="'PUBLISH.CHAPTER.INFO' | translate"></div>
   <div class="row media-viewer">
     <div class='col-sm-8 col-sm-push-4'>
@@ -13,6 +15,9 @@
          ></ov-player>
     </div>
     <div class='col-sm-4 col-sm-pull-8' >
+    <uib-tabset active="activeJustified" justified="true">
+      <uib-tab ng-repeat="data in dataId" select="selectedData.value = data;" index="0" heading="{{ 'PUBLISH.CHAPTER.CONTEXT.' + data.toUpperCase() + '_TITLE' | translate}}"></uib-tab>
+    </uib-tabset>
       <table class="table table-striped table-condensed chapter-table" ng-show='ranges.length'>
         <thead>
           <tr><th class='col-sm-3 active'>{{ 'PUBLISH.CHAPTER.HEAD_TIME' | translate}}</th>
@@ -37,7 +42,7 @@
         </tbody>
       </table>
       <div class="no-chapter" ng-if='!ranges.length'>
-        <span class="text" ng-bind-html="'PUBLISH.CHAPTER.NO_CHAPTER' | translate"></span>
+        <span class="text" ng-bind-html="'PUBLISH.CHAPTER.NO_' + selectedData.value.toUpperCase() | translate"></span>
       </div>
 
       <div class="btn-group btn-group-justified" role="group">
@@ -52,34 +57,54 @@
         </div>
       </div>
     </div>
-
-
   </div>
 
   <div class="editform" uib-collapse="isCollapsed">
     <div class='well container-fluid'>
-      <form name="myForm">
-      <div class="col-sm-4">
-        <div class="form-group">
-          <label for="time">{{ 'PUBLISH.CHAPTER.FORM_TIME' | translate}}</label>
-          <input type="time" step="1" name="time" class="form-control" id="time" ng-model="editTime" ng-change="updateRange()" min="00:00:00" max="{{ duration*1000 | date:'HH:mm:ss':'+0000'}}" placeholder="00:00:00">
+      <form name="myForm" enctype="multipart/form-data" ng-submit="submit()">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label for="time">{{ 'PUBLISH.CHAPTER.FORM_TIME' | translate}}</label>
+            <input type="time" step="1" name="time" class="form-control" id="time" ng-model="editTime" ng-change="updateRange()" min="00:00:00" max="{{ duration*1000 | date:'HH:mm:ss':'+0000'}}" placeholder="00:00:00">
+          </div>
+          <div class="form-group">
+            <label for="title">{{ 'PUBLISH.CHAPTER.FORM_TITLE' | translate}}*</label>
+            <div ng-hide="!modelToEdit.type" class="well well-sm">{{modelToEdit.name | translate}}</div>
+            <input ng-show="!modelToEdit.type" type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
+          </div>
+          <div ng-show="!modelToEdit.type && selectedData.value == 'tags'" class="form-group">
+            <label for="file" ng-if='!modelToEdit.file'>{{ 'PUBLISH.CHAPTER.ADD_FILE' | translate}}</label>
+            <label for="file" ng-if='modelToEdit.file'>{{ 'PUBLISH.CHAPTER.REPLACE_FILE' | translate}}</label>
+            <input type="file" class="btn btn-default" ngf-select ng-model="file" name="file"
+            ngf-max-size="20MB"
+            ngf-model-invalid="errorFile">
+            <i ng-show="myForm.file.$error.maxSize">{{ 'PUBLISH.CHAPTER.LARGE_FILE_ERROR' | translate}} {{errorFile.size / 1000000|number:2}}MB: max 20MB</i>
+            <img style="width:100%" ng-show="myForm.file.$valid" ngf-thumbnail="file" class="thumb">
+            <audio style="width:100%" controls ngf-src="file"></audio>
+            <video style="width:100%" controls ngf-src="file"></video>
+            <button type="button" class="btn btn-default" ng-click="file = null" ng-show="file">{{ 'CORE.UI.REMOVE'  | translate}}</button>
+            <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+            <uib-progressbar  ng-show="file.progress >= 0" class="progress-striped" value="file.progress" type="warning">{{file.progress}}%</uib-progressbar>
+          </div>
+          <div class="form-group" ng-show="!modelToEdit.type && !file">
+            <img style="width:100%" ng-if="modelToEdit.file.mimetype.substr(0, 'image'.length) === 'image'" ng-src="/publish/{{media.id}}/uploads/{{modelToEdit.file.filename}}">
+            <video width="100%" height="240" controls ng-if="modelToEdit.file.mimetype.substr(0, 'video'.length) === 'video'">
+              <source src="{{'/publish/' + media.id +'/uploads/' + modelToEdit.file.filename}}"/>
+            </video>
+            <audio ng-if="modelToEdit.file.mimetype.substr(0, 'audio'.length) === 'audio'" src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}" audioplayer controls></audio>
+            <button type="button" class="btn btn-default" ng-click="modelToEdit.file = null" ng-show="modelToEdit.file">{{ 'CORE.UI.REMOVE' | translate}}</button>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="title">{{ 'PUBLISH.CHAPTER.FORM_TITLE' | translate}}*</label>
-          <div ng-hide="!modelToEdit.type" class="well well-sm">{{modelToEdit.name | translate}}</div>
-          <input ng-show="!modelToEdit.type" type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
+        <div class="col-sm-5">
+          <div class="form-group" ng-if="!modelToEdit.type">
+            <label for="desc">{{ 'PUBLISH.CHAPTER.FORM_DESCRIPTION' | translate}}</label>
+            <textarea class="form-control" name="desc" rows="5" ng-model="modelToEdit.description"></textarea>
+          </div>
         </div>
-      </div>
-      <div class="col-sm-5" >
-        <div class="form-group"  ng-if="!modelToEdit.type">
-          <label for="title">{{ 'PUBLISH.CHAPTER.FORM_DESCRIPTION' | translate}}</label>
-          <textarea class="form-control" rows="5" ng-model="modelToEdit.description"></textarea>
+        <div class="col-sm-3 button">
+          <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime || !myForm.file.$valid" class="btn btn-primary" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
+          <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
         </div>
-      </div>
-      <div class="col-sm-3 button">
-        <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime " class="btn btn-primary" ng-click="submit()" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
-        <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
-      </div>
       </form>
     </div>
   </div>
@@ -93,7 +118,7 @@
          <i class="glyphicon glyphicon-log-in"></i>
        </button>
      </div>
-     <div class="pull-right" style="margin-bottom: 5px">
+     <div class="pull-right" style="margin-bottom: 5px" ng-if="slider.views.length>1">
        <span class="ng-binding">Zoom x<span ng-bind="slider.view+1"></span></span>
        <button class="btn btn-default" ng-disabled="slider.view == slider.views.length-1" ng-click="changeSliderView($event, 1)">
          <i class="glyphicon glyphicon-zoom-in"></i>

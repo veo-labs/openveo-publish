@@ -76,7 +76,7 @@
     "UPLOAD_LOCAL" : "Envoyer sur la machine local",
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
-    "CHAPTER_EDIT": "Chapitre",
+    "CHAPTER_EDIT": "Editer le media",
     "SHARECODE" : "Pour partager la vidéo, copiez le code HTML ci-dessous dans votre page :",
     "ATTR_TITLE" : "Titre",
     "ATTR_DESCRIPTION" : "Description",
@@ -154,9 +154,9 @@
     "EMPTY" : "Vous ne pouvez pas ajouter une catégorie vide."
   },
   "CHAPTER" : {
-    "PAGE_TITLE" : "Publish - Chapitres",
-    "TITLE" : "Video - Chapitres",
-    "INFO" : "Organisez votre contenu en rajoutant des chapitres pour illustrer et détailler votre sujet.",
+    "PAGE_TITLE" : "Publish - Rich media",
+    "TITLE" : "Edition Rich Media",
+    "INFO" : "Organisez votre contenu en rajoutant des chapitres ou des tags. Les chapitres permettent d'organiser votre contenu en y rajoutant plus d'information. Avec les tags, vous pouvez marquer les moments important de votre contenu.",
     "HEAD_TITLE": "Titre",
     "HEAD_TIME": "Temps",
     "FORM_TITLE": "Titre",
@@ -168,7 +168,17 @@
     "ADD_BEGIN": "Couper le début",
     "REMOVE_BEGIN": "Enlever la coupe de début",
     "SAVE_ERROR": "Une erreur est survenue. Vos modifications n'ont pas pu être sauvegardées.",
-    "NO_CHAPTER": "Aucun chapitre. <br> Cliquez sur \"Nouveau\" pour en ajouter."
+    "NO_CHAPTERS": "Aucun chapitre. <br> Cliquez sur \"Nouveau\" pour en ajouter.",
+    "NO_TAGS": "Aucun tag. <br> Cliquez sur \"Nouveau\" pour en ajouter.",
+    "UPLOAD_CANCELED": "L'upload à été interrompu. Le fichier n'a pas été uploadé.",
+    "CONTEXT": {
+      "INDEX_TITLE": "Indexes",
+      "CHAPTERS_TITLE": "Chapitres",
+      "TAGS_TITLE": "Tags"
+    },
+    "ADD_FILE": "Ajouter un fichier",
+    "REPLACE_FILE": "Remplacer le fichier",
+    "LARGE_FILE_ERROR": "Taille du fichier trop grande"
   },
   "CONFIGURATION": {
     "PAGE_TITLE": "Publish - Configuration",

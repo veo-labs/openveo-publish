@@ -16,7 +16,9 @@ module.exports = {
         'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
         'get /configuration/googleOAuthAssociation':
         'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
-        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
+        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration',
+        'post /updateVideoTags/:id': 'app/server/controllers/VideoController.updateTagsAction',
+        'post /removeVideoTags/:id': 'app/server/controllers/VideoController.removeTagsAction'
       },
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
@@ -82,7 +84,11 @@ module.exports = {
         {
           id: 'publish-chapter-videos',
           name: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_NAME',
-          description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION'
+          description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION',
+          paths: [
+            'post /publish/updateVideoTags*',
+            'post /publish/removeVideoTags*'
+          ]
         },
         {
           id: 'publish-retry-videos',
@@ -142,7 +148,8 @@ module.exports = {
         '/publish/lib/dashjs/dist/dash.all.min.js',
         '/publish/lib/videojs-contrib-dash/index.js',
         '/publish/lib/videojs-contrib-hls/index.js',
-        '/publish/lib/openveo-player/dist/openveo-player.min.js'
+        '/publish/lib/openveo-player/dist/openveo-player.min.js',
+        '/publish/lib/ng-file-upload/ng-file-upload.min.js'
       ],
       dev: [
         '/publish/ovPub/PublishApp.js',

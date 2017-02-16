@@ -8,7 +8,7 @@
    * @module ov.publish
    * @class publishService
    */
-  function PublishService($http, $q, entityService, jsonPath, publishName) {
+  function PublishService($http, $q, entityService, jsonPath, publishName, Upload) {
     var basePath = '/be/';
     var properties;
     var taxonomyCategory;
@@ -227,6 +227,36 @@
     }
 
     /**
+     * Upload file and Update Tags and .
+     *
+     * @param {String} id The media id
+     * @param {Object} file The file to upload
+     * @param {Object} the data to add/update
+     * @return {Promise} The HTTP promise
+     * @method updateTags
+     */
+    function updateTags(id, file, data) {
+
+      return Upload.upload({
+        url: '/be/publish/updateVideoTags/' + id,
+        data: {file: file, info: Upload.json(data)}
+      });
+    }
+
+     /**
+     * Remove tags from video.
+     *
+     * @param {String} id The media id
+     * @param {Object} data The upload configuration object
+     * @return {Promise} The HTTP promise
+     * @method removeTags
+     */
+    function removeTags(id, data) {
+      return $http.post(basePath + 'publish/removeVideoTags/' + id, data);
+    }
+
+
+    /**
      * Clears a publish service cache.
      *
      * @param {String} [type] The cache element to clear (**properties**, **categories** or **chapter**), null to
@@ -281,12 +311,14 @@
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
       saveUploadConfig: saveUploadConfig,
+      updateTags: updateTags,
+      removeTags: removeTags,
       cacheClear: cacheClear
     };
 
   }
 
   app.factory('publishService', PublishService);
-  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath', 'publishName'];
+  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath', 'publishName', 'Upload'];
 
 })(angular.module('ov.publish'));
