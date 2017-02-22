@@ -312,6 +312,7 @@
     // Init object for player
     $scope.mediaPlayer = angular.copy($scope.media);
     delete $scope.mediaPlayer.chapters;
+    delete $scope.mediaPlayer.tags;
     delete $scope.mediaPlayer.cut;
 
     // Set player language
