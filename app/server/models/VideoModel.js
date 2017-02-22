@@ -932,17 +932,22 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
         tags[key] = entity[key];
         var tag = tags[key];
 
-        // remove old file from filesystem;
-        if (item.file) removeTagsFile([item.file.path]);
-
-        if (file) item.file = file;
-
         if (!item.id) {
           item.id = shortid.generate();
+          if (file) item.file = file;
           tag.push(item);
         } else {
           for (var i = 0; i < tag.length; i++) {
             if (tag[i].id == item.id) {
+
+              // remove old file from filesystem when
+              // old file exist
+              if (file) {
+                if (item.file) removeTagsFile([item.file.path]);
+                item.file = file;
+              } else if (!item.file && tag[i].file) { // or when user delete file attached
+                removeTagsFile([tag[i].file.path]);
+              }
               tag[i] = item;
             }
           }
