@@ -86,12 +86,12 @@
             <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
             <uib-progressbar  ng-show="file.progress >= 0" class="progress-striped" value="file.progress" type="warning">{{file.progress}}%</uib-progressbar>
           </div>
-          <div class="form-group" ng-show="!modelToEdit.type && !file">
+          <div class="form-group" ng-if="!modelToEdit.type && !file">
             <img style="width:100%" ng-if="modelToEdit.file.mimetype.substr(0, 'image'.length) === 'image'" ng-src="/publish/{{media.id}}/uploads/{{modelToEdit.file.filename}}">
-            <video width="100%" height="240" controls ng-if="modelToEdit.file.mimetype.substr(0, 'video'.length) === 'video'">
-              <source src="{{'/publish/' + media.id +'/uploads/' + modelToEdit.file.filename}}"/>
+            <video width="100%" height="240" controls ng-if="modelToEdit.file.mimetype.substr(0, 'video'.length) === 'video'"
+              ng-src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}">
             </video>
-            <audio ng-if="modelToEdit.file.mimetype.substr(0, 'audio'.length) === 'audio'" src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}" audioplayer controls></audio>
+            <audio ng-if="modelToEdit.file.mimetype.substr(0, 'audio'.length) === 'audio'" ng-src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}" audioplayer controls></audio>
             <button type="button" class="btn btn-default" ng-click="modelToEdit.file = null" ng-show="modelToEdit.file">{{ 'CORE.UI.REMOVE' | translate}}</button>
           </div>
         </div>
