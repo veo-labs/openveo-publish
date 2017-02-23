@@ -178,7 +178,8 @@
     },
     "ADD_FILE": "Ajouter un fichier",
     "REPLACE_FILE": "Remplacer le fichier",
-    "LARGE_FILE_ERROR": "Taille du fichier trop grande"
+    "LARGE_FILE_ERROR": "Taille du fichier trop grande",
+    "FILE_DOWNLOAD": "Télécharger"
   },
   "CONFIGURATION": {
     "PAGE_TITLE": "Publish - Configuration",

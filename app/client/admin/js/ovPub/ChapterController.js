@@ -170,7 +170,9 @@
 
         $scope.file = null;
         $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
+        $scope.simpleMimeType = $scope.getFileMimeType();
         if (!$scope.selectRow) {
+
           // ADD the new model
           $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
         } else {
@@ -375,6 +377,7 @@
         $scope.selectRow = null;
       }
       deleteUpload();
+      $scope.simpleMimeType = null;
       $scope.isCollapsed = false;
     };
 
@@ -387,6 +390,7 @@
 
         // Copy
         $scope.modelToEdit = $scope.selectRow;
+        $scope.simpleMimeType = $scope.getFileMimeType();
         $scope.isCollapsed = false;
       } else {
 
@@ -430,6 +434,15 @@
         $scope.cancel();
         $scope.select(object);
       }
+    };
+
+    // Get simple mimetype
+    $scope.getFileMimeType = function() {
+      if (!$scope.modelToEdit || !$scope.modelToEdit.file) return null;
+      else if ($scope.modelToEdit.file.mimetype.substr(0, 'image'.length) == 'image') return 'image';
+      else if ($scope.modelToEdit.file.mimetype.substr(0, 'video'.length) == 'video') return 'video';
+      else if ($scope.modelToEdit.file.mimetype.substr(0, 'audio'.length) == 'audio') return 'audio';
+      else return $scope.modelToEdit.file.mimetype;
     };
 
     /*
