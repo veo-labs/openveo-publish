@@ -133,7 +133,10 @@ module.exports = {
       }
     ],
     scriptLibFiles: {
-      base: [],
+      base: [
+        '/publish/lib/tinymce/tinymce.min.js',
+        '/publish/lib/angular-ui-tinymce/dist/tinymce.min.js'
+      ],
       dev: [
         '/publish/multirange/multirange.js',
         '/publish/timePolyfill/time-polyfill.js'

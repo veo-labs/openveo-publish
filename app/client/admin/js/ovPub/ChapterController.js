@@ -342,6 +342,13 @@
 
     $scope.nbCheckRow = 0;
 
+    $scope.tinymceOptions = {
+      plugins: 'link',
+      menubar: false,
+      toolbar: 'undo redo | styleselect removeformat | bold italic ' +
+      '| alignleft aligncenter alignjustify | bullist numlist | link'
+    };
+
     $scope.$watch('selectedData.value', function() {
       $scope.select(null);
       $scope.cancel();
