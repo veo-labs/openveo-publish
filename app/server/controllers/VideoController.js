@@ -461,7 +461,7 @@ VideoController.prototype.getPublishManager = function() {
 VideoController.prototype.updateTagsAction = function(request, response, next) {
   if (request.params.id) {
     var entityId = request.params.id;
-    var model = new this.Entity(request.user);
+    var model = this.getModel(request);
     var upload = multer({dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/'});
     upload.single('file')(request, response, function(err) {
       if (err || !request.body.info) {
@@ -474,7 +474,7 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
 
       model.updateTags(entityId, data, file, function(error, newtag) {
         if (error)
-          next((error instanceof AccessError) ? errors.UPDATE_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
+          next((error instanceof AccessError) ? HTTP_ERRORS.UPDATE_VIDEO_FORBIDDEN : HTTP_ERRORS.PUBLISH_VIDEO_ERROR);
         else
           response.send(newtag);
       });
@@ -483,7 +483,7 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
   } else {
 
     // Missing type and / or id of the video
-    next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
+    next(HTTP_ERRORS.PUBLISH_VIDEO_MISSING_PARAMETERS);
   }
 };
 
@@ -497,18 +497,18 @@ VideoController.prototype.removeTagsAction = function(request, response, next) {
 
   if (request.params.id) {
     var entityId = request.params.id;
-    var model = new this.Entity(request.user);
+    var model = this.getModel(request);
     var data = request.body;
 
     model.removeTags(entityId, data, function(error, deletedTag) {
       if (error)
-        next((error instanceof AccessError) ? errors.UPDATE_VIDEO_FORBIDDEN : errors.PUBLISH_VIDEO_ERROR);
+        next((error instanceof AccessError) ? HTTP_ERRORS.UPDATE_VIDEO_FORBIDDEN : HTTP_ERRORS.PUBLISH_VIDEO_ERROR);
       else
         response.send(deletedTag);
     });
   } else {
 
     // Missing type and / or id of the video
-    next(errors.PUBLISH_VIDEO_MISSING_PARAMETERS);
+    next(HTTP_ERRORS.PUBLISH_VIDEO_MISSING_PARAMETERS);
   }
 };
