@@ -72,7 +72,7 @@
             <div ng-hide="!modelToEdit.type" class="well well-sm">{{modelToEdit.name | translate}}</div>
             <input ng-show="!modelToEdit.type" type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
           </div>
-          <div class="form-group" ng-if="!modelToEdit.type && !file">
+          <div class="form-group" ng-if="modelToEdit.file && !modelToEdit.type && !file">
 
             <img style="width:100%" ng-if="simpleMimeType == 'image'" ng-src="/publish/{{media.id}}/uploads/{{modelToEdit.file.filename}}">
             <video width="100%" controls ng-if="simpleMimeType == 'video'"

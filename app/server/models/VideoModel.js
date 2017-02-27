@@ -939,11 +939,8 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
         } else {
           for (var i = 0; i < tag.length; i++) {
             if (tag[i].id == item.id) {
-
-              // remove old file from filesystem when
-              // old file exist
-              if (file) {
-                if (item.file) removeTagsFile([item.file.path]);
+              if (file) { // delete old file when new file uploaded
+                if (tag[i].file) removeTagsFile([tag[i].file.path]);
                 item.file = file;
               } else if (!item.file && tag[i].file) { // or when user delete file attached
                 removeTagsFile([tag[i].file.path]);
