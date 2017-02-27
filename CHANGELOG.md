@@ -4,15 +4,20 @@
 
 - The watcher which used to be a sub process is now integrated inside the OpenVeo process
 - Back end page to start / stop the watcher has been removed
+- Chapters are no more initiated relatively to slides. User have to define them himself.
 - Drop support for Node.js &lt;7.4.0
 - Drop support for NPM &lt;4.0.5
 
 ## NEW FEATURES
 
-- **Search engines** for medias and custom properties have been improved. Multiple search fields have been replaced by a unique field. Search is now case insensitive and search is made on the whole string not just strings starting with the query. The query string is taken as the whole when searching meaning that special characters aren't interpreted and thus will be searched as is.
+- **Search engines** for medias and custom properties have been improved. Multiple search fields have been replaced by a unique field. Search is now case insensitive and search is made on the whole string, not just strings starting with the query. The query string is taken as the whole when searching meaning that special characters aren't interpreted and thus will be searched as is.
+- **Rich media tags**. Tags and chapters now embed a WYSIWYG editor. Tags can also be associated with a file that user can upload up to 20MB. These associated information can be previewed before saving modification and are rendered in player views associated with tags and chapters.
 
 ## DEPENDENCIES
 
+### SERVER
+
+- **multer 1.3.0** has been added
 - **javascript-state-machine** has been updated from 2.3.5 to **2.4.0**
 - **googleapis** has been updated from 5.2.1 to **16.0.0**
 - **xml2js** has been updated from 0.4.16 to **0.4.17**
@@ -35,6 +40,10 @@
 - **grunt-remove** has been removed
 - **grunt-rename** has been removed
 - **grunt-extend-config** has been removed
+
+### CLIENT
+
+- **angular-ui-tinymce 0.0.18**  has been added
 
 # 2.1.2 / 2017-01-11
 
