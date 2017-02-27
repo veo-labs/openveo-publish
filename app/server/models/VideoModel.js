@@ -942,6 +942,7 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
               if (file) { // delete old file when new file uploaded
                 if (tag[i].file) removeTagsFile([tag[i].file.path]);
                 item.file = file;
+                item.file.basePath = '/publish/' + entity.id + '/uploads/' + item.file.filename;
               } else if (!item.file && tag[i].file) { // or when user delete file attached
                 removeTagsFile([tag[i].file.path]);
               }

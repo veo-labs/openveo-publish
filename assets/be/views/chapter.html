@@ -74,14 +74,14 @@
           </div>
           <div class="form-group" ng-if="modelToEdit.file && !modelToEdit.type && !file">
 
-            <img style="width:100%" ng-if="simpleMimeType == 'image'" ng-src="/publish/{{media.id}}/uploads/{{modelToEdit.file.filename}}">
+            <img style="width:100%" ng-if="simpleMimeType == 'image'" ng-src="{{modelToEdit.file.basePath}}">
             <video width="100%" controls ng-if="simpleMimeType == 'video'"
-              ng-src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}">
+              ng-src="{{modelToEdit.file.basePath}}">
             </video>
-            <audio style="width:100%" ng-if="simpleMimeType == 'audio'" ng-src="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}" audioplayer controls></audio>
+            <audio style="width:100%" ng-if="simpleMimeType == 'audio'" ng-src="{{modelToEdit.file.basePath}}" audioplayer controls></audio>
             <div ng-if="simpleMimeType && ['image','video','audio'].indexOf(simpleMimeType) == -1">{{modelToEdit.file.originalname}}</div>
 
-            <a ng-if="simpleMimeType" href="{{'/publish/' + media.id + '/uploads/' + modelToEdit.file.filename}}"
+            <a ng-if="simpleMimeType" href="{{modelToEdit.file.basePath}}"
               class="btn btn-default" role="button"
               download="{{modelToEdit.file.originalname}}"
               ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <span> {{ 'PUBLISH.CHAPTER.FILE_DOWNLOAD' | translate}}</span>
