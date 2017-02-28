@@ -3,7 +3,6 @@
 var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
-var openVeoApi = require('@openveo/api');
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
@@ -17,7 +16,7 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Chapter page', function() {
-  var coreApi = openVeoApi.api.getCoreApi();
+  var coreApi = process.api.getCoreApi();
   var page;
   var medias;
   var mediaId = 'test-chapters-page-permissions';

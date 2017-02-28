@@ -29,12 +29,13 @@ describe('Video platforms factory', function() {
         return new openVeoApi.database.Database({});
       }
     };
-    openVeoApi.plugin.pluginManager.addPlugin(corePlugin);
+
+    process.api.addPlugin(corePlugin);
   });
 
   // Clean up tests
   afterEach(function() {
-    openVeoApi.plugin.pluginManager.removePlugin(corePlugin.name);
+    process.api.removePlugins();
   });
 
   // get method

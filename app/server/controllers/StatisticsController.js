@@ -55,7 +55,7 @@ StatisticsController.prototype.statisticsAction = function(request, response, ne
               next(HTTP_ERRORS.STATISTICS_MISSING_COUNT_PARAMETERS);
               return;
             }
-            var coreApi = openVeoApi.api.getCoreApi();
+            var coreApi = process.api.getCoreApi();
             var videoProvider = new VideoProvider(coreApi.getDatabase());
             var propertyProvider = new PropertyProvider(coreApi.getDatabase());
             var videoModel = new VideoModel(null, videoProvider, propertyProvider);

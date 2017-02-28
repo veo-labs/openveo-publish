@@ -11,8 +11,6 @@
  * @static
  */
 
-var openVeoApi = require('@openveo/api');
-
 /**
  * Gets an instance of a VideoPlatformProvider giving a type and a
  * configuration object.
@@ -39,7 +37,7 @@ module.exports.get = function(type, providerConf) {
         var GoogleOAuthHelper = process.requirePublish(
           'app/server/providers/videoPlatforms/youtube/GoogleOAuthHelper.js'
         );
-        var coreApi = openVeoApi.api.getCoreApi();
+        var coreApi = process.api.getCoreApi();
         var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
         return new YoutubeProvider(providerConf, new GoogleOAuthHelper(configurationModel));
       case 'wowza':

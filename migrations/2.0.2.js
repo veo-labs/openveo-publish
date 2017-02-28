@@ -1,10 +1,9 @@
 'use strict';
 
 var async = require('async');
-var openVeoApi = require('@openveo/api');
 
 module.exports.update = function(callback) {
-  var coreApi = openVeoApi.api.getCoreApi();
+  var coreApi = process.api.getCoreApi();
   var db = coreApi.getDatabase();
   process.logger.info('Publish 2.0.2 migration launched.');
 

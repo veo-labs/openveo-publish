@@ -20,7 +20,7 @@ var EntityController = openVeoApi.controllers.EntityController;
  * @constructor
  */
 function PropertyController() {
-  PropertyController.super_.call(this, PropertyModel, PropertyProvider);
+  PropertyController.super_.call(this);
 }
 
 module.exports = PropertyController;
@@ -123,6 +123,6 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
  * @return {PropertyModel} The PropertyModel instance
  */
 PropertyController.prototype.getModel = function(request) {
-  var coreApi = openVeoApi.api.getCoreApi();
-  return new this.Model(new this.Provider(coreApi.getDatabase()), new VideoProvider(coreApi.getDatabase()));
+  var database = process.api.getCoreApi().getDatabase();
+  return new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
 };

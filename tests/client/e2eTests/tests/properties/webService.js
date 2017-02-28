@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var openVeoTest = require('@openveo/test');
-var openVeoApi = require('@openveo/api');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
@@ -23,7 +22,7 @@ describe('Properties web service', function() {
   var propertyHelper;
 
   before(function() {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var application = process.protractorConf.getWebServiceApplication(
       datas.applications.publishApplicationsProperties.name
     );

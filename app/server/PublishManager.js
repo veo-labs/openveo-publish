@@ -52,7 +52,7 @@ var publishManager;
  * different regarding the type of the media.
  *
  * @example
- *     var coreApi = require('@openveo/api').api.getCoreApi();
+ *     var coreApi = process.api.getCoreApi();
  *     var database = coreApi.getDatabase();
  *     var PublishManager = process.requirePublish('app/server/PublishManager.js');
  *     var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));

@@ -11,7 +11,6 @@ var PropertyProvider = process.requirePublish('app/server/providers/PropertyProv
 var Package = process.requirePublish('app/server/packages/Package.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
-var pluginManager = openVeoApi.plugin.pluginManager;
 var assert = chai.assert;
 
 chai.should();
@@ -23,7 +22,6 @@ describe('VideoModel', function() {
   var videoModel;
   var TestPropertyProvider;
   var TestVideoProvider;
-  var CorePlugin;
   var anonymousUserId = 'anonymous';
   var superAdminId = 'admin';
 
@@ -31,37 +29,25 @@ describe('VideoModel', function() {
   beforeEach(function() {
     TestPropertyProvider = function() {};
     TestVideoProvider = function() {};
-    CorePlugin = function() {};
 
     util.inherits(TestPropertyProvider, PropertyProvider);
     util.inherits(TestVideoProvider, VideoProvider);
-    util.inherits(CorePlugin, openVeoApi.plugin.Plugin);
   });
 
   // Initializes tests
   beforeEach(function() {
     var videoProvider = new TestVideoProvider();
     var propertyProvider = new TestPropertyProvider();
-    var corePlugin = new CorePlugin();
-    corePlugin.name = 'core';
-    corePlugin.api = {
-      getAnonymousUserId: function() {
-        return anonymousUserId;
-      },
-      getSuperAdminId: function() {
-        return superAdminId;
-      }
-    };
 
     user = {};
     videoModel = new VideoModel(user, videoProvider, propertyProvider);
+    videoModel.getSuperAdminId = function() {
+      return superAdminId;
+    };
 
-    pluginManager.addPlugin(corePlugin);
-  });
-
-  // Remove core plugin from plugin manager
-  afterEach(function() {
-    pluginManager.removePlugin('core');
+    videoModel.getAnonymousId = function() {
+      return anonymousUserId;
+    };
   });
 
   it('should be an instance of EntityModel', function() {

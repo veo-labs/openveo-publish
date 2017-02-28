@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
-var openVeoApi = require('@openveo/api');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -172,7 +171,7 @@ describe('Media page translations', function() {
 
   // Load page
   before(function() {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     var videoModel = new VideoModel(null, videoProvider, propertyProvider);

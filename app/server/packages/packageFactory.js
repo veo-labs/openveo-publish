@@ -11,7 +11,6 @@
  * @static
  */
 
-var openVeoApi = require('@openveo/api');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -29,7 +28,7 @@ var ConfigurationProvider = process.requirePublish('app/server/providers/Configu
  */
 module.exports.get = function(type, mediaPackage) {
   if (type) {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     var videoModel = new VideoModel(null, videoProvider, propertyProvider);

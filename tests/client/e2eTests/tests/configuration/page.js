@@ -16,7 +16,7 @@ describe('Configuration page', function() {
 
   // Prepare page
   before(function() {
-    var coreApi = require('@openveo/api').api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var model = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
     configurationHelper = new ConfigurationHelper(model);
     page = new ConfigurationPage();

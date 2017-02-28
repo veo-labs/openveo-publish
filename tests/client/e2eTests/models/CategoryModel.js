@@ -5,7 +5,7 @@ var openVeoApi = require('@openveo/api');
 var CategoryProvider = process.requirePublish('tests/client/e2eTests/providers/CategoryProvider.js');
 
 function CategoryModel() {
-  var coreApi = openVeoApi.api.getCoreApi();
+  var coreApi = process.api.getCoreApi();
   CategoryModel.super_.call(this, new CategoryProvider(coreApi.getDatabase()));
 }
 

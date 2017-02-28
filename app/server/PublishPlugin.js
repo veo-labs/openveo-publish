@@ -73,7 +73,7 @@ util.inherits(PublishPlugin, openVeoApi.plugin.Plugin);
  *  - **Error** An error if something went wrong, null otherwise
  */
 PublishPlugin.prototype.init = function(callback) {
-  var coreApi = openVeoApi.api.getCoreApi();
+  var coreApi = process.api.getCoreApi();
   var database = coreApi.getDatabase();
   var asyncFunctions = [];
   var providers = [
@@ -108,7 +108,7 @@ PublishPlugin.prototype.start = function(callback) {
 
   // Do not start the watcher if the process is the web service
   if (!process.isWebService) {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
     var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
     var publishManager = PublishManager.get(videoModel, publishConf.maxConcurrentPackage);

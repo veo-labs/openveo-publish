@@ -7,7 +7,6 @@ var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var VideoController = process.requirePublish('app/server/controllers/VideoController.js');
 var PublishPlugin = process.requirePublish('app/server/PublishPlugin.js');
-var pluginManager = openVeoApi.plugin.pluginManager;
 
 // VideoController.js
 describe('VideoController', function() {
@@ -64,11 +63,11 @@ describe('VideoController', function() {
         },
         cssFiles: expectedCssFiles
       };
-      pluginManager.addPlugin(publishPlugin);
+      process.api.addPlugin(publishPlugin);
     });
 
     afterEach(function() {
-      pluginManager.removePlugin(publishPlugin.name);
+      process.api.removePlugins();
     });
 
     it('should display the video page', function(done) {
@@ -86,7 +85,7 @@ describe('VideoController', function() {
       response.render = function() {
         assert.ok(false, 'Unexpected call to render');
       };
-      pluginManager.removePlugin(publishPlugin.name);
+      process.api.removePlugins();
       videoController.displayVideoAction(request, response, done);
     });
   });

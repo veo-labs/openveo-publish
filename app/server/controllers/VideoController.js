@@ -16,7 +16,6 @@ var PropertyProvider = process.requirePublish('app/server/providers/PropertyProv
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
-var pluginManager = openVeoApi.plugin.pluginManager;
 var AccessError = openVeoApi.errors.AccessError;
 var ContentController = openVeoApi.controllers.ContentController;
 
@@ -31,7 +30,7 @@ var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
  * @constructor
  */
 function VideoController() {
-  VideoController.super_.call(this, VideoModel, VideoProvider);
+  VideoController.super_.call(this);
 }
 
 module.exports = VideoController;
@@ -51,7 +50,7 @@ util.inherits(VideoController, ContentController);
  */
 VideoController.prototype.displayVideoAction = function(request, response, next) {
   var publishPlugin;
-  var plugins = pluginManager.getPlugins();
+  var plugins = process.api.getPlugins();
   response.locals.scripts = [];
   response.locals.css = [];
 
@@ -434,11 +433,11 @@ VideoController.prototype.startUploadAction = function(request, response, next) 
  * @return {VideoModel} The VideoModel instance
  */
 VideoController.prototype.getModel = function(request) {
-  var coreApi = openVeoApi.api.getCoreApi();
-  return new this.Model(
+  var database = process.api.getCoreApi().getDatabase();
+  return new VideoModel(
     request.user,
-    new this.Provider(coreApi.getDatabase()),
-    new PropertyProvider(coreApi.getDatabase())
+    new VideoProvider(database),
+    new PropertyProvider(database)
   );
 };
 

@@ -2,7 +2,6 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
-var openVeoApi = require('@openveo/api');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -16,7 +15,7 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Media page', function() {
-  var coreApi = openVeoApi.api.getCoreApi();
+  var coreApi = process.api.getCoreApi();
   var page, mediaHelper;
 
   // Prepare page

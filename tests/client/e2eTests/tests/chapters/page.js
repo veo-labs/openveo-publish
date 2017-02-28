@@ -3,7 +3,6 @@
 var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
-var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
@@ -28,7 +27,7 @@ describe('Chapter page', function() {
 
   // Create a media content
   before(function() {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));

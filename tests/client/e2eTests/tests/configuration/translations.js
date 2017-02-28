@@ -2,7 +2,6 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
-var openVeoApi = require('@openveo/api');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
@@ -81,7 +80,7 @@ describe('Configuration page translations', function() {
 
   // Prepare page
   before(function() {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var model = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
     configurationHelper = new ConfigurationHelper(model);
     page = new ConfigurationPage();

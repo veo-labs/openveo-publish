@@ -24,7 +24,7 @@ var EntityController = openVeoApi.controllers.EntityController;
  * @constructor
  */
 function ConfigurationController() {
-  ConfigurationController.super_.call(this, ConfigurationModel, ConfigurationProvider);
+  ConfigurationController.super_.call(this);
 }
 
 module.exports = ConfigurationController;
@@ -49,8 +49,8 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     function(callback) {
       if (videoPlatformConf['youtube']) {
         var youtubeConf = configurations['youtube'] = {};
-        var coreApi = openVeoApi.api.getCoreApi();
-        var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
+        var database = process.api.getCoreApi().getDatabase();
+        var configurationModel = new ConfigurationModel(new ConfigurationProvider(database));
         var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
         googleOAuthHelper.hasToken(function(error, hasToken) {
           if (error) {
@@ -177,4 +177,14 @@ ConfigurationController.prototype.saveUploadConfiguration = function(request, re
       }
     }
     );
+};
+
+/**
+ * Gets an instance of the entity model associated to the controller.
+ *
+ * @method getModel
+ * @return {EntityModel} The entity model
+ */
+ConfigurationController.prototype.getModel = function() {
+  return new ConfigurationModel(new ConfigurationProvider(process.api.getCoreApi().getDatabase()));
 };

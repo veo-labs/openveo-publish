@@ -149,6 +149,27 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
   });
 }
 
+
+/**
+ * Gets the id of the super administrator.
+ *
+ * @method getSuperAdminId
+ * @return {String} The id of the super admin
+ */
+VideoModel.prototype.getSuperAdminId = function() {
+  return process.api.getCoreApi().getSuperAdminId();
+};
+
+/**
+ * Gets the id of the anonymous user.
+ *
+ * @method getAnonymousId
+ * @return {String} The id of the anonymous user
+ */
+VideoModel.prototype.getAnonymousId = function() {
+  return process.api.getCoreApi().getAnonymousUserId();
+};
+
 /**
  * Remove a list of file
  *
@@ -221,7 +242,6 @@ function removeTagsFile(filePathArray) {
  *   - **Object** The inserted video
  */
 VideoModel.prototype.add = function(media, callback) {
-  var coreApi = openVeoApi.api.getCoreApi();
   var data = {
     id: String(media.id),
     available: media.available,
@@ -248,7 +268,7 @@ VideoModel.prototype.add = function(media, callback) {
     views: media.views || 0
   };
 
-  data.metadata.user = media.user || (this.user && this.user.id) || coreApi.getAnonymousUserId();
+  data.metadata.user = media.user || (this.user && this.user.id) || this.getAnonymousId();
   data.metadata.groups = media.groups || [];
 
   this.provider.add(data, function(error, addedCount, videos) {
@@ -818,7 +838,7 @@ VideoModel.prototype.update = function(id, data, callback) {
       if (self.isUserAuthorized(entity, openVeoApi.models.ContentModel.UPDATE_OPERATION)) {
 
         // user is authorized to update but he must be owner to update the owner
-        if (!self.isUserOwner(entity) && !self.isUserAdmin()) delete info['metadata.user'];
+        if (!self.isUserOwner(entity, self.user) && !self.isUserAdmin(self.user)) delete info['metadata.user'];
 
         self.provider.update(id, info, callback);
       } else

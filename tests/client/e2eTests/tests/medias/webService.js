@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var openVeoTest = require('@openveo/test');
-var openVeoApi = require('@openveo/api');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
@@ -50,7 +49,7 @@ describe('Web service /publish/videos', function() {
     var application = process.protractorConf.getWebServiceApplication(
       datas.applications.publishApplicationsVideos.name
     );
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     webServiceClient = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);

@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
-var openVeoApi = require('@openveo/api');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
 var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
@@ -20,7 +19,7 @@ describe('Property page', function() {
 
   // Prepare page
   before(function() {
-    var coreApi = openVeoApi.api.getCoreApi();
+    var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
     var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
     propertyHelper = new PropertyHelper(propertyModel);
