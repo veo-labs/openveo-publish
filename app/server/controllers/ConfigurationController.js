@@ -107,7 +107,7 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
 ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response, next) {
   var code = request.query.code;
   var coreApi = openVeoApi.api.getCoreApi();
-  var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase));
+  var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
   var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
   process.logger.debug('Code received ', code);
   googleOAuthHelper.persistTokenWithCode(code, function() {
