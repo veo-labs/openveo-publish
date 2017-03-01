@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@openveo/rest-nodejs-client": "1.*",
-    "@openveo/test": "3.*",
     "chai": "3.5.0",
     "chai-spies": "0.7.1",
     "chai-as-promised": "6.0.0",
@@ -66,8 +65,7 @@
     "yuidoc-theme-blue": "0.1.9"
   },
   "peerDependencies": {
-    "@openveo/core": "3.*",
-    "@openveo/api": "3.* >=3.0.1"
+    "@openveo/core": "3.*"
   },
   "scripts": {
     "prepublish": "grunt prod",
