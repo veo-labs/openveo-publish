@@ -4,6 +4,8 @@
  * @module providers
  */
 
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
+
 /**
  * Defines a factory to create video platforms' providers.
  *
@@ -27,10 +29,10 @@
 module.exports.get = function(type, providerConf) {
   if (type && providerConf) {
     switch (type) {
-      case 'vimeo':
+      case TYPES.VIMEO:
         var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
-      case 'youtube':
+      case TYPES.YOUTUBE:
         var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
         var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
         var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
@@ -40,10 +42,10 @@ module.exports.get = function(type, providerConf) {
         var coreApi = process.api.getCoreApi();
         var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
         return new YoutubeProvider(providerConf, new GoogleOAuthHelper(configurationModel));
-      case 'wowza':
+      case TYPES.WOWZA:
         var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
         return new WowzaProvider(providerConf);
-      case 'local':
+      case TYPES.LOCAL:
         var LocalProvider = process.requirePublish('app/server/providers/videoPlatforms/LocalProvider.js');
         return new LocalProvider(providerConf);
 

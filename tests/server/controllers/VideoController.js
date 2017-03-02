@@ -7,6 +7,7 @@ var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var VideoController = process.requirePublish('app/server/controllers/VideoController.js');
 var PublishPlugin = process.requirePublish('app/server/PublishPlugin.js');
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 
 // VideoController.js
 describe('VideoController', function() {
@@ -556,7 +557,7 @@ describe('VideoController', function() {
       var ids = [];
       var callbacks = [];
       request.params.ids = '41,42';
-      request.params.platform = 'wowza';
+      request.params.platform = TYPES.WOWZA;
       publishManager.once = function(name, callback) {
         callbacks.push(callback);
       };
@@ -580,7 +581,7 @@ describe('VideoController', function() {
     });
 
     it('should call next with an error if videos ids are not provided', function(done) {
-      request.params.platform = 'wowza';
+      request.params.platform = TYPES.WOWZA;
       videoController.startUploadAction(request, response, function(error) {
         assert.strictEqual(error, HTTP_ERRORS.START_UPLOAD_VIDEO_MISSING_PARAMETERS);
         done();

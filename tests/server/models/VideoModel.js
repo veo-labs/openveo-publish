@@ -24,6 +24,7 @@ describe('VideoModel', function() {
   var TestVideoProvider;
   var anonymousUserId = 'anonymous';
   var superAdminId = 'admin';
+  var CDN_URL = 'http://cdn.openveo.com';
 
   // Mocks
   beforeEach(function() {
@@ -48,6 +49,18 @@ describe('VideoModel', function() {
     videoModel.getAnonymousId = function() {
       return anonymousUserId;
     };
+    process.api.addPlugin({
+      name: 'core',
+      api: {
+        getCdnUrl: function() {
+          return CDN_URL;
+        }
+      }
+    });
+  });
+
+  afterEach(function() {
+    process.api.removePlugins();
   });
 
   it('should be an instance of EntityModel', function() {

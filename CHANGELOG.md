@@ -8,6 +8,7 @@
 - Drop support for Node.js &lt;7.4.0
 - Drop support for NPM &lt;4.0.5
 - Usage of Web Service end points */videos* and */properties* has change. *page* parameter now starts at 0 instead of 1.
+- Usage of Web Service end point */publish/videos/{video_id}* has change. OpenVeo publish now uses OpenVeo CDN url for local videos urls and videos thumbnails instead of relative urls.
 
 ## NEW FEATURES
 

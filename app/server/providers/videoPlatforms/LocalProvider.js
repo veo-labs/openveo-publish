@@ -92,9 +92,10 @@ LocalProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
   }
 
   var infos = {sources: [], available: true};
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
   mediaIds.forEach(function(mediaId) {
     var info = {};
-    var basePath = self.conf.streamPath + '/' + mediaId + '/video.mp4';
+    var basePath = cdnUrl + self.conf.streamPath + '/' + mediaId + '/video.mp4';
     info.files = [{
       quality: 2, // 0 = mobile, 1 = sd, 2 = hd
       height: expectedDefinition,

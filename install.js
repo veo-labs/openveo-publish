@@ -6,6 +6,7 @@ var fs = require('fs');
 var os = require('os');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
 
 var exit = process.exit;
@@ -313,7 +314,7 @@ function createVideoPlatformConf(callback) {
       rl.question('Do you want to configure Openveo to host video on local server ? (y/N) :\n', function(answer) {
         if (answer === 'y') localConf = {
           vodFilePath: path.join(__dirname, '/assets/player/videos/local'),
-          streamPath: '/publish/player/videos/local'
+          streamPath: 'publish/player/videos/local'
         };
         callback();
       });
@@ -369,10 +370,10 @@ function createWatcherConf(callback) {
     },
     function(callback) {
       if (!videoPlatformConf.vimeo) return callback();
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'vimeo');
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.VIMEO);
       rl.question('Enter Vimeo hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
-          type: 'vimeo',
+          type: TYPES.VIMEO,
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();
@@ -380,10 +381,10 @@ function createWatcherConf(callback) {
     },
     function(callback) {
       if (!videoPlatformConf.youtube) return callback();
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'youtube');
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.YOUTUBE);
       rl.question('Enter Youtube hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
-          type: 'youtube',
+          type: TYPES.YOUTUBE,
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();
@@ -391,10 +392,10 @@ function createWatcherConf(callback) {
     },
     function(callback) {
       if (!videoPlatformConf.wowza) return callback();
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'wowza');
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.WOWZA);
       rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
-          type: 'wowza',
+          type: TYPES.WOWZA,
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();
@@ -402,10 +403,10 @@ function createWatcherConf(callback) {
     },
     function(callback) {
       if (!videoPlatformConf.local) return callback();
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', 'local');
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.LOCAL);
       rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
-          type: 'local',
+          type: TYPES.LOCAL,
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();

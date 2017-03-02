@@ -4,6 +4,7 @@ var util = require('util');
 var assert = require('chai').assert;
 var openVeoApi = require('@openveo/api');
 var factory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
 var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
 var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
@@ -42,15 +43,15 @@ describe('Video platforms factory', function() {
   describe('get', function() {
 
     it('should be able to instanciate a YoutubeProvider', function() {
-      assert.instanceOf(factory.get('youtube', {}), YoutubeProvider);
+      assert.instanceOf(factory.get(TYPES.YOUTUBE, {}), YoutubeProvider);
     });
 
     it('should be able to instanciate a VimeoProvider', function() {
-      assert.instanceOf(factory.get('vimeo', {}), VimeoProvider);
+      assert.instanceOf(factory.get(TYPES.VIMEO, {}), VimeoProvider);
     });
 
     it('should be able to instanciate a WowzaProvider', function() {
-      assert.instanceOf(factory.get('wowza', {
+      assert.instanceOf(factory.get(TYPES.WOWZA, {
         host: 'host',
         user: 'user',
         pwd: 'pwd'
@@ -58,7 +59,7 @@ describe('Video platforms factory', function() {
     });
 
     it('should be able to instanciate a LocalProvider', function() {
-      assert.instanceOf(factory.get('local', {}), LocalProvider);
+      assert.instanceOf(factory.get(TYPES.LOCAL, {}), LocalProvider);
     });
 
     it('should throw an error if type is unknown', function() {
@@ -72,7 +73,7 @@ describe('Video platforms factory', function() {
     });
 
     it('should return null if configuration is missing', function() {
-      assert.isNull(factory.get('local'));
+      assert.isNull(factory.get(TYPES.LOCAL));
     });
 
   });

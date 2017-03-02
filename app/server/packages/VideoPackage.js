@@ -134,6 +134,7 @@ Object.freeze(VideoPackage.stateMachine);
 VideoPackage.prototype.generateThumb = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
 
   // Generate thumb
   this.videoModel.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB);
@@ -146,7 +147,10 @@ VideoPackage.prototype.generateThumb = function() {
   }).on('error', function(error) {
     self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
   }).on('end', function() {
-    self.videoModel.updateThumbnail(self.mediaPackage.id, '/publish/' + self.mediaPackage.id + '/thumbnail.jpg');
+    self.videoModel.updateThumbnail(
+      self.mediaPackage.id,
+      cdnUrl + 'publish/' + self.mediaPackage.id + '/thumbnail.jpg'
+    );
     self.fsm.transition();
   });
 };

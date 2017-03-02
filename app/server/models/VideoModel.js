@@ -640,6 +640,7 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  */
 VideoModel.prototype.getOne = function(id, filter, callback) {
   var self = this;
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
   var videoInfo,
     timecodes;
 
@@ -720,8 +721,8 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
               videoInfo.timecodes.push({
                 timecode: currentTc.timecode,
                 image: {
-                  small: '/publish/' + videoInfo.id + '/' + currentTc.data.filename + '?thumb=small',
-                  large: '/publish/' + videoInfo.id + '/' + currentTc.data.filename
+                  small: cdnUrl + 'publish/' + videoInfo.id + '/' + currentTc.data.filename + '?thumb=small',
+                  large: cdnUrl + 'publish/' + videoInfo.id + '/' + currentTc.data.filename
                 }
               });
               break;
@@ -938,6 +939,7 @@ VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
  */
 VideoModel.prototype.updateTags = function(id, data, file, callback) {
   var self = this;
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
 
   this.provider.get({id: id}, function(error, entities) {
     if (error || !entities || !entities[0]) {
@@ -962,7 +964,7 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
               if (file) { // delete old file when new file uploaded
                 if (tag[i].file) removeTagsFile([tag[i].file.path]);
                 item.file = file;
-                item.file.basePath = '/publish/' + entity.id + '/uploads/' + item.file.filename;
+                item.file.basePath = cdnUrl + 'publish/' + entity.id + '/uploads/' + item.file.filename;
               } else if (!item.file && tag[i].file) { // or when user delete file attached
                 removeTagsFile([tag[i].file.path]);
               }
