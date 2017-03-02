@@ -186,7 +186,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       user: {type: 'array<string>'},
       properties: {type: 'object', default: {}},
       limit: {type: 'number', gt: 0},
-      page: {type: 'number', gt: 0, default: 1},
+      page: {type: 'number', gte: 0, default: 0},
       sortBy: {type: 'string', in: orderedProperties, default: 'date'},
       sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
     });

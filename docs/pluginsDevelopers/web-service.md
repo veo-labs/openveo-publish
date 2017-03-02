@@ -20,7 +20,7 @@ categories | String/Array | No | - | To filter videos by category
 groups | String/Array | No | - | To filter videos by group
 sortBy | String | No | date | To sort videos by either **title**, **description**, **date**, **state**, **views** or **category**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
-page | Number | No | 1 | The expected page
+page | Number | No | 0 | The expected page
 limit | Number | No | - | To limit the number of videos per page. If not specified get all videos
 properties | Object | No | - | A list of properties with the property id as the key and the expected property value as the value. (e.g. **properties[property1Id]=property1Value**)
 
@@ -95,7 +95,13 @@ HTTP Status Code | Details
         }
       ]
     }
-  ]
+  ],
+  "pagination": {
+    "limit": 1,
+    "page": 0,
+    "pages": 2,
+    "size": 2
+  }
 }
 ```
 
@@ -288,7 +294,7 @@ query | String | No | - | To search on both properties' name and description
 types | String/Array | No | - | To filter properties by type
 sortBy | String | No | name | To sort properties by either **name** or **description**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
-page | Number | No | 1 | The expected page
+page | Number | No | 0 | The expected page
 limit | Number | No | - | To limit the number of properties per page. If not specified get all properties
 
 HTTP Status Code | Details
@@ -318,7 +324,7 @@ HTTP Status Code | Details
   ],
   "pagination": {
     "limit": 1,
-    "page": 1,
+    "page": 0,
     "pages": 2,
     "size": 2
   }

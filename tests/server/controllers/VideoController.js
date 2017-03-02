@@ -175,7 +175,7 @@ describe('VideoController', function() {
       videoModel.getPaginatedFilteredEntities = function(filter, limit, page, sort, populate, callback) {
         assert.deepEqual(filter, {}, 'Unexpected filters');
         assert.isUndefined(limit, 'Unexpected limit');
-        assert.equal(page, 1, 'Unexpected page');
+        assert.equal(page, 0, 'Unexpected page');
         assert.deepEqual(sort, {date: -1}, 'Unexpected sort');
         callback(null, expectedEntities, expectedPagination);
       };

@@ -66,7 +66,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
       query: {type: 'string'},
       types: {type: 'array<string>'},
       limit: {type: 'number', gt: 0},
-      page: {type: 'number', gt: 0, default: 1},
+      page: {type: 'number', gte: 0, default: 0},
       sortBy: {type: 'string', in: ['name', 'description'], default: 'name'},
       sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
     });

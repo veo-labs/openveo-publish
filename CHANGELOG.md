@@ -7,6 +7,7 @@
 - Chapters are no more initiated relatively to slides. User have to define them himself.
 - Drop support for Node.js &lt;7.4.0
 - Drop support for NPM &lt;4.0.5
+- Usage of Web Service end points */videos* and */properties* has change. *page* parameter now starts at 0 instead of 1.
 
 ## NEW FEATURES
 
