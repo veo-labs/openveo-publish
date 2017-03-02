@@ -59,7 +59,7 @@ describe('Property page', function() {
     page.removeLine(name);
   });
 
-  it('should be able to add / remove a list property', function() {
+  it.only('should be able to add / remove a list property', function() {
     var name = 'test add / remove list property';
     var description = 'test add / remove list property description';
     var type = page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE;

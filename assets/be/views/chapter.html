@@ -102,9 +102,9 @@
             <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
             <uib-progressbar  ng-show="file.progress >= 0" class="progress-striped" value="file.progress" type="warning">{{file.progress}}%</uib-progressbar>
           </div>
-           <div class="button">
-          <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime || !myForm.file.$valid" class="btn btn-primary" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
-          <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
+          <div class="button">
+            <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime || !myForm.file.$valid" class="btn btn-primary" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
+            <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
           </div>
         </div>
         <div class="col-sm-8">

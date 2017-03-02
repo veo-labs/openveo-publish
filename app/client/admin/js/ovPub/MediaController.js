@@ -218,10 +218,18 @@
       },
       {
         key: 'description',
-        type: 'horizontalEditableInput',
+        type: 'horizontalEditableTinymce',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
           required: true
+        },
+        data: {
+          tinymceOptions: {
+            plugins: 'link',
+            menubar: false,
+            toolbar: 'undo redo | styleselect removeformat | bold italic ' +
+            '| alignleft aligncenter alignjustify | bullist numlist | link'
+          }
         }
       },
       {

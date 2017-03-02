@@ -93,7 +93,7 @@ MediaPage.prototype.getEditFormFields = function(form) {
 
   // Description field
   fields.description = Field.get({
-    type: 'text',
+    type: 'tinymce',
     name: this.translations.PUBLISH.MEDIAS.ATTR_DESCRIPTION,
     baseElement: form
   });

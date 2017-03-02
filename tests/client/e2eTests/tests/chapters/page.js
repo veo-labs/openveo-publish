@@ -111,7 +111,7 @@ describe('Chapter page', function() {
         assert.equal(chapter.cells[titleHeaderIndex], expectedChapter.title);
         assert.equal(chapter.fields.time, expectedChapter.time);
         assert.equal(chapter.fields.title, expectedChapter.title);
-        assert.equal(chapter.fields.description, expectedChapter.description);
+        assert.equal(chapter.fields.description, '<p>' + expectedChapter.description + '</p>');
         assert.eventually.ok(page.isChapterOnTimeBar(expectedChapter.title));
 
         return page.unselectLine(expectedChapter.title);

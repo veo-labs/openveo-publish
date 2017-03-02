@@ -25,7 +25,7 @@ function ChapterPage(mediaId) {
   this.titleHeaderElement = element(by.binding('PUBLISH.CHAPTER.HEAD_TITLE'));
   this.newButtonElement = element(by.binding('CORE.UI.FORM_NEW'));
   this.editButtonElement = element(by.binding('CORE.UI.FORM_EDIT'));
-  this.removeButtonElement = element(by.binding('CORE.UI.REMOVE'));
+  this.removeButtonElement = element(by.css('.media-viewer')).element(by.binding('CORE.UI.REMOVE'));
   this.beginCutButtonElement = element(by.css('.pull-left .glyphicon-log-out')).element(by.xpath('..'));
   this.endCutButtonElement = element(by.css('.pull-left .glyphicon-log-in')).element(by.xpath('..'));
   this.zoomInButtonElement = element(by.css('.glyphicon-zoom-in')).element(by.xpath('..'));
@@ -33,7 +33,7 @@ function ChapterPage(mediaId) {
   this.formElement = element(by.css('.editform'));
   this.lineElements = element.all(by.css('.chapter-table tbody tr'));
   this.headerElements = element.all(by.css('.chapter-table th'));
-  this.saveButtonElements = this.formElement.all(by.css('button'));
+  this.saveButtonElements = this.formElement.all(by.css('.button > button'));
   this.timeBarElement = element(by.css('ov-multirange'));
   this.timeBarLabelElements = this.timeBarElement.all(by.css('ov-multirange-labels span'));
 }
@@ -143,7 +143,7 @@ ChapterPage.prototype.getAddFormFields = function(form) {
 
   // Description field
   fields.description = Field.get({
-    type: 'textarea',
+    type: 'tinymce',
     name: this.translations.PUBLISH.CHAPTER.FORM_DESCRIPTION,
     baseElement: form
   });

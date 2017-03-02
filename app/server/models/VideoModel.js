@@ -973,8 +973,9 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
           }
         }
       });
-      self.update(id, tags, function(update) {
-        callback(null, items);
+      self.update(id, tags, function(error, update) {
+        if (error) return callback(error);
+        else return callback(null, items);
       });
     }
   });
@@ -1026,8 +1027,9 @@ VideoModel.prototype.removeTags = function(id, data, callback) {
           }
         }
       });
-      self.update(id, tags, function(update) {
-        callback(null, items);
+      self.update(id, tags, function(error, update) {
+        if (error) return callback(error);
+        else return callback(null, items);
       });
     }
   });

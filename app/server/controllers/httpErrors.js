@@ -139,6 +139,33 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Updating a video tag failed.
+   *
+   * @property UPDATE_VIDEO_TAGS_ERROR
+   * @type Object
+   * @final
+   */
+  UPDATE_VIDEO_TAGS_ERROR: {
+    code: 0x009,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Deleting a video tag failed.
+   *
+   * @property REMOVE_VIDEO_TAGS_ERROR
+   * @type Object
+   * @final
+   */
+  REMOVE_VIDEO_TAGS_ERROR: {
+    code: 0x010,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+
   // Authentication errors
 
   /**
@@ -176,6 +203,32 @@ var HTTP_ERRORS = {
    */
   UNPUBLISH_VIDEO_FORBIDDEN: {
     code: 0x102,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  /**
+   * Updating a video tag failed, user doesn't have enough permissions.
+   *
+   * @property UPDATE_TAGS_VIDEO_FORBIDDEN
+   * @type Object
+   * @final
+   */
+  UPDATE_VIDEO_TAGS_FORBIDDEN: {
+    code: 0x103,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  /**
+   * Removing a video tag failed, user doesn't have enough permissions.
+   *
+   * @property REMOVE_TAGS_VIDEO_FORBIDDEN
+   * @type Object
+   * @final
+   */
+  REMOVE_VIDEO_TAGS_FORBIDDEN: {
+    code: 0x104,
     httpCode: 403,
     module: 'publish'
   },
@@ -314,8 +367,35 @@ var HTTP_ERRORS = {
     code: 0x209,
     httpCode: 400,
     module: 'publish'
-  }
+  },
 
+  /**
+   * Update the video tag failed, wrong parameters.
+   *
+   * @property UPDATE_VIDEO_TAG_MISSING_PARAMETERS
+   * @type Object
+   * @final
+   */
+  UPDATE_VIDEO_TAGS_MISSING_PARAMETERS: {
+    code: 0x210,
+    httpCode: 400,
+    module: 'publish',
+    message: 'Missing id parameter'
+  },
+
+  /**
+   * remove the video tag failed, wrong parameters.
+   *
+   * @property REMOVE_VIDEO_TAG_MISSING_PARAMETERS
+   * @type Object
+   * @final
+   */
+  REMOVE_VIDEO_TAGS_MISSING_PARAMETERS: {
+    code: 0x211,
+    httpCode: 400,
+    module: 'publish',
+    message: 'Missing id parameter'
+  }
 };
 
 Object.freeze(HTTP_ERRORS);

@@ -458,32 +458,35 @@ VideoController.prototype.getPublishManager = function() {
  * @method updateTagsAction
  */
 VideoController.prototype.updateTagsAction = function(request, response, next) {
-  if (request.params.id) {
-    var entityId = request.params.id;
-    var model = this.getModel(request);
-    var upload = multer({dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/'});
-    upload.single('file')(request, response, function(err) {
-      if (err || !request.body.info) {
-
-        // An error occurred when uploading
-        return response.end('Error uploading file.');
-      }
-      var data = JSON.parse(request.body.info);
-      var file = request.file;
-
-      model.updateTags(entityId, data, file, function(error, newtag) {
-        if (error)
-          next((error instanceof AccessError) ? HTTP_ERRORS.UPDATE_VIDEO_FORBIDDEN : HTTP_ERRORS.PUBLISH_VIDEO_ERROR);
-        else
-          response.send(newtag);
-      });
+  var params;
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.params, {
+      id: {type: 'string', required: true}
     });
-
-  } else {
-
-    // Missing type and / or id of the video
-    next(HTTP_ERRORS.PUBLISH_VIDEO_MISSING_PARAMETERS);
+  } catch (error) {
+    return next(HTTP_ERRORS.UPDATE_VIDEO_TAGS_MISSING_PARAMETERS);
   }
+
+  var entityId = params.id;
+  var model = this.getModel(request);
+  var upload = multer({dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/'});
+  upload.single('file')(request, response, function(err) {
+    if (err || !request.body.info) {
+
+      // An error occurred when uploading
+      return response.end('Error uploading file.');
+    }
+    var data = JSON.parse(request.body.info);
+    var file = request.file;
+
+    model.updateTags(entityId, data, file, function(error, newtag) {
+      if (error)
+        next((error instanceof AccessError) ?
+          HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+      else
+        response.send(newtag);
+    });
+  });
 };
 
 
@@ -493,21 +496,24 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
  * @method removeTagsAction
  */
 VideoController.prototype.removeTagsAction = function(request, response, next) {
-
-  if (request.params.id) {
-    var entityId = request.params.id;
-    var model = this.getModel(request);
-    var data = request.body;
-
-    model.removeTags(entityId, data, function(error, deletedTag) {
-      if (error)
-        next((error instanceof AccessError) ? HTTP_ERRORS.UPDATE_VIDEO_FORBIDDEN : HTTP_ERRORS.PUBLISH_VIDEO_ERROR);
-      else
-        response.send(deletedTag);
+  var params;
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.params, {
+      id: {type: 'string', required: true}
     });
-  } else {
-
-    // Missing type and / or id of the video
-    next(HTTP_ERRORS.PUBLISH_VIDEO_MISSING_PARAMETERS);
+  } catch (error) {
+    return next(HTTP_ERRORS.REMOVE_VIDEO_TAGS_MISSING_PARAMETERS);
   }
+
+  var entityId = params.id;
+  var model = this.getModel(request);
+  var data = request.body;
+
+  model.removeTags(entityId, data, function(error, deletedTag) {
+    if (error)
+      next((error instanceof AccessError) ?
+        HTTP_ERRORS.REMOVE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.REMOVE_VIDEO_TAGS_FORBIDDEN);
+    else
+      response.send(deletedTag);
+  });
 };
