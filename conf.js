@@ -134,8 +134,6 @@ module.exports = {
     ],
     scriptLibFiles: {
       base: [
-        '/publish/lib/tinymce/tinymce.min.js',
-        '/publish/lib/angular-ui-tinymce/dist/tinymce.min.js'
       ],
       dev: [
         '/publish/multirange/multirange.js',

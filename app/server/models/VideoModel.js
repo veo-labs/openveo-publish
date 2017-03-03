@@ -925,6 +925,22 @@ VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
 };
 
 /**
+ * Edit a tag item by adding file informations
+ *
+ * @method resolveMediaPath
+ * @param  {String} id   The media id
+ * @param  {Object} item item to modify with file
+ * @param  {[type]} file File information do add
+ */
+function resolveMediaPath(id, item, file) {
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
+  item.file = file;
+  if (item.file.mimetype.substr(0, 'image'.length) == 'image')
+    item.file.basePath = cdnUrl + 'publish/player/videos/' + id + '/uploads/' + item.file.filename;
+  else item.file.basePath = cdnUrl + 'publish/' + id + '/uploads/' + item.file.filename;
+}
+
+/**
  * Add/update video tags/chapters to existing tags/chapters
  * Associate a file to a tag
  *
@@ -939,7 +955,6 @@ VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
  */
 VideoModel.prototype.updateTags = function(id, data, file, callback) {
   var self = this;
-  var cdnUrl = process.api.getCoreApi().getCdnUrl();
 
   this.provider.get({id: id}, function(error, entities) {
     if (error || !entities || !entities[0]) {
@@ -956,15 +971,17 @@ VideoModel.prototype.updateTags = function(id, data, file, callback) {
 
         if (!item.id) {
           item.id = shortid.generate();
-          if (file) item.file = file;
+          if (file) {
+            resolveMediaPath(entity.id, item, file);
+          }
           tag.push(item);
         } else {
           for (var i = 0; i < tag.length; i++) {
             if (tag[i].id == item.id) {
               if (file) { // delete old file when new file uploaded
                 if (tag[i].file) removeTagsFile([tag[i].file.path]);
-                item.file = file;
-                item.file.basePath = cdnUrl + 'publish/' + entity.id + '/uploads/' + item.file.filename;
+                resolveMediaPath(entity.id, item, file);
+
               } else if (!item.file && tag[i].file) { // or when user delete file attached
                 removeTagsFile([tag[i].file.path]);
               }
