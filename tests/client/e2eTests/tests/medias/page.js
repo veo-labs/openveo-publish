@@ -208,7 +208,7 @@ describe('Media page', function() {
     });
   });
 
-  it.only('should be able to edit a media', function() {
+  it('should be able to edit a media', function() {
     var categories = page.getCategories();
     var properties = page.getProperties();
     var name = 'test edition';
