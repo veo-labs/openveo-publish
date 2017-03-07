@@ -6,9 +6,7 @@ var fs = require('fs');
 var os = require('os');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
-
 var exit = process.exit;
 
 // Set module root directory
@@ -16,6 +14,8 @@ process.rootPublish = __dirname;
 process.requirePublish = function(filePath) {
   return require(path.join(process.rootPublish, filePath));
 };
+
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 
 // Create a readline interface to interact with the user
 var rl = readline.createInterface({
