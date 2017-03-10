@@ -42,6 +42,7 @@
 - **grunt-remove** has been removed
 - **grunt-rename** has been removed
 - **grunt-extend-config** has been removed
+- **grunt-init** has been removed
 
 ### CLIENT
 
