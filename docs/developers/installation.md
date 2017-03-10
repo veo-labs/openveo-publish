@@ -42,7 +42,7 @@ We use [NPM links](https://docs.npmjs.com/cli/link) to deal with this problem an
 
 ## Clone project from git
 
-    # Clone projet into workspace
+    # Clone project into workspace
     cd /WORKSPACE_PATH/
     git clone git@github.com:veo-labs/openveo-publish.git
 
