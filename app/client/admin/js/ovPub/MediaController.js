@@ -225,10 +225,33 @@
         },
         data: {
           tinymceOptions: {
-            plugins: 'link',
+            plugins: 'lists link autolink autoresize textpattern',
+            autoresize_bottom_margin: 20, // eslint-disable-line
             menubar: false,
             toolbar: 'undo redo | styleselect removeformat | bold italic ' +
-            '| alignleft aligncenter alignjustify | bullist numlist | link'
+            '| alignleft aligncenter alignright alignjustify | bullist numlist | link',
+            style_formats: [{ // eslint-disable-line
+              title: 'Headers',
+              items: [
+              {title: 'Header 1', format: 'h1'},
+              {title: 'Header 2', format: 'h2'},
+              {title: 'Header 3', format: 'h3'},
+              {title: 'Header 4', format: 'h4'}
+              ]
+            }, {
+              title: 'Inline', items: [
+              {title: 'Bold', icon: 'bold', format: 'bold'},
+              {title: 'Italic', icon: 'italic', format: 'italic'},
+              {title: 'Underline', icon: 'underline', format: 'underline'},
+              {title: 'Code', icon: 'code', format: 'code'}
+              ]
+            }, {
+              title: 'Blocks',
+              items: [
+              {title: 'Paragraph', format: 'p'},
+              {title: 'Blockquote', format: 'blockquote'}
+              ]
+            }]
           }
         }
       },
