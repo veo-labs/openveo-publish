@@ -5,7 +5,7 @@
   /**
    * Defines the categories controller for the categories page.
    */
-  function CategoriesController($scope, $filter, entityService, categories, publishName) {
+  function CategoriesController($scope, $filter, entityService, categories, publishName, publishService) {
     var entityType = 'categories';
     $scope.categoryTaxonomy = categories.data || {};
 
@@ -16,6 +16,7 @@
       $scope.categoryTaxonomy.id = data.entity.id;
       $scope.saveIsDisabled = $scope.list.length == 0;
       $scope.listback = angular.copy($scope.list);
+      publishService.cacheClear(entityType);
       $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.CATEGORIES.SAVE_SUCCESS'), 4000);
     }
 
@@ -112,6 +113,6 @@
   }
 
   app.controller('CategoriesController', CategoriesController);
-  CategoriesController.$inject = ['$scope', '$filter', 'entityService', 'categories', 'publishName'];
+  CategoriesController.$inject = ['$scope', '$filter', 'entityService', 'categories', 'publishName', 'publishService'];
 
 })(angular.module('ov.publish'));
