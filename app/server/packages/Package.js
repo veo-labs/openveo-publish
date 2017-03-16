@@ -312,7 +312,7 @@ Package.prototype.initPackage = function() {
           if (error)
             callback(error);
           else if (result && result.length >= 1) {
-            if (result[0].errorCode)
+            if (result[0].errorCode != ERRORS.NO_ERROR)
               callback(error);
             else {
               var originalPackagePath = self.mediaPackage.originalPackagePath;

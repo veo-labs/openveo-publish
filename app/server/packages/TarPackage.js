@@ -428,8 +428,8 @@ TarPackage.prototype.validatePackage = function() {
   this.videoModel.updateState(this.mediaPackage.id, STATES.VALIDATING);
 
   // Validate package content
-  if (this.mediaPackage.metadata.indexes)
-    self.fsm.transition();
+  if (this.mediaPackage.metadata && this.mediaPackage.metadata.indexes)
+    this.fsm.transition();
   else validatePackage.call(this, function(error, metadata) {
     if (error)
       self.setError(new TarPackageError(error.message, ERRORS.VALIDATION));
@@ -461,8 +461,8 @@ TarPackage.prototype.saveTimecodes = function() {
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, STATES.SAVING_TIMECODES);
 
-  if (this.mediaPackage.metadata.indexes)
-    self.fsm.transition();
+  if (this.mediaPackage.metadata && this.mediaPackage.metadata.indexes)
+    this.fsm.transition();
   else saveTimecodes(path.join(extractDirectory, 'synchro.xml'), self, function(error) {
     if (error && self.mediaPackage.metadata['rich-media'])
       self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
