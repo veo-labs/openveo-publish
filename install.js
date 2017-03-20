@@ -116,35 +116,6 @@ function createConf(callback) {
 }
 
 /**
- * Creates loggers configuration file if it does not exist.
- */
-function createLoggerConf(callback) {
-  var confFile = path.join(confDir, 'loggerConf.json');
-
-  fs.exists(confFile, function(exists) {
-    if (exists) {
-      process.stdout.write(confFile + ' already exists\n');
-      callback();
-    } else {
-      var defaultPath = path.join(os.tmpdir(), 'openveo', 'logs');
-      rl.question('Enter logger directory path for watcher process (default: ' + defaultPath + ') :\n',
-      function(answer) {
-        var conf = {
-          watcher: {
-            fileName: path.join((answer || defaultPath), 'openveo-watcher.log').replace(/\\/g, '/'),
-            level: 'info',
-            maxFileSize: 1048576,
-            maxFiles: 2
-          }
-        };
-
-        fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
-      });
-    }
-  });
-}
-
-/**
  * Creates video platform configuration file if it does not exist.
  */
 function createVideoPlatformConf(callback) {
@@ -426,7 +397,6 @@ async.series([
   createConfDir,
   createConf,
   createVideoTmpDir,
-  createLoggerConf,
   createVideoPlatformConf,
   createWatcherConf,
   createHotFolder
