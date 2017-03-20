@@ -425,7 +425,6 @@
       } else {
 
         // Close edit on toggle
-        $scope.file = null;
         $scope.cancel();
       }
     };
@@ -441,6 +440,7 @@
     $scope.cancel = function() {
 
       // Copy backup
+      $scope.file = null;
       angular.copy($scope.backUpRow, $scope.selectRow);
       $scope.isCollapsed = true;
     };
@@ -460,7 +460,6 @@
           }
         }
       } else { // if close by toggle, close edit form
-        $scope.file = null;
         $scope.cancel();
         $scope.select(object);
       }
