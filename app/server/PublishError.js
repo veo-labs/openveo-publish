@@ -16,8 +16,7 @@ var util = require('util');
  * @param {String} code The error code
  */
 function PublishError(message, code) {
-  PublishError.super_.call(this, message);
-  this.name = 'PublishError';
+  Error.captureStackTrace(this, this.constructor);
 
   Object.defineProperties(this, {
 
@@ -28,7 +27,25 @@ function PublishError(message, code) {
      * @type String
      * @final
      */
-    code: {value: code}
+    code: {value: code},
+
+    /**
+     * Error message.
+     *
+     * @property message
+     * @type String
+     * @final
+     */
+    message: {value: message, writable: true},
+
+    /**
+     * Error name.
+     *
+     * @property name
+     * @type String
+     * @final
+     */
+    name: {value: 'PublishError', writable: true}
 
   });
 }
