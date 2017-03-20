@@ -271,7 +271,12 @@
       // CALL SAVE HTTP
       var objToSave = cleanObjectToSave('cut');
       entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
-
+        if ($scope.selectRow) {
+          $scope.selectRow.select = false;
+          $scope.selectRow = null;
+        }
+        updateRange();
+        $scope.isCollapsed = true;
       }).error(function(data, status) {
         $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CUT.SAVE_ERROR'), 4000);
         if (status === 401)
@@ -431,9 +436,8 @@
 
     // on Submit Edit Form
     $scope.submit = function() {
-
-       // Save
-      saveChapter();
+      if ($scope.modelToEdit.type) saveCut();
+      else saveChapter();
     };
 
     // on cancel Edit Form
