@@ -224,13 +224,13 @@ Package.prototype.init = function(initialState, initialTransition) {
   // Handle each enter state event to launch automatically the next
   // transition regarding the stack of transitions
   this.fsm.onenterstate = function() {
-    process.logger.verbose('State = ' + self.fsm.current);
+    process.logger.verbose('State = ' + self.fsm.current, {id: self.mediaPackage.id});
     self.executeTransition((transitions[transition + 1]) ? transitions[++transition] : null);
   };
 
   // Handle each leave state event to execute the corresponding transition
   this.fsm.onleavestate = function(event) {
-    process.logger.verbose('Transition = ' + event);
+    process.logger.verbose('Transition = ' + event, {id: self.mediaPackage.id});
 
     // Executes function corresponding to transition
     if (self[event])

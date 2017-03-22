@@ -139,6 +139,7 @@ VideoPackage.prototype.generateThumb = function() {
   // Generate thumb
   this.videoModel.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB);
 
+  process.logger.debug('Generate thumbnail (' + this.mediaPackage.id + ')');
   var destinationPath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   ffmpeg(filePath).screenshots({
     timestamps: ['10%'],
