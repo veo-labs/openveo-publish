@@ -331,6 +331,33 @@ describe('VideoModel', function() {
 
   });
 
+  // update method
+  describe('update', function() {
+
+    it('should execute updates sequentially', function(done) {
+      var expectedFirstId = '42';
+      var expectedSecondId = '43';
+      var expectedState = STATES.CONFIGURING;
+      var count = 0;
+
+      TestVideoProvider.prototype.update = function(id, filter, callback) {
+        if (id === expectedFirstId)
+          setTimeout(callback, 50);
+        else
+          callback();
+      };
+
+      videoModel.updateState(expectedFirstId, expectedState, function() {
+        assert.equal(count, 0);
+        done();
+      });
+      videoModel.updateState(expectedSecondId, expectedState, function() {
+        count++;
+      });
+    });
+
+  });
+
   // get method
   describe('get', function() {
 

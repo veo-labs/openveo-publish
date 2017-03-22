@@ -15,6 +15,10 @@
 - **Search engines** for medias and custom properties have been improved. Multiple search fields have been replaced by a unique field. Search is now case insensitive and search is made on the whole string, not just strings starting with the query. The query string is taken as the whole when searching meaning that special characters aren't interpreted and thus will be searched as is.
 - **Rich media tags**. Tags and chapters now embed a WYSIWYG editor. Tags can also be associated with a file that user can upload up to 20MB. These associated information can be previewed before saving modification and are rendered in player views associated with tags and chapters.
 
+## BUG FIXES
+
+- Fix the freeze of packages during a publication process. Sometimes packages could stay stuck in a state (copy, retrieve metadata etc.).
+
 ## DEPENDENCIES
 
 ### SERVER

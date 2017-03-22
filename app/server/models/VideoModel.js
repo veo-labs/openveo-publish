@@ -41,7 +41,25 @@ function VideoModel(user, videoProvider, propertyProvider) {
      * @type PropertyProvider
      * @final
      */
-    propertyProvider: {value: propertyProvider}
+    propertyProvider: {value: propertyProvider},
+
+    /**
+     * List of pending updates.
+     *
+     * @property updateQueue
+     * @type Array
+     * @final
+     */
+    updateQueue: {value: []},
+
+    /**
+     * Indicates if an update is actually running.
+     *
+     * @property pendingUpdate
+     * @type Boolean
+     * @final
+     */
+    pendingUpdate: {value: false, writable: true}
 
   });
 }
@@ -207,6 +225,63 @@ function removeTagsFile(filePathArray) {
 }
 
 /**
+ * Executes an update operation on the given media.
+ *
+ * Only one update operation can be performed at a time. Pending operations
+ * are added to the queue and executed sequentially.
+ *
+ * @method updateMedia
+ * @private
+ * @param {String} id The media id
+ * @param {Object} modifier Database modifier
+ * @param {Function} [callback] Function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
+ */
+function updateMedia(id, modifier, callback) {
+  var self = this;
+
+  /**
+   * Executes oldest update in the queue.
+   */
+  function executeOperation() {
+    if (!self.updateQueue.length)
+      return;
+
+    // Retrieve oldest operation
+    var update = self.updateQueue.shift();
+    self.pendingUpdate = true;
+
+    // Execute operation
+    self.provider.update(update.id, update.modifier, function() {
+      self.pendingUpdate = false;
+
+      // Execute update callback
+      if (update.callback)
+        update.callback.apply(arguments);
+
+      // Execute next operation in the queue
+      executeOperation();
+
+    });
+  }
+
+  // Add update operation to queue
+  this.updateQueue.push(
+    {
+      id: id,
+      modifier: modifier,
+      callback: callback
+    }
+  );
+
+  // If no update operation is running
+  // execute the oldest operation in the queue
+  if (!this.pendingUpdate)
+    executeOperation();
+}
+
+/**
  * Adds a new video.
  *
  * @method add
@@ -289,7 +364,7 @@ VideoModel.prototype.add = function(media, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateState = function(id, state, callback) {
-  this.provider.update(id, {state: state}, callback);
+  updateMedia.call(this, id, {state: state}, callback);
 };
 
 /**
@@ -304,7 +379,7 @@ VideoModel.prototype.updateState = function(id, state, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLastState = function(id, state, callback) {
-  this.provider.update(id, {lastState: state}, callback);
+  updateMedia.call(this, id, {lastState: state}, callback);
 };
 
 /**
@@ -319,7 +394,7 @@ VideoModel.prototype.updateLastState = function(id, state, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLastTransition = function(id, state, callback) {
-  this.provider.update(id, {lastTransition: state}, callback);
+  updateMedia.call(this, id, {lastTransition: state}, callback);
 };
 
 /**
@@ -334,7 +409,7 @@ VideoModel.prototype.updateLastTransition = function(id, state, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
-  this.provider.update(id, {errorCode: errorCode}, callback);
+  updateMedia.call(this, id, {errorCode: errorCode}, callback);
 };
 
 /**
@@ -349,7 +424,7 @@ VideoModel.prototype.updateErrorCode = function(id, errorCode, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateLink = function(id, link, callback) {
-  this.provider.update(id, {link: link}, callback);
+  updateMedia.call(this, id, {link: link}, callback);
 };
 
 /**
@@ -364,7 +439,7 @@ VideoModel.prototype.updateLink = function(id, link, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
-  this.provider.update(id, {mediaId: idMediaPlatform}, callback);
+  updateMedia.call(this, id, {mediaId: idMediaPlatform}, callback);
 };
 
 /**
@@ -379,7 +454,7 @@ VideoModel.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
-  this.provider.update(id, {metadata: metadata}, callback);
+  updateMedia.call(this, id, {metadata: metadata}, callback);
 };
 
 /**
@@ -394,7 +469,7 @@ VideoModel.prototype.updateMetadata = function(id, metadata, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateDate = function(id, date, callback) {
-  this.provider.update(id, {date: date}, callback);
+  updateMedia.call(this, id, {date: date}, callback);
 };
 
 /**
@@ -409,7 +484,7 @@ VideoModel.prototype.updateDate = function(id, date, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
-  this.provider.update(id, {category: categoryId}, callback);
+  updateMedia.call(this, id, {category: categoryId}, callback);
 };
 
 /**
@@ -424,7 +499,7 @@ VideoModel.prototype.updateCategory = function(id, categoryId, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateType = function(id, type, callback) {
-  this.provider.update(id, {type: type}, callback);
+  updateMedia.call(this, id, {type: type}, callback);
 };
 
 /**
@@ -439,7 +514,7 @@ VideoModel.prototype.updateType = function(id, type, callback) {
  *   - **Number** The number of updated items
  */
 VideoModel.prototype.updateThumbnail = function(id, path, callback) {
-  this.provider.update(id, {thumbnail: path}, callback);
+  updateMedia.call(this, id, {thumbnail: path}, callback);
 };
 
 /**
