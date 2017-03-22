@@ -640,9 +640,7 @@ VideoModel.prototype.getOneReady = function(id, callback) {
  */
 VideoModel.prototype.getOne = function(id, filter, callback) {
   var self = this;
-  var cdnUrl = process.api.getCoreApi().getCdnUrl();
-  var videoInfo,
-    timecodes;
+  var videoInfo;
 
   async.series([
 
@@ -670,9 +668,6 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
     // Retrieve video information from video platform
     function(callback) {
       if (videoInfo && videoInfo.type && videoInfo.mediaId) {
-
-        // Get timecodes from metadata
-        timecodes = videoInfo.metadata.indexes;
 
         // Video information already retrieved
         if (videoInfo.available && videoInfo.sources.length == videoInfo.mediaId.length)
@@ -706,43 +701,8 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
     if (error || !videoInfo) {
       callback(error);
     } else {
-
-      // Got timecodes for this video
-      if (timecodes) {
-        videoInfo.timecodes = [];
-        var tags = [];
-
-        for (var i = 0; i < timecodes.length; i++) {
-          var currentTc = timecodes[i];
-          var timecodeType = currentTc.type;
-
-          switch (timecodeType) {
-            case 'image':
-              videoInfo.timecodes.push({
-                timecode: currentTc.timecode,
-                image: {
-                  small: cdnUrl + 'publish/' + videoInfo.id + '/' + currentTc.data.filename + '?thumb=small',
-                  large: cdnUrl + 'publish/' + videoInfo.id + '/' + currentTc.data.filename
-                }
-              });
-              break;
-
-            case 'tag':
-              tags.push({
-                value: currentTc.timecode / (videoInfo.metadata.duration * 1000),
-                name: currentTc.data && currentTc.data.tagname ? currentTc.data.tagname : 'Tag' + (tags.length + 1)
-              });
-              break;
-            default:
-          }
-        }
-
-        // Set tags from timecode only if user has not allready edit tags
-        if ((!videoInfo.tags || !videoInfo.tags.length) && tags.length) videoInfo.tags = tags;
-      }
       callback(null, videoInfo);
     }
-
   });
 };
 
@@ -820,6 +780,8 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.category = data.category;
   if (data.cut)
     info.cut = data.cut;
+  if (data.timecodes)
+    info.timecodes = data.timecodes;
   if (data.chapters)
     info.chapters = data.chapters;
   if (data.tags)

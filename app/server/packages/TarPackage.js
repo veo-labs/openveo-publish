@@ -295,7 +295,8 @@ function validatePackage(callback) {
  * @param {Function} callback The function to call when done
  *   - **Error** The error if an error occurred, null otherwise
  */
-function saveTimecodes(xmlTimecodeFilePath, tarPackage, callback) {
+function saveTimecodes(xmlTimecodeFilePath, callback) {
+  var self = this;
   var formattedTimecodes = [];
   async.series([
     function(callback) {
@@ -352,11 +353,12 @@ function saveTimecodes(xmlTimecodeFilePath, tarPackage, callback) {
     if (error) {
       callback(error);
     } else {
-      if (!tarPackage.mediaPackage.metadata) tarPackage.mediaPackage.metadata = {};
-      openVeoApi.util.merge(tarPackage.mediaPackage.metadata, {indexes: formattedTimecodes});
+      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+      openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: formattedTimecodes});
 
-      tarPackage.videoModel.updateMetadata(tarPackage.mediaPackage.id, tarPackage.mediaPackage.metadata);
-      callback();
+      self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+        callback(error, formattedTimecodes);
+      });
     }
   });
 
@@ -457,15 +459,73 @@ TarPackage.prototype.saveTimecodes = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
 
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, STATES.SAVING_TIMECODES);
 
-  if (this.mediaPackage.metadata && this.mediaPackage.metadata.indexes)
-    this.fsm.transition();
-  else saveTimecodes(path.join(extractDirectory, 'synchro.xml'), self, function(error) {
-    if (error && self.mediaPackage.metadata['rich-media'])
-      self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
+  var timecodes;
+  async.series([
+
+    // save timecode in metadata from XML if they are not in metadata
+    function(callback) {
+      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
+        timecodes = self.mediaPackage.metadata.indexes;
+        callback();
+      } else saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
+        if (error && self.mediaPackage.metadata['rich-media'])
+          callback(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
+        else {
+          timecodes = formatedTimecodes;
+          callback();
+        }
+      });
+    },
+
+    // parse meatadata to save timecodes and tags
+    function(callback) {
+      var videoInfo = {};
+
+      // Got timecodes for this video
+      if (timecodes) {
+        videoInfo.timecodes = [];
+        videoInfo.tags = [];
+
+        for (var i = 0; i < timecodes.length; i++) {
+          var currentTc = timecodes[i];
+          var timecodeType = currentTc.type;
+
+          switch (timecodeType) {
+            case 'image':
+              videoInfo.timecodes.push({
+                timecode: currentTc.timecode,
+                image: {
+                  small: cdnUrl + 'publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?thumb=small',
+                  large: cdnUrl + 'publish/' + self.mediaPackage.id + '/' + currentTc.data.filename
+                }
+              });
+              break;
+
+            case 'tag':
+              videoInfo.tags.push({
+                value: currentTc.timecode / (self.mediaPackage.metadata.duration * 1000),
+                name: currentTc.data && currentTc.data.tagname ?
+                  currentTc.data.tagname : 'Tag' + (videoInfo.tags.length + 1)
+              });
+              break;
+            default:
+          }
+        }
+        self.videoModel.update(self.mediaPackage.id, videoInfo, function(error) {
+          return callback(error);
+        });
+      } else {
+        callback();
+      }
+    }
+  ], function(error) {
+    if (error)
+      self.setError(error);
     else
       self.fsm.transition();
   });
