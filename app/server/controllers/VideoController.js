@@ -469,7 +469,15 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
 
   var entityId = params.id;
   var model = this.getModel(request);
-  var upload = multer({dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/'});
+
+  var maxsize = 20 * 1000 * 1000; // in bytes
+  var upload = multer({
+    dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/',
+    limits: {
+      fileSize: maxsize
+    }
+  });
+
   upload.single('file')(request, response, function(err) {
     if (err || !request.body.info) {
 

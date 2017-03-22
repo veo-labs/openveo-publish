@@ -159,54 +159,73 @@
       return ids.indexOf(id);
     }
 
+
     /**
-     * Save chapter and cut
+     * Save chapter error callback
+     */
+    function saveChapterErrorCb(resp) {
+      if (resp.status > 0)
+        $scope.errorMsg = resp.status + ': ' + resp.data;
+
+      if ($scope.selectRow) {
+        $scope.selectRow.select = false;
+        $scope.selectRow = null;
+      }
+
+      // emit alert
+      if (uploadAborted) {
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
+      } else {
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
+        if (status === 401)
+          $scope.$parent.logout();
+      }
+    }
+
+    /**
+     * Save chapter success callback
+     */
+    function saveChapterSuccessCb(resp) {
+      if (typeof resp.data === 'string') {
+        saveChapterErrorCb(resp);
+        return;
+      }
+
+      $scope.file = null;
+      $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
+      $scope.simpleMimeType = $scope.getFileMimeType();
+      if (!$scope.selectRow) {
+
+        // ADD the new model
+        $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
+      } else {
+        var i = searchPosition($scope.modelToEdit.id);
+        $scope.media[$scope.selectedData.value][i] = $scope.modelToEdit;
+      }
+
+      if ($scope.selectRow) {
+        $scope.selectRow.select = false;
+        $scope.selectRow = null;
+      }
+      updateRange();
+      $scope.isCollapsed = true;
+    }
+
+    /**
+     * Save chapter
      */
     function saveChapter() {
       var objToSave = cleanObjectToSave($scope.selectedData.value, true);
       $scope.upload = publishService.updateTags($scope.media.id, $scope.file, objToSave);
 
-      $scope.upload.then(function(resp) {
-
-        $scope.file = null;
-        $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
-        $scope.simpleMimeType = $scope.getFileMimeType();
-        if (!$scope.selectRow) {
-
-          // ADD the new model
-          $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
-        } else {
-          var i = searchPosition($scope.modelToEdit.id);
-          $scope.media[$scope.selectedData.value][i] = $scope.modelToEdit;
+      $scope.upload.then(
+        saveChapterSuccessCb,
+        saveChapterErrorCb,
+        function(evt) {
+          if ($scope.file)
+            $scope.file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
         }
-
-        if ($scope.selectRow) {
-          $scope.selectRow.select = false;
-          $scope.selectRow = null;
-        }
-        updateRange();
-        $scope.isCollapsed = true;
-      }, function(resp) {
-        if (resp.status > 0)
-          $scope.errorMsg = resp.status + ': ' + resp.data;
-
-        if ($scope.selectRow) {
-          $scope.selectRow.select = false;
-          $scope.selectRow = null;
-        }
-
-        // emit alert
-        if (uploadAborted) {
-          $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
-        } else {
-          $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
-          if (status === 401)
-            $scope.$parent.logout();
-        }
-      }, function(evt) {
-        if ($scope.file)
-          $scope.file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-      });
+      );
     }
 
     /*

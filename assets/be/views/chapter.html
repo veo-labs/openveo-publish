@@ -101,7 +101,7 @@
               <audio style="width:100%" controls ngf-src="file"></audio>
               <video width="100%" controls ngf-src="file"></video>
             </div>
-            <button type="button" class="btn btn-default" ng-click="file = null" ng-show="file">{{ 'CORE.UI.REMOVE'  | translate}}</button>
+            <button type="button" class="btn btn-default" ng-click="file = null; errorMsg = null;" ng-show="file">{{ 'CORE.UI.REMOVE'  | translate}}</button>
             <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
             <uib-progressbar  ng-show="file.progress >= 0" class="progress-striped" value="file.progress" type="warning">{{file.progress}}%</uib-progressbar>
           </div>
