@@ -167,19 +167,16 @@
       if (resp.status > 0)
         $scope.errorMsg = resp.status + ': ' + resp.data;
 
-      if ($scope.selectRow) {
-        $scope.selectRow.select = false;
-        $scope.selectRow = null;
-      }
-
       // emit alert
       if (uploadAborted) {
         $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
+        uploadAborted = false;
       } else {
         $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
         if (status === 401)
           $scope.$parent.logout();
       }
+      $scope.upload = null;
     }
 
     /**
@@ -209,6 +206,7 @@
       }
       updateRange();
       $scope.isCollapsed = true;
+      $scope.upload = null;
     }
 
     /**
@@ -485,6 +483,15 @@
       } else { // if close by toggle, close edit form
         $scope.cancel();
         $scope.select(object);
+      }
+    };
+
+    // Select row and open edit
+    $scope.selectAndOpen = function(row) {
+      if (row.select) $scope.openEdit();
+      else {
+        $scope.select(row);
+        $scope.openEdit();
       }
     };
 
