@@ -81,7 +81,7 @@
             <audio style="width:100%" ng-if="simpleMimeType == 'audio'" ng-src="{{modelToEdit.file.basePath}}" audioplayer controls></audio>
             <div ng-if="simpleMimeType && ['image','video','audio'].indexOf(simpleMimeType) == -1">{{modelToEdit.file.originalname}}</div>
 
-            <a ng-if="simpleMimeType" href="{{modelToEdit.file.basePath}}"
+            <a ng-if="simpleMimeType" href="{{modelToEdit.file.basePath}}?filename={{modelToEdit.file.originalname}}"
               class="btn btn-default" role="button"
               download="{{modelToEdit.file.originalname}}"
               ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <span> {{ 'PUBLISH.CHAPTER.FILE_DOWNLOAD' | translate}}</span>
