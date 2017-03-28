@@ -316,6 +316,9 @@
       $scope.back();
     });
 
+    // inject Math
+    $scope.Math = window.Math;
+
     // Init
     $scope.dataId = ['chapters', 'tags'];
     $scope.selectedData = {value: $scope.dataId[0]};
@@ -571,7 +574,7 @@
     var changebyRange = true;
     $scope.updateTime = function() {
       if (changebyRange) {
-        var d = new Date(parseInt($scope.modelToEdit.value * $scope.duration) * 1000);
+        var d = new Date(parseInt(Math.round($scope.modelToEdit.value * Math.round($scope.duration * 1000))));
         var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
         var nd = new Date(utc);
         $scope.editTime = nd;
@@ -583,7 +586,7 @@
         var d = new Date($scope.editTime.getTime());
         var local = d.getTime() - (d.getTimezoneOffset() * 60000);
         changebyRange = false;
-        $scope.modelToEdit.value = local / ($scope.duration * 1000);
+        $scope.modelToEdit.value = local / Math.round($scope.duration * 1000);
       }
     };
     $scope.$watch('modelToEdit.value', function() {
