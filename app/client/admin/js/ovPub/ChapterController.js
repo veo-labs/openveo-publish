@@ -559,6 +559,8 @@
           }
         }
         updateRange();
+      }).catch(function(error) {
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
       });
     };
 
