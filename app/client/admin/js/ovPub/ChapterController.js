@@ -398,6 +398,7 @@
     };
 
     $scope.$watch('selectedData.value', function() {
+      $scope.updateGlobalCheck();
       $scope.select(null);
       $scope.cancel();
       updateRange();
@@ -409,6 +410,16 @@
         $scope.media[$scope.selectedData.value][i].check = $scope.checkAllSelected;
       }
       $scope.nbCheckRow = $scope.checkAllSelected ? $scope.media[$scope.selectedData.value].length : 0;
+    };
+
+    // Update GlobalCheck according to selectedData
+    $scope.updateGlobalCheck = function() {
+      $scope.nbCheckRow = 0;
+      angular.forEach($scope.media[$scope.selectedData.value], function(row) {
+        if (row.check)
+          $scope.nbCheckRow++;
+      });
+      $scope.checkAllSelected = $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length;
     };
 
     // Check a chapter for removal
