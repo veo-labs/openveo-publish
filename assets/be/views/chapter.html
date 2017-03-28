@@ -88,7 +88,7 @@
             </a>
             <button type="button" class="btn btn-danger" ng-click="modelToEdit.file = null" ng-show="modelToEdit.file">{{ 'CORE.UI.REMOVE' | translate}}</button>
           </div>
-          
+
           <div ng-show="!modelToEdit.type && selectedData.value == 'tags'" class="form-group">
             <label for="file" ng-if='!modelToEdit.file'>{{ 'PUBLISH.CHAPTER.ADD_FILE' | translate}}</label>
             <label for="file" ng-if='modelToEdit.file'>{{ 'PUBLISH.CHAPTER.REPLACE_FILE' | translate}}</label>
@@ -96,7 +96,7 @@
             ngf-max-size="20MB"
             ngf-model-invalid="errorFile">
             <i ng-show="myForm.file.$error.maxSize">{{ 'PUBLISH.CHAPTER.LARGE_FILE_ERROR' | translate}} {{errorFile.size / 1000000|number:2}}MB: max 20MB</i>
-            <div ng-show="myForm.file.$valid">
+            <div ng-if="myForm.file.$valid && file">
               <img style="width:100%" ngf-thumbnail="file" class="thumb">
               <audio style="width:100%" controls ngf-src="file"></audio>
               <video width="100%" controls ngf-src="file"></video>
