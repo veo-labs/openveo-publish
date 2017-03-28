@@ -172,7 +172,7 @@
         $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
         uploadAborted = false;
       } else {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       }
@@ -295,7 +295,7 @@
         updateRange();
         $scope.isCollapsed = true;
       }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       });
@@ -312,7 +312,7 @@
     // Listen to player errors
     // If an error occurs go back to catalog with an alert
     angular.element(myPlayer).on('error', function(event, error) {
-      $scope.$emit('setAlert', 'danger', error.message, 8000);
+      $scope.$emit('setAlert', 'danger', error.message);
       $scope.back();
     });
 
@@ -560,7 +560,7 @@
         }
         updateRange();
       }).catch(function(error) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
       });
     };
 
