@@ -295,7 +295,7 @@
         updateRange();
         $scope.isCollapsed = true;
       }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CUT.SAVE_ERROR'), 4000);
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'), 4000);
         if (status === 401)
           $scope.$parent.logout();
       });
