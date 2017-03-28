@@ -4,7 +4,6 @@ Configuration files are all in user's directory under **~/.openveo/publish**
 
 - **~/.openveo/publish/publishConf.json**
 - **~/.openveo/publish/videoPlatformConf.json**
-- **~/.openveo/publish/loggerConf.json**
 - **~/.openveo/publish/watcherConf.json**
 
 **Nb :** You must restart OpenVeo servers after modifications.
@@ -65,27 +64,11 @@ To upload videos on **Local Openveo Server**, you need to set this configuration
 {
   "local": {
     "vodFilePath": "/path/to/publish/assets/player/videos/local",// path where the video will be uploaded on the local machine
-    "streamPath": "publish/player/videos/local" //stream path exposed by local server to access video, if 
+    "streamPath": "publish/player/videos/local" //stream path exposed by local server to access video, if
   }
 }
 ```
 <br/>
-
-# Configure the logger
-
-Open **~/.openveo/publish/loggerConf.json**
-
-```json
-{
-  "watcher": { // Watcher logger
-    "fileName" : "/var/log/openveo-watcher.log", // Path to log file
-    "level" : "info", // Log level
-    "maxFileSize" : 1048576, // Maximum log file size (in Bytes)
-    "maxFiles" : 2, // Maximum number of files archived
-    "console" : false // false to deactivate logs in standard output
-  }
-}
-```
 
 # Configure the [watcher](watcher.md)
 

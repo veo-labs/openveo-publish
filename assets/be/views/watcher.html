@@ -1,8 +1,0 @@
-<h2 ng-bind="'PUBLISH.WATCHER.TITLE' | translate"></h2>
-<div class="well well-lg" ng-bind="'PUBLISH.WATCHER.INFO' | translate"></div>
-<div class="alert alert-warning" ng-show="watcherStatus == 0" role="alert"  ng-bind="'PUBLISH.WATCHER.STARTING' | translate"></div>
-<div class="alert alert-success" ng-show="watcherStatus == 1" role="alert" ng-bind="'PUBLISH.WATCHER.STARTED' | translate"></div>
-<div class="alert alert-warning" ng-show="watcherStatus == 2" role="alert" ng-bind="'PUBLISH.WATCHER.STOPPING' | translate"></div>
-<div class="alert alert-danger" ng-show="watcherStatus == 3" role="alert" ng-bind="'PUBLISH.WATCHER.STOPPED' | translate"></div>
-<button type="button" class="btn btn-danger" ng-if="rights.edit" ng-show="watcherStatus == 0 || watcherStatus == 1" ng-click="stopWatcher()" ng-disabled="disableWatcher" ng-bind="'PUBLISH.WATCHER.STOP_BUTTON' | translate"></button>
-<button type="button" class="btn btn-success" ng-if="rights.edit" ng-show="watcherStatus == 2 || watcherStatus == 3" ng-click="startWatcher()" ng-disabled="disableWatcher" ng-bind="'PUBLISH.WATCHER.START_BUTTON' | translate"></button>

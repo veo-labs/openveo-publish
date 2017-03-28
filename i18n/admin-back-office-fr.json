@@ -40,14 +40,11 @@
     "UPDATE_VIDEOS_DESCRIPTION" : "Editer les vidéos",
     "DELETE_VIDEOS_NAME" : "Supprimer les vidéos",
     "DELETE_VIDEOS_DESCRIPTION" : "Supprimer les vidéos",
-    "MANAGE_WATCHER_NAME" : "Gérer le watcher",
-    "MANAGE_WATCHER_DESCRIPTION" : "Démarrer / Arrêter le watcher",
     "MANAGE_PUBLISH_CONF_NAME" : "Gérer la configuration de Publish",
     "MANAGE_PUBLISH_CONF_DESCRIPTION" : "Gère l'ensemble des paramètres de configuration du plugin publish",
     "PUBLISH_VIDEO_NAME" : "Publier des vidéos",
     "PUBLISH_VIDEO_DESCRIPTION" : "Publier / Dépublier des vidéos",
     "ACCESS_VIDEOS_PAGE_NAME" : "Accès à la page des vidéos",
-    "ACCESS_WATCHER_PAGE_NAME" : "Accès à la page du watcher",
     "ACCESS_PROPERTIES_PAGE_NAME" : "Accès à la page des propriétés",
     "ACCESS_CATEGORIES_PAGE_NAME" : "Accès à la page des catégories",
     "ACCESS_PUBLISH_CONF_PAGE_NAME" : "Accès à la page de configuration de Publish",
@@ -107,17 +104,6 @@
     "CATEGORY_FILTER" : "Rubrique",
     "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s.",
     "NOT_READY": "Cette vidéo nécessite un réencodage pour etre visionné. Cette tâche est en cours.<br><br>Merci de réessayer dans quelques instant."
-  },
-  "WATCHER" : {
-    "PAGE_TITLE" : "Publish - Watcher",
-    "TITLE" : "Watcher",
-    "INFO" : "Le watcher écoute un ou plusieurs répertoires (en fonction de la configuration). Lorsqu'un paquet vidéo est ajouté à l'un des répertoires écoutés, la vidéo est envoyée sur la plateforme vidéo.",
-    "STARTING" : "Le Watcher démarre... Veuillez patienter",
-    "STARTED" : "Le Watcher est actif et à l'écoute des répertoires",
-    "STOPPING" : "Le Watcher est en cours d'arrêt... Veuillez patienter",
-    "STOPPED" : "Le Watcher est inactif",
-    "STOP_BUTTON" : "Arrêter le Watcher",
-    "START_BUTTON" : "Démarrer le Watcher"
   },
   "PROPERTIES" : {
     "SEARCH_BY" : "Rechercher par ",

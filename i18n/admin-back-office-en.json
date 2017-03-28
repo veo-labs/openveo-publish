@@ -40,14 +40,11 @@
     "UPDATE_VIDEOS_DESCRIPTION" : "Edit videos",
     "DELETE_VIDEOS_NAME" : "Remove videos",
     "DELETE_VIDEOS_DESCRIPTION" : "Remove videos",
-    "MANAGE_WATCHER_NAME" : "Manage watcher",
-    "MANAGE_WATCHER_DESCRIPTION" : "Start / Stop the watcher",
     "MANAGE_PUBLISH_CONF_NAME" : "Manage Publish configuration",
     "MANAGE_PUBLISH_CONF_DESCRIPTION" : "Configure all publish plugin parameters",
     "PUBLISH_VIDEO_NAME" : "Publish videos",
     "PUBLISH_VIDEO_DESCRIPTION" : "Publish / Unpublish videos",
     "ACCESS_VIDEOS_PAGE_NAME" : "Access videos page",
-    "ACCESS_WATCHER_PAGE_NAME" : "Access watcher page",
     "ACCESS_PROPERTIES_PAGE_NAME" : "Access properties page",
     "ACCESS_CATEGORIES_PAGE_NAME" : "Access categories page",
     "ACCESS_PUBLISH_CONF_PAGE_NAME" : "Access Publish configuration page",
@@ -107,17 +104,6 @@
     "CATEGORY_FILTER" : "Category",
     "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s.",
     "NOT_READY": "This video need to be formated to be streamed. The process is currently running.<br><br>Please, try again in few minutes."
-  },
-  "WATCHER" : {
-    "PAGE_TITLE" : "Publish - Watcher",
-    "TITLE" : "Watcher",
-    "INFO" : "The watcher listens to one or several directories (depending on configuration). Whenever a video is added to one of the hot folders, the video is sent to the video platform.",
-    "STARTING" : "The Watcher is starting... Please wait",
-    "STARTED" : "The Watcher is currently listening to hot folder(s)",
-    "STOPPING" : "The Watcher is stopping... Please wait",
-    "STOPPED" : "The Watcher is not started",
-    "STOP_BUTTON" : "Stop watcher",
-    "START_BUTTON" : "Start watcher"
   },
   "PROPERTIES" : {
     "SEARCH_BY" : "Search by ",
