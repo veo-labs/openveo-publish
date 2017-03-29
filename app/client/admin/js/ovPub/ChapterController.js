@@ -394,7 +394,8 @@
         {title: 'Paragraph', format: 'p'},
         {title: 'Blockquote', format: 'blockquote'}
         ]
-      }]
+      }],
+      content_css: '/be/css/tinymce.css?' + new Date().getTime() // eslint-disable-line
     };
 
     $scope.$watch('selectedData.value', function() {
