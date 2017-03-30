@@ -4,20 +4,26 @@
 
 - The watcher which used to be a sub process is now integrated inside the OpenVeo process
 - Back end page to start / stop the watcher has been removed
-- Chapters are no more initiated relatively to slides. User have to define them himself.
+- Chapters are no more initiated relatively to slides. User have to define them himself
 - Drop support for Node.js &lt;7.4.0
 - Drop support for NPM &lt;4.0.5
-- Usage of Web Service end points */videos* and */properties* has change. *page* parameter now starts at 0 instead of 1.
-- Usage of Web Service end point */publish/videos/{video_id}* has change. OpenVeo publish now uses OpenVeo CDN url for local videos urls and videos thumbnails instead of relative urls.
+- Usage of Web Service end points */videos* and */properties* has changed. *page* parameter now starts at 0 instead of 1
+- Usage of Web Service end point */publish/videos/{video_id}* has changed. OpenVeo publish now uses OpenVeo CDN url for local videos urls and videos thumbnails instead of relative urls
 
 ## NEW FEATURES
 
 - **Search engines** for medias and custom properties have been improved. Multiple search fields have been replaced by a unique field. Search is now case insensitive and search is made on the whole string, not just strings starting with the query. The query string is taken as the whole when searching meaning that special characters aren't interpreted and thus will be searched as is.
 - **Rich media tags**. Tags and chapters now embed a WYSIWYG editor. Tags can also be associated with a file that user can upload up to 20MB. These associated information can be previewed before saving modification and are rendered in player views associated with tags and chapters.
+- **Rich text description** is now available on the description of videos.
+- **Double click** is now possible on the list of chapters to directly open the edit form
+- **An error message** is now displayed if removing a chapter or tag failed
 
 ## BUG FIXES
 
 - Fix the freeze of packages during a publication process. Sometimes packages could stay stuck in a state (copy, retrieve metadata etc.).
+- Fix deprecation warning on compass (_mq.scss file) when installing
+- Fix category update. When adding a new category the list of categories in the list of videos wasn't updated if the whole page wasn't refreshed
+- Freeze errors in media editor instead of auto hide
 
 ## DEPENDENCIES
 
