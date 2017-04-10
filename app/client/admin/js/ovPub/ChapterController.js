@@ -191,12 +191,11 @@
       $scope.file = null;
       $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
       $scope.simpleMimeType = $scope.getFileMimeType();
-      if (!$scope.selectRow) {
 
-        // ADD the new model
+      var i = searchPosition($scope.modelToEdit.id);
+      if (i < 0) { // ADD the new model
         $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
       } else {
-        var i = searchPosition($scope.modelToEdit.id);
         $scope.media[$scope.selectedData.value][i] = $scope.modelToEdit;
       }
 
