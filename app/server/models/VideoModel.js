@@ -837,7 +837,7 @@ VideoModel.prototype.remove = function(ids, callback) {
  * @param {Array} [data.chapters] The media chapters
  * @param {Number} [data.views] The media number of views
  * @param {Array} [data.groups] The list of groups the media belongs to
- * @param {String} [data.user] The id of the user the media belongs to
+ * @param {String} [data.user] The id of the user the media belongs to, null to delete associated user
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of updated items
@@ -868,7 +868,7 @@ VideoModel.prototype.update = function(id, data, callback) {
       return group ? true : false;
     });
   }
-  if (data.user)
+  if (data.hasOwnProperty('user'))
     info['metadata.user'] = data.user;
 
   this.provider.getOne(id, null, function(error, entity) {
