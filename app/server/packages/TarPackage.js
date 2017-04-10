@@ -16,6 +16,8 @@ var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
 
+var shortid = require('shortid');
+
 /**
  * Defines a TarPackage to manage publication of a tar file.
  *
@@ -498,6 +500,7 @@ TarPackage.prototype.saveTimecodes = function() {
           switch (timecodeType) {
             case 'image':
               videoInfo.timecodes.push({
+                id: shortid.generate(),
                 timecode: currentTc.timecode,
                 image: {
                   small: cdnUrl + 'publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?thumb=small',
@@ -508,6 +511,7 @@ TarPackage.prototype.saveTimecodes = function() {
 
             case 'tag':
               videoInfo.tags.push({
+                id: shortid.generate(),
                 value: currentTc.timecode / (self.mediaPackage.metadata.duration * 1000),
                 name: currentTc.data && currentTc.data.tagname ?
                   currentTc.data.tagname : 'Tag' + (videoInfo.tags.length + 1)

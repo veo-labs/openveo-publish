@@ -419,7 +419,8 @@
         if (row.check)
           $scope.nbCheckRow++;
       });
-      $scope.checkAllSelected = $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length;
+      $scope.checkAllSelected = $scope.media[$scope.selectedData.value] ?
+        $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length : false;
     };
 
     // Check a chapter for removal
