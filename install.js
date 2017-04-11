@@ -242,8 +242,8 @@ function createVideoPlatformConf(callback) {
       if (!wowzaConf) return callback();
       rl.question('Enter Wowza file transfert port (let empty to set port acccording to protocol):\n',
       function(answer) {
-        if (answer) wowzaConf.port = answer;
-        else if (wowzaConf.protocol == 'ftp') wowzaConf.port = '21';
+        if (answer) wowzaConf.port = parseInt(answer);
+        else if (wowzaConf.protocol == 'ftp') wowzaConf.port = 21;
         callback();
       });
     },
