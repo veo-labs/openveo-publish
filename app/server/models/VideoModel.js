@@ -12,6 +12,7 @@ var async = require('async');
 var openVeoApi = require('@openveo/api');
 var videoPlatformFactory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
+var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
 var AccessError = openVeoApi.errors.AccessError;
 var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
@@ -279,6 +280,64 @@ function updateMedia(id, modifier, callback) {
   // execute the oldest operation in the queue
   if (!this.pendingUpdate)
     executeOperation();
+}
+
+/**
+ * Resolves videos resources urls using CDN url.
+ *
+ * Videos may have attached resources like files associated to tags, timecodes images, thumbnail image and
+ * so on. These resources must be accessible through an url. As all resources must, in the future, reside in
+ * a CDN, resolveResourcesUrls transforms all resources URIs to URLs based on CDN.
+ *
+ * @param {Array} videos The list of videos
+ */
+function resolveResourcesUrls(videos) {
+  var cdnUrl = process.api.getCoreApi().getCdnUrl();
+  var removeFirstSlashRegExp = new RegExp(/^\//);
+
+  if (videos && videos.length) {
+    videos.forEach(function(video) {
+
+      // Timecodes
+      if (video.timecodes) {
+        video.timecodes.forEach(function(timecode) {
+          if (timecode.image) {
+
+            if (timecode.image.small)
+              timecode.image.small = cdnUrl + timecode.image.small.replace(removeFirstSlashRegExp, '');
+
+            if (timecode.image.large)
+              timecode.image.large = cdnUrl + timecode.image.large.replace(removeFirstSlashRegExp, '');
+          }
+        });
+      }
+
+      // Tags
+      if (video.tags) {
+        video.tags.forEach(function(tag) {
+          if (tag.file && tag.file.basePath)
+            tag.file.basePath = cdnUrl + tag.file.basePath.replace(removeFirstSlashRegExp, '');
+        });
+      }
+
+      // Thumbnail
+      if (video.thumbnail)
+        video.thumbnail = cdnUrl + video.thumbnail.replace(removeFirstSlashRegExp, '');
+
+      // Local videos are hosted in local and consequently delivered by OpenVeo HTTP server
+      if (video.type === TYPES.LOCAL && video.sources) {
+        video.sources.forEach(function(source) {
+          if (source.files) {
+            source.files.forEach(function(file) {
+              if (file.link)
+                file.link = cdnUrl + file.link.replace(removeFirstSlashRegExp, '');
+            });
+          }
+        });
+      }
+
+    });
+  }
 }
 
 /**
@@ -589,6 +648,7 @@ VideoModel.prototype.get = function(filter, callback) {
           videos[i].properties = videoPropertiesWithValues;
         }
 
+        resolveResourcesUrls(videos);
       }
 
       callback(null, videos);
@@ -673,6 +733,8 @@ VideoModel.prototype.getPaginatedFilteredEntities = function(filter, limit, page
           }
           videos[i].properties = newVideoProperty;
         }
+
+        resolveResourcesUrls(videos);
       }
       callback(null, videos, pagination);
     }
@@ -776,6 +838,7 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
     if (error || !videoInfo) {
       callback(error);
     } else {
+      resolveResourcesUrls([videoInfo]);
       callback(null, videoInfo);
     }
   });
@@ -970,11 +1033,10 @@ VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
  * @param  {[type]} file File information do add
  */
 function resolveMediaPath(id, item, file) {
-  var cdnUrl = process.api.getCoreApi().getCdnUrl();
   item.file = file;
   if (item.file.mimetype.substr(0, 'image'.length) == 'image')
-    item.file.basePath = cdnUrl + 'publish/player/videos/' + id + '/uploads/' + item.file.filename;
-  else item.file.basePath = cdnUrl + 'publish/' + id + '/uploads/' + item.file.filename;
+    item.file.basePath = '/publish/player/videos/' + id + '/uploads/' + item.file.filename;
+  else item.file.basePath = '/publish/' + id + '/uploads/' + item.file.filename;
 }
 
 /**

@@ -461,7 +461,6 @@ TarPackage.prototype.saveTimecodes = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-  var cdnUrl = process.api.getCoreApi().getCdnUrl();
 
   process.logger.debug('Save timecodes to ' + videoFinalDir);
   this.videoModel.updateState(this.mediaPackage.id, STATES.SAVING_TIMECODES);
@@ -503,8 +502,8 @@ TarPackage.prototype.saveTimecodes = function() {
                 id: shortid.generate(),
                 timecode: currentTc.timecode,
                 image: {
-                  small: cdnUrl + 'publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?thumb=small',
-                  large: cdnUrl + 'publish/' + self.mediaPackage.id + '/' + currentTc.data.filename
+                  small: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?thumb=small',
+                  large: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename
                 }
               });
               break;
