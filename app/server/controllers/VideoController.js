@@ -6,6 +6,7 @@
 
 var util = require('util');
 var path = require('path');
+var fs = require('fs');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var configDir = openVeoApi.fileSystem.getConfDir();
@@ -471,8 +472,35 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
   var model = this.getModel(request);
 
   var maxsize = 20 * 1000 * 1000; // in bytes
+  var uploadPath = process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/';
+
+  var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+      cb(null, uploadPath);
+    },
+    filename: function(req, file, cb) {
+      var extension = path.extname(file.originalname);
+      var basename = path.basename(file.originalname, extension);
+      var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase() + extension;
+
+      fs.stat(uploadPath + sanitizedFilename, function(error, stat) {
+        var uploadedFileName;
+        if (error) {
+          if (error.code == 'ENOENT') { // file does not exist
+            uploadedFileName = sanitizedFilename;
+          } else {
+            next((error instanceof AccessError) ?
+              HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+          }
+        } else uploadedFileName = Date.now() + '-' + sanitizedFilename;
+
+        cb(null, uploadedFileName);
+      });
+    }
+  });
+
   var upload = multer({
-    dest: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/',
+    storage: storage,
     limits: {
       fileSize: maxsize
     }

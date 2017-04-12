@@ -1034,7 +1034,7 @@ VideoModel.prototype.increaseVideoViews = function(id, count, callback) {
  */
 function resolveMediaPath(id, item, file) {
   item.file = file;
-  if (item.file.mimetype.substr(0, 'image'.length) == 'image')
+  if (item.file.mimetype.substr(0, 'image'.length) != 'image')
     item.file.basePath = '/publish/player/videos/' + id + '/uploads/' + item.file.filename;
   else item.file.basePath = '/publish/' + id + '/uploads/' + item.file.filename;
 }
