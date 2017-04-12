@@ -419,7 +419,8 @@
         if (row.check)
           $scope.nbCheckRow++;
       });
-      $scope.checkAllSelected = $scope.media[$scope.selectedData.value] ?
+      $scope.checkAllSelected = $scope.media[$scope.selectedData.value] &&
+        $scope.media[$scope.selectedData.value].length ?
         $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length : false;
     };
 
@@ -522,7 +523,6 @@
     /*
      * Slider
      */
-
     $scope.changeSliderView = function(event, direction) {
       var indexView = $scope.slider.view + direction;
       if (0 > indexView) {
@@ -562,8 +562,10 @@
       $scope.selectRow = null;
 
       publishService.removeTags($scope.media.id, tagsToRemove).then(function(resp) {
-        if ($scope.checkAllSelected) $scope.media[$scope.selectedData.value] = [];
-        else for (var i = 0; i < tagsToRemove[$scope.selectedData.value].length; i++) {
+        if ($scope.checkAllSelected) {
+          $scope.media[$scope.selectedData.value] = [];
+          $scope.checkAllSelected = false;
+        } else for (var i = 0; i < tagsToRemove[$scope.selectedData.value].length; i++) {
           var id = tagsToRemove[$scope.selectedData.value][i]['id'];
           var k = searchPosition(id);
           if (k >= 0) {
