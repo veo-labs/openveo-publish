@@ -97,9 +97,10 @@
     // its status
     var pollMediasPromise = $interval(function() {
       if (!scopeEditForm.pendingEdition) {
-        $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.MEDIAS.RELOAD'), 4000);
         entityService.deleteCache(entityType, publishName);
-        tableReloadEventService.broadcast();
+        tableReloadEventService.broadcast(function() {
+          $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.MEDIAS.RELOAD'), 4000);
+        });
       }
     }, 30000);
 
