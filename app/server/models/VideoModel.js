@@ -143,21 +143,29 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
   videosToRemove.forEach(function(video) {
     parallel.push(
       function(callback) {
-        var videoPlatformProvider = videoPlatformFactory.get(video.type,
-          videoPlatformConf[video.type]);
+        var mediaId = [];
 
         // compatibility with old mediaId format
-        var mediaId = !Array.isArray(video.mediaId) ? [video.mediaId] : video.mediaId;
-        if (videoPlatformProvider) videoPlatformProvider.remove(mediaId, function(error, info) {
-          if (error) {
-            callback(error);
-            return;
-          }
-          callback();
-        });
-        else callback();
-      }
-    );
+        if (video.mediaId) {
+          mediaId = !Array.isArray(video.mediaId) ? [video.mediaId] : video.mediaId;
+        }
+
+        // verify that media is uploaded before retreiving platformPorvider
+        if (mediaId.length) {
+          var videoPlatformProvider = videoPlatformFactory.get(video.type,
+            videoPlatformConf[video.type]);
+
+          if (videoPlatformProvider)
+            videoPlatformProvider.remove(mediaId, function(error, info) {
+              if (error) {
+                callback(error);
+                return;
+              }
+              callback();
+            });
+          else callback();
+        } else callback();
+      });
   });
 
   async.parallel(parallel, function(error) {
