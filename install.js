@@ -375,7 +375,7 @@ function createWatcherConf(callback) {
     function(callback) {
       if (!videoPlatformConf.local) return callback();
       var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.LOCAL);
-      rl.question('Enter Local hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
+      rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
           type: TYPES.LOCAL,
           path: (answer || defaultPath).replace(/\\/g, '/')
