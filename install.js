@@ -50,7 +50,7 @@ function createConfDir(callback) {
 }
 
 /**
- * Creates logger directory if it does not exist.
+ * Creates videos temporary directory if it does not exist.
  */
 function createVideoTmpDir(callback) {
   var conf = require(path.join(confDir, 'publishConf.json'));
