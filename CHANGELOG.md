@@ -24,6 +24,7 @@
 - Fix deprecation warning on compass (_mq.scss file) when installing
 - Fix category update. When adding a new category the list of categories in the list of videos wasn't updated if the whole page wasn't refreshed
 - Freeze errors in media editor instead of auto hide
+- Fix watcher detection issues. Sometimes the watcher didn't detect new files added to the hot folders
 
 ## DEPENDENCIES
 
@@ -48,6 +49,7 @@
 - **karma-phantomjs-launcher** has been updated from 1.0.0 to **1.0.2**
 - **mocha** has been updated from 2.4.5 to **3.2.0**
 - **pre-commit** has been updated from 1.1.2 to **1.2.2**
+- **chokidar** has been removed
 - **glob** has been removed
 - **grunt-remove** has been removed
 - **grunt-rename** has been removed

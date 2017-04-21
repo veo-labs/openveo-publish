@@ -5,7 +5,7 @@ var util = require('util');
 var express = require('express');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
-var Watcher = process.requirePublish('app/server/Watcher.js');
+var Watcher = process.requirePublish('app/server/watcher/Watcher.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -117,37 +117,22 @@ PublishPlugin.prototype.start = function(callback) {
 
     // Retrieve the list of hot folders paths from configuration
     watcherConf.hotFolders.forEach(function(hotFolder) {
-
       if (
         typeof hotFolder === 'object' &&
         typeof hotFolder.path === 'string'
       )
         hotFoldersPaths.push(path.normalize(hotFolder.path));
-
-    });
-
-    // Listen to watcher's status changes
-    watcher.on('status', function(status) {
-      process.logger.debug('Watcher status : ' + status);
-
-      if (status === Watcher.STATUSES.STARTED) {
-        process.logger.info('Watcher started');
-
-        // Retry all packages which are not in a stable state
-        publishManager.retryAll();
-
-      }
     });
 
     // Listen to watcher's errors
     watcher.on('error', function(error) {
-      process.logger.error(error && error.message);
+      process.logger.error(error && error.message, {code: error.code, directoryPath: error.directoryPath});
     });
 
     // Listen to watcher's new detected files
-    watcher.on('newFile', function(filePath) {
-      process.logger.verbose('Watcher detected a new file : ' + filePath);
-      var pathDescriptor = path.parse(filePath);
+    watcher.on('create', function(resourcePath) {
+      process.logger.verbose('Watcher detected a new resource : ' + resourcePath);
+      var pathDescriptor = path.parse(resourcePath);
       var packageInfo = null;
 
       // Find the hot folder in which the file was added
@@ -158,7 +143,7 @@ PublishPlugin.prototype.start = function(callback) {
         }
       });
 
-      packageInfo['originalPackagePath'] = filePath;
+      packageInfo['originalPackagePath'] = resourcePath;
       packageInfo['originalFileName'] = pathDescriptor.name;
       publishManager.publish(packageInfo);
     });
@@ -183,8 +168,19 @@ PublishPlugin.prototype.start = function(callback) {
       process.logger.info('Force uploading media ' + mediaPackage.id + ' started');
     });
 
-    watcher.start(hotFoldersPaths);
-  }
+    // Watch hot folders
+    watcher.add(hotFoldersPaths, function(results) {
+      results.forEach(function(result) {
+        if (result.error)
+          process.logger.error(result.error && result.error.message);
+      });
 
-  callback();
+      // Retry all packages which are not in a stable state
+      publishManager.retryAll();
+
+      callback();
+    });
+
+  } else
+    callback();
 };
