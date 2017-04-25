@@ -474,53 +474,57 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
   var maxsize = 20 * 1000 * 1000; // in bytes
   var uploadPath = process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/';
 
-  var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-      cb(null, uploadPath);
-    },
-    filename: function(req, file, cb) {
-      var extension = path.extname(file.originalname);
-      var basename = path.basename(file.originalname, extension);
-      var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase() + extension;
+  openVeoApi.fileSystem.mkdir(uploadPath, function() {
 
-      fs.stat(uploadPath + sanitizedFilename, function(error, stat) {
-        var uploadedFileName;
-        if (error) {
-          if (error.code == 'ENOENT') { // file does not exist
-            uploadedFileName = sanitizedFilename;
-          } else {
-            next((error instanceof AccessError) ?
-              HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
-          }
-        } else uploadedFileName = Date.now() + '-' + sanitizedFilename;
+    var storage = multer.diskStorage({
+      destination: function(req, file, cb) {
+        cb(null, uploadPath);
+      },
+      filename: function(req, file, cb) {
+        var extension = path.extname(file.originalname);
+        var basename = path.basename(file.originalname, extension);
+        var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase() +
+          extension;
 
-        cb(null, uploadedFileName);
+        fs.stat(uploadPath + sanitizedFilename, function(error, stat) {
+          var uploadedFileName;
+          if (error) {
+            if (error.code == 'ENOENT') { // file does not exist
+              uploadedFileName = sanitizedFilename;
+            } else {
+              next((error instanceof AccessError) ?
+                HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+            }
+          } else uploadedFileName = Date.now() + '-' + sanitizedFilename;
+
+          cb(null, uploadedFileName);
+        });
+      }
+    });
+
+    var upload = multer({
+      storage: storage,
+      limits: {
+        fileSize: maxsize
+      }
+    });
+
+    upload.single('file')(request, response, function(err) {
+      if (err || !request.body.info) {
+
+        // An error occurred when uploading
+        return response.end('Error uploading file.');
+      }
+      var data = JSON.parse(request.body.info);
+      var file = request.file;
+
+      model.updateTags(entityId, data, file, function(error, newtag) {
+        if (error)
+          next((error instanceof AccessError) ?
+            HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+        else
+          response.send(newtag);
       });
-    }
-  });
-
-  var upload = multer({
-    storage: storage,
-    limits: {
-      fileSize: maxsize
-    }
-  });
-
-  upload.single('file')(request, response, function(err) {
-    if (err || !request.body.info) {
-
-      // An error occurred when uploading
-      return response.end('Error uploading file.');
-    }
-    var data = JSON.parse(request.body.info);
-    var file = request.file;
-
-    model.updateTags(entityId, data, file, function(error, newtag) {
-      if (error)
-        next((error instanceof AccessError) ?
-          HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
-      else
-        response.send(newtag);
     });
   });
 };
