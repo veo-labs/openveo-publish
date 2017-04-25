@@ -98,9 +98,9 @@ describe('Chapter page', function() {
     it('should not be able to add / remove a begin cut', function() {
       page.addCut(0.1, true);
       page.getAlertMessages().then(function(messages) {
-        assert.equal(messages.length, 2);
+        assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.CORE.ERROR.FORBIDDEN);
+        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
       });
       page.closeAlerts();
     });
@@ -108,9 +108,9 @@ describe('Chapter page', function() {
     it('should not be able to add / remove a end cut', function() {
       page.addCut(0.8, false);
       page.getAlertMessages().then(function(messages) {
-        assert.equal(messages.length, 2);
+        assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.CORE.ERROR.FORBIDDEN);
+        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
       });
       page.closeAlerts();
     });
@@ -126,7 +126,7 @@ describe('Chapter page', function() {
       page.addChapter(chapterToAdd);
 
       page.getAlertMessages().then(function(messages) {
-        assert.equal(messages.length, 1);
+        assert.equal(messages.length, 2);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
       });
       page.closeAlerts();
