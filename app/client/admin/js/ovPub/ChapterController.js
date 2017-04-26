@@ -593,6 +593,7 @@
         var d = new Date(parseInt(Math.round($scope.modelToEdit.value * Math.round($scope.duration * 1000))));
         var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
         var nd = new Date(utc);
+        nd.setMilliseconds(0);
         $scope.editTime = nd;
       } else
         changebyRange = true;
