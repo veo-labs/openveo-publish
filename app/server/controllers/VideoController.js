@@ -483,19 +483,18 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
       filename: function(req, file, cb) {
         var extension = path.extname(file.originalname);
         var basename = path.basename(file.originalname, extension);
-        var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase() +
-          extension;
+        var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase();
 
-        fs.stat(uploadPath + sanitizedFilename, function(error, stat) {
+        fs.stat(uploadPath + sanitizedFilename + extension, function(error, stat) {
           var uploadedFileName;
           if (error) {
             if (error.code == 'ENOENT') { // file does not exist
-              uploadedFileName = sanitizedFilename;
+              uploadedFileName = sanitizedFilename + extension;
             } else {
               next((error instanceof AccessError) ?
                 HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
             }
-          } else uploadedFileName = Date.now() + '-' + sanitizedFilename;
+          } else uploadedFileName = sanitizedFilename + '-' + Date.now() + extension;
 
           cb(null, uploadedFileName);
         });
