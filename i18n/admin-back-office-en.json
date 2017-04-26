@@ -165,7 +165,8 @@
     "ADD_FILE": "Add a file",
     "REPLACE_FILE": "Replace attached file",
     "LARGE_FILE_ERROR": "File too large",
-    "FILE_DOWNLOAD": "Download"
+    "FILE_DOWNLOAD": "Download",
+    "UPLOAD_FILE_ERROR": "Error uploading file."
   },
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",

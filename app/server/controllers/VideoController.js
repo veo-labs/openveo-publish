@@ -491,8 +491,7 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
             if (error.code == 'ENOENT') { // file does not exist
               uploadedFileName = sanitizedFilename + extension;
             } else {
-              next((error instanceof AccessError) ?
-                HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+              return cb(error);
             }
           } else uploadedFileName = sanitizedFilename + '-' + Date.now() + extension;
 
@@ -510,9 +509,11 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
 
     upload.single('file')(request, response, function(err) {
       if (err || !request.body.info) {
+        if (err)
+          process.logger.error(err.message, {error: err, method: 'updateTagsAction'});
 
         // An error occurred when uploading
-        return response.end('Error uploading file.');
+        return response.end('PUBLISH.CHAPTER.UPLOAD_FILE_ERROR');
       }
       var data = JSON.parse(request.body.info);
       var file = request.file;

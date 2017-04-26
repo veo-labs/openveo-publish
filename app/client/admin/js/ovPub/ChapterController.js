@@ -165,7 +165,7 @@
      */
     function saveChapterErrorCb(resp) {
       if (resp.status > 0)
-        $scope.errorMsg = resp.status + ': ' + resp.data;
+        $scope.errorMsg = resp.data;
 
       // emit alert
       if (uploadAborted) {
