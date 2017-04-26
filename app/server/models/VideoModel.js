@@ -903,12 +903,12 @@ VideoModel.prototype.remove = function(ids, callback) {
  * @param {String} [data.title] The media title
  * @param {String} [data.description] The media description
  * @param {Array} [data.properties] The media properties' values
- * @param {String} [data.category] The category the media belongs to
+ * @param {String} [data.category] The category the media belongs to, nullable
  * @param {Array} [data.cut] Begin and end cuts
  * @param {Array} [data.chapters] The media chapters
  * @param {Number} [data.views] The media number of views
  * @param {Array} [data.groups] The list of groups the media belongs to
- * @param {String} [data.user] The id of the user the media belongs to, null to delete associated user
+ * @param {String} [data.user] The id of the user the media belongs to, null to delete associated user, nullable
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Number** The number of updated items
@@ -922,7 +922,7 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.description = data.description;
   if (data.properties)
     info.properties = data.properties;
-  if (data.category)
+  if (data.hasOwnProperty('category'))
     info.category = data.category;
   if (data.cut)
     info.cut = data.cut;
