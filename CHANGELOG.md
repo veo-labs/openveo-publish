@@ -25,6 +25,7 @@
 - Fix category update. When adding a new category the list of categories in the list of videos wasn't updated if the whole page wasn't refreshed
 - Freeze errors in media editor instead of auto hide
 - Fix watcher detection issues. Sometimes the watcher didn't detect new files added to the hot folders
+- Fix fullscreen for embedded videos. Fullscreen button didn't have any effect
 
 ## DEPENDENCIES
 
