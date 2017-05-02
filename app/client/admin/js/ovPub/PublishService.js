@@ -239,7 +239,7 @@
 
       return Upload.upload({
         url: '/be/publish/updateVideoTags/' + id,
-        data: {file: file, info: Upload.json(data)}
+        data: {info: Upload.json(data), file: file}
       });
     }
 
