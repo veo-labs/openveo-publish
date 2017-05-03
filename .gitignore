@@ -11,20 +11,18 @@ Icon?
 # Windows
 Thumbs.db
 Desktop.ini
-
-# Windows XP
 ehthumbs.db
 
 # Logs
 *.log
 
-# Project npm dependencies
+# NPM dependencies
 /node_modules
 
 # Published video packages
 /assets/player/videos
 
-# Bower libraries
+# Bower dependencies
 /assets/lib
 
 # Compiled files
@@ -35,9 +33,11 @@ ehthumbs.db
 /assets/player/js
 /assets/player/css
 
-#IDE
+# IDE
 nbproject
 
 # Documentation
 /site
+
+# Grunt
 /.grunt
