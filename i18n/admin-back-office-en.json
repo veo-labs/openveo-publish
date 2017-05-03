@@ -166,7 +166,7 @@
     "REPLACE_FILE": "Replace attached file",
     "LARGE_FILE_ERROR": "File too large",
     "FILE_DOWNLOAD": "Download",
-    "UPLOAD_FILE_ERROR": "Error uploading file."
+    "SAVE_TAG_ERROR": "Saving tag failed with error : \"{{message}}\""
   },
   "CONFIGURATION" : {
     "PAGE_TITLE" : "Publish - Configuration",

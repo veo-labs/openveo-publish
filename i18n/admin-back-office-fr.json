@@ -166,7 +166,7 @@
     "REPLACE_FILE": "Remplacer le fichier",
     "LARGE_FILE_ERROR": "Taille du fichier trop grande",
     "FILE_DOWNLOAD": "Télécharger",
-    "UPLOAD_FILE_ERROR": "Erreur d'enregistrement du fichier."
+    "SAVE_TAG_ERROR": "L'enregistrement du tag a échoué avec le message : \"{{message}}\""
   },
   "CONFIGURATION": {
     "PAGE_TITLE": "Publish - Configuration",

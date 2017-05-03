@@ -165,6 +165,18 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Attaching a file to a tag failed.
+   *
+   * @property UPLOAD_TAG_FILE_ERROR
+   * @type Object
+   * @final
+   */
+  UPLOAD_TAG_FILE_ERROR: {
+    code: 0x011,
+    httpCode: 500,
+    module: 'publish'
+  },
 
   // Authentication errors
 

@@ -164,13 +164,16 @@
      * Save chapter error callback
      */
     function saveChapterErrorCb(resp) {
-      if (resp.status > 0)
-        $scope.errorMsg = resp.data;
+      var fileError;
+      if (resp.status > 0 && !resp.data.error)
+        fileError = {message: resp.statusText};
 
       // emit alert
       if (uploadAborted) {
         $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
         uploadAborted = false;
+      } else if (fileError) {
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_TAG_ERROR', null, fileError));
       } else {
         $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
         if (status === 401)
@@ -184,11 +187,6 @@
      * Save chapter success callback
      */
     function saveChapterSuccessCb(resp) {
-      if (typeof resp.data === 'string') {
-        saveChapterErrorCb(resp);
-        return;
-      }
-
       $scope.file = null;
       $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
       $scope.simpleMimeType = $scope.getFileMimeType();
@@ -479,6 +477,7 @@
 
       // Copy backup
       $scope.file = null;
+      $scope.errorFile = null;
       angular.copy($scope.backUpRow, $scope.selectRow);
       $scope.isCollapsed = true;
     };

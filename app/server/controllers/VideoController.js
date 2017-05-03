@@ -513,7 +513,7 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
           process.logger.error(err.message, {error: err, method: 'updateTagsAction'});
 
         // An error occurred when uploading
-        return response.end('PUBLISH.CHAPTER.UPLOAD_FILE_ERROR');
+        return next(HTTP_ERRORS.UPLOAD_TAG_FILE_ERROR);
       }
       var data = JSON.parse(request.body.info);
       var file = request.file;
