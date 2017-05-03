@@ -177,6 +177,7 @@
           $scope.$parent.logout();
       }
       $scope.upload = null;
+      $scope.file = null;
     }
 
     /**
