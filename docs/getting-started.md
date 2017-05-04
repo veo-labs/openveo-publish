@@ -1,6 +1,6 @@
 # Installation
 
-From [OpenVeo](https://github.com/veo-labs/openveo-core) root :
+From [OpenVeo](https://github.com/veo-labs/openveo-core) root:
 
     npm install @openveo/publish
 
@@ -8,7 +8,7 @@ From [OpenVeo](https://github.com/veo-labs/openveo-core) root :
 
 # Start / Restart OpenVeo
 
-OpenVeo Publish is now installed. You can start / restart OpenVeo :
+OpenVeo Publish is now installed. You can start / restart OpenVeo:
 
     node server.js
 

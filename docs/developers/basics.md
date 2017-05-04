@@ -4,7 +4,7 @@ Publish uses [OpenVeo Player](https://github.com/veo-labs/openveo-player) to pla
 
 # Entities
 
-Publish defines new entities :
+Publish defines new entities:
 
 - **properties** - Custom properties for videos
 - **videos** - Videos

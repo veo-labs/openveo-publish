@@ -8,7 +8,7 @@ As expected by OpenVeo, Publish defines an AngularJS module **ov.publish**.
 
 ## Main module (**ov.publish**)
 
-Publish main module defines the following routes :
+Publish main module defines the following routes:
 
 - **/publish/medias-list** to access the catalogue page
 - **/publish/media/:mediaId** to access media edition page

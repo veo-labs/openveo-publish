@@ -2,7 +2,7 @@
 
 The Watcher is capable of listening to some directories specified in [plugin's configuration](advanced-configuration.md).
 
-Two types of files can be copied in these directories :
+Two types of files can be copied in these directories:
 
 - [tar files](#tar-files)
 - [mp4 files](#mp4-files)
@@ -17,7 +17,7 @@ tar files are used for videos with synchronized images. A valid tar file must co
 
 ## .session file
 
-**.session** file is used to store information about the package. It is written in JSON format and must contain at least :
+**.session** file is used to store information about the package. It is written in JSON format and must contain at least:
 
 ```json
 {
@@ -39,12 +39,12 @@ tar files are used for videos with synchronized images. A valid tar file must co
 }
 ```
 
-It can contain some optional properties :
+It can contain some optional properties:
 
 ```json
 {
   "date": 1425916390, // The date the video was recorded (in Unix epoch time)
-  "rich-media": true // true to indicates that video has associated images ("indexes" property must be present)
+  "rich-media": true, // true to indicates that video has associated images ("indexes" property must be present)
   "indexes": [  // An array specifying a list of timecodes, their own type and data associated.
     {
       "timecode": 0, // timecode in ms
@@ -64,21 +64,21 @@ It can contain some optional properties :
   ]
 }
 ```
-"indexes" property is used to map each a video timecode to an image or a chapter (Tag) and must be present if **rich-media** property is set to "true". In this exemple:
+"indexes" property is used to map each video timecode to an image or a tag and must be present if **rich-media** property is set to "true". In this example:
 
 - at time **0ms**, image **slide_00000.jpeg** will be displayed (**slide_00000.jpeg** file must be present in the package)
 - a chapter named "**Very important moment**" will be created and will redirect video at time **9500ms**.
 
-**Nb :** All extra properties are kept but won't be used directly by Publish.
+**Nb:** All extra properties are kept but won't be used directly by Publish.
 
 ## synchro.xml file **(DEPRECATED)**
 
 ** The use of this file is deprecated.
 This file is used only if indexes information are not in .session file.**
 
-**synchro.xml** file is used to map each images to a video timecode . If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
+**synchro.xml** file is used to map each images to a video timecode. If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
 
-It is written in XML format and must respect the following structure :
+It is written in XML format and must respect the following structure:
 
 ```xml
 <?xml version="1.0"?>

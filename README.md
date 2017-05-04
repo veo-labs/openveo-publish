@@ -2,11 +2,11 @@
 
 OpenVeo Publish is an [OpenVeo](https://github.com/veo-labs/openveo-core) plugin.
 
-OpenVeo Publish adds the following features :
+OpenVeo Publish adds the following features:
 
 - The possibility to upload videos, on [Vimeo](https://vimeo.com), [Youtube](https://www.youtube.com), on a [Wowza server](https://www.wowza.com/) or on a local server with synchronized images. ([Watcher](/watcher.md))
 - The possibility to manage synchronized multi-sources videos.
-- Back end pages :
+- Back end pages:
     - A page to manage the list of videos
     - A page to create and organize video categories
     - A page to create new video properties
@@ -21,7 +21,7 @@ Documentation is available on [Github pages](http://veo-labs.github.io/openveo-p
 
 # Contributors
 
-Maintainer : [Veo-Labs](http://www.veo-labs.com/)
+Maintainer: [Veo-Labs](http://www.veo-labs.com/)
 
 # License
 

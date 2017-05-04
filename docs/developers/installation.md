@@ -14,10 +14,9 @@ To install OpenVeo Publish you first need to install OpenVeo Core if not already
     mkdir openveo-core
 
     # Install OpenVeo core in this directory
-    cd /WORKSPACE_PATH/openveo-core
-    npm install @openveo/core
+    # See OpenVeo core documentation for more information
 
-Your workspace should look like this :
+Your workspace should look like this:
 
 ```
 .
@@ -26,16 +25,16 @@ Your workspace should look like this :
 
 ## Create NPM links for openveo-api and openveo-test
 
-In a classical NPM project @openveo/publish package should be installed in /WORKSPACE_PATH/openveo-core/node_modules/@openveo/core/node_modules/@openveo/publish. For development, the first thing which comes to mind is to create a clone of the OpenVeo Publish project inside this repository. But doing this will prevent npm install from working and will create a complicated development architecture with the risk to erase the repository at any time.
+In a classical NPM project @openveo/publish package should be installed in /WORKSPACE_PATH/openveo-core/node_modules/@openveo/publish. For development, the first thing which comes to mind is to create a clone of the OpenVeo Publish project inside this repository. But doing this will prevent npm install from working and will create a complicated development architecture with the risk to erase the repository at any time.
 
 We use [NPM links](https://docs.npmjs.com/cli/link) to deal with this problem and store OpenVeo Publish inside /WORKSPACE_PATH/openveo-publish. But there is a catch. OpenVeo Publish needs both @openveo/api and @openveo/test of the core. As packages @openveo/publish and @openveo/core are installed in two different locations, package @openveo/publish won't find @openveo/api nor @openveo/test in its Node.JS path. That's why we have to create NPM links for both @openveo/api and @openveo/test and refer to it inside @openveo/publish.
 
     # Create a link for @openveo/api
-    cd /WORKSPACE_PATH/openveo-core/node_modules/@openveo/core/node_modules/@openveo/api
+    cd /WORKSPACE_PATH/openveo-core/node_modules/@openveo/api
     npm link
 
     # Create a link for @openveo/test
-    cd /WORKSPACE_PATH/openveo-core/node_modules/@openveo/core/node_modules/@openveo/test
+    cd /WORKSPACE_PATH/openveo-core/node_modules/@openveo/test
     npm link
 
 # OpenVeo Publish
@@ -46,7 +45,7 @@ We use [NPM links](https://docs.npmjs.com/cli/link) to deal with this problem an
     cd /WORKSPACE_PATH/
     git clone git@github.com:veo-labs/openveo-publish.git
 
-Your workspace should look like this :
+Your workspace should look like this:
 
 ```
 .

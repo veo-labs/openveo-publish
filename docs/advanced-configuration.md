@@ -64,7 +64,7 @@ To upload videos on **Local Openveo Server**, you need to set this configuration
 {
   "local": {
     "vodFilePath": "/path/to/publish/assets/player/videos/local",// path where the video will be uploaded on the local machine
-    "streamPath": "publish/player/videos/local" //stream path exposed by local server to access video, if
+    "streamPath": "publish/player/videos/local" // stream path exposed by local server to access video
   }
 }
 ```
@@ -94,7 +94,7 @@ Open **~/.openveo/publish/watcherConf.json**
       "path" : "/user/box/hot5" // Path to the hot folder
     },
     {
-      // No video platform specified : let user choose on which platform the video will be uplaoded
+      // No video platform specified: let user choose on which platform the video will be uploaded
       "path" : "/user/box/hot1" // Path to the hot folder
     },
     ...
