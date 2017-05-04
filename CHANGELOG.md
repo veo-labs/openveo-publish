@@ -1,4 +1,4 @@
-# 3.0.0 /
+# 3.0.0 / 2017-05-04
 
 ## BREAKING CHANGES
 
@@ -59,7 +59,7 @@
 
 ### CLIENT
 
-- **angular-ui-tinymce 0.0.18**  has been added
+- **angular-ui-tinymce 0.0.18** has been added
 
 # 2.1.2 / 2017-01-11
 

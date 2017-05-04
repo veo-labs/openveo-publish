@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "3.0.0-RC3",
+  "version": "3.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -35,7 +35,7 @@
     "shortid": "2.2.6"
   },
   "devDependencies": {
-    "@openveo/rest-nodejs-client": "2.0.0-RC2",
+    "@openveo/rest-nodejs-client": "2.*",
     "chai": "3.5.0",
     "chai-spies": "0.7.1",
     "chai-as-promised": "6.0.0",
@@ -63,7 +63,7 @@
     "yuidoc-theme-blue": "0.1.9"
   },
   "peerDependencies": {
-    "@openveo/core": "4.0.0-RC2"
+    "@openveo/core": "4.*"
   },
   "scripts": {
     "prepublish": "grunt prod",
