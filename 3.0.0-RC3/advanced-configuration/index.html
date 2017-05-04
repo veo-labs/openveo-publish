@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>Advanced configuration - Openveo Publish</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Advanced configuration";
+    var mkdocs_page_input_path = "advanced-configuration.md";
+    var mkdocs_page_url = "/advanced-configuration/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Openveo Publish</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">INTRODUCTION</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>USERS</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../prerequisites/">Prerequisites</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting started</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../watcher/">Watcher</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Advanced configuration</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#introduction">Introduction</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#configure-the-plugin">Configure the plugin</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#configure-video-platform-credentials">Configure video platform credentials</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#configure-the-watcher">Configure the watcher</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>PLUGINS DEVELOPERS</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../pluginsDevelopers/web-service/">Web Service</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../pluginsDevelopers/api/">API</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>PUBLISH DEVELOPERS</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/basics/">Basics</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/installation/">Installation</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/back-end/">Back end AngularJS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/compilation/">CSS / SASS / JS compilation</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/unit-tests/">Unit tests</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/end-to-end-tests/">End to end tests</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../developers/api/">API</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Openveo Publish</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>USERS &raquo;</li>
+        
+      
+    
+    <li>Advanced configuration</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/veo-labs/openveo-publish" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="introduction">Introduction</h1>
+<p>Configuration files are all in user's directory under <strong>~/.openveo/publish</strong></p>
+<ul>
+<li><strong>~/.openveo/publish/publishConf.json</strong></li>
+<li><strong>~/.openveo/publish/videoPlatformConf.json</strong></li>
+<li><strong>~/.openveo/publish/watcherConf.json</strong></li>
+</ul>
+<p><strong>Nb :</strong> You must restart OpenVeo servers after modifications.</p>
+<h1 id="configure-the-plugin">Configure the plugin</h1>
+<p>Open <strong>~/.openveo/publish/publishConf.json</strong></p>
+<pre><code class="json">{
+  &quot;videoTmpDir&quot; : &quot;/tmp/videos&quot;, // Temporary directory to stock uploading videos (video is removed after the upload)
+  &quot;maxConcurrentPublish&quot; : 3, // Maximum number of videos to upload simultaneously
+  &quot;metadataFileName&quot; : &quot;.session&quot; // Name of the video metadata file in a tar package
+}
+</code></pre>
+
+<h1 id="configure-video-platform-credentials">Configure video platform credentials</h1>
+<p>Open <strong>~/.openveo/publish/videoPlatformConf.json</strong></p>
+<pre><code class="json">{
+  &quot;vimeo&quot; : { // Vimeo platform configuration
+    &quot;clientId&quot; : &quot;vimeo client id (available on vimeo application page https://developer.vimeo.com/apps)&quot;,
+    &quot;clientSecret&quot; : &quot;vimeo client secret (available on vimeo application page https://developer.vimeo.com/apps)&quot;,
+    &quot;accessToken&quot; : &quot;vimeo access token (available on vimeo application page https://developer.vimeo.com/apps)&quot;
+  },
+  &quot;youtube&quot;: {
+    &quot;uploadMethod&quot;: &quot;uploadResumable&quot;, // (uploadResumable or uploadClassic; default: uploadResumable)
+    &quot;googleOAuth&quot;: {
+       &quot;clientId&quot;: &quot;Youtube API client Id (available in your Google Developper Console )&quot;,
+       &quot;clientSecret&quot;:  &quot;Youtube API client secret (available in your Google Developper Console )&quot;,
+       &quot;redirectUrl&quot;: &quot;http://SERVER_HOST_NAME:SERVER_PORT/be/publish/configuration/googleOAuthAssosiation&quot;
+     },
+     &quot;privacy&quot;: &quot;public&quot; // (public, private or unlisted; default: public)
+  },
+  &quot;wowza&quot;:{
+    &quot;protocol&quot;: &quot;sftp&quot;, // (ftp, sftp, ftps)
+    &quot;host&quot;: &quot;HOST&quot;, //server host where the video will be uploaded
+    &quot;port&quot;: &quot;PORT&quot;, //server host port
+    &quot;user&quot;: &quot;USERNAME&quot;, // server username
+    &quot;pwd&quot;: &quot;PASSWORD&quot;, // server password
+    &quot;vodFilePath&quot;: &quot;/files/&quot;, // path where the video will be uploaded
+    &quot;streamPath&quot;: &quot;https://HOST/APP_NAME&quot; // stream path exposed by wowza to access video, HOST and APP_NAME are defined in wowza
+  },
+  &quot;local&quot;: {
+    &quot;vodFilePath&quot;: &quot;/path/to/host/folder/&quot;,// path where the video will be uploaded on the local machine
+    &quot;streamPath&quot;: &quot;stream/path/&quot; //stream path exposed by local server relative to Openveo CDN to access the video
+  }
+}
+</code></pre>
+
+<p>To upload videos on <strong>Vimeo</strong>, publish requires oauth credentials.<br/>
+To upload videos on <strong>Youtube</strong>, publish requires googleOAuth credentials.<br/>
+To upload videos on <strong>Wowza</strong>, you need to install <strong>lfpt</strong> on your system.<br/>
+To upload videos on <strong>Local Openveo Server</strong>, you need to set this configuration:</p>
+<pre><code class="json">{
+  &quot;local&quot;: {
+    &quot;vodFilePath&quot;: &quot;/path/to/publish/assets/player/videos/local&quot;,// path where the video will be uploaded on the local machine
+    &quot;streamPath&quot;: &quot;publish/player/videos/local&quot; //stream path exposed by local server to access video, if
+  }
+}
+</code></pre>
+
+<p><br/></p>
+<h1 id="configure-the-watcher">Configure the <a href="../watcher/">watcher</a></h1>
+<p>Open <strong>~/.openveo/publish/watcherConf.json</strong></p>
+<pre><code class="json">{
+  &quot;hotFolders&quot; : [ // List of folders to watch
+    {
+      &quot;type&quot; : &quot;vimeo&quot;, // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
+      &quot;path&quot; : &quot;/user/box/hot2&quot; // Path to the hot folder
+    },
+    {
+      &quot;type&quot; : &quot;youtube&quot;, // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
+      &quot;path&quot; : &quot;/user/box/hot3&quot; // Path to the hot folder
+    },
+    {
+      &quot;type&quot; : &quot;wowza&quot;, // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
+      &quot;path&quot; : &quot;/user/box/hot4&quot; // Path to the hot folder
+    },
+    {
+      &quot;type&quot; : &quot;local&quot;, // Video platform to upload to for this hot folder (only local, vimeo, wowza or youtube is supported)
+      &quot;path&quot; : &quot;/user/box/hot5&quot; // Path to the hot folder
+    },
+    {
+      // No video platform specified : let user choose on which platform the video will be uplaoded
+      &quot;path&quot; : &quot;/user/box/hot1&quot; // Path to the hot folder
+    },
+    ...
+  ]
+}
+</code></pre>
+
+<p><strong>Nb :</strong> If <strong>type</strong> is missing for a hot folder, videos won't be automatically uploaded to a platform. Videos can be uploaded to a platform from the catalogue of videos in the back end.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../pluginsDevelopers/web-service/" class="btn btn-neutral float-right" title="Web Service">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../watcher/" class="btn btn-neutral" title="Watcher"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/veo-labs/openveo-publish" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../watcher/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../pluginsDevelopers/web-service/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>
