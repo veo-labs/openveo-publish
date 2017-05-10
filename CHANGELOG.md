@@ -1,3 +1,9 @@
+# 3.0.1 /
+
+## BUG FIXES
+
+- Fix regression introduced in version 3.0.0. Already uploaded videos in old package format (with synchro.xml file) did not display synchronized images anymore
+
 # 3.0.0 / 2017-05-04
 
 ## BREAKING CHANGES
