@@ -23,7 +23,10 @@
     "element": true,
     "by": true,
     "protractor": true,
-    "browser": true
+    "browser": true,
+
+    // Add openVeoSettings environment global but do not authorize to overwrite it
+    openVeoSettings: true
 
   },
   "rules": {

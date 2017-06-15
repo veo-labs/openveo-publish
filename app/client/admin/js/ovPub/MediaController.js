@@ -478,7 +478,7 @@
 
       row.properties = properties;
 
-      if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == 0) {
+      if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == openVeoSettings.superAdminId) {
         var opt = utilService.buildSelectOptions($scope.users);
         scopeEditForm.fields.push({
           key: 'user',
