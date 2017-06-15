@@ -1,3 +1,12 @@
+# 3.1.0 /
+
+## DEPENDENCIES
+
+- **video.js** has been updated from 5.9.2 to **5.19.2**
+- **dashjs** has been updated from 2.1.1 to **2.5.0**
+- **videojs-contrib-dash** has been updated from 2.4.0 to **2.9.0**
+- **videojs-contrib-hls** has been updated from 1.3.11 to **5.5.3**
+
 # 3.0.1 / 2017-05-10
 
 ## BUG FIXES
