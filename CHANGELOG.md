@@ -1,5 +1,9 @@
 # 3.1.0 /
 
+## FEATURES
+
+- Execute functional tests on Travis
+
 ## DEPENDENCIES
 
 - **video.js** has been updated from 5.9.2 to **5.19.2**

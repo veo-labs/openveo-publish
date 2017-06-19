@@ -1,0 +1,5 @@
+{
+  "videoTmpDir": "/tmp",
+  "maxConcurrentPublish": 3,
+  "metadataFileName": ".session"
+}

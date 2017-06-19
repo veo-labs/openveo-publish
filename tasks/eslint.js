@@ -8,6 +8,7 @@ module.exports = {
       'Gruntfile.js',
       'install.js',
       'backup.js',
+      'flightplan.js',
       'tasks/**/*.js',
       'tests/**/*.js',
       'app/**/*.js',
