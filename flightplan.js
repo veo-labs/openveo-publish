@@ -14,18 +14,36 @@
  * e2e environment variables:
  * - TRAVIS_BRANCH: The name of the openveo-publish branch to test (default: develop)
  * - OPENVEO_CORE_BRANCH: The name of the openveo-core branch to test on (default: develop)
- * - OPENVEO_API_BRANCH: The name of the openveo-api branch to test on (default: develop)
- * - OPENVEO_TEST_BRANCH: The name of the openveo-test branch to test on (default: develop)
- * - OPENVEO_REST_NODEJS_CLIENT_BRANCH: The name of the openveo-rest-nodejs-client branch to test on (default: develop)
+ * - OPENVEO_API_BRANCH: The name of the openveo-api branch to test with (default: develop)
+ * - OPENVEO_TEST_BRANCH: The name of the openveo-test branch to test with (default: develop)
+ * - OPENVEO_REST_NODEJS_CLIENT_BRANCH: The name of the openveo-rest-nodejs-client branch to test
+ *   with (default: develop)
  *
  * e2e options:
- * - skipInstall: Skip installation of openveo-core and openveo-publish
- * - skipCoreInstall: Skip installation of openveo-core
+ * - skipInstall: Skip installation, executes tests directly
  * - skipDriversUpdate: Skip protractor web drivers update
  *
  * e2e usage:
  * - fly e2e:local
- * - fly e2e:local --skipInstall --skipCoreInstall --skipDriversUpdate
+ * - fly e2e:local --skipInstall --skipDriversUpdate
+ *
+ * unit task:
+ * Execute OpenVeo Publish unit tests.
+ *
+ * unit environment variables:
+ * - TRAVIS_BRANCH: The name of the openveo-publish branch to test (default: develop)
+ * - OPENVEO_CORE_BRANCH: The name of the openveo-core branch to test on (default: develop)
+ * - OPENVEO_API_BRANCH: The name of the openveo-api branch to test with (default: develop)
+ * - OPENVEO_TEST_BRANCH: The name of the openveo-test branch to test with (default: develop)
+ * - OPENVEO_REST_NODEJS_CLIENT_BRANCH: The name of the openveo-rest-nodejs-client branch to test
+ *   with (default: develop)
+ *
+ * unit options:
+ * - skipInstall: Skip installation, executes tests directly
+ *
+ * unit usage:
+ * - fly unit:local
+ * - fly unit:local --skipInstall
  */
 
 var path = require('path');
@@ -33,6 +51,7 @@ var plan = require('flightplan');
 var openVeoApi = require('@openveo/api');
 
 var workingDirectory = path.normalize('build/working');
+var projectDirectory = path.join(workingDirectory, 'node_modules/@openveo/publish');
 var homeDirectory = openVeoApi.fileSystem.getConfDir();
 var publishBranch = process.env.TRAVIS_BRANCH || 'develop';
 var coreBranch = process.env.OPENVEO_CORE_BRANCH || 'develop';
@@ -44,8 +63,8 @@ var restNodejsClientBranch = process.env.OPENVEO_REST_NODEJS_CLIENT_BRANCH || 'd
 plan.target('local');
 
 // Create working directory where plans will be executed
-plan.local(['e2e'], function(local) {
-  if (plan.runtime.options.skipInstall || plan.runtime.options.skipCoreInstall)
+plan.local(['e2e', 'unit'], function(local) {
+  if (plan.runtime.options.skipInstall)
     return;
 
   // Remove working directory if it exists
@@ -58,8 +77,8 @@ plan.local(['e2e'], function(local) {
 });
 
 // Install OpenVeo Core
-plan.local(['e2e'], function(local) {
-  if (plan.runtime.options.skipInstall || plan.runtime.options.skipCoreInstall)
+plan.local(['e2e', 'unit'], function(local) {
+  if (plan.runtime.options.skipInstall)
     return;
 
   local.log('Start installing openveo-core');
@@ -103,20 +122,19 @@ plan.local(['e2e'], function(local) {
 });
 
 // Install OpenVeo Publish
-plan.local(['e2e'], function(local) {
+plan.local(['e2e', 'unit'], function(local) {
   if (plan.runtime.options.skipInstall)
     return;
 
   local.log('Start installing openveo-publish');
 
   try {
-    var projectPath = path.join(workingDirectory, 'node_modules/@openveo/publish');
 
     // Checkout project
     local.exec('git clone --branch=' +
                publishBranch +
                ' --single-branch https://github.com/veo-labs/openveo-publish.git ' +
-               projectPath);
+               projectDirectory);
 
     // Create configuration directory
     var publishConfigurationDirectory = path.join(homeDirectory, 'publish');
@@ -135,8 +153,8 @@ plan.local(['e2e'], function(local) {
         local.cp(path.normalize('tests/conf/publish/' + configurationFile) + ' ' + destinationPath);
     });
 
-    // Install openveo-core dependencies and compile sources
-    local.with('cd ' + projectPath, function() {
+    // Install openveo-publish dependencies and compile sources
+    local.with('cd ' + projectDirectory, function() {
       local.exec('npm install --ignore-scripts');
       local.exec('bower install');
       local.exec('grunt prod');
@@ -173,6 +191,9 @@ plan.local(['e2e', 'unit'], function(local) {
       local.exec('npm install');
     });
 
+    // Remove @openveo dependencies if any
+    local.rm('-Rf ' + path.join(apiDirectory, 'node_modules/@openveo'));
+
     local.log('openveo-api successfully installed');
   } catch (e) {
     plan.abort(e.message);
@@ -203,6 +224,9 @@ plan.local(['e2e', 'unit'], function(local) {
     local.with('cd ' + testDirectory, function() {
       local.exec('npm install');
     });
+
+    // Remove @openveo dependencies if any
+    local.rm('-Rf ' + path.join(testDirectory, 'node_modules/@openveo'));
 
     local.log('openveo-test successfully installed');
   } catch (e) {
@@ -235,6 +259,9 @@ plan.local(['e2e', 'unit'], function(local) {
       local.exec('npm install');
     });
 
+    // Remove @openveo dependencies if any
+    local.rm('-Rf ' + path.join(restNodejsClientDirectory, 'node_modules/@openveo'));
+
     local.log('openveo-rest-nodejs-client successfully installed');
   } catch (e) {
     plan.abort(e.message);
@@ -260,6 +287,18 @@ plan.local(['e2e'], function(local) {
       local.exec(
         'grunt test-e2e --capabilities="{\\"browserName\\": \\"chrome\\"}" --directConnect=true --suite="publish"'
       );
+    });
+  } catch (e) {
+    plan.abort(e.message);
+  }
+});
+
+// Execute OpenVeo Publish unit tests
+plan.local(['unit'], function(local) {
+  try {
+    local.with('cd ' + projectDirectory, function() {
+      local.exec('grunt karma');
+      local.exec('grunt mochaTest');
     });
   } catch (e) {
     plan.abort(e.message);

@@ -8,8 +8,6 @@ addons:
   chrome: stable
 branches:
   only:
-    - feature/travis
-    - master
     - develop
 git:
   depth: 3
@@ -41,4 +39,5 @@ before_script:
   - sleep 15
   - mongo openveo-test --eval "db.createUser({user:'travis',pwd:'test',roles:['readWrite']})";
 script:
-  - fly e2e:local
+  - fly unit:local
+  - fly e2e:local --skipInstall --skipCoreInstall

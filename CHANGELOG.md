@@ -1,8 +1,9 @@
 # 3.1.0 /
 
-## FEATURES
+## NEW FEATURES
 
 - Execute functional tests on Travis
+- Execute unit tests on Travis
 
 ## DEPENDENCIES
 
