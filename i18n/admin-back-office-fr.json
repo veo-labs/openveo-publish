@@ -54,8 +54,10 @@
     "RETRY_VIDEO_DESCRIPTION": "Relancer manuellement le processus d'enregistrement de la vidéo",
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
     "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo",
-    "GROUP_PROPERTIES" : "Propriétés",
-    "GROUP_VIDEOS" : "Vidéos"
+    "GROUP_PROPERTIES" : "Publish : Propriétés",
+    "GROUP_VIDEOS" : "Publish : Vidéos",
+    "GROUP_CONFIGURATION" : "Publish : Configuration",
+    "GROUP_CATEGORIES" : "Publish : Catégories"
   },
   "MEDIAS" : {
     "PAGE_TITLE" : "Publish - Vidéos",

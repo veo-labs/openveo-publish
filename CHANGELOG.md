@@ -4,6 +4,7 @@
 
 - Execute functional tests on Travis
 - Execute unit tests on Travis
+- Some of the permissions in group "Other permissions" have been moved to other groups. "Access properties page" permission has been moved to "Publish: Properties" group. "Access Publish configuration page" permission and "Manage Publish configuration" permission have been moved to a new group "Publish: Configuration". "Access categories page" permission has been moved to a new group "Publish: Categories". "Access videos page" permission has been moved to "Publish: Videos" group. Also note that "Properties" group has been renamed into "Publish: Properties" and "Videos" group has been renamed into "Publish: Videos".
 
 ## DEPENDENCIES
 

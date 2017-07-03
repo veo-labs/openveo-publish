@@ -42,36 +42,51 @@ module.exports = {
   ],
   permissions: [
     {
-      id: 'publish-access-videos-page',
-      name: 'PUBLISH.PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
-    },
-    {
-      id: 'publish-access-properties-page',
-      name: 'PUBLISH.PERMISSIONS.ACCESS_PROPERTIES_PAGE_NAME'
-    },
-    {
-      id: 'publish-access-categories-page',
-      name: 'PUBLISH.PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME'
-    },
-    {
-      id: 'publish-access-conf-page',
-      name: 'PUBLISH.PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME',
-      paths: [
-        'get /publish/configuration/all',
-        'post /publish/configuration/upload'
+      label: 'PUBLISH.PERMISSIONS.GROUP_PROPERTIES',
+      permissions: [
+        {
+          id: 'publish-access-properties-page',
+          name: 'PUBLISH.PERMISSIONS.ACCESS_PROPERTIES_PAGE_NAME'
+        }
       ]
     },
     {
-      id: 'publish-manage-publish-config',
-      name: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_NAME',
-      description: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION',
-      paths: [
-        'get /publish/configuration/all'
+      label: 'PUBLISH.PERMISSIONS.GROUP_CONFIGURATION',
+      permissions: [
+        {
+          id: 'publish-access-conf-page',
+          name: 'PUBLISH.PERMISSIONS.ACCESS_PUBLISH_CONF_PAGE_NAME',
+          paths: [
+            'get /publish/configuration/all',
+            'post /publish/configuration/upload'
+          ]
+        },
+        {
+          id: 'publish-manage-publish-config',
+          name: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_NAME',
+          description: 'PUBLISH.PERMISSIONS.MANAGE_PUBLISH_CONF_DESCRIPTION',
+          paths: [
+            'get /publish/configuration/all'
+          ]
+        }
+      ]
+    },
+    {
+      label: 'PUBLISH.PERMISSIONS.GROUP_CATEGORIES',
+      permissions: [
+        {
+          id: 'publish-access-categories-page',
+          name: 'PUBLISH.PERMISSIONS.ACCESS_CATEGORIES_PAGE_NAME'
+        }
       ]
     },
     {
       label: 'PUBLISH.PERMISSIONS.GROUP_VIDEOS',
       permissions: [
+        {
+          id: 'publish-access-videos-page',
+          name: 'PUBLISH.PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
+        },
         {
           id: 'publish-publish-videos',
           name: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_NAME',
