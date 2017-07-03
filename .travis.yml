@@ -41,4 +41,4 @@ before_script:
   - mongo openveo-test --eval "db.createUser({user:'travis',pwd:'test',roles:['readWrite']})";
 script:
   - fly unit:local
-  - fly e2e:local --skipInstall --skipCoreInstall
+  - fly e2e:local --skipInstall
