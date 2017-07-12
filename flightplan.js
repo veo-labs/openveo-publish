@@ -285,7 +285,10 @@ plan.local(['e2e'], function(local) {
   try {
     local.with('cd ' + workingDirectory, function() {
       local.exec(
-        'grunt test-e2e --capabilities="{\\"browserName\\": \\"chrome\\"}" --directConnect=true --suite="publish"'
+        'grunt test-e2e ' +
+        '--capabilities="{\\"browserName\\": \\"chrome\\"}" ' +
+        '--directConnect=true ' +
+        '--suite="coreCommon,publish"'
       );
     });
   } catch (e) {
