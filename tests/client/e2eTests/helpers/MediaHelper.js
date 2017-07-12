@@ -114,31 +114,33 @@ MediaHelper.prototype.addEntitiesAuto = function(name, total, offset) {
 MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileName, mediaState, groups) {
   var self = this;
 
-  return this.flow.execute(function() {
-    var deferred = protractor.promise.defer();
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var deferred = protractor.promise.defer();
 
-    var videoPublicDirectory = path.join(publicDirectory, mediaId);
+      var videoPublicDirectory = path.join(publicDirectory, mediaId);
 
-    // Create video public directory
-    openVeoApi.fileSystem.mkdir(videoPublicDirectory,
-      function(error) {
-        if (error)
-          throw error;
-        else {
+      // Create video public directory
+      openVeoApi.fileSystem.mkdir(videoPublicDirectory,
+        function(error) {
+          if (error)
+            throw error;
+          else {
 
-          // Copy video file to public directory
-          var mediaFile = path.join(mediaFilePath, mediaFileName);
-          var finalFile = path.join(videoPublicDirectory, mediaFileName);
-          openVeoApi.fileSystem.copy(mediaFile, finalFile, function(error) {
-            if (error)
-              throw error;
+            // Copy video file to public directory
+            var mediaFile = path.join(mediaFilePath, mediaFileName);
+            var finalFile = path.join(videoPublicDirectory, mediaFileName);
+            openVeoApi.fileSystem.copy(mediaFile, finalFile, function(error) {
+              if (error)
+                throw error;
 
-            deferred.fulfill();
-          });
-        }
-      });
+              deferred.fulfill();
+            });
+          }
+        });
 
-    return deferred.promise;
+      return deferred.promise;
+    });
   }).then(function() {
 
     // Create media information into database
@@ -179,41 +181,43 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
 MediaHelper.prototype.removeEntities = function(medias) {
   var self = this;
 
-  return this.flow.execute(function() {
-    var deferred = protractor.promise.defer();
-    var parallel = [];
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var deferred = protractor.promise.defer();
+      var parallel = [];
 
-    // Create function for async to remove a video directory
-    function createRemoveFunction(mediaId) {
+      // Create function for async to remove a video directory
+      function createRemoveFunction(mediaId) {
 
-      // Add function to the list of functions to execute in parallel
-      parallel.push(function(callback) {
+        // Add function to the list of functions to execute in parallel
+        parallel.push(function(callback) {
 
-        // Remove video directory
-        openVeoApi.fileSystem.rmdir(path.join(publicDirectory, mediaId), function(error) {
-          callback(error);
+          // Remove video directory
+          openVeoApi.fileSystem.rmdir(path.join(publicDirectory, mediaId), function(error) {
+            callback(error);
+          });
+
         });
+      }
 
+      // Create functions to remove video directories with async
+      for (var i = 0; i < medias.length; i++)
+        createRemoveFunction(medias[i].id);
+
+      // Nothing to remove
+      if (!parallel.length)
+        return protractor.promise.fulfilled();
+
+      // Asynchonously remove video directories
+      async.parallel(parallel, function(error) {
+        if (error)
+          deferred.reject(error);
+        else
+          deferred.fulfill();
       });
-    }
 
-    // Create functions to remove video directories with async
-    for (var i = 0; i < medias.length; i++)
-      createRemoveFunction(medias[i].id);
-
-    // Nothing to remove
-    if (!parallel.length)
-      return protractor.promise.fulfilled();
-
-    // Asynchonously remove video directories
-    async.parallel(parallel, function(error) {
-      if (error)
-        deferred.reject(error);
-      else
-        deferred.fulfill();
+      return deferred.promise;
     });
-
-    return deferred.promise;
   }).then(function() {
     return MediaHelper.super_.prototype.removeEntities.call(self, medias);
   });
@@ -250,19 +254,21 @@ MediaHelper.prototype.getCategories = function(categories) {
 MediaHelper.prototype.clearChapters = function(mediaId) {
   var self = this;
 
-  return this.flow.execute(function() {
-    var deferred = protractor.promise.defer();
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var deferred = protractor.promise.defer();
 
-    self.model.update(mediaId, {
-      cut: [],
-      chapters: []
-    }, function(error) {
-      if (error)
-        throw error;
-      else
-        deferred.fulfill();
+      self.model.update(mediaId, {
+        cut: [],
+        chapters: []
+      }, function(error) {
+        if (error)
+          throw error;
+        else
+          deferred.fulfill();
+      });
+      return deferred.promise;
     });
-    return deferred.promise;
   });
 };
 

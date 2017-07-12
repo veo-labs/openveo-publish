@@ -30,40 +30,43 @@ util.inherits(CategoryHelper, Helper);
 CategoryHelper.prototype.addEntities = function(tree) {
   var self = this;
 
-  return this.flow.execute(function() {
-    var deferred = protractor.promise.defer();
-    var categoriesToAdd = {
-      name: 'categories',
-      id: self.treeId,
-      tree: tree
-    };
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var deferred = protractor.promise.defer();
+      var categoriesToAdd = {
+        name: 'categories',
+        id: self.treeId,
+        tree: tree
+      };
 
-    self.model.get({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories.length) {
-        self.model.add(categoriesToAdd, function(error, addedCount, data) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill(data);
-        });
-      } else {
-        self.model.update([self.treeId], categoriesToAdd, function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill(categoriesToAdd);
-        });
-      }
-    });
-    return deferred.promise.then(function(data) {
-      return protractor.promise.fulfilled(data);
+      self.model.get({
+        name: 'categories'
+      },
+      function(error, categories) {
+        if (error)
+          deferred.reject(error);
+        else if (!categories.length) {
+          self.model.add(categoriesToAdd, function(error, addedCount, data) {
+            if (error)
+              deferred.reject(error);
+            else
+              deferred.fulfill(data);
+          });
+        } else {
+          self.model.update([self.treeId], categoriesToAdd, function(error) {
+            if (error)
+              deferred.reject(error);
+            else
+              deferred.fulfill(categoriesToAdd);
+          });
+        }
+      });
+      return deferred.promise.then(function(data) {
+        return protractor.promise.fulfilled(data);
+      });
     });
   });
+
 };
 
 /**
@@ -76,29 +79,31 @@ CategoryHelper.prototype.addEntities = function(tree) {
 CategoryHelper.prototype.removeAllEntities = function() {
   var self = this;
 
-  return this.flow.execute(function() {
-    var deferred = protractor.promise.defer();
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var deferred = protractor.promise.defer();
 
-    self.model.get({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories.length)
-        deferred.fulfill();
-      else {
-        self.model.remove([categories[0].id], function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill();
-        });
-      }
-    });
+      self.model.get({
+        name: 'categories'
+      },
+      function(error, categories) {
+        if (error)
+          deferred.reject(error);
+        else if (!categories.length)
+          deferred.fulfill();
+        else {
+          self.model.remove([categories[0].id], function(error) {
+            if (error)
+              deferred.reject(error);
+            else
+              deferred.fulfill();
+          });
+        }
+      });
 
-    return deferred.promise.then(function() {
-      return protractor.promise.fulfilled();
+      return deferred.promise.then(function() {
+        return protractor.promise.fulfilled();
+      });
     });
   });
 };
@@ -112,16 +117,18 @@ CategoryHelper.prototype.removeAllEntities = function() {
 CategoryHelper.prototype.createCategories = function(categoryNames) {
   var self = this;
 
-  return this.flow.execute(function() {
-    var categories = [];
+  return browser.waitForAngular().then(function() {
+    return self.flow.execute(function() {
+      var categories = [];
 
-    for (var i = 0; i < categoryNames.length; i++) {
-      categories.push({
-        id: String(i),
-        title: categoryNames[i],
-        items: []
-      });
-    }
-    return self.addEntities(categories);
+      for (var i = 0; i < categoryNames.length; i++) {
+        categories.push({
+          id: String(i),
+          title: categoryNames[i],
+          items: []
+        });
+      }
+      return self.addEntities(categories);
+    });
   });
 };
