@@ -80,7 +80,7 @@
     "ATTR_TITLE" : "Title",
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Category",
-    "ATTR_GROUPS" : "Groups",
+    "ATTR_GROUPS" : "Groups of contents",
     "STATE_0" : "Error",
     "STATE_1" : "Pending",
     "STATE_2" : "Copying",
