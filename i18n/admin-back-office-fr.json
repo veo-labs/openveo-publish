@@ -158,7 +158,7 @@
     "SAVE_ERROR": "Une erreur est survenue. Vos modifications n'ont pas pu être sauvegardées.",
     "NO_CHAPTERS": "Aucun chapitre. <br> Cliquez sur \"Nouveau\" pour en ajouter.",
     "NO_TAGS": "Aucun tag. <br> Cliquez sur \"Nouveau\" pour en ajouter.",
-    "UPLOAD_CANCELED": "L'upload à été interrompu. Le fichier n'a pas été uploadé.",
+    "UPLOAD_CANCELED": "L'upload a été interrompu. Le fichier n'a pas été uploadé.",
     "CONTEXT": {
       "INDEX_TITLE": "Indexes",
       "CHAPTERS_TITLE": "Chapitres",
