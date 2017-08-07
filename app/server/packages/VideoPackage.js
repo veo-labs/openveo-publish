@@ -7,15 +7,20 @@
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
+var async = require('async');
+var ffmpeg = require('fluent-ffmpeg');
+var openVeoApi = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var VideoPackageError = process.requirePublish('app/server/packages/VideoPackageError.js');
-var openVeoApi = require('@openveo/api');
-var ffmpeg = require('fluent-ffmpeg');
+var fileSystem = openVeoApi.fileSystem;
 
 // Accepted images files extensions in the package
-var acceptedImagesExtensions = ['jpeg', 'jpg', 'gif', 'bmp'];
+var acceptedImagesExtensions = [
+  fileSystem.FILE_TYPES.JPG,
+  fileSystem.FILE_TYPES.GIF
+];
 
 /**
  * Defines a VideoPackage to manage publication of a video file.
@@ -136,22 +141,24 @@ VideoPackage.prototype.generateThumb = function() {
   var filePath = this.getMediaFilePath();
 
   // Generate thumb
-  this.videoModel.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB);
-
-  process.logger.debug('Generate thumbnail (' + this.mediaPackage.id + ')');
-  var destinationPath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  ffmpeg(filePath).screenshots({
-    timestamps: ['10%'],
-    filename: 'thumbnail.jpg',
-    folder: destinationPath
-  }).on('error', function(error) {
-    self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
-  }).on('end', function() {
-    self.videoModel.updateThumbnail(
-      self.mediaPackage.id,
-      '/publish/' + self.mediaPackage.id + '/thumbnail.jpg'
-    );
-    self.fsm.transition();
+  this.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB, function() {
+    process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ')');
+    var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    ffmpeg(filePath).screenshots({
+      timestamps: ['10%'],
+      filename: 'thumbnail.jpg',
+      folder: destinationPath
+    }).on('error', function(error) {
+      self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
+    }).on('end', function() {
+      self.videoModel.updateThumbnail(
+        self.mediaPackage.id,
+        '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+        function() {
+          self.fsm.transition();
+        }
+      );
+    });
   });
 };
 
@@ -165,17 +172,18 @@ VideoPackage.prototype.generateThumb = function() {
 VideoPackage.prototype.preparePublicDirectory = function() {
   var self = this;
   var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-  this.videoModel.updateState(this.mediaPackage.id, STATES.PREPARING);
 
-  process.logger.debug('Prepare package public directory ' + publicDirectory);
+  this.updateState(this.mediaPackage.id, STATES.PREPARING, function() {
+    process.logger.debug('Prepare package public directory ' + publicDirectory);
 
-  openVeoApi.fileSystem.mkdir(publicDirectory,
-    function(error) {
-      if (error && error.code !== 'EEXIST')
-        self.setError(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
-      else
-        self.fsm.transition();
-    });
+    openVeoApi.fileSystem.mkdir(publicDirectory,
+      function(error) {
+        if (error && error.code !== 'EEXIST')
+          self.setError(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
+        else
+          self.fsm.transition();
+      });
+  });
 };
 
 /**
@@ -188,36 +196,38 @@ VideoPackage.prototype.preparePublicDirectory = function() {
 VideoPackage.prototype.getMetadata = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
-  this.videoModel.updateState(this.mediaPackage.id, STATES.GET_METADATA);
 
-  if (!this.mediaPackage.metadata) this.mediaPackage.metadata = {};
-  this.mediaPackage.metadata['profile-settings'] = this.mediaPackage.metadata['profile-settings'] || {};
+  this.updateState(this.mediaPackage.id, STATES.GET_METADATA, function() {
+    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+    self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
 
-  if (this.mediaPackage.metadata['profile-settings']['video-height'])
-    this.fsm.transition();
-  else {
-    ffmpeg.ffprobe(filePath, function(error, metadata) {
-      if (error || !metadata.streams)
-        self.setError(new VideoPackageError(error.message, ERRORS.GET_METADATA));
-      else {
+    if (self.mediaPackage.metadata['profile-settings']['video-height'])
+      self.fsm.transition();
+    else {
+      ffmpeg.ffprobe(filePath, function(error, metadata) {
+        if (error || !metadata.streams)
+          self.setError(new VideoPackageError(error.message, ERRORS.GET_METADATA));
+        else {
 
-        // Find video stream
-        var videoStream;
-        for (var i = 0; i < metadata.streams.length; i++) {
-          if (metadata.streams[i]['codec_type'] === 'video')
-            videoStream = metadata.streams[i];
+          // Find video stream
+          var videoStream;
+          for (var i = 0; i < metadata.streams.length; i++) {
+            if (metadata.streams[i]['codec_type'] === 'video')
+              videoStream = metadata.streams[i];
+          }
+
+          // Got video stream associated to the video file
+          if (videoStream) {
+            self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
+            self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
+              self.fsm.transition();
+            });
+          } else
+            self.setError(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
         }
-
-        // Got video stream associated to the video file
-        if (videoStream) {
-          self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-          self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
-          self.fsm.transition();
-        } else
-          self.setError(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
-      }
-    });
-  }
+      });
+    }
+  });
 };
 
 /**
@@ -231,43 +241,74 @@ VideoPackage.prototype.copyImages = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
+  var resources = [];
+  var filesToCopy = [];
 
   process.logger.debug('Copy images to ' + videoFinalDir);
+  async.series([
 
-  fs.readdir(extractDirectory, function(error, files) {
-    if (error)
-      self.setError(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
-    else {
-      var filesToCopy = [];
-      files.forEach(function(file) {
+    // Read directory
+    function(callback) {
+      fs.readdir(extractDirectory, function(error, files) {
+        if (error)
+          callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
+        else {
+          resources = files;
+          callback();
+        }
+      });
+    },
 
-        // File extension is part of the accepted extensions
-        if (acceptedImagesExtensions.indexOf(path.extname(file).slice(1)) >= 0)
-          filesToCopy.push(file);
+    // Validate files in the directory to keep only accepted types
+    function(callback) {
+      var filesToValidate = {};
+      var filesValidationDescriptor = {};
 
+      resources.forEach(function(resource) {
+        filesToValidate[resource] = path.join(extractDirectory, resource);
+        filesValidationDescriptor[resource] = {in: acceptedImagesExtensions};
       });
 
-      var filesLeftToCopy = filesToCopy.length;
-      filesToCopy.forEach(function(file) {
+      openVeoApi.util.validateFiles(filesToValidate, filesValidationDescriptor, function(error, files) {
+        if (error)
+          process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
 
+        for (var filePath in files) {
+          if (files[filePath].isValid)
+            filesToCopy.push(filePath);
+        }
+
+        callback();
+      });
+    },
+
+    // Copy images
+    function(callback) {
+      var filesLeftToCopy = filesToCopy.length;
+
+      if (!filesToCopy.length) return callback();
+
+      filesToCopy.forEach(function(file) {
         openVeoApi.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
 
           if (error)
-            process.logger.warn(error.message, {
-              action: 'copyImages',
-              mediaId: self.mediaPackage.id
-            });
+            process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
 
           filesLeftToCopy--;
 
           if (filesLeftToCopy === 0)
-            self.fsm.transition();
-
+            callback();
         });
-
       });
+
     }
+  ], function(error) {
+    if (error)
+      self.setError(error);
+    else
+      self.fsm.transition();
   });
+
 };
 
 /**

@@ -8,13 +8,15 @@ var util = require('util');
 var events = require('events');
 var path = require('path');
 var shortid = require('shortid');
+var openVeoApi = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var packageFactory = process.requirePublish('app/server/packages/packageFactory.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishError = process.requirePublish('app/server/PublishError.js');
+var fileSystem = openVeoApi.fileSystem;
 
-var acceptedPackagesExtensions = ['tar', 'mp4'];
+var acceptedPackagesExtensions = [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4];
 var publishManager;
 
 /**
@@ -42,6 +44,13 @@ var publishManager;
  * Fired when a media stuck in "waiting for upload" state starts uploading.
  *
  * @event upload
+ * @param {Object} The media
+ */
+
+/**
+ * Fired when media state has changed.
+ *
+ * @event stateChanged
  * @param {Object} The media
  */
 
@@ -226,6 +235,11 @@ function createMediaPackageManager(mediaPackage) {
     onComplete.call(self, completePackage);
   });
 
+  // Handle stateChanged events from media package manager
+  mediaPackageManager.on('stateChanged', function(mediaPackage) {
+    self.emit('stateChanged', mediaPackage);
+  });
+
   return mediaPackageManager;
 }
 
@@ -264,18 +278,6 @@ function addPackage(mediaPackage) {
 }
 
 /**
- * Tests if media package is a valid one depending on the given type.
- *
- * @method isValidPackageType
- * @private
- * @param {String} type The media package type
- * @return {Boolean} true if the package is valid false otherwise
- */
-function isValidPackageType(type) {
-  return acceptedPackagesExtensions.indexOf(type) >= 0;
-}
-
-/**
  * Gets an instance of the PublishManager.
  *
  * @method get
@@ -305,43 +307,39 @@ PublishManager.prototype.publish = function(mediaPackage) {
   var self = this;
 
   if (mediaPackage && (typeof mediaPackage === 'object')) {
-    var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
 
-    // Generate a package id
-    mediaPackage.id = shortid.generate();
+    openVeoApi.util.validateFiles({
+      file: mediaPackage.originalPackagePath
+    }, {
+      file: {in: acceptedPackagesExtensions}
+    }, function(error, files) {
+      if (error || (files.file && !files.file.isValid))
+        return self.emit('error', new PublishError('Media package type is not valid', ERRORS.INVALID_PACKAGE_TYPE));
 
-    // Find out media type depending on media extension
-    mediaPackage.packageType = pathDescriptor.ext.slice(1);
+      var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
+      mediaPackage.packageType = files.file.type;
+      mediaPackage.id = shortid.generate();
+      mediaPackage.title = pathDescriptor.name;
 
-    // Use file name as media title
-    mediaPackage.title = pathDescriptor.name;
+      self.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
+        if (error) {
+          self.emit('error', new PublishError('Getting medias with original package path "' +
+                                              mediaPackage.originalPackagePath + '" failed with message : ' +
+                                              error.message, ERRORS.UNKNOWN));
+        } else if (!videos || !videos.length) {
 
-    // Validate extension
-    if (!isValidPackageType(mediaPackage.packageType))
-      return this.emit('error', new PublishError('Media package type is not valid (' + mediaPackage.packageType + ')',
-                                                 ERRORS.INVALID_PACKAGE_TYPE));
+          // Media package does not exist
+          // Publish it
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+          mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
 
-    this.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
-      if (error) {
-        self.emit('error', new PublishError('Getting medias with original package path "' +
-                                            mediaPackage.originalPackagePath + '" failed with message : ' +
-                                            error.message,
-                                                 ERRORS.UNKNOWN));
-      } else if (!videos || !videos.length) {
+          // Package can be added to pending packages
+          if (addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
+        }
 
-        // Media package does not exist
-        // Publish it
-        var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
-
-        // Package can be added to pending packages
-        if (addPackage.call(self, mediaPackage))
-          mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
-
-      }
-
+      });
     });
-
   } else
     this.emit('error', new PublishError('mediaPackage argument must be an Object', ERRORS.UNKNOWN));
 };
@@ -376,6 +374,7 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
 
           // Retry officially started
           self.emit('retry', mediaPackage);
+          self.emit('stateChanged', mediaPackage);
 
         });
 
@@ -459,6 +458,7 @@ PublishManager.prototype.upload = function(packageId, platform) {
 
           // Upload officially started
           self.emit('upload', mediaPackage);
+          self.emit('stateChanged', mediaPackage);
 
         });
         self.videoModel.updateType(mediaPackage.id, platform);

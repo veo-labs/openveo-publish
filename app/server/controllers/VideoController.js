@@ -13,14 +13,17 @@ var configDir = openVeoApi.fileSystem.getConfDir();
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
+var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
+var MultipartParser = openVeoApi.multipart.MultipartParser;
 var AccessError = openVeoApi.errors.AccessError;
 var ContentController = openVeoApi.controllers.ContentController;
+var fileSystemApi = openVeoApi.fileSystem;
 
-var multer = require('multer');
 var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
 
 /**
@@ -140,6 +143,257 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
         entity: video
       });
   });
+};
+
+/**
+ * Adds a media.
+ *
+ * @example
+ *
+ *     // Expected multipart body example
+ *     {
+ *       "file" : ...,
+ *       "info": {
+ *         "title" : 'Media title',
+ *         "description" : 'Media HTML description',
+ *         "category" : 'Media category',
+ *         "groups" : 'Media groups'
+ *       }
+ *     }
+ *
+ * @method addEntityAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+VideoController.prototype.addEntityAction = function(request, response, next) {
+  if (request.body) {
+    var self = this;
+    var categoriesIds;
+    var groupsIds;
+    var customProperties;
+    var params;
+    var model = this.getModel(request);
+    var parser = new MultipartParser(request, [
+      {
+        name: 'file',
+        destinationPath: publishConf.videoTmpDir,
+        maxCount: 1
+      }
+    ]);
+
+    async.parallel([
+
+      // Get the list of categories
+      function(callback) {
+        process.api.getCoreApi().taxonomyModel.getTaxonomyTerms('categories', function(error, terms) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_CATEGORIES_ERROR);
+          }
+
+          categoriesIds = openVeoApi.util.getPropertyFromArray('id', terms, 'items');
+          callback();
+        });
+      },
+
+      // Get the list of groups
+      function(callback) {
+        process.api.getCoreApi().groupModel.get(null, function(error, entities) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_GROUPS_ERROR);
+          }
+
+          groupsIds = openVeoApi.util.getPropertyFromArray('id', entities);
+          callback();
+        });
+      },
+
+      // Get the list of custom properties
+      function(callback) {
+        var database = process.api.getCoreApi().getDatabase();
+        var model = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
+
+        model.get(null, function(error, entities) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_CUSTOM_PROPERTIES_ERROR);
+          }
+
+          customProperties = entities;
+          callback();
+        });
+      },
+
+      // Parse multipart body
+      function(callback) {
+        parser.parse(function(error) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
+          }
+
+          if (!request.body.info) return callback(HTTP_ERRORS.ADD_MEDIA_MISSING_INFO_PARAMETERS);
+
+          request.body.info = JSON.parse(request.body.info);
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) return next(error);
+
+      async.series([
+
+        // Validate file
+        function(callback) {
+          if (!request.files || !request.files.file || !request.files.file.length)
+            return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
+
+          openVeoApi.util.validateFiles({
+            file: request.files.file[0].path
+          }, {
+            file: {in: [fileSystemApi.FILE_TYPES.MP4, fileSystemApi.FILE_TYPES.TAR]}
+          }, function(error, files) {
+            if (error || (files.file && !files.file.isValid)) {
+              if (error)
+                process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+
+              callback(HTTP_ERRORS.ADD_MEDIA_WRONG_FILE_PARAMETER);
+            } else
+              callback();
+          });
+        },
+
+        // Validate custom properties
+        function(callback) {
+          var validationDescriptor = {};
+
+          // Iterate through properties
+          for (var id in request.body.info.properties) {
+            var value = request.body.info.properties[id];
+
+            // Iterate through custom properties
+            for (var i = 0; i < customProperties.length; i++) {
+              var customProperty = customProperties[i];
+              if (customProperties[i].id === id) {
+
+                // Found custom property description corresponding to the custom property from request
+                // Add its validation descriptor
+
+                if (customProperty.type === PropertyModel.TYPES.BOOLEAN)
+                  validationDescriptor[id] = {type: 'boolean'};
+
+                else if (customProperty.type === PropertyModel.TYPES.LIST && value !== null)
+                  validationDescriptor[id] = {type: 'string'};
+
+                else if (customProperty.type === PropertyModel.TYPES.TEXT)
+                  validationDescriptor[id] = {type: 'string'};
+
+                break;
+              }
+            }
+          }
+
+          try {
+            request.body.info.properties = openVeoApi.util.shallowValidateObject(
+              request.body.info.properties,
+              validationDescriptor
+            );
+          } catch (validationError) {
+            process.logger.error(validationError.message, {error: validationError, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_WRONG_PROPERTIES_PARAMETER);
+          }
+
+          callback();
+        },
+
+        // Validate other parameters
+        function(callback) {
+          try {
+            var validationDescriptor = {
+              title: {type: 'string', required: true},
+              description: {type: 'string', required: true},
+              groups: {type: 'array<string>', in: groupsIds}
+            };
+
+            // Avoid getting a category with value "null" (string)
+            if (request.body.info.category !== null)
+              validationDescriptor.category = {type: 'string', in: categoriesIds};
+
+            params = openVeoApi.util.shallowValidateObject(request.body.info, validationDescriptor);
+
+          } catch (validationError) {
+            process.logger.error(validationError.message, {error: validationError, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_WRONG_PARAMETERS);
+          }
+
+          callback();
+        },
+
+        // Make sure media does not already exist in database
+        function(callback) {
+          model.get({originalPackagePath: request.files.file[0].path}, function(error, medias) {
+            if (error)
+              process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+
+            if (medias && medias.length)
+              callback(HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR);
+            else callback();
+          });
+        },
+
+        // Add new media
+        function(callback) {
+          var pathDescriptor = path.parse(request.files.file[0].path);
+          var publishManager = self.getPublishManager();
+
+          var listener = function(mediaPackage) {
+            if (mediaPackage.originalPackagePath === request.files.file[0].path) {
+              publishManager.removeListener('stateChanged', listener);
+              callback();
+            }
+          };
+
+          // Make sure process has started before sending back response to the client
+          publishManager.on('stateChanged', listener);
+
+          publishManager.publish({
+            originalPackagePath: request.files.file[0].path,
+            originalFileName: pathDescriptor.name,
+            title: params.title,
+            description: params.description,
+            category: params.category,
+            groups: params.groups,
+            user: request.user.id,
+            properties: request.body.info.properties
+          });
+        }
+
+      ], function(error) {
+        if (error) {
+          if (request.files && request.files.file && request.files.file.length) {
+
+            // Remove temporary file
+            fs.unlink(request.files.file[0].path, function(unlinkError) {
+              if (unlinkError) return next(HTTP_ERRORS.ADD_MEDIA_REMOVE_FILE_ERROR);
+              next(error);
+            });
+
+          } else
+            next(error);
+        } else response.send();
+      });
+    });
+
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.ADD_MEDIA_MISSING_PARAMETERS);
+
+  }
 };
 
 /**
@@ -452,7 +706,6 @@ VideoController.prototype.getPublishManager = function() {
   return PublishManager.get();
 };
 
-
 /**
  * Handles back office updateTags action to upload files and save associated tags.
  *
@@ -471,64 +724,37 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
   var entityId = params.id;
   var model = this.getModel(request);
 
-  var maxsize = 20 * 1000 * 1000; // in bytes
-  var uploadPath = process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/';
+  var parser = new MultipartParser(request, [
+    {
+      name: 'file',
+      destinationPath: process.rootPublish + '/assets/player/videos/' + entityId + '/uploads/',
+      maxCount: 1
+    }
+  ], {
+    fileSize: 20 * 1000 * 1000
+  });
 
-  openVeoApi.fileSystem.mkdir(uploadPath, function() {
+  parser.parse(function(error) {
+    if (error || !request.body.info) {
+      if (error)
+        process.logger.error(error.message, {error: error, method: 'updateTagsAction'});
 
-    var storage = multer.diskStorage({
-      destination: function(req, file, cb) {
-        cb(null, uploadPath);
-      },
-      filename: function(req, file, cb) {
-        var extension = path.extname(file.originalname);
-        var basename = path.basename(file.originalname, extension);
-        var sanitizedFilename = basename.replace(/[^a-z0-9\-]/gi, '-').replace(/\-{2,}/g, '-').toLowerCase();
+      // An error occurred when uploading
+      return next(HTTP_ERRORS.UPLOAD_TAG_FILE_ERROR);
+    }
 
-        fs.stat(uploadPath + sanitizedFilename + extension, function(error, stat) {
-          var uploadedFileName;
-          if (error) {
-            if (error.code == 'ENOENT') { // file does not exist
-              uploadedFileName = sanitizedFilename + extension;
-            } else {
-              return cb(error);
-            }
-          } else uploadedFileName = sanitizedFilename + '-' + Date.now() + extension;
+    var data = JSON.parse(request.body.info);
+    var file = request.files.file[0];
 
-          cb(null, uploadedFileName);
-        });
-      }
-    });
-
-    var upload = multer({
-      storage: storage,
-      limits: {
-        fileSize: maxsize
-      }
-    });
-
-    upload.single('file')(request, response, function(err) {
-      if (err || !request.body.info) {
-        if (err)
-          process.logger.error(err.message, {error: err, method: 'updateTagsAction'});
-
-        // An error occurred when uploading
-        return next(HTTP_ERRORS.UPLOAD_TAG_FILE_ERROR);
-      }
-      var data = JSON.parse(request.body.info);
-      var file = request.file;
-
-      model.updateTags(entityId, data, file, function(error, newtag) {
-        if (error)
-          next((error instanceof AccessError) ?
-            HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
-        else
-          response.send(newtag);
-      });
+    model.updateTags(entityId, data, file, function(error, newtag) {
+      if (error)
+        next((error instanceof AccessError) ?
+          HTTP_ERRORS.UPDATE_VIDEO_TAGS_FORBIDDEN : HTTP_ERRORS.UPDATE_VIDEO_TAGS_ERROR);
+      else
+        response.send(newtag);
     });
   });
 };
-
 
 /**
  * Handles back office removeTags action to remove tags.

@@ -2,6 +2,30 @@
   <h2 ng-bind="'PUBLISH.MEDIAS.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PUBLISH.MEDIAS.INFO' | translate"></div>
 
+  <hr/>
+  <div ng-if="rights.add">
+    <div class="container">
+      <div class="add-form col-xs-12 col-md-8">
+        <div class="add-element" ng-click="toggleAddForm();">
+          <span class="glyphicon" ng-class="isCollapsed?'glyphicon-plus':'glyphicon-minus'"aria-hidden="true"></span>
+          <span ng-bind="'PUBLISH.MEDIAS.ADD_MEDIA' | translate"></span>
+        </div>
+        <div uib-collapse="isCollapsed">
+          <ng-include src="'views/elements/form.html'"></ng-include>
+          <div class="col-xs-12">
+            <uib-progressbar ng-show="addFormContainer.model.file >= 0 && fileToUpload"
+                             class="progress-striped"
+                             value="addFormContainer.model.file"
+                             type="warning">
+            {{addFormContainer.model.file}}%
+          </uib-progressbar>
+          </div>
+        </div>
+     </div>
+    </div>
+    <hr/>
+  </div>
+
   <ng-include src="'views/elements/dataTable.html'"></ng-include>
 
 </div>

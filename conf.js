@@ -8,6 +8,7 @@ module.exports = {
         'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
       },
       private: {
+        'post /addMedia': 'app/server/controllers/VideoController.addEntityAction',
         'post /retryVideo/:ids': 'app/server/controllers/VideoController.retryVideosAction',
         'post /startUpload/:ids/:platform': 'app/server/controllers/VideoController.startUploadAction',
         'post /publishVideo/:ids': 'app/server/controllers/VideoController.publishVideosAction',
@@ -88,6 +89,12 @@ module.exports = {
           name: 'PUBLISH.PERMISSIONS.ACCESS_VIDEOS_PAGE_NAME'
         },
         {
+          id: 'publish-add-videos',
+          name: 'PUBLISH.PERMISSIONS.ADD_VIDEOS_NAME',
+          description: 'PUBLISH.PERMISSIONS.ADD_VIDEOS_DESCRIPTION',
+          paths: ['post /publish/addMedia*']
+        },
+        {
           id: 'publish-publish-videos',
           name: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_NAME',
           description: 'PUBLISH.PERMISSIONS.PUBLISH_VIDEO_DESCRIPTION',
@@ -164,8 +171,7 @@ module.exports = {
         '/publish/lib/dashjs/dist/dash.all.min.js',
         '/publish/lib/videojs-contrib-dash/index.js',
         '/publish/lib/videojs-contrib-hls/index.js',
-        '/publish/lib/openveo-player/dist/openveo-player.min.js',
-        '/publish/lib/ng-file-upload/ng-file-upload.min.js'
+        '/publish/lib/openveo-player/dist/openveo-player.min.js'
       ],
       dev: [
         '/publish/ovPub/PublishApp.js',

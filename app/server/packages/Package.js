@@ -34,6 +34,13 @@ var PackageError = process.requirePublish('app/server/packages/PackageError.js')
  */
 
 /**
+ * Fired when package state has changed.
+ *
+ * @event stateChanged
+ * @param {Object} The processed package
+ */
+
+/**
  * Defines a Package to manage publication of a media file.
  *
  * @class Package
@@ -245,6 +252,26 @@ Package.prototype.init = function(initialState, initialTransition) {
 };
 
 /**
+ * Updates media state and sends an event to inform about state changed.
+ *
+ * @method updateState
+ * @async
+ * @param {Number} id The id of the media to update
+ * @param {String} state The state of the media
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
+ */
+Package.prototype.updateState = function(id, state, callback) {
+  var self = this;
+
+  this.videoModel.updateState(id, state, function(error, totalItems) {
+    self.emit('stateChanged', self.mediaPackage);
+    callback(error, totalItems);
+  });
+};
+
+/**
  * Starts executing at the given transition.
  *
  * The rest of the transitions stack will be executed.
@@ -253,32 +280,43 @@ Package.prototype.init = function(initialState, initialTransition) {
  * @param {String} transition The transition to launch
  */
 Package.prototype.executeTransition = function(transition) {
+  var self = this;
 
   // Package is initialized
   // Memorize the last state and last transition of the package
-  this.videoModel.updateLastState(this.mediaPackage.id, this.fsm.current);
-  this.videoModel.updateLastTransition(this.mediaPackage.id, transition);
+  async.parallel([
+    function(callback) {
+      self.videoModel.updateLastState(self.mediaPackage.id, self.fsm.current, callback);
+    },
+    function(callback) {
+      self.videoModel.updateLastTransition(self.mediaPackage.id, transition, callback);
+    }
+  ], function() {
 
-  // If no more transition or upload transition reached without platform type
-  // The publication is considered done
-  if (!transition || (transition === Package.TRANSITIONS.UPLOAD_MEDIA && !this.mediaPackage.type)) {
+    // If no more transition or upload transition reached without platform type
+    // The publication is considered done
+    if (!transition || (transition === Package.TRANSITIONS.UPLOAD_MEDIA && !self.mediaPackage.type)) {
 
-    // Package has not been uploaded yet and request a manual upload
-    // Change package state
-    if (transition === Package.TRANSITIONS.UPLOAD_MEDIA) {
-      process.logger.debug('Package ' + this.mediaPackage.id + ' is waiting for manual upload');
-      this.videoModel.updateState(this.mediaPackage.id, STATES.WAITING_FOR_UPLOAD);
-    } else
-      this.videoModel.updateState(this.mediaPackage.id, STATES.READY);
+      // Package has not been uploaded yet and request a manual upload
+      // Change package state
+      if (transition === Package.TRANSITIONS.UPLOAD_MEDIA) {
+        process.logger.debug('Package ' + self.mediaPackage.id + ' is waiting for manual upload');
+        self.updateState(self.mediaPackage.id, STATES.WAITING_FOR_UPLOAD, function() {
+          self.emit('complete', self.mediaPackage);
+        });
+      } else
+        self.updateState(self.mediaPackage.id, STATES.READY, function() {
+          self.emit('complete', self.mediaPackage);
+        });
+    } else {
 
-    // Done, final state reached
-    this.emit('complete', this.mediaPackage);
-  } else {
+      // Continue by executing the next transition in the stack
+      self.fsm[transition]();
 
-    // Continue by executing the next transition in the stack
-    this.fsm[transition]();
+    }
 
-  }
+  });
+
 };
 
 /**
@@ -332,7 +370,7 @@ Package.prototype.initPackage = function() {
             self.mediaPackage.link = null;
             self.mediaPackage.mediaId = null;
             self.mediaPackage.errorCode = ERRORS.NO_ERROR;
-            self.mediaPackage.properties = [];
+            self.mediaPackage.properties = self.mediaPackage.properties || {};
             self.mediaPackage.metadata = self.mediaPackage.metadata || {};
             self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
             self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
@@ -345,8 +383,10 @@ Package.prototype.initPackage = function() {
     function(error) {
       if (error)
         self.emit('error', new PackageError(error.message, ERRORS.SAVE_PACKAGE_DATA));
-      else
+      else {
+        self.emit('stateChanged', self.mediaPackage);
         self.fsm.transition();
+      }
     });
 };
 
@@ -364,15 +404,17 @@ Package.prototype.copyPackage = function() {
   var destinationFilePath = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id),
     this.mediaPackage.id + '.' + this.mediaPackage.packageType);
 
-  this.videoModel.updateState(this.mediaPackage.id, STATES.COPYING);
+  this.updateState(this.mediaPackage.id, STATES.COPYING, function() {
 
-  // Copy package
-  process.logger.debug('Copy ' + this.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
-  openVeoApi.fileSystem.copy(this.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
-    if (copyError)
-      self.setError(new PackageError(copyError.message, ERRORS.COPY));
-    else
-      self.fsm.transition();
+    // Copy package
+    process.logger.debug('Copy ' + self.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
+    openVeoApi.fileSystem.copy(self.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
+      if (copyError)
+        self.setError(new PackageError(copyError.message, ERRORS.COPY));
+      else
+        self.fsm.transition();
+    });
+
   });
 };
 
@@ -405,27 +447,38 @@ Package.prototype.removeOriginalPackage = function() {
  */
 Package.prototype.uploadMedia = function() {
   var self = this;
-  this.videoModel.updateState(this.mediaPackage.id, STATES.UPLOADING);
 
-  // Get video plaform provider from package type
-  var videoPlatformProvider = videoPlatformFactory.get(this.mediaPackage.type,
-    this.videoPlatformConf[this.mediaPackage.type]);
+  this.updateState(this.mediaPackage.id, STATES.UPLOADING, function() {
 
-  // Start uploading the media to the platform
-  process.logger.debug('Upload media ' + this.mediaPackage.id);
-  videoPlatformProvider.upload(this.getMediaFilePath(), function(error, mediaId) {
-    if (error)
-      self.setError(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
-    else {
-      if (!self.mediaPackage.mediaId) {
-        self.mediaPackage.mediaId = [mediaId];
-        self.videoModel.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id);
-      } else {
-        self.mediaPackage.mediaId = self.mediaPackage.mediaId.concat([mediaId]);
+    // Get video plaform provider from package type
+    var videoPlatformProvider = videoPlatformFactory.get(self.mediaPackage.type,
+      self.videoPlatformConf[self.mediaPackage.type]);
+
+    // Start uploading the media to the platform
+    process.logger.debug('Upload media ' + self.mediaPackage.id);
+    videoPlatformProvider.upload(self.getMediaFilePath(), function(error, mediaId) {
+      if (error)
+        self.setError(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
+      else {
+        async.series([
+          function(callback) {
+            if (!self.mediaPackage.mediaId) {
+              self.mediaPackage.mediaId = [mediaId];
+              self.videoModel.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id, callback);
+            } else {
+              self.mediaPackage.mediaId = self.mediaPackage.mediaId.concat([mediaId]);
+              callback();
+            }
+          },
+          function(callback) {
+            self.videoModel.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId, callback);
+          }
+        ], function() {
+          self.fsm.transition();
+        });
       }
-      self.videoModel.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId);
-      self.fsm.transition();
-    }
+    });
+
   });
 };
 
@@ -438,21 +491,24 @@ Package.prototype.uploadMedia = function() {
  */
 Package.prototype.configureMedia = function() {
   var self = this;
+
   process.logger.debug('Configure media ' + this.mediaPackage.id);
-  this.videoModel.updateState(this.mediaPackage.id, STATES.CONFIGURING);
+  this.updateState(this.mediaPackage.id, STATES.CONFIGURING, function() {
 
-  // Get video plaform provider from package type
-  var videoPlatformProvider = videoPlatformFactory.get(this.mediaPackage.type,
-    this.videoPlatformConf[this.mediaPackage.type]);
+    // Get video plaform provider from package type
+    var videoPlatformProvider = videoPlatformFactory.get(self.mediaPackage.type,
+      self.videoPlatformConf[self.mediaPackage.type]);
 
-  var mediaId = this.mediaPackage.mediaId[this.mediaPackage.mediaId.length];
+    var mediaId = self.mediaPackage.mediaId[self.mediaPackage.mediaId.length];
 
-  // Configure media
-  videoPlatformProvider.configure(mediaId, function(error) {
-    if (error)
-      self.setError(new PackageError(error.message, ERRORS.MEDIA_CONFIGURE));
-    else
-      self.fsm.transition();
+    // Configure media
+    videoPlatformProvider.configure(mediaId, function(error) {
+      if (error)
+        self.setError(new PackageError(error.message, ERRORS.MEDIA_CONFIGURE));
+      else
+        self.fsm.transition();
+    });
+
   });
 };
 
@@ -520,12 +576,21 @@ Package.prototype.getMediaFilePath = function() {
  * @param {PublishError} error The package error
  */
 Package.prototype.setError = function(error) {
+  var self = this;
 
   // An error occurred
   if (error) {
-    this.videoModel.updateState(this.mediaPackage.id, STATES.ERROR);
-    this.videoModel.updateErrorCode(this.mediaPackage.id, error.code);
-    this.emit('error', error);
-  }
 
+    async.parallel([
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.ERROR, callback);
+      },
+      function(callback) {
+        self.videoModel.updateErrorCode(self.mediaPackage.id, error.code, callback);
+      }
+    ], function() {
+      self.emit('error', error);
+    });
+
+  }
 };

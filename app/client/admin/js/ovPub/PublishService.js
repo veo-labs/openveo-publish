@@ -295,7 +295,25 @@
       return $http.get(basePath + 'publish/configuration/all');
     }
 
+    /**
+     * Adds a media.
+     *
+     * @param {Object} Information about the media
+     * @return {Promise} An HTTP promise resolving when media has been added
+     * @method addMedia
+     */
+    function addMedia(data) {
+      var file = data.file;
+      delete data.file;
+
+      return Upload.upload({
+        url: '/be/publish/addMedia',
+        data: {info: Upload.json(data), file: file}
+      });
+    }
+
     return {
+      addMedia: addMedia,
       retryMedia: retryMedia,
       publishMedia: publishMedia,
       unpublishMedia: unpublishMedia,

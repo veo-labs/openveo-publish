@@ -12,6 +12,7 @@ var Package = process.requirePublish('app/server/packages/Package.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var assert = chai.assert;
+var fileSystem = openVeoApi.fileSystem;
 
 chai.should();
 chai.use(spies);
@@ -94,7 +95,7 @@ describe('VideoModel', function() {
         errorCode: ERRORS.NO_ERROR,
         category: '43',
         properties: [],
-        packageType: 'tar',
+        packageType: fileSystem.FILE_TYPES.TAR,
         lastState: STATES.PUBLISHED,
         lastTransition: Package.TRANSITIONS.INIT,
         originalPackagePath: 'path',
@@ -132,7 +133,7 @@ describe('VideoModel', function() {
         assert.isObject(video.metadata, 'Expected metadata to be an object');
         assert.equal(video.metadata.user, anonymousUserId, 'Expected user to be anonymous');
         assert.isArray(video.metadata.groups, 'Expected groups to be an array');
-        assert.isArray(video.properties, 'Expected properties to be an array');
+        assert.isObject(video.properties, 'Expected properties to be an object');
         assert.isArray(video.cut, 'Expected cut to be an array');
         assert.isArray(video.sources, 'Expected sources to be an array');
         assert.equal(video.views, 0, 'Expected view to be 0 by default');
@@ -304,7 +305,7 @@ describe('VideoModel', function() {
 
     it('should be able to update type property of a video', function() {
       var expectedId = '42';
-      var expectedType = 'tar';
+      var expectedType = fileSystem.FILE_TYPES.TAR;
       TestVideoProvider.prototype.update = function(id, filter, callback) {
         assert.strictEqual(id, expectedId, 'Wrong id');
         assert.strictEqual(filter.type, expectedType, 'Wrong type');
@@ -320,7 +321,7 @@ describe('VideoModel', function() {
 
     it('should be able to update thumbnail property of a video', function() {
       var expectedId = '42';
-      var expectedThumbnail = 'tar';
+      var expectedThumbnail = fileSystem.FILE_TYPES.TAR;
       TestVideoProvider.prototype.update = function(id, filter, callback) {
         assert.strictEqual(id, expectedId, 'Wrong id');
         assert.strictEqual(filter.thumbnail, expectedThumbnail, 'Wrong thumbnail');

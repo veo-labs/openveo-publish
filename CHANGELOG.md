@@ -6,6 +6,7 @@
 - Execute unit tests on Travis
 - Some of the permissions in group "Other permissions" have been moved to other groups. "Access properties page" permission has been moved to "Publish: Properties" group. "Access Publish configuration page" permission and "Manage Publish configuration" permission have been moved to a new group "Publish: Configuration". "Access categories page" permission has been moved to a new group "Publish: Categories". "Access videos page" permission has been moved to "Publish: Videos" group. Also note that "Properties" group has been renamed into "Publish: Properties" and "Videos" group has been renamed into "Publish: Videos".
 - Rename "Groups" property of a video into "Groups of contents" to avoid possible ambiguity with "Groups of users"
+- Add the possibility to upload a video directly from the catalog. **CAUTION**: to use this feature you may have to increase the HTTP limit size of your front end server
 
 ## DEPENDENCIES
 
@@ -16,6 +17,8 @@
 - **karma-phantomjs-launcher** has been removed
 - **chai** has been upgraded from 3.5.0 to **4.0.2**
 - **chai-as-promised** has been upgraded from 6.0.0 to **7.1.1**
+- **ng-file-upload** has been removed, it is now a dependency of OpenVeo Core
+- **multer** has been removed, it is now a dependency of OpenVeo Core
 
 # 3.0.1 / 2017-05-10
 

@@ -9,8 +9,8 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     'ov.player',
     'ov.multirange',
     'angular-time-polyfill',
-    'ngFileUpload',
-    'ui.tinymce'
+    'ui.tinymce',
+    'ngFileUpload'
   ]);
 
   /**

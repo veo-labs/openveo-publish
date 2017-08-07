@@ -395,7 +395,7 @@ VideoModel.prototype.add = function(media, callback) {
     type: media.type,
     errorCode: media.errorCode,
     category: media.category,
-    properties: media.properties || [],
+    properties: media.properties || {},
     packageType: media.packageType,
     lastState: media.lastState,
     lastTransition: media.lastTransition,

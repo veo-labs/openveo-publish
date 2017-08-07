@@ -22,36 +22,70 @@
   i18nService,
   publishName) {
     var entityType = 'videos';
+    var addMediaPromise = null;
 
     $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
     $scope.groups = groups.data.entities;
     $scope.users = users.data.entities;
+    $scope.isCollapsed = true;
+    $scope.fileToUpload = null;
 
-    /*
-     *
-     * RIGHTS
-     *
-     */
+    // Fetch permissions of the connected user for MediaController features
     $scope.rights = {};
+    $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
     $scope.rights.publish = $scope.checkAccess('publish-publish-' + entityType);
     $scope.rights.chapter = $scope.checkAccess('publish-chapter-' + entityType);
     $scope.rights.retry = $scope.checkAccess('publish-retry-' + entityType);
     $scope.rights.upload = $scope.checkAccess('publish-upload-' + entityType);
 
-    /*
-     * FORM EDIT
-     */
+    // Define add form
+    var scopeAddForm = $scope.addFormContainer = {};
+    scopeAddForm.model = {
+      properties: {}
+    };
+
+    // Define edit form
     var scopeEditForm = $scope.editFormContainer = {};
     scopeEditForm.model = {};
     scopeEditForm.pendingEdition = false;
     scopeEditForm.pluginName = publishName;
 
-    /*
-     * DATATABLE
-     */
+    // Define datatable
     var scopeDataTable = $scope.tableContainer = {};
     scopeDataTable.pluginName = publishName;
+
+    // TinyMCE options
+    var tinyOptions = {
+      plugins: 'lists link autolink autoresize textpattern',
+      autoresize_bottom_margin: 20, // eslint-disable-line
+      menubar: false,
+      toolbar: 'undo redo | styleselect removeformat | bold italic ' +
+      '| alignleft aligncenter alignright alignjustify | bullist numlist | link',
+      style_formats: [{ // eslint-disable-line
+        title: 'Headers',
+        items: [
+        {title: 'Header 1', format: 'h1'},
+        {title: 'Header 2', format: 'h2'},
+        {title: 'Header 3', format: 'h3'},
+        {title: 'Header 4', format: 'h4'}
+        ]
+      }, {
+        title: 'Inline', items: [
+        {title: 'Bold', icon: 'bold', format: 'bold'},
+        {title: 'Italic', icon: 'italic', format: 'italic'},
+        {title: 'Underline', icon: 'underline', format: 'underline'},
+        {title: 'Code', icon: 'code', format: 'code'}
+        ]
+      }, {
+        title: 'Blocks',
+        items: [
+        {title: 'Paragraph', format: 'p'},
+        {title: 'Blockquote', format: 'blockquote'}
+        ]
+      }],
+      content_css: '/be/css/tinymce.css?' + new Date().getTime() // eslint-disable-line
+    };
 
     /**
      * Gets all categories and add a value for "none".
@@ -202,12 +236,185 @@
       $location.path('/publish/media/' + media.id);
     }
 
-    /*
-     * FORM EDIT
+    /**
+     * Builds custom properties fields descriptors for formly.
+     *
+     * @param {Object} [model] Model where to find default values
+     * @param {Boolean} [inlineEditable] true to generate an inline editable field instead of a simple editable field
+     * @return {Array} The list of formly fields descriptors
      */
-    scopeEditForm.entityType = entityType;
+    function getCustomPropertiesFields(model, inlineEditable) {
+      var fields = [];
 
-    var categoriesfield = getSelectableCategories('CORE.UI.NONE');
+      angular.forEach($scope.properties, function(property, index) {
+        if (property.type === 'text') {
+          fields.push({
+            key: property.id,
+            type: inlineEditable ? 'horizontalEditableInput' : 'horizontalInput',
+            model: model,
+            templateOptions: {
+              label: property.name || property.id
+            }
+          });
+
+        } else if (property.type === 'list') {
+
+          // Build list options with list values
+          var options = [{
+            value: null,
+            name: $filter('translate')('CORE.UI.EMPTY')
+          }];
+
+          for (var i = 0; i < property.values.length; i++) {
+            options.push({
+              value: property.values[i],
+              name: property.values[i]
+            });
+          }
+
+          fields.push({
+            key: property.id,
+            type: inlineEditable ? 'horizontalEditableSelect' : 'horizontalSelect',
+            model: model,
+            defaultValue: options[0].value,
+            templateOptions: {
+              label: property.name || property.id,
+              options: options
+            }
+          });
+        } else if (property.type === 'boolean') {
+          fields.push({
+            key: property.id,
+            type: inlineEditable ? 'horizontalEditableCheckbox' : 'horizontalCheckbox',
+            defaultValue: false,
+            model: model,
+            templateOptions: {
+              label: property.name || property.id
+            }
+          });
+        }
+      });
+
+      return fields;
+    }
+
+    // Setup add form
+    scopeAddForm.fields = [
+      {
+        key: 'title',
+        type: 'horizontalInput',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_TITLE'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_TITLE_DESC'),
+          required: true
+        }
+      },
+      {
+        key: 'description',
+        type: 'horizontalTinymce',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DESCRIPTION_DESC'),
+          required: true
+        },
+        data: {
+          tinymceOptions: tinyOptions
+        }
+      },
+      {
+        key: 'file',
+        type: 'horizontalFile',
+        defaultValue: -1,
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_MEDIA'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_MEDIA_DESC'),
+          acceptedTypes: '.mp4,.tar',
+          required: true,
+          progressBar: false,
+          onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
+            $scope.fileToUpload = file;
+          }
+        }
+      },
+      {
+        key: 'category',
+        type: 'horizontalSelect',
+        defaultValue: null,
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_CATEGORY'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_CATEGORY_DESC'),
+          options: getSelectableCategories('CORE.UI.NONE')
+        }
+      },
+      {
+        key: 'groups',
+        type: 'horizontalSelect',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_GROUPS'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_GROUPS_DESC'),
+          options: utilService.buildSelectOptions($scope.groups)
+        },
+        ngModelAttrs: {
+          'true': {
+            value: 'multiple'
+          }
+        }
+      }
+    ];
+
+    // Separator between built-in properties and custom properties
+    if ($scope.properties.length) {
+      scopeAddForm.fields.push({
+        noFormControl: true,
+        template: '<hr>'
+      });
+    }
+
+    // Custom properties
+    scopeAddForm.fields = scopeAddForm.fields.concat(getCustomPropertiesFields(scopeAddForm.model.properties));
+
+    /**
+     * Collapses / extends the add form.
+     */
+    $scope.toggleAddForm = function() {
+      $scope.isCollapsed = !$scope.isCollapsed;
+    };
+
+    scopeAddForm.onSubmit = function(model) {
+      var groups = [];
+
+      // Remove group "null" from the list of selected groups
+      if (model.groups) {
+        groups = model.groups.filter(function(group) {
+          return group;
+        });
+      }
+
+      addMediaPromise = publishService.addMedia({
+        title: model.title,
+        description: model.description,
+        category: model.category,
+        groups: groups,
+        file: $scope.fileToUpload,
+        properties: model.properties
+      });
+
+      return addMediaPromise.then(function() {
+        entityService.deleteCache(entityType, publishName);
+        addMediaPromise = null;
+        $scope.isCollapsed = true;
+      }, function() {
+        addMediaPromise = null;
+      }, function(event) {
+
+        // Update progress bar
+        model.file = Math.min(100, parseInt(100.0 * event.loaded / event.total));
+
+      });
+    };
+
+    // Setup edit form
+    scopeEditForm.entityType = entityType;
     scopeEditForm.fieldsBase = [
       {
         key: 'title',
@@ -225,36 +432,7 @@
           required: true
         },
         data: {
-          tinymceOptions: {
-            plugins: 'lists link autolink autoresize textpattern',
-            autoresize_bottom_margin: 20, // eslint-disable-line
-            menubar: false,
-            toolbar: 'undo redo | styleselect removeformat | bold italic ' +
-            '| alignleft aligncenter alignright alignjustify | bullist numlist | link',
-            style_formats: [{ // eslint-disable-line
-              title: 'Headers',
-              items: [
-              {title: 'Header 1', format: 'h1'},
-              {title: 'Header 2', format: 'h2'},
-              {title: 'Header 3', format: 'h3'},
-              {title: 'Header 4', format: 'h4'}
-              ]
-            }, {
-              title: 'Inline', items: [
-              {title: 'Bold', icon: 'bold', format: 'bold'},
-              {title: 'Italic', icon: 'italic', format: 'italic'},
-              {title: 'Underline', icon: 'underline', format: 'underline'},
-              {title: 'Code', icon: 'code', format: 'code'}
-              ]
-            }, {
-              title: 'Blocks',
-              items: [
-              {title: 'Paragraph', format: 'p'},
-              {title: 'Blockquote', format: 'blockquote'}
-              ]
-            }],
-            content_css: '/be/css/tinymce.css?' + new Date().getTime() // eslint-disable-line
-          }
+          tinymceOptions: tinyOptions
         }
       },
       {
@@ -262,7 +440,7 @@
         type: 'horizontalEditableSelect',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_CATEGORY'),
-          options: categoriesfield
+          options: getSelectableCategories('CORE.UI.NONE')
         }
       },
       {
@@ -280,10 +458,7 @@
       }
     ];
 
-    /*
-     *
-     * DATATABLE
-     */
+    // Setup datatable
     scopeDataTable.entityType = entityType;
     scopeDataTable.cellTheme = '/publish/be/views/partial/publishCells.html';
 
@@ -292,7 +467,6 @@
       sortOrder: 'dsc',
       notSortBy: ['mediaId']
     };
-    var categoriesFilter = getSelectableCategories('CORE.UI.ALL');
     scopeDataTable.filterBy = [
       {
         key: 'query',
@@ -320,7 +494,7 @@
          ...
          ];
          */
-        options: categoriesFilter,
+        options: getSelectableCategories('CORE.UI.ALL'),
 
         // if enable filter will filter with the selectId AND additionnal id set in the "children" key of each options
         filterWithChildren: true
@@ -473,11 +647,12 @@
       // Build properties
       for (var propertyId in row.properties) {
         if (row.properties[propertyId])
-          properties[propertyId] = row.properties[propertyId].value;
+          properties[propertyId] = row.properties[propertyId].value || null;
       }
 
       row.properties = properties;
 
+      // User field
       if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == openVeoSettings.superAdminId) {
         var opt = utilService.buildSelectOptions($scope.users);
         scopeEditForm.fields.push({
@@ -490,6 +665,7 @@
         });
       }
 
+      // Separator between built-in properties and custom properties
       if ($scope.properties.length) {
         scopeEditForm.fields.push({
           noFormControl: true,
@@ -497,54 +673,7 @@
         });
       }
 
-      // Create a formly field for each property
-      angular.forEach($scope.properties, function(property, index) {
-        if (property.type === 'text') {
-          scopeEditForm.fields.push({
-            key: property.id,
-            type: 'horizontalEditableInput',
-            model: row.properties,
-            templateOptions: {
-              label: property.name || property.id
-            }
-          });
-
-        } else if (property.type === 'list') {
-
-          // Build list options with list values
-          var options = [{
-            value: '',
-            name: $filter('translate')('CORE.UI.EMPTY')
-          }];
-
-          for (var i = 0; i < property.values.length; i++) {
-            options.push({
-              value: property.values[i],
-              name: property.values[i]
-            });
-          }
-
-          scopeEditForm.fields.push({
-            key: property.id,
-            type: 'horizontalEditableSelect',
-            model: row.properties,
-            templateOptions: {
-              label: property.name || property.id,
-              options: options
-            }
-          });
-        } else if (property.type === 'boolean') {
-          scopeEditForm.fields.push({
-            key: property.id,
-            type: 'horizontalEditableCheckbox',
-            model: row.properties,
-            templateOptions: {
-              label: property.name || property.id
-            }
-          });
-        }
-      });
-
+      scopeEditForm.fields = scopeEditForm.fields.concat(getCustomPropertiesFields(row.properties, true));
     };
 
     scopeEditForm.conditionToggleDetail = function(row) {
@@ -561,6 +690,12 @@
     // Listen to destroy event on the view to update
     $scope.$on('$destroy', function() {
       $interval.cancel(pollMediasPromise);
+
+      // Abort upload if any
+      if (addMediaPromise) {
+        addMediaPromise.abort();
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.MEDIAS.UPLOAD_CANCELED'), 4000);
+      }
     });
   }
 

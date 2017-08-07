@@ -398,23 +398,25 @@ TarPackage.prototype.extractPackage = function() {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
   // Extract package
-  this.videoModel.updateState(this.mediaPackage.id, STATES.EXTRACTING);
+  this.updateState(this.mediaPackage.id, STATES.EXTRACTING, function() {
 
-  // Copy destination
-  var packagePath = path.join(extractDirectory, this.mediaPackage.id + '.tar');
+    // Copy destination
+    var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.tar');
 
-  process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
-  openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
+    process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
+    openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
 
-    // Extraction failed
-    if (error) {
-      self.setError(new TarPackageError(error.message, ERRORS.EXTRACT));
-    } else {
+      // Extraction failed
+      if (error) {
+        self.setError(new TarPackageError(error.message, ERRORS.EXTRACT));
+      } else {
 
-      // Extraction done
-      self.fsm.transition();
+        // Extraction done
+        self.fsm.transition();
 
-    }
+      }
+
+    });
 
   });
 };
@@ -428,25 +430,36 @@ TarPackage.prototype.extractPackage = function() {
  */
 TarPackage.prototype.validatePackage = function() {
   var self = this;
+
   process.logger.debug('Validate package ' + this.mediaPackage.originalPackagePath);
-  this.videoModel.updateState(this.mediaPackage.id, STATES.VALIDATING);
+  this.updateState(this.mediaPackage.id, STATES.VALIDATING, function() {
 
-  // Validate package content
-  if (this.mediaPackage.metadata && this.mediaPackage.metadata.indexes)
-    this.fsm.transition();
-  else validatePackage.call(this, function(error, metadata) {
-    if (error)
-      self.setError(new TarPackageError(error.message, ERRORS.VALIDATION));
-    else {
-      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-
-      openVeoApi.util.merge(self.mediaPackage.metadata, metadata);
-      self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata);
-
-      if (self.mediaPackage.metadata.date)
-        self.videoModel.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000);
+    // Validate package content
+    if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
       self.fsm.transition();
-    }
+    else validatePackage.call(self, function(error, metadata) {
+      if (error)
+        self.setError(new TarPackageError(error.message, ERRORS.VALIDATION));
+      else {
+        if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+
+        openVeoApi.util.merge(self.mediaPackage.metadata, metadata);
+
+        async.parallel([
+          function(callback) {
+            self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, callback);
+          },
+          function(callback) {
+            if (self.mediaPackage.metadata.date)
+              self.videoModel.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000, callback);
+            else callback();
+          }
+        ], function() {
+          self.fsm.transition();
+        });
+      }
+    });
+
   });
 };
 
@@ -463,10 +476,14 @@ TarPackage.prototype.saveTimecodes = function() {
   var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
   process.logger.debug('Save timecodes to ' + videoFinalDir);
-  this.videoModel.updateState(this.mediaPackage.id, STATES.SAVING_TIMECODES);
 
   var timecodes;
   async.series([
+
+    // Update state
+    function(callback) {
+      self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, callback);
+    },
 
     // save timecode in metadata from XML if they are not in metadata
     function(callback) {

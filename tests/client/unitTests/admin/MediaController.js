@@ -12,6 +12,7 @@ describe('MediaController', function() {
   // Load module publish, entity and ngJSONPath
   beforeEach(function() {
     module('ngJSONPath');
+    module('ngFileUpload');
     module('ov.publish');
     module('ov.entity');
     module('ov.tableForm');

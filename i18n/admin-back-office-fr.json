@@ -81,6 +81,12 @@
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Rubrique",
     "ATTR_GROUPS" : "Groupes de contenus",
+    "ATTR_MEDIA" : "Vidéo",
+    "FORM_ADD_TITLE_DESC" : "Titre de la vidéo",
+    "FORM_ADD_DESCRIPTION_DESC" : "Description de la vidéo",
+    "FORM_ADD_CATEGORY_DESC" : "La catégorie à laquelle appartient la vidéo",
+    "FORM_ADD_GROUPS_DESC" : "Les groupes de contenus dont la vidéo fait partie. Les utilisateurs peuvent avoir des permissions sur un groupe de contenus. Ajouter la vidéo à un groupe pour autoriser d'autres utilisateurs à manipuler votre vidéo.",
+    "FORM_ADD_MEDIA_DESC" : "Un fichier vidéo au format MP4 ou un fichier tar (vidéo et images synchronisées)",
     "STATE_0" : "Erreur",
     "STATE_1" : "En attente",
     "STATE_2" : "Copie",
@@ -96,6 +102,7 @@
     "STATE_12" : "Publié",
     "STATE_13" : "Generation de miniature",
     "STATE_14" : "Récupération des métadonnées",
+    "ADD_MEDIA" : "Ajouter une vidéo",
     "REMOVE_SUCCESS" : "La vidéo a été supprimée.",
     "RETRY_SUCCESS" : "Le traitement de la vidéo va être relancé.",
     "UPLOAD_START_SUCCESS" : "L'envoi de la vidéo va démarrer.",
@@ -105,7 +112,8 @@
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Rubrique",
     "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s.",
-    "NOT_READY": "Cette vidéo nécessite un réencodage pour etre visionné. Cette tâche est en cours.<br><br>Merci de réessayer dans quelques instant."
+    "NOT_READY": "Cette vidéo nécessite un réencodage pour etre visionné. Cette tâche est en cours.<br><br>Merci de réessayer dans quelques instant.",
+    "UPLOAD_CANCELED": "L'upload a été interrompu. Le fichier n'a pas été uploadé."
   },
   "PROPERTIES" : {
     "SEARCH_BY" : "Rechercher par ",

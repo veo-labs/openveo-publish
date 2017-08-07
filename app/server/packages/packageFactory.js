@@ -11,11 +11,13 @@
  * @static
  */
 
+var openVeoApi = require('@openveo/api');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
+var fileSystem = openVeoApi.fileSystem;
 
 /**
  * Gets an instance of a Package depending on package file type (factory).
@@ -35,11 +37,11 @@ module.exports.get = function(type, mediaPackage) {
     var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
 
     switch (type) {
-      case 'tar':
+      case fileSystem.FILE_TYPES.TAR:
         var TarPackage = process.requirePublish('app/server/packages/TarPackage.js');
         return new TarPackage(mediaPackage, videoModel, configurationModel);
 
-      case 'mp4':
+      case fileSystem.FILE_TYPES.MP4:
         var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
         return new VideoPackage(mediaPackage, videoModel, configurationModel);
 

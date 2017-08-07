@@ -8,6 +8,7 @@ var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
 var STATES = process.requirePublish('app/server/packages/states.js');
+var fileSystem = openVeoApi.fileSystem;
 
 var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/');
 
@@ -91,7 +92,7 @@ MediaHelper.prototype.addEntitiesAuto = function(name, total, offset) {
       title: name + ' ' + i,
       category: category,
       properties: this.getProperties(),
-      packageType: 'tar',
+      packageType: fileSystem.FILE_TYPES.TAR,
       description: name + ' description ' + i
     });
   }

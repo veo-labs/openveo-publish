@@ -81,6 +81,12 @@
     "ATTR_DESCRIPTION" : "Description",
     "ATTR_CATEGORY" : "Category",
     "ATTR_GROUPS" : "Groups of contents",
+    "ATTR_MEDIA" : "Video",
+    "FORM_ADD_TITLE_DESC" : "Title of the video",
+    "FORM_ADD_DESCRIPTION_DESC" : "Description of the video",
+    "FORM_ADD_CATEGORY_DESC" : "The category the video belongs to",
+    "FORM_ADD_GROUPS_DESC" : "The groups of contents the video is part of. Users can have permissions on a group of contents. Use it to enable other users to manipulate your video",
+    "FORM_ADD_MEDIA_DESC" : "The video as an MP4 file or a tar file (video and synchronized images)",
     "STATE_0" : "Error",
     "STATE_1" : "Pending",
     "STATE_2" : "Copying",
@@ -96,6 +102,7 @@
     "STATE_12" : "Published",
     "STATE_13" : "Generating thumbnail",
     "STATE_14" : "Retrieving metadatas",
+    "ADD_MEDIA" : "Add a video",
     "REMOVE_SUCCESS" : "Video successfully removed.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",
     "UPLOAD_START_SUCCESS" : "Video will be uploaded soon.",
@@ -105,7 +112,8 @@
     "DATE_FILTER": "Date",
     "CATEGORY_FILTER" : "Category",
     "RELOAD": "All videos successfully updated.<br><br>Next reload in 30s.",
-    "NOT_READY": "This video need to be formated to be streamed. The process is currently running.<br><br>Please, try again in few minutes."
+    "NOT_READY": "This video need to be formated to be streamed. The process is currently running.<br><br>Please, try again in few minutes.",
+    "UPLOAD_CANCELED": "Upload canceled. File was not uploaded."
   },
   "PROPERTIES" : {
     "SEARCH_BY" : "Search by ",

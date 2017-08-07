@@ -178,6 +178,84 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Getting the list of categories, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_CATEGORIES_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_CATEGORIES_ERROR: {
+    code: 0x012,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting the list of groups, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_GROUPS_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_GROUPS_ERROR: {
+    code: 0x013,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting the list of custom properties, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_CUSTOM_PROPERTIES_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_CUSTOM_PROPERTIES_ERROR: {
+    code: 0x014,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Parsing multipart body, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_PARSE_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_PARSE_ERROR: {
+    code: 0x015,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Checking that media does not already exists in database, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_CHECK_DUPLICATE_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_CHECK_DUPLICATE_ERROR: {
+    code: 0x016,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Removing temporary media file, when adding a media, failed.
+   *
+   * @property ADD_MEDIA_REMOVE_FILE_ERROR
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_REMOVE_FILE_ERROR: {
+    code: 0x017,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -407,7 +485,88 @@ var HTTP_ERRORS = {
     httpCode: 400,
     module: 'publish',
     message: 'Missing id parameter'
+  },
+
+  /**
+   * Adding a media failed, wrong parameters.
+   *
+   * @property ADD_MEDIA_MISSING_PARAMETERS
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_MISSING_PARAMETERS: {
+    code: 0x212,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Adding media failed, missing the info parameter.
+   *
+   * @property ADD_MEDIA_MISSING_INFO_PARAMETERS
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_MISSING_INFO_PARAMETERS: {
+    code: 0x213,
+    httpCode: 400,
+    module: 'publish',
+    message: 'Missing Id parameter'
+  },
+
+  /**
+   * Adding media failed, wrong file parameter.
+   *
+   * @property ADD_MEDIA_WRONG_FILE_PARAMETER
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_WRONG_FILE_PARAMETER: {
+    code: 0x214,
+    httpCode: 400,
+    module: 'publish',
+    message: 'Wrong file parameter'
+  },
+
+  /**
+   * Adding media failed, wrong parameters.
+   *
+   * @property ADD_MEDIA_WRONG_PARAMETERS
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_WRONG_PARAMETERS: {
+    code: 0x215,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Adding media failed, wrong properties parameter.
+   *
+   * @property ADD_MEDIA_WRONG_PROPERTIES_PARAMETER
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_WRONG_PROPERTIES_PARAMETER: {
+    code: 0x216,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Adding media failed, file already exists.
+   *
+   * @property ADD_MEDIA_FILE_ALREADY_EXISTS
+   * @type Object
+   * @final
+   */
+  ADD_MEDIA_FILE_ALREADY_EXISTS: {
+    code: 0x217,
+    httpCode: 400,
+    module: 'publish'
   }
+
 };
 
 Object.freeze(HTTP_ERRORS);
