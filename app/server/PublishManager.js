@@ -316,10 +316,13 @@ PublishManager.prototype.publish = function(mediaPackage) {
       if (error || (files.file && !files.file.isValid))
         return self.emit('error', new PublishError('Media package type is not valid', ERRORS.INVALID_PACKAGE_TYPE));
 
-      var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
-      mediaPackage.packageType = files.file.type;
-      mediaPackage.id = shortid.generate();
-      mediaPackage.title = pathDescriptor.name;
+      // Media package can be in queue and already have an id
+      if (!mediaPackage.id) {
+        var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
+        mediaPackage.packageType = files.file.type;
+        mediaPackage.id = shortid.generate();
+        mediaPackage.title = pathDescriptor.name;
+      }
 
       self.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
         if (error) {
@@ -328,14 +331,17 @@ PublishManager.prototype.publish = function(mediaPackage) {
                                               error.message, ERRORS.UNKNOWN));
         } else if (!videos || !videos.length) {
 
-          // Media package does not exist
-          // Publish it
-          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-          mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
-
           // Package can be added to pending packages
-          if (addPackage.call(self, mediaPackage))
+          if (addPackage.call(self, mediaPackage)) {
+
+            // Media package does not exist
+            // Publish it
+            var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+            mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
             mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
+
+          }
+
         }
 
       });
