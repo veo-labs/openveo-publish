@@ -142,8 +142,8 @@ VideoPackage.prototype.generateThumb = function() {
 
   // Generate thumb
   this.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB, function() {
-    process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ')');
     var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
     ffmpeg(filePath).screenshots({
       timestamps: ['10%'],
       filename: 'thumbnail.jpg',
@@ -249,6 +249,7 @@ VideoPackage.prototype.copyImages = function() {
 
     // Read directory
     function(callback) {
+      process.logger.verbose('Scan directory ' + extractDirectory + ' for images');
       fs.readdir(extractDirectory, function(error, files) {
         if (error)
           callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
@@ -289,6 +290,8 @@ VideoPackage.prototype.copyImages = function() {
       if (!filesToCopy.length) return callback();
 
       filesToCopy.forEach(function(file) {
+        process.logger.verbose('Copy image ' + path.join(extractDirectory, file) +
+                               ' to ' + path.join(videoFinalDir, file));
         openVeoApi.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
 
           if (error)
