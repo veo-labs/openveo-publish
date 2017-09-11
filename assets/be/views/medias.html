@@ -13,7 +13,7 @@
         <div uib-collapse="isCollapsed">
           <ng-include src="'views/elements/form.html'"></ng-include>
           <div class="col-xs-12">
-            <uib-progressbar ng-show="addFormContainer.model.file >= 0 && fileToUpload"
+            <uib-progressbar ng-show="addFormContainer.model.file && addFormContainer.model.file >= 0 && fileToUpload"
                              class="progress-striped"
                              value="addFormContainer.model.file"
                              type="warning">

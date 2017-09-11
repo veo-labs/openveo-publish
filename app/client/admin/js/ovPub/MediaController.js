@@ -11,6 +11,7 @@
   $location,
   $window,
   $interval,
+  $q,
   entityService,
   publishService,
   utilService,
@@ -405,6 +406,8 @@
         $scope.isCollapsed = true;
       }, function() {
         addMediaPromise = null;
+        model.file = null;
+        return $q.reject();
       }, function(event) {
 
         // Update progress bar
@@ -706,6 +709,7 @@
     '$location',
     '$window',
     '$interval',
+    '$q',
     'entityService',
     'publishService',
     'utilService',
