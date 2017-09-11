@@ -1,4 +1,7 @@
-# 3.1.0 /
+# 4.0.0 /
+
+## BREAKING CHANGES
+- Deactivate video auto-play by default. Video auto-play can be activated using the URL parameter "auto-play" when sharing the video
 
 ## NEW FEATURES
 

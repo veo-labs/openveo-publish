@@ -28,6 +28,7 @@
 
           if (media.available || $scope.data.type == 'youtube') {
             $scope.isFullViewport = urlParams['fullscreen'] || false;
+            $scope.autoPlay = urlParams['auto-play'] || false;
             $scope.playerType = $scope.data.type == 'youtube' ? 'youtube' : urlParams['type'] || 'html';
             $scope.ready = true;
           }
