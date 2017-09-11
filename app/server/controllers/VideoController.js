@@ -744,7 +744,7 @@ VideoController.prototype.updateTagsAction = function(request, response, next) {
     }
 
     var data = JSON.parse(request.body.info);
-    var file = request.files.file[0];
+    var file = request.files.file ? request.files.file[0] : null;
 
     model.updateTags(entityId, data, file, function(error, newtag) {
       if (error)
