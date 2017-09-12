@@ -302,6 +302,7 @@ PublishManager.get = function(videoModel, maxConcurrentPackage) {
  * @param {Object} mediaPackage Media to publish
  * @param {String} mediaPackage.originalPackagePath Package absolute path
  * @param {String} mediaPackage.packageType The package type
+ * @param {String} [mediaPackage.title] The title to use for this media, default to the file name without extension
  */
 PublishManager.prototype.publish = function(mediaPackage) {
   var self = this;
@@ -321,7 +322,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
         var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
         mediaPackage.packageType = files.file.type;
         mediaPackage.id = shortid.generate();
-        mediaPackage.title = pathDescriptor.name;
+        mediaPackage.title = mediaPackage.title || pathDescriptor.name;
       }
 
       self.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
