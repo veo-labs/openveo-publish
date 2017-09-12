@@ -218,7 +218,7 @@
       return entityService.updateEntity(entityType, publishName, media.id, {
         title: media.title,
         description: media.description,
-        properties: media.properties,
+        properties: media.customProperties,
         category: media.category,
         groups: media.groups,
         user: media.user
@@ -650,7 +650,7 @@
           properties[propertyId] = row.properties[propertyId].value || null;
       }
 
-      row.properties = properties;
+      row.customProperties = properties;
 
       // User field
       if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == openVeoSettings.superAdminId) {
@@ -673,7 +673,7 @@
         });
       }
 
-      scopeEditForm.fields = scopeEditForm.fields.concat(getCustomPropertiesFields(row.properties, true));
+      scopeEditForm.fields = scopeEditForm.fields.concat(getCustomPropertiesFields(row.customProperties, true));
     };
 
     scopeEditForm.conditionToggleDetail = function(row) {
