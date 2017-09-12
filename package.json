@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -62,7 +62,7 @@
     "flightplan": "0.6.17"
   },
   "peerDependencies": {
-    "@openveo/core": "4.*"
+    "@openveo/core": "4.* >=4.1.0"
   },
   "scripts": {
     "prepublish": "grunt prod",
