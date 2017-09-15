@@ -178,9 +178,6 @@ function interpretRename() {
   // Do not interpret events anymore if watcher has been closed
   if (!this.fsWatcher) return;
 
-  // Queue "rename" events to not miss any while reading the directory
-  this.pendingEventsCounter++;
-
   fs.readdir(this.directoryPath, (function(error, resources) {
     var newSnapshot = {};
     if (error && error.code !== 'EPERM')
@@ -217,7 +214,7 @@ function interpretRename() {
     this.pendingEventsCounter--;
 
     // If another "rename" event was fired while interpreting, interpret again
-    if (this.pendingEventsCounter)
+    if (this.pendingEventsCounter > 0)
       interpretRename.call(this);
   }).bind(this));
 }
@@ -247,6 +244,9 @@ DirectoryFsWatcher.prototype.watch = function(callback) {
 
     this.fsWatcher.on('change', (function(type) {
       if (type === 'rename') {
+
+        // Queue "rename" events to not miss any while reading the directory
+        this.pendingEventsCounter++;
 
         // Read dir to find out what have changed
         interpretRename.call(this);

@@ -1,3 +1,9 @@
+# 4.0.1 /
+
+## BUG FIXES
+
+- Fix CPU issue when uploading a package through FTP which was causing the CPU usage of NodeJS process to explode
+
 # 4.0.0 / 2017-09-12
 
 ## BREAKING CHANGES
