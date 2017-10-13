@@ -39,7 +39,10 @@ VideoProvider.prototype.updateVideosState = function(ids, oldState, newState, ca
       id: {
         $in: ids
       },
-      state: oldState
+      state: oldState,
+      locked: {
+        $ne: true
+      }
     },
     {
       state: newState
