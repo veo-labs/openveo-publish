@@ -10,8 +10,6 @@
   "WS_SCOPES" : {
     "GET_VIDEOS_NAME" : "Récupérer les vidéos",
     "GET_VIDEOS_DESCRIPTION" : "Récupérer une liste paginée de vidéos",
-    "ADD_VIDEOS_NAME" : "Ajouter des vidéos",
-    "ADD_VIDEOS_DESCRIPTION" : "Ajouter de nouvelles vidéos au catalogue",
     "UPDATE_VIDEOS_NAME" : "Mettre à jour les vidéos",
     "UPDATE_VIDEOS_DESCRIPTION" : "Mettre à jour les vidéos (titre, description, categorie, propriétés personnalisées etc.)",
     "DELETE_VIDEOS_NAME" : "Supprimer les vidéos",

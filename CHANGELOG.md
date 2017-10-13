@@ -1,4 +1,8 @@
-# 4.1.0 /
+# 5.0.0 /
+
+## BREAKING CHANGES
+
+- put /videos has been removed from web service end points
 
 ## BUG FIXES
 

@@ -8,6 +8,10 @@ module.exports = {
         'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
       },
       private: {
+        'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
+        'get /videos': 'app/server/controllers/VideoController.getEntitiesAction',
+        'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction',
         'post /addMedia': 'app/server/controllers/VideoController.addEntityAction',
         'post /retryVideo/:ids': 'app/server/controllers/VideoController.retryVideosAction',
         'post /startUpload/:ids/:platform': 'app/server/controllers/VideoController.startUploadAction',
@@ -23,13 +27,15 @@ module.exports = {
       },
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
-        'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction'
+        'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction',
+        'get /videos': 'app/server/controllers/VideoController.getEntitiesAction',
+        'post /videos': 'app/server/controllers/VideoController.updateEntityAction',
+        'delete /videos': 'app/server/controllers/VideoController.removeEntityAction'
       }
     }
   },
   entities: {
-    properties: 'app/server/controllers/PropertyController',
-    videos: 'app/server/controllers/VideoController'
+    properties: 'app/server/controllers/PropertyController'
   },
   webServiceScopes: [
     {
@@ -38,6 +44,30 @@ module.exports = {
       description: 'PUBLISH.WS_SCOPES.INCREASE_VIEW_DESCRIPTION',
       paths: [
         'post /publish/statistics*'
+      ]
+    },
+    {
+      id: 'publish-get-videos',
+      name: 'PUBLISH.WS_SCOPES.GET_VIDEOS_NAME',
+      description: 'PUBLISH.WS_SCOPES.GET_VIDEOS_DESCRIPTION',
+      paths: [
+        'get /publish/videos*'
+      ]
+    },
+    {
+      id: 'publish-update-videos',
+      name: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_NAME',
+      description: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_DESCRIPTION',
+      paths: [
+        'post /publish/videos*'
+      ]
+    },
+    {
+      id: 'publish-delete-videos',
+      name: 'PUBLISH.WS_SCOPES.DELETE_VIDEOS_NAME',
+      description: 'PUBLISH.WS_SCOPES.DELETE_VIDEOS_DESCRIPTION',
+      paths: [
+        'delete /publish/videos*'
       ]
     }
   ],
@@ -93,6 +123,18 @@ module.exports = {
           name: 'PUBLISH.PERMISSIONS.ADD_VIDEOS_NAME',
           description: 'PUBLISH.PERMISSIONS.ADD_VIDEOS_DESCRIPTION',
           paths: ['post /publish/addMedia*']
+        },
+        {
+          id: 'publish-update-videos',
+          name: 'PUBLISH.PERMISSIONS.UPDATE_VIDEOS_NAME',
+          description: 'PUBLISH.PERMISSIONS.UPDATE_VIDEOS_DESCRIPTION',
+          paths: ['post /publish/videos*']
+        },
+        {
+          id: 'publish-delete-videos',
+          name: 'PUBLISH.PERMISSIONS.DELETE_VIDEOS_NAME',
+          description: 'PUBLISH.PERMISSIONS.DELETE_VIDEOS_DESCRIPTION',
+          paths: ['delete /publish/videos*']
         },
         {
           id: 'publish-publish-videos',

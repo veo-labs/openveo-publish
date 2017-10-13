@@ -10,8 +10,6 @@
   "WS_SCOPES" : {
     "GET_VIDEOS_NAME" : "Get videos",
     "GET_VIDEOS_DESCRIPTION" : "Get a paginated list of videos",
-    "ADD_VIDEOS_NAME" : "Add videos",
-    "ADD_VIDEOS_DESCRIPTION" : "Add new videos to the catalog",
     "UPDATE_VIDEOS_NAME" : "Update videos",
     "UPDATE_VIDEOS_DESCRIPTION" : "Update videos properties (title, description, category, custom properties etc.)",
     "DELETE_VIDEOS_NAME" : "Delete videos",
