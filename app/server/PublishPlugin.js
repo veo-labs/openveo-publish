@@ -10,6 +10,7 @@ var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
+var listener = process.requirePublish('app/server/listener.js');
 
 var configDir = openVeoApi.fileSystem.getConfDir();
 var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
@@ -63,6 +64,18 @@ module.exports = PublishPlugin;
 util.inherits(PublishPlugin, openVeoApi.plugin.Plugin);
 
 /**
+ * Sets listeners on core events.
+ *
+ * @method setCoreListeners
+ * @private
+ */
+function setCoreListeners() {
+  var coreApi = process.api.getCoreApi();
+  var CORE_HOOKS = coreApi.getHooks();
+  coreApi.registerAction(CORE_HOOKS.USERS_DELETED, listener.onUsersDeleted);
+}
+
+/**
  * Prepares plugin by creating required database indexes.
  *
  * This is automatically called by core application after plugin is loaded.
@@ -80,6 +93,9 @@ PublishPlugin.prototype.init = function(callback) {
     new PropertyProvider(database),
     new VideoProvider(database)
   ];
+
+  // Set event listeners on core and plugins
+  setCoreListeners.call(this);
 
   providers.forEach(function(provider) {
     if (provider.createIndexes) {
