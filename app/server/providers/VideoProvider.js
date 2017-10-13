@@ -120,3 +120,32 @@ VideoProvider.prototype.createIndexes = function(callback) {
     callback(error);
   });
 };
+
+/**
+ * Updates user of videos.
+ *
+ * @method updateVideosUser
+ * @async
+ * @param {Array} ids The ids of the videos
+ * @param {String} userId The new user id for the videos
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+VideoProvider.prototype.updateVideosUser = function(ids, userId, callback) {
+  this.database.update(this.collection,
+    {
+      id: {
+        $in: ids
+      },
+      locked: {
+        $ne: true
+      }
+    },
+    {
+      'metadata.user': userId
+    },
+    function(error) {
+      if (callback)
+        callback(error);
+    });
+};

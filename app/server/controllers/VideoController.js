@@ -190,10 +190,10 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
         process.api.getCoreApi().taxonomyModel.getTaxonomyTerms('categories', function(error, terms) {
           if (error) {
             process.logger.error(error.message, {error: error, method: 'addEntityAction'});
-            return callback(HTTP_ERRORS.ADD_MEDIA_CATEGORIES_ERROR);
-          }
+            categoriesIds = [];
+          } else
+            categoriesIds = openVeoApi.util.getPropertyFromArray('id', terms, 'items');
 
-          categoriesIds = openVeoApi.util.getPropertyFromArray('id', terms, 'items');
           callback();
         });
       },

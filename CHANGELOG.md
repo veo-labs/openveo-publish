@@ -1,3 +1,9 @@
+# 4.1.0 /
+
+## BUG FIXES
+
+- Fix error when trying to add a video from the catalogue (code 18) while there is no category defined in categories page
+
 # 4.0.1 / 2017-09-15
 
 ## BUG FIXES

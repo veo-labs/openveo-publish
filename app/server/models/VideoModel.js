@@ -1158,3 +1158,31 @@ VideoModel.prototype.removeTags = function(id, data, callback) {
     }
   });
 };
+
+/**
+ * Sets videos user to no one.
+ *
+ * @method anonymizeByUser
+ * @async
+ * @param {Array} ids A list of user ids, all videos which belong to these users
+ * will be anonymized
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
+ */
+VideoModel.prototype.anonymizeByUser = function(ids, callback) {
+  var self = this;
+  var idsToAnonymize = [];
+
+  this.provider.get({'metadata.user': {$in: ids}}, function(error, entities) {
+    if (!error) {
+      for (var i = 0; i < entities.length; i++) {
+        if (self.isUserAuthorized(entities[i], openVeoApi.models.ContentModel.UPDATE_OPERATION))
+          idsToAnonymize.push(entities[i].id);
+      }
+
+      self.provider.updateVideosUser(idsToAnonymize, null, callback);
+    } else
+      callback(error);
+  });
+};

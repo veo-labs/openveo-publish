@@ -179,19 +179,6 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Getting the list of categories, when adding a media, failed.
-   *
-   * @property ADD_MEDIA_CATEGORIES_ERROR
-   * @type Object
-   * @final
-   */
-  ADD_MEDIA_CATEGORIES_ERROR: {
-    code: 0x012,
-    httpCode: 500,
-    module: 'publish'
-  },
-
-  /**
    * Getting the list of groups, when adding a media, failed.
    *
    * @property ADD_MEDIA_GROUPS_ERROR
