@@ -84,7 +84,6 @@
     "publishMediasGroup": {
       "name": "publish-medias-group",
       "permissions": [
-        "publish-access-videos-page",
         "get-group-publishGroup1",
         "update-group-publishGroup1",
         "delete-group-publishGroup1"
@@ -93,7 +92,6 @@
     "publishMediasGroupNoRead": {
       "name": "publish-medias-group-no-read",
       "permissions": [
-        "publish-access-videos-page",
         "update-group-publishGroup1",
         "delete-group-publishGroup1"
       ]
@@ -101,7 +99,6 @@
     "publishMediasGroupNoUpdate": {
       "name": "publish-medias-group-no-update",
       "permissions": [
-        "publish-access-videos-page",
         "get-group-publishGroup1",
         "delete-group-publishGroup1"
       ]
@@ -109,7 +106,6 @@
     "publishMediasGroupNoDelete": {
       "name": "publish-medias-group-no-delete",
       "permissions": [
-        "publish-access-videos-page",
         "get-group-publishGroup1",
         "update-group-publishGroup1"
       ]
@@ -193,25 +189,25 @@
       "name": "publish-medias-group",
       "email": "publish-medias-group@veo-labs.com",
       "password": "publish-medias-group",
-      "roles": [ "publishMediasGroup" ]
+      "roles": [ "publishMediasGroup", "publishMedias" ]
     },
     "publishMediasGroupNoRead": {
       "name": "publish-medias-group-no-read",
       "email": "publish-medias-group-no-read@veo-labs.com",
       "password": "publish-medias-group-no-read",
-      "roles": [ "publishMediasGroupNoRead" ]
+      "roles": [ "publishMediasGroupNoRead", "publishMedias" ]
     },
     "publishMediasGroupNoUpdate": {
       "name": "publish-medias-group-no-update",
       "email": "publish-medias-group-no-update@veo-labs.com",
       "password": "publish-medias-group-no-update",
-      "roles": [ "publishMediasGroupNoUpdate" ]
+      "roles": [ "publishMediasGroupNoUpdate", "publishMedias" ]
     },
     "publishMediasGroupNoDelete": {
       "name": "publish-medias-group-no-delete",
       "email": "publish-medias-group-no-delete@veo-labs.com",
       "password": "publish-medias-group-no-delete",
-      "roles": [ "publishMediasGroupNoDelete" ]
+      "roles": [ "publishMediasGroupNoDelete", "publishMedias" ]
     },
     "publishChaptersEdit": {
       "name": "publish-chapters-edit",

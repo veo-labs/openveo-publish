@@ -60,6 +60,8 @@ describe('Media page', function() {
       var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
       var videoModelWithUser = new VideoModel(owner, videoProvider, propertyProvider);
       mediaHelperWithUser = new MediaHelper(videoModelWithUser);
+
+      page.logAs(datas.users.publishGuest);
     });
 
     // Log with a user without access permission
