@@ -488,7 +488,7 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Adding media failed, missing the info parameter.
+   * Adding media failed, missing the body.
    *
    * @property ADD_MEDIA_MISSING_INFO_PARAMETERS
    * @type Object
@@ -497,8 +497,7 @@ var HTTP_ERRORS = {
   ADD_MEDIA_MISSING_INFO_PARAMETERS: {
     code: 0x213,
     httpCode: 400,
-    module: 'publish',
-    message: 'Missing Id parameter'
+    module: 'publish'
   },
 
   /**
