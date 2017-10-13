@@ -449,7 +449,7 @@ var HTTP_ERRORS = {
   /**
    * Update the video tag failed, wrong parameters.
    *
-   * @property UPDATE_VIDEO_TAG_MISSING_PARAMETERS
+   * @property UPDATE_VIDEO_TAGS_MISSING_PARAMETERS
    * @type Object
    * @final
    */
