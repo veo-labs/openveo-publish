@@ -285,7 +285,7 @@ describe('Media page', function() {
   });
 
   it('should be able to select lines', function() {
-    return tableAssert.checkLinesSelection(page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
+    return tableAssert.checkLinesSelection('title');
   });
 
   it('should be able to see, publish, access chapters or remove a media in ready state', function() {
