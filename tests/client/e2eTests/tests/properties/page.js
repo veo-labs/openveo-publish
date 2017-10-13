@@ -158,7 +158,7 @@ describe('Property page', function() {
     var description = 'test edition description';
     var newName = 'test edition renamed';
     var newDescription = 'test edition renamed description';
-    var newValues = ['value2', 'value2'];
+    var newValues = ['value1', 'value2'];
 
     // Create line
     page.addLine(name, {
@@ -174,6 +174,7 @@ describe('Property page', function() {
       values: newValues,
       type: page.translations.PUBLISH.PROPERTIES.FORM_ADD_LIST_TYPE
     });
+
     assert.isFulfilled(page.getLine(newName));
     assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
     assert.eventually.equal(page.getLineFieldText(newName, 'listValues'), newValues.join(', '));
@@ -200,7 +201,7 @@ describe('Property page', function() {
   });
 
   it('should be able to select lines', function() {
-    return tableAssert.checkLinesSelection(page.translations.PUBLISH.PROPERTIES.NAME_COLUMN);
+    return tableAssert.checkLinesSelection();
   });
 
   describe('Search', function() {
