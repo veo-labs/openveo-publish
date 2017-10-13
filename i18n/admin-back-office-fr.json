@@ -191,6 +191,6 @@
     "UPLOAD_TITLE": "Upload",
     "UPLOAD_INFO": "Vous pouvez définir les options par défaut de l'upload tel que le propriétaire ou le groupe par défaut d'une vidéo.",
     "UPLOAD_DEFAULT_OWNER": "Propriétaire de la vidéo par défaut",
-    "UPLOAD_DEFAULT_GROUP": "Groupe de le vidéo par défaut"
+    "UPLOAD_DEFAULT_GROUP": "Groupe de vidéos par défaut"
   }
 }
