@@ -23,21 +23,21 @@ module.exports = VideoProvider;
 util.inherits(VideoProvider, openVeoApi.providers.EntityProvider);
 
 /**
- * Updates video state.
+ * Updates state of videos.
  *
- * @method updateVideoState
+ * @method updateVideosState
  * @async
- * @param {String} id The id of the video
+ * @param {Array} ids The ids of the videos
  * @param {String} oldState The actual state of the video
  * @param {String} newState The new state of the video
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoProvider.prototype.updateVideoState = function(id, oldState, newState, callback) {
+VideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
   this.database.update(this.collection,
     {
       id: {
-        $in: id
+        $in: ids
       },
       state: oldState
     },

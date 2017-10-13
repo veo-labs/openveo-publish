@@ -733,7 +733,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         assert.deepEqual(ids, expectedIds);
         assert.strictEqual(oldState, STATES.READY, 'Expected old state to be ready');
         assert.strictEqual(newState, STATES.PUBLISHED, 'Expected new state to be published');
@@ -758,7 +758,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         assert.equal(ids.length, 0);
         callback();
       };
@@ -794,7 +794,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         callback(expectedError);
       };
 
@@ -820,7 +820,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         assert.deepEqual(ids, expectedIds);
         assert.strictEqual(oldState, STATES.PUBLISHED, 'Expected old state to be published');
         assert.strictEqual(newState, STATES.READY, 'Expected new state to be ready');
@@ -845,7 +845,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         assert.equal(ids.length, 0);
         callback();
       };
@@ -881,7 +881,7 @@ describe('VideoModel', function() {
         }]);
       };
 
-      TestVideoProvider.prototype.updateVideoState = function(ids, oldState, newState, callback) {
+      TestVideoProvider.prototype.updateVideosState = function(ids, oldState, newState, callback) {
         callback(expectedError);
       };
 

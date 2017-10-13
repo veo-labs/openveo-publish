@@ -981,7 +981,7 @@ VideoModel.prototype.publishVideos = function(ids, callback) {
           idsToPublish.push(entities[i].id);
       }
 
-      self.provider.updateVideoState(idsToPublish, STATES.READY, STATES.PUBLISHED, callback);
+      self.provider.updateVideosState(idsToPublish, STATES.READY, STATES.PUBLISHED, callback);
     } else
       callback(error);
   });
@@ -1011,7 +1011,7 @@ VideoModel.prototype.unpublishVideos = function(ids, callback) {
           idsToUnpublish.push(entities[i].id);
       }
 
-      self.provider.updateVideoState(idsToUnpublish, STATES.PUBLISHED, STATES.READY, callback);
+      self.provider.updateVideosState(idsToUnpublish, STATES.PUBLISHED, STATES.READY, callback);
     } else
       callback(error);
   });
