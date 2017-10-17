@@ -9,7 +9,7 @@ module.exports = {
       },
       private: {
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
-        'get /videos': 'app/server/controllers/VideoController.getEntitiesAction',
+        'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
         'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
         'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction',
         'post /addMedia': 'app/server/controllers/VideoController.addEntityAction',
@@ -28,9 +28,10 @@ module.exports = {
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
         'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction',
-        'get /videos': 'app/server/controllers/VideoController.getEntitiesAction',
-        'post /videos': 'app/server/controllers/VideoController.updateEntityAction',
-        'delete /videos': 'app/server/controllers/VideoController.removeEntityAction'
+        'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
+        'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
+        'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction'
       }
     }
   },
