@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>PublishManager - OpenVeo Publish server</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish server</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 5.0.1
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/ConfigurationController.html">ConfigurationController</a></li>
+                                <li><a href="../classes/ConfigurationModel.html">ConfigurationModel</a></li>
+                                <li><a href="../classes/ConfigurationProvider.html">ConfigurationProvider</a></li>
+                                <li><a href="../classes/DirectoryFsWatcher.html">DirectoryFsWatcher</a></li>
+                                <li><a href="../classes/DirectoryWatcher.html">DirectoryWatcher</a></li>
+                                <li><a href="../classes/ERRORS.html">ERRORS</a></li>
+                                <li><a href="../classes/factory.html">factory</a></li>
+                                <li><a href="../classes/GoogleOAuthHelper.html">GoogleOAuthHelper</a></li>
+                                <li><a href="../classes/HTTP_ERRORS.html">HTTP_ERRORS</a></li>
+                                <li><a href="../classes/listener.html">listener</a></li>
+                                <li><a href="../classes/LocalProvider.html">LocalProvider</a></li>
+                                <li><a href="../classes/Package.html">Package</a></li>
+                                <li><a href="../classes/PackageError.html">PackageError</a></li>
+                                <li><a href="../classes/PropertyController.html">PropertyController</a></li>
+                                <li><a href="../classes/PropertyModel.html">PropertyModel</a></li>
+                                <li><a href="../classes/PropertyProvider.html">PropertyProvider</a></li>
+                                <li><a href="../classes/PublishError.html">PublishError</a></li>
+                                <li><a href="../classes/PublishManager.html">PublishManager</a></li>
+                                <li><a href="../classes/PublishPlugin.html">PublishPlugin</a></li>
+                                <li><a href="../classes/ResumableUpload.html">ResumableUpload</a></li>
+                                <li><a href="../classes/STATES.html">STATES</a></li>
+                                <li><a href="../classes/StatisticsController.html">StatisticsController</a></li>
+                                <li><a href="../classes/TarPackage.html">TarPackage</a></li>
+                                <li><a href="../classes/TarPackageError.html">TarPackageError</a></li>
+                                <li><a href="../classes/TYPES.html">TYPES</a></li>
+                                <li><a href="../classes/VideoController.html">VideoController</a></li>
+                                <li><a href="../classes/VideoModel.html">VideoModel</a></li>
+                                <li><a href="../classes/VideoPackage.html">VideoPackage</a></li>
+                                <li><a href="../classes/VideoPackageError.html">VideoPackageError</a></li>
+                                <li><a href="../classes/videoPlatformFactory.html">videoPlatformFactory</a></li>
+                                <li><a href="../classes/VideoPlatformProvider.html">VideoPlatformProvider</a></li>
+                                <li><a href="../classes/VideoProvider.html">VideoProvider</a></li>
+                                <li><a href="../classes/VimeoProvider.html">VimeoProvider</a></li>
+                                <li><a href="../classes/Watcher.html">Watcher</a></li>
+                                <li><a href="../classes/WatcherError.html">WatcherError</a></li>
+                                <li><a href="../classes/WowzaProvider.html">WowzaProvider</a></li>
+                                <li><a href="../classes/YoutubeProvider.html">YoutubeProvider</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/controllers.html">controllers</a></li>
+                                <li><a href="../modules/models.html">models</a></li>
+                                <li><a href="../modules/packages.html">packages</a></li>
+                                <li><a href="../modules/providers.html">providers</a></li>
+                                <li><a href="../modules/publish.html">publish</a></li>
+                                <li><a href="../modules/watcher.html">watcher</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>PublishManager</h1>
+<div class="meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/app_server_PublishManager.js.html#l57"><code>app&#x2F;server&#x2F;PublishManager.js:57</code></a>
+        </div>
+
+            Module: <a href="../modules/publish.html">publish</a>
+
+</div>
+
+
+<h3>Summary</h3>
+<div class="intro">
+    <p>Defines the PublishManager which handles the media publication's process.</p>
+<p>Media publications are handled in parallel. Media publication's process can be
+different regarding the type of the media.</p>
+
+</div>
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+<div id="method_PublishManager" class="method item">
+  <h3 class="blue-method-name">PublishManager</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l57"><code>app&#x2F;server&#x2F;PublishManager.js:57</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>PublishManager</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>videoModel</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[maxConcurrentPackage=3]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">videoModel</code>
+                        <span class="type"><a href="../classes/VideoModel.html" class="crosslink">VideoModel</a></span>
+
+
+                    <div class="param-description">
+                        <p>The videoModel</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[maxConcurrentPackage=3]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                        <p>The maximum number of medias to treat in parallel</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>var coreApi = process.api.getCoreApi();
+var database = coreApi.getDatabase();
+var PublishManager = process.requirePublish('app/server/PublishManager.js');
+var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
+var publishManager = new PublishManager(videoModel, 5);
+
+// Listen publish manager's errors
+publishManager.on('error', function(error) {
+  // Do something
+});
+
+// Listen to publish manager's end of processing for a media
+publishManager.on('complete', function(mediaPackage){
+  // Do something
+});
+
+// Listen to publish manager's event informing that a media processing is retrying
+publishManager.on('retry', function(mediaPackage) {
+  // Do something
+});
+
+// Listen to publish manager's event informing that a media, waiting for upload, starts uploading
+publishManager.on('upload', function(mediaPackage) {
+  // Do something
+});
+
+publishManager.publish({
+  type: 'youtube', // The media platform to use for this media
+  originalPackagePath: '/home/openveo/medias/media-package.tar', // Path of the media package
+  originalFileName: 'media-package' // File name without extension
+});</code></pre>
+
+            </div>
+        </div>
+
+</div>
+    </div>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+            <li class="api-class-tab events"><a href="#events">Events</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                            <li class="index-item method private">
+                                <a href="#method_addPackage">addPackage</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_createMediaPackageManager">createMediaPackageManager</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_get">get</a>
+
+                                    <span class="flag static">static</span>
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_onComplete">onComplete</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_onError">onError</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_publish">publish</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_removeFromPending">removeFromPending</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_retry">retry</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_retryAll">retryAll</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_upload">upload</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                            <li class="index-item property">
+                                <a href="#property_maxConcurrentPackage">maxConcurrentPackage</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_pendingPackages">pendingPackages</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_queue">queue</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_videoModel">videoModel</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+                <div class="index-section events">
+                    <h3>Events</h3>
+
+                    <ul class="index-list events">
+                            <li class="index-item event">
+                                <a href="#event_complete">complete</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_error">error</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_retry">retry</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_stateChanged">stateChanged</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_upload">upload</a>
+
+                            </li>
+                    </ul>
+                </div>
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method_addPackage" class="method item private">
+  <h3 class="blue-method-name">addPackage</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l246"><code>app&#x2F;server&#x2F;PublishManager.js:246</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>addPackage</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Adds media package to the list of pending packages.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media package to add to pending packages</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                <div class="blue-return-desc">
+                    <p>true if the media package is successfully added to pending packages
+false if it has been added to queue</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_createMediaPackageManager" class="method item private">
+  <h3 class="blue-method-name">createMediaPackageManager</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l216"><code>app&#x2F;server&#x2F;PublishManager.js:216</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>createMediaPackageManager</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Package.html" class="crosslink">Package</a></span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Creates a media package manager corresponding to the media type.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media to manage</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="../classes/Package.html" class="crosslink">Package</a></span>:
+                <div class="blue-return-desc">
+                    <p>A media package manager</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_get" class="method item">
+  <h3 class="blue-method-name">get</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l280"><code>app&#x2F;server&#x2F;PublishManager.js:280</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>get</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>videoModel</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[maxConcurrentPackage]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/PublishManager.html" class="crosslink">PublishManager</a></span>
+        </span>
+
+
+
+
+        <span class="flag static">static</span>
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets an instance of the PublishManager.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">videoModel</code>
+                        <span class="type"><a href="../classes/VideoModel.html" class="crosslink">VideoModel</a></span>
+
+
+                    <div class="param-description">
+                        <p>The videoModel</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[maxConcurrentPackage]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                        <p>The maximum number of medias to treat in parallel</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="../classes/PublishManager.html" class="crosslink">PublishManager</a></span>:
+                <div class="blue-return-desc">
+                    <p>The PublishManager singleton instance</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_onComplete" class="method item private">
+  <h3 class="blue-method-name">onComplete</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l197"><code>app&#x2F;server&#x2F;PublishManager.js:197</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>onComplete</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Handles media complete event.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The package on error</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_onError" class="method item private">
+  <h3 class="blue-method-name">onError</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l173"><code>app&#x2F;server&#x2F;PublishManager.js:173</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>onError</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>error</code>
+                </li>
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Handles media error event.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">error</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="crosslink external" target="_blank">Error</a></span>
+
+
+                    <div class="param-description">
+                        <p>The error</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media on error</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_publish" class="method item">
+  <h3 class="blue-method-name">publish</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l296"><code>app&#x2F;server&#x2F;PublishManager.js:296</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>publish</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Publishes the given media package.</p>
+<p>Media package must be of one of the supported type.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>Media to publish</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">originalPackagePath</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>Package absolute path</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">packageType</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>The package type</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[title]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The title to use for this media, default to the file name without extension</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_removeFromPending" class="method item private">
+  <h3 class="blue-method-name">removeFromPending</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l149"><code>app&#x2F;server&#x2F;PublishManager.js:149</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>removeFromPending</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>mediaPackage</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Removes a media from pending medias.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">mediaPackage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media package to remove</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_retry" class="method item">
+  <h3 class="blue-method-name">retry</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l359"><code>app&#x2F;server&#x2F;PublishManager.js:359</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>retry</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>packageId</code>
+                </li>
+                <li class="arg">
+                        <code>forceRetry</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Retries publishing a media package which is on error.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">packageId</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                        <p>The id of the package on error</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">forceRetry</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+
+
+                    <div class="param-description">
+                        <p>Force retrying a package no matter its state</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_retryAll" class="method item">
+  <h3 class="blue-method-name">retryAll</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l406"><code>app&#x2F;server&#x2F;PublishManager.js:406</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>retryAll</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Retries publishing all packages in a non stable state.</p>
+<p>Stable states are :</p>
+<ul>
+<li>STATES.ERROR</li>
+<li>STATES.WAITING_FOR_UPLOAD</li>
+<li>STATES.READY</li>
+<li>STATES.PUBLISHED</li>
+</ul>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_upload" class="method item">
+  <h3 class="blue-method-name">upload</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_PublishManager.js.html#l444"><code>app&#x2F;server&#x2F;PublishManager.js:444</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>upload</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>packageId</code>
+                </li>
+                <li class="arg">
+                        <code>platform</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Uploads a media blocked in &quot;waiting to upload&quot; state.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">packageId</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                        <p>The id of the package waiting to be uploaded</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">platform</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                        <p>The type of the video platform to upload to</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+            </div>
+
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                    <div id="property_maxConcurrentPackage" class="property item">
+                    
+                      <h3 class="blue-method-name">maxConcurrentPackage</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l134"><code>app&#x2F;server&#x2F;PublishManager.js:134</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>maxConcurrentPackage</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Maximum number of medias to treat in parallel.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    
+                    </div>
+                    <div id="property_pendingPackages" class="property item">
+                    
+                      <h3 class="blue-method-name">pendingPackages</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l116"><code>app&#x2F;server&#x2F;PublishManager.js:116</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>pendingPackages</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Medias being processed.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    
+                    </div>
+                    <div id="property_queue" class="property item">
+                    
+                      <h3 class="blue-method-name">queue</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l107"><code>app&#x2F;server&#x2F;PublishManager.js:107</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>queue</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Medias waiting to be processed.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    
+                    </div>
+                    <div id="property_videoModel" class="property item">
+                    
+                      <h3 class="blue-method-name">videoModel</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l125"><code>app&#x2F;server&#x2F;PublishManager.js:125</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>videoModel</code></h3>
+                        <span class="type"><a href="../classes/VideoModel.html" class="crosslink">VideoModel</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Video model.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    
+                    </div>
+            </div>
+
+
+            <div id="events" class="api-class-tabpanel">
+                <h2 class="off-left">Events</h2>
+
+                    <div id="event_complete" class="events item">
+                        <h3 class="blue-method-name">complete</h3>
+                    
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l29"><code>app&#x2F;server&#x2F;PublishManager.js:29</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>complete</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                      </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Fired when a package process has succeed.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">The</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                            <p>processed package</p>
+                    
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_error" class="events item">
+                        <h3 class="blue-method-name">error</h3>
+                    
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l22"><code>app&#x2F;server&#x2F;PublishManager.js:22</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>error</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                      </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Fired when an error occurred while processing a package.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">The</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="crosslink external" target="_blank">Error</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                            <p>error</p>
+                    
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_retry" class="events item">
+                        <h3 class="blue-method-name">retry</h3>
+                    
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l36"><code>app&#x2F;server&#x2F;PublishManager.js:36</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>retry</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                      </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Fired when a media in error restarts.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">The</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                            <p>media</p>
+                    
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_stateChanged" class="events item">
+                        <h3 class="blue-method-name">stateChanged</h3>
+                    
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l50"><code>app&#x2F;server&#x2F;PublishManager.js:50</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>stateChanged</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                      </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Fired when media state has changed.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">The</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                            <p>media</p>
+                    
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_upload" class="events item">
+                        <h3 class="blue-method-name">upload</h3>
+                    
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_PublishManager.js.html#l43"><code>app&#x2F;server&#x2F;PublishManager.js:43</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>upload</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                      </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Fired when a media stuck in &quot;waiting for upload&quot; state starts uploading.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">The</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                            <p>media</p>
+                    
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    
+                    </div>
+            </div>
+    </div>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
