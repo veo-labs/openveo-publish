@@ -1,3 +1,9 @@
+# 5.0.1 /
+
+## BUG FIXES
+
+- A package could be on error when the upload had some difficulty (slow connection, stopping then resuming). This could lead to a package in the error state with code "3" in the catalogue of videos. For this to work you may have to execute "npm install" again on OpenVeo Core.
+
 # 5.0.0 / 2017-10-19
 
 ## BREAKING CHANGES

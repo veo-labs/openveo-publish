@@ -312,7 +312,10 @@ PublishManager.prototype.publish = function(mediaPackage) {
     openVeoApi.util.validateFiles({
       file: mediaPackage.originalPackagePath
     }, {
-      file: {in: acceptedPackagesExtensions}
+      file: {
+        in: acceptedPackagesExtensions,
+        validateExtension: true
+      }
     }, function(error, files) {
       if (error || (files.file && !files.file.isValid))
         return self.emit('error', new PublishError('Media package type is not valid (' +
