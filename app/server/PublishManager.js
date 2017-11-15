@@ -315,7 +315,9 @@ PublishManager.prototype.publish = function(mediaPackage) {
       file: {in: acceptedPackagesExtensions}
     }, function(error, files) {
       if (error || (files.file && !files.file.isValid))
-        return self.emit('error', new PublishError('Media package type is not valid', ERRORS.INVALID_PACKAGE_TYPE));
+        return self.emit('error', new PublishError('Media package type is not valid (' +
+                                                   mediaPackage.originalPackagePath +
+                                                   ')', ERRORS.INVALID_PACKAGE_TYPE));
 
       // Media package can be in queue and already have an id
       if (!mediaPackage.id) {
