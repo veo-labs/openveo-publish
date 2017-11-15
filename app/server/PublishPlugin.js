@@ -147,7 +147,7 @@ PublishPlugin.prototype.start = function(callback) {
 
     // Listen to watcher's new detected files
     watcher.on('create', function(resourcePath) {
-      process.logger.verbose('Watcher detected a new resource : ' + resourcePath);
+      process.logger.info('Watcher detected a new resource : ' + resourcePath);
       var pathDescriptor = path.parse(resourcePath);
       var packageInfo = null;
 
@@ -161,6 +161,7 @@ PublishPlugin.prototype.start = function(callback) {
 
       packageInfo['originalPackagePath'] = resourcePath;
       packageInfo['originalFileName'] = pathDescriptor.name;
+
       publishManager.publish(packageInfo);
     });
 
