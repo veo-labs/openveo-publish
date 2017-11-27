@@ -65,12 +65,14 @@ describe('Web service /publish/videos', function() {
       });
     }
 
+    page.logAsAdmin();
+    page.load();
+
     propertyHelper.addEntities(properties).then(function(addedLines) {
       addedProperties = addedLines;
     });
 
-    page.logAsAdmin();
-    page.load();
+    page.refresh();
   });
 
   // Remove custom properties and logout

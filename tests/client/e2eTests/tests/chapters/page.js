@@ -5,6 +5,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
+var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -30,8 +31,14 @@ describe('Chapter page', function() {
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
+    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
+    var mediaPage = new MediaPage(videoModel);
     page = new ChapterPage(mediaId);
+    mediaHelper = new MediaHelper(videoModel);
+
+    mediaPage.logAsAdmin();
+    mediaPage.load();
+
     mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED).then(
       function(mediasAdded) {
         medias = mediasAdded;
