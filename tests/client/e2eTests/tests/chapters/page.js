@@ -22,7 +22,7 @@ describe('Chapter page', function() {
   var mediaId = 'test-chapters-page';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
-  var mediaFileDuration = '00:10:10';
+  var mediaFileDuration = 610000;
   var medias;
   var mediaHelper;
 
@@ -69,10 +69,14 @@ describe('Chapter page', function() {
    * @return {Number} The percent of the video corresponding to the given time
    */
   function convertTimeToPercent(time) {
-    var timeDate = new Date('1970-01-01T' + time);
-    var endDate = new Date('1970-01-01T' + mediaFileDuration);
+    var fields = time.split(':');
+    var seconds = 0;
 
-    return timeDate.getTime() / endDate.getTime();
+    for (var i = 0; i < fields.length; i++) {
+      seconds = seconds * 60 + parseInt(fields[i]);
+    }
+
+    return seconds * 1000 / mediaFileDuration;
   }
 
   /**
@@ -84,13 +88,15 @@ describe('Chapter page', function() {
    * @return {String} The time corresponding to the percent of the media in format hh:mm:ss
    */
   function convertPercentToTime(percent) {
-    var endDate = new Date('1970-01-01T' + mediaFileDuration);
-    var timeDate = new Date(endDate.getTime() * percent + endDate.getTimezoneOffset() * 60000);
+    var ms = percent * mediaFileDuration;
+    var hours = Math.floor(ms / (1000 * 3600));
+    var minutes = Math.floor(((ms / 1000) - hours * 3600) / 60);
+    var seconds = Math.floor((ms / 1000) - (hours * 60 + minutes) * 60);
+    var pad = function(value) {
+      return ('0' + value).slice(-2);
+    };
 
-    var hours = (timeDate.getHours() < 10) ? '0' + timeDate.getHours() : String(timeDate.getHours());
-    var minutes = (timeDate.getMinutes() < 10) ? '0' + timeDate.getMinutes() : String(timeDate.getMinutes());
-    var seconds = (timeDate.getSeconds() < 10) ? '0' + timeDate.getSeconds() : String(timeDate.getSeconds());
-    return hours + ':' + minutes + ':' + seconds;
+    return pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
   }
 
   /**
@@ -114,7 +120,7 @@ describe('Chapter page', function() {
         var chapter = results[2];
 
         // Check chapter's cells and fields (in edition form)
-        assert.equal(chapter.cells[timeHeaderIndex], expectedChapter.time.slice(1));
+        assert.equal(chapter.cells[timeHeaderIndex], expectedChapter.time);
         assert.equal(chapter.cells[titleHeaderIndex], expectedChapter.title);
         assert.equal(chapter.fields.time, expectedChapter.time);
         assert.equal(chapter.fields.title, expectedChapter.title);
@@ -150,7 +156,7 @@ describe('Chapter page', function() {
         var cut = results[2];
 
         // Check cut's cells and fields (in edition form)
-        assert.equal(cut.cells[timeHeaderIndex], expectedTime.slice(1));
+        assert.equal(cut.cells[timeHeaderIndex], expectedTime);
         assert.equal(cut.cells[titleHeaderIndex], cutTitle);
         assert.equal(cut.fields.time, expectedTime);
         assert.equal(cut.fields.title, cutTitle);

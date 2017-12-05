@@ -27,7 +27,6 @@ module.exports = function(config) {
       'tests/client/unitTests/admin/entity/EntityApp.js',
       'tests/client/unitTests/admin/uploader/UploaderApp.js',
       'app/client/admin/js/multirange/multirange.js',
-      'app/client/admin/js/timePolyfill/time-polyfill.js',
       'app/client/admin/js/ovPub/PublishApp.js',
       'app/client/admin/js/ovPub/**/*.js',
       'app/client/front/js/PublishPlayerApp.js',

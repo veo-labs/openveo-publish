@@ -12,7 +12,7 @@ module.exports = {
         cwd: '<%= publish.beJS %>/',
 
         // Match all JavaScript library files
-        src: ['multirange/*.js', 'timePolyfill/*.js'],
+        src: ['multirange/*.js'],
 
         // Set destination directory
         dest: '<%= publish.uglify %>/',

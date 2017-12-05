@@ -590,20 +590,13 @@
     var changebyRange = true;
     $scope.updateTime = function() {
       if (changebyRange) {
-        var d = new Date(parseInt(Math.round($scope.modelToEdit.value * Math.round($scope.duration * 1000))));
-        var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-        var nd = new Date(utc);
-        nd.setMilliseconds(0);
-        $scope.editTime = nd;
+        $scope.editTime = parseInt($scope.modelToEdit.value * $scope.duration * 1000);
       } else
         changebyRange = true;
     };
     $scope.updateRange = function() {
-      if ($scope.myForm.time.$valid && $scope.editTime) {
-        var d = new Date($scope.editTime.getTime());
-        var local = d.getTime() - (d.getTimezoneOffset() * 60000);
-        changebyRange = false;
-        $scope.modelToEdit.value = local / Math.round($scope.duration * 1000);
+      if ($scope.myForm.time.$valid) {
+        $scope.modelToEdit.value = $scope.editTime / ($scope.duration * 1000);
       }
     };
     $scope.$watch('modelToEdit.value', function() {
@@ -666,7 +659,7 @@
       deleteUpload();
     });
 
-    $scope.editTime = new Date(Date.UTC(1970, 0, 1, 0, 0, 0));
+    $scope.editTime = 0;
   }
 
   app.controller('ChapterController', ChapterController);

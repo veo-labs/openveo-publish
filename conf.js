@@ -201,8 +201,7 @@ module.exports = {
       base: [
       ],
       dev: [
-        '/publish/multirange/multirange.js',
-        '/publish/timePolyfill/time-polyfill.js'
+        '/publish/multirange/multirange.js'
       ],
       prod: [
         '/publish/be/js/libOpenveoPublish.js'
@@ -223,7 +222,10 @@ module.exports = {
         '/publish/ovPub/CategoriesController.js',
         '/publish/ovPub/ChapterController.js',
         '/publish/ovPub/ConfigurationController.js',
-        '/publish/ovPub/PublishService.js'
+        '/publish/ovPub/PublishService.js',
+        '/publish/ovPub/TimeDirective.js',
+        '/publish/ovPub/MillisecondsToTimeFilter.js',
+        '/publish/ovPub/TimeToMillisecondsFilter.js'
       ],
       prod: [
         '/publish/be/js/openveoPublish.js'

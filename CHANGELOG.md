@@ -1,3 +1,9 @@
+# 5.0.2
+
+## BUG FIXES
+
+  - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
+
 # 5.0.1 / 2017-11-15
 
 ## BUG FIXES

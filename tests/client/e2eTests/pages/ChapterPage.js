@@ -3,6 +3,7 @@
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
 var Field = e2e.fields.Field;
+var OvpTimeField = process.requirePublish('tests/client/e2eTests/fields/OvpTimeField.js');
 var BackEndPage = e2e.pages.BackEndPage;
 var browserExt = e2e.browser;
 
@@ -128,8 +129,7 @@ ChapterPage.prototype.getAddFormFields = function(form) {
   var fields = {};
 
   // Time field
-  fields.time = Field.get({
-    type: 'time',
+  fields.time = new OvpTimeField({
     name: this.translations.PUBLISH.CHAPTER.FORM_TIME,
     baseElement: form
   });
@@ -186,8 +186,6 @@ ChapterPage.prototype.addChapter = function(data, cancel) {
     // Web Driver can't deal with input in time state. TimeField.setValue is not able to dispatch events set on the
     // field, thus updateRange function has to be called manually.
     fields.time.setValue(data.time);
-    browser.executeScript('var scope = angular.element(arguments[0]).scope(); scope.updateRange();',
-                                   self.formElement.getWebElement());
     fields.title.setValue(data.title);
     fields.description.setValue(data.description);
 
@@ -605,8 +603,6 @@ ChapterPage.prototype.editChapter = function(name, data, cancel) {
     // Set time
     if (data.time !== undefined) {
       fields.time.setValue(data.time);
-      browser.executeScript('var scope = angular.element(arguments[0]).scope(); scope.updateRange(); scope.$apply();',
-                                   self.formElement.getWebElement());
     }
 
     // Click the save button
@@ -642,8 +638,6 @@ ChapterPage.prototype.editCut = function(time, isBeginCut, cancel) {
     // Set time
     if (time !== undefined) {
       fields.time.setValue(time);
-      browser.executeScript('var scope = angular.element(arguments[0]).scope(); scope.updateRange(); scope.$apply();',
-                                   self.formElement.getWebElement());
     }
 
     // Click the save button

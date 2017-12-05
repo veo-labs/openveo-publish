@@ -30,7 +30,7 @@
         <tbody>
           <tr ng-repeat="row in ranges| orderBy:'+value'" ng-dblclick="selectAndOpen(row)" ng-click="select(row)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
             <td class="col-sm-3">
-            {{ duration ? (Math.round(row.value * Math.round(duration * 1000)) | date:'H:mm:ss':'+0000'):'-:--:--' }}</td>
+            {{ duration ? (Math.floor(row.value * duration * 1000) | millisecondsToTime):'--:--:--' }}</td>
             <td class="col-sm-8 chapter-title ">
               <span ng-bind="row.name | translate"></span>
             </td>
@@ -62,9 +62,9 @@
     <div class='well container-fluid'>
       <form name="myForm" enctype="multipart/form-data" ng-submit="submit()">
         <div class="col-sm-4">
-          <div class="form-group">
-            <label for="time">{{ 'PUBLISH.CHAPTER.FORM_TIME' | translate}}</label>
-            <input type="time" step="1" name="time" class="form-control" id="time" ng-model="editTime" ng-change="updateRange()" min="00:00:00" max="{{ Math.round(duration*1000) | date:'HH:mm:ss':'+0000'}}" placeholder="00:00:00">
+          <div class="form-group" ng-class="{ 'has-error': myForm.time.$invalid }">
+            <label class="control-label" for="time">{{ 'PUBLISH.CHAPTER.FORM_TIME' | translate}}</label>
+            <ovp-time ng-change="updateRange()" ng-model="editTime" name="time" milliseconds-max="{{ duration * 1000 }}"></ovp-time>
           </div>
           <div class="form-group">
             <label for="title">{{ 'PUBLISH.CHAPTER.FORM_TITLE' | translate}}*</label>
@@ -104,7 +104,7 @@
             <uib-progressbar  ng-show="file.progress >= 0" class="progress-striped" value="file.progress" type="warning">{{file.progress}}%</uib-progressbar>
           </div>
           <div class="button">
-            <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !editTime || !myForm.file.$valid" class="btn btn-primary" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
+            <button type="submit" ng-disabled="!myForm.time.$valid || !myForm.title.$valid || !myForm.file.$valid" class="btn btn-primary" ng-bind="selectRow?'CORE.UI.FORM_SAVE':'CORE.UI.FORM_ADD' | translate"></button>
             <button type="button" class="btn btn-default" ng-click="cancel()" ng-bind="'CORE.UI.FORM_CANCEL' | translate"></button>
           </div>
         </div>
@@ -140,4 +140,21 @@
 </div>
 <script>
   videojs.options.flash.swf = "/publish/lib/video.js/dist/video-js.swf";
+</script>
+
+<!-- "ovp-time" directive template -->
+<script type="text/ng-template" id="ov-publish-time.html">
+  <div class="form-inline">
+    <div class="form-group">
+      <input type="text" name="hours" class="form-control ovp-time-input" ng-change="updateTime()" ng-blur="formatInputs()" ng-model="hours" size="2" maxlength="2">
+    </div>
+    :
+    <div class="form-group">
+      <input type="text" class="form-control ovp-time-input" ng-change="updateTime()" ng-blur="formatInputs()" ng-model="minutes" size="2" maxlength="2">
+    </div>
+    :
+    <div class="form-group">
+      <input type="text" class="form-control ovp-time-input" ng-change="updateTime()" ng-blur="formatInputs()" ng-model="seconds" size="2" maxlength="2">
+    </div>
+  </div>
 </script>
