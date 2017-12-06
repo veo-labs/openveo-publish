@@ -147,7 +147,7 @@
     "SAVE_SUCCESS" : "Les rubriques ont été enregistrées",
     "EMPTY" : "Vous ne pouvez pas ajouter une catégorie vide."
   },
-  "CHAPTER" : {
+  "EDITOR": {
     "PAGE_TITLE" : "Publish - Rich media",
     "TITLE" : "Edition Rich Media",
     "INFO" : "Organisez votre contenu en rajoutant des chapitres ou des tags. Les chapitres permettent d'organiser votre contenu en y rajoutant plus d'information. Avec les tags, vous pouvez marquer les moments importants de votre contenu.",

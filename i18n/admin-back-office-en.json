@@ -147,7 +147,7 @@
     "SAVE_SUCCESS" : "Category successfully saved.",
     "EMPTY" : "An empty category could not be added."
   },
-  "CHAPTER" : {
+  "EDITOR" : {
     "PAGE_TITLE" : "Publish - Rich media",
     "TITLE" : "Rich Media Edition",
     "INFO" : "Adding chapters ar tags allows a better organization of your content. For each chapter, a description can be added to explain the content or add extra information. With tags, you can pin important moment in your content and adding files to add informations.",

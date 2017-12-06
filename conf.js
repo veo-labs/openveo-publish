@@ -147,7 +147,7 @@ module.exports = {
           ]
         },
         {
-          id: 'publish-chapter-videos',
+          id: 'publish-editor-videos',
           name: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_NAME',
           description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION',
           paths: [
@@ -220,7 +220,7 @@ module.exports = {
         '/publish/ovPub/MediaController.js',
         '/publish/ovPub/PropertiesController.js',
         '/publish/ovPub/CategoriesController.js',
-        '/publish/ovPub/ChapterController.js',
+        '/publish/ovPub/EditorController.js',
         '/publish/ovPub/ConfigurationController.js',
         '/publish/ovPub/PublishService.js',
         '/publish/ovPub/TimeDirective.js',

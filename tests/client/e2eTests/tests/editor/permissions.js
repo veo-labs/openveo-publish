@@ -4,7 +4,7 @@ var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
-var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
+var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
@@ -16,11 +16,11 @@ var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
-describe('Chapter page', function() {
+describe('Editor page', function() {
   var coreApi = process.api.getCoreApi();
   var page;
   var medias;
-  var mediaId = 'test-chapters-page-permissions';
+  var mediaId = 'test-editor-page-permissions';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
   var mediaHelper;
@@ -33,7 +33,7 @@ describe('Chapter page', function() {
       var propertyProvider = new PropertyProvider(coreApi.getDatabase());
       var videoModel = new VideoModel(null, videoProvider, propertyProvider);
       var mediaPage = new MediaPage(videoModel);
-      page = new ChapterPage(mediaId);
+      page = new EditorPage(mediaId);
       mediaHelper = new MediaHelper(videoModel);
 
       mediaPage.logAsAdmin();
@@ -76,7 +76,7 @@ describe('Chapter page', function() {
       var propertyProvider = new PropertyProvider(coreApi.getDatabase());
       var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
       mediaHelper = new MediaHelper(new VideoModel(owner, videoProvider, propertyProvider));
-      page = new ChapterPage(mediaId);
+      page = new EditorPage(mediaId);
       mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED, 'publishGroup1').then(
         function(mediasAdded) {
           medias = mediasAdded;
@@ -87,7 +87,7 @@ describe('Chapter page', function() {
 
     // Log with a user with only edit chapters permission
     before(function() {
-      page.logAs(datas.users.publishChaptersEdit);
+      page.logAs(datas.users.publishEditorEdit);
       page.load();
     });
 
@@ -107,7 +107,7 @@ describe('Chapter page', function() {
       page.getAlertMessages().then(function(messages) {
         assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
+        assert.equal(messages[1], page.translations.PUBLISH.EDITOR.SAVE_ERROR);
       });
       page.closeAlerts();
     });
@@ -117,7 +117,7 @@ describe('Chapter page', function() {
       page.getAlertMessages().then(function(messages) {
         assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
+        assert.equal(messages[1], page.translations.PUBLISH.EDITOR.SAVE_ERROR);
       });
       page.closeAlerts();
     });

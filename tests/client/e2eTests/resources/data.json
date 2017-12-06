@@ -110,10 +110,10 @@
         "update-group-publishGroup1"
       ]
     },
-    "publishChaptersEdit": {
-      "name": "publish-chapters-edit",
+    "publishEditorEdit": {
+      "name": "publish-editor-edit",
       "permissions": [
-        "publish-chapter-videos",
+        "publish-editor-videos",
         "get-group-publishGroup1"
       ]
     },
@@ -209,11 +209,11 @@
       "password": "publish-medias-group-no-delete",
       "roles": [ "publishMediasGroupNoDelete", "publishMedias" ]
     },
-    "publishChaptersEdit": {
-      "name": "publish-chapters-edit",
-      "email": "publish-chapters-edit@veo-labs.com",
-      "password": "publish-chapters-edit",
-      "roles": [ "publishChaptersEdit" ]
+    "publishEditorEdit": {
+      "name": "publish-editor-edit",
+      "email": "publish-editor-edit@veo-labs.com",
+      "password": "publish-editor-edit",
+      "roles": [ "publishEditorEdit" ]
     },
     "publishConfigurationNoManage": {
       "name": "publish-configuration-no-manage",

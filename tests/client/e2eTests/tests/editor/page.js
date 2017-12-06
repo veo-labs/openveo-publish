@@ -4,7 +4,7 @@ var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
-var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
+var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
@@ -17,9 +17,9 @@ var browserExt = e2e.browser;
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
-describe('Chapter page', function() {
+describe('Editor page', function() {
   var page;
-  var mediaId = 'test-chapters-page';
+  var mediaId = 'test-editor-page';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
   var mediaFileDuration = 610000;
@@ -33,7 +33,7 @@ describe('Chapter page', function() {
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     var videoModel = new VideoModel(null, videoProvider, propertyProvider);
     var mediaPage = new MediaPage(videoModel);
-    page = new ChapterPage(mediaId);
+    page = new EditorPage(mediaId);
     mediaHelper = new MediaHelper(videoModel);
 
     mediaPage.logAsAdmin();
@@ -110,8 +110,8 @@ describe('Chapter page', function() {
       var promises = [];
 
       // Get both time and title header indexes to avoid hard coding it
-      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TIME));
-      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TITLE));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.EDITOR.HEAD_TIME));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.EDITOR.HEAD_TITLE));
       promises.push(page.getLineDetails(expectedChapter.title));
 
       return protractor.promise.all(promises).then(function(results) {
@@ -146,8 +146,8 @@ describe('Chapter page', function() {
       var cutTitle = isBegin ? page.translations.CORE.UI.BEGIN : page.translations.CORE.UI.END;
 
       // Get both time and title header indexes to avoid hard coding it
-      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TIME));
-      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.CHAPTER.HEAD_TITLE));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.EDITOR.HEAD_TIME));
+      promises.push(page.getTableHeaderIndex(page.translations.PUBLISH.EDITOR.HEAD_TITLE));
       promises.push(page.getLineDetails(cutTitle, 'cut'));
 
       return protractor.promise.all(promises).then(function(results) {

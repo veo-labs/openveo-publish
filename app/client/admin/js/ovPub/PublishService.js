@@ -259,7 +259,7 @@
     /**
      * Clears a publish service cache.
      *
-     * @param {String} [type] The cache element to clear (**properties**, **categories** or **chapter**), null to
+     * @param {String} [type] The cache element to clear (**properties**, **categories** or **editor**), null to
      * clear all caches
      * @method cacheClear
      */
@@ -277,7 +277,7 @@
             categoriesOptions = null;
             categoriesByKey = null;
             break;
-          case 'chapter':
+          case 'editor':
             mediaChapter = {};
             break;
           default:

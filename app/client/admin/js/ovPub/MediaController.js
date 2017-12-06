@@ -36,7 +36,7 @@
     $scope.rights = {};
     $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
     $scope.rights.publish = $scope.checkAccess('publish-publish-' + entityType);
-    $scope.rights.chapter = $scope.checkAccess('publish-chapter-' + entityType);
+    $scope.rights.editor = $scope.checkAccess('publish-editor-' + entityType);
     $scope.rights.retry = $scope.checkAccess('publish-retry-' + entityType);
     $scope.rights.upload = $scope.checkAccess('publish-upload-' + entityType);
 
@@ -229,11 +229,11 @@
     }
 
     /**
-     * Routes to chapters edition.
+     * Routes to media editor.
      *
      * @param {Object} media The media to edit
      */
-    function editChapter(media) {
+    function mediaEditor(media) {
       $location.path('/publish/media/' + media.id);
     }
 
@@ -590,13 +590,13 @@
       {
         label: $filter('translate')('PUBLISH.MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
-          return $scope.rights.chapter &&
+          return $scope.rights.editor &&
             $scope.checkContentAccess(row, 'update') &&
             !row.saving &&
             (row.state == 11 || row.state == 12);
         },
         callback: function(row) {
-          editChapter(row);
+          mediaEditor(row);
         }
       },
       {

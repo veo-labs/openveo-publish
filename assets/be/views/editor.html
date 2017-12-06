@@ -1,27 +1,27 @@
 <div class="pu-chapter" ng-class="selectedData.value">
   <h2>
      <div class='btn btn-default back-button' ng-click='back()'><span class='glyphicon glyphicon-chevron-left'></span>{{'CORE.UI.BACK'| translate}}</div>
-     <span ng-bind="'PUBLISH.CHAPTER.TITLE' | translate"></span>
+     <span ng-bind="'PUBLISH.EDITOR.TITLE' | translate"></span>
   </h2>
 
-  <div class="well well-lg" ng-bind="'PUBLISH.CHAPTER.INFO' | translate"></div>
+  <div class="well well-lg" ng-bind="'PUBLISH.EDITOR.INFO' | translate"></div>
   <div class="row media-viewer">
     <div class='col-sm-8 col-sm-push-4'>
        <ov-player
          ov-player-type="{{playerType}}"
          ov-data="mediaPlayer"
          ov-language="{{playerLanguage}}"
-         id="chapterPlayer"
+         id="editorPlayer"
          ></ov-player>
     </div>
     <div class='col-sm-4 col-sm-pull-8' >
     <uib-tabset active="activeJustified" justified="true">
-      <uib-tab ng-repeat="data in dataId" select="selectedData.value = data;" index="0" heading="{{ 'PUBLISH.CHAPTER.CONTEXT.' + data.toUpperCase() + '_TITLE' | translate}}"></uib-tab>
+      <uib-tab ng-repeat="data in dataId" select="selectedData.value = data;" index="0" heading="{{ 'PUBLISH.EDITOR.CONTEXT.' + data.toUpperCase() + '_TITLE' | translate}}"></uib-tab>
     </uib-tabset>
       <table class="table table-striped table-condensed chapter-table" ng-show='ranges.length'>
         <thead>
-          <tr><th class='col-sm-3 active'>{{ 'PUBLISH.CHAPTER.HEAD_TIME' | translate}}</th>
-            <th class='col-sm-8 active'>{{ 'PUBLISH.CHAPTER.HEAD_TITLE' | translate}}</th>
+          <tr><th class='col-sm-3 active'>{{ 'PUBLISH.EDITOR.HEAD_TIME' | translate}}</th>
+            <th class='col-sm-8 active'>{{ 'PUBLISH.EDITOR.HEAD_TITLE' | translate}}</th>
             <th class='col-sm-1 active'>
               <input type="checkbox" ng-model="checkAllSelected" ng-click="checkAll();$event.stopPropagation();">
             </th>
@@ -41,7 +41,7 @@
         </tbody>
       </table>
       <div class="no-chapter" ng-if='!ranges.length'>
-        <span class="text" ng-bind-html="'PUBLISH.CHAPTER.NO_' + selectedData.value.toUpperCase() | translate"></span>
+        <span class="text" ng-bind-html="'PUBLISH.EDITOR.NO_' + selectedData.value.toUpperCase() | translate"></span>
       </div>
 
       <div class="btn-group btn-group-justified" role="group">
@@ -63,11 +63,11 @@
       <form name="myForm" enctype="multipart/form-data" ng-submit="submit()">
         <div class="col-sm-4">
           <div class="form-group" ng-class="{ 'has-error': myForm.time.$invalid }">
-            <label class="control-label" for="time">{{ 'PUBLISH.CHAPTER.FORM_TIME' | translate}}</label>
+            <label class="control-label" for="time">{{ 'PUBLISH.EDITOR.FORM_TIME' | translate}}</label>
             <ovp-time ng-change="updateRange()" ng-model="editTime" name="time" milliseconds-max="{{ duration * 1000 }}"></ovp-time>
           </div>
           <div class="form-group">
-            <label for="title">{{ 'PUBLISH.CHAPTER.FORM_TITLE' | translate}}*</label>
+            <label for="title">{{ 'PUBLISH.EDITOR.FORM_TITLE' | translate}}*</label>
             <div ng-hide="!modelToEdit.type" class="well well-sm">{{modelToEdit.name | translate}}</div>
             <input ng-show="!modelToEdit.type" type="text" class="form-control" name="title" id="title" ng-model="modelToEdit.name" ng-disabled="modelToEdit.type" required>
           </div>
@@ -83,18 +83,18 @@
             <a ng-if="simpleMimeType" href="{{modelToEdit.file.basePath}}?filename={{modelToEdit.file.originalname}}"
               class="btn btn-default" role="button"
               download="{{modelToEdit.file.originalname}}"
-              ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <span> {{ 'PUBLISH.CHAPTER.FILE_DOWNLOAD' | translate}}</span>
+              ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <span> {{ 'PUBLISH.EDITOR.FILE_DOWNLOAD' | translate}}</span>
             </a>
             <button type="button" class="btn btn-danger" ng-click="modelToEdit.file = null" ng-show="modelToEdit.file">{{ 'CORE.UI.REMOVE' | translate}}</button>
           </div>
 
           <div ng-show="!modelToEdit.type && selectedData.value == 'tags'" class="form-group">
-            <label for="file" ng-if='!modelToEdit.file'>{{ 'PUBLISH.CHAPTER.ADD_FILE' | translate}}</label>
-            <label for="file" ng-if='modelToEdit.file'>{{ 'PUBLISH.CHAPTER.REPLACE_FILE' | translate}}</label>
+            <label for="file" ng-if='!modelToEdit.file'>{{ 'PUBLISH.EDITOR.ADD_FILE' | translate}}</label>
+            <label for="file" ng-if='modelToEdit.file'>{{ 'PUBLISH.EDITOR.REPLACE_FILE' | translate}}</label>
             <input type="file" class="btn btn-default" ngf-select ng-model="file" name="file"
             ngf-max-size="20MB"
             ngf-model-invalid="errorFile">
-            <i ng-show="myForm.file.$error.maxSize && errorFile">{{ 'PUBLISH.CHAPTER.LARGE_FILE_ERROR' | translate}} {{errorFile.size / 1000000|number:2}}MB: max 20MB</i>
+            <i ng-show="myForm.file.$error.maxSize && errorFile">{{ 'PUBLISH.EDITOR.LARGE_FILE_ERROR' | translate}} {{errorFile.size / 1000000|number:2}}MB: max 20MB</i>
             <div ng-if="myForm.file.$valid && file">
               <img style="width:100%" ngf-thumbnail="file" class="thumb">
               <audio style="width:100%" controls ngf-src="file"></audio>
@@ -110,7 +110,7 @@
         </div>
         <div class="col-sm-8">
           <div class="form-group" ng-if="!modelToEdit.type">
-            <label for="desc">{{ 'PUBLISH.CHAPTER.FORM_DESCRIPTION' | translate}}</label>
+            <label for="desc">{{ 'PUBLISH.EDITOR.FORM_DESCRIPTION' | translate}}</label>
             <textarea ui-tinymce="tinymceOptions" class="form-control" name="desc" rows="5" ng-model="modelToEdit.description"></textarea>
           </div>
         </div>
@@ -120,10 +120,10 @@
 
    <div class="multirange-container" ng-swipe-disable-mouse>
      <div class="pull-left" style="margin-bottom: 5px">
-       <button uib-popover="{{!beginCut.isInArray?'PUBLISH.CHAPTER.ADD_BEGIN':'PUBLISH.CHAPTER.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" uib-btn-checkbox>
+       <button uib-popover="{{!beginCut.isInArray?'PUBLISH.EDITOR.ADD_BEGIN':'PUBLISH.EDITOR.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-out"></i>
        </button>
-       <button uib-popover="{{!endCut.isInArray?'PUBLISH.CHAPTER.ADD_END':'PUBLISH.CHAPTER.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" uib-btn-checkbox>
+       <button uib-popover="{{!endCut.isInArray?'PUBLISH.EDITOR.ADD_END':'PUBLISH.EDITOR.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-in"></i>
        </button>
      </div>

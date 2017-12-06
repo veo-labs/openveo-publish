@@ -5,7 +5,7 @@
   /**
    * Defines the categories controller for the categories page.
    */
-  function ChapterController(
+  function EditorController(
           $window,
           $scope,
           $filter,
@@ -56,7 +56,7 @@
       };
     }
 
-    var myPlayer = document.getElementById('chapterPlayer');
+    var myPlayer = document.getElementById('editorPlayer');
     var playerController;
 
     /**
@@ -170,12 +170,12 @@
 
       // emit alert
       if (uploadAborted) {
-        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.EDITOR.UPLOAD_CANCELED'), 4000);
         uploadAborted = false;
       } else if (fileError) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_TAG_ERROR', null, fileError));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_TAG_ERROR', null, fileError));
       } else {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       }
@@ -275,7 +275,7 @@
         $scope.endCut.range.value <= $scope.beginCut.range.value) {
         // Reset end
         $scope.endCut.range.value = 1;
-        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.DELETE_END_CUT'), 8000);
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.EDITOR.DELETE_END_CUT'), 8000);
         toggleEnd(false);
 
         // the watch for endCut.isInArray will save everything
@@ -293,7 +293,7 @@
         updateRange();
         $scope.isCollapsed = true;
       }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       });
@@ -574,7 +574,7 @@
         }
         updateRange();
       }).catch(function(error) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
       });
     };
 
@@ -662,8 +662,8 @@
     $scope.editTime = 0;
   }
 
-  app.controller('ChapterController', ChapterController);
-  ChapterController.$inject = [
+  app.controller('EditorController', EditorController);
+  EditorController.$inject = [
     '$window',
     '$scope',
     '$filter',

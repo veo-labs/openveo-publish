@@ -8,10 +8,10 @@ var BackEndPage = e2e.pages.BackEndPage;
 var browserExt = e2e.browser;
 
 /**
- * Creates a new ChapterPage representing the chapters back end page of a media.
+ * Creates a new EditorPage representing the chapters back end page of a media.
  */
-function ChapterPage(mediaId) {
-  ChapterPage.super_.call(this);
+function EditorPage(mediaId) {
+  EditorPage.super_.call(this);
 
   // Id of the media to test
   this.mediaId = mediaId;
@@ -20,10 +20,10 @@ function ChapterPage(mediaId) {
   this.path = 'be/publish/media/' + this.mediaId;
 
   // Element finders specific to this page
-  this.pageDescriptionElement = element(by.binding('PUBLISH.CHAPTER.INFO'));
+  this.pageDescriptionElement = element(by.binding('PUBLISH.EDITOR.INFO'));
   this.backButtonElement = element(by.binding('CORE.UI.BACK'));
-  this.timeHeaderElement = element(by.binding('PUBLISH.CHAPTER.HEAD_TIME'));
-  this.titleHeaderElement = element(by.binding('PUBLISH.CHAPTER.HEAD_TITLE'));
+  this.timeHeaderElement = element(by.binding('PUBLISH.EDITOR.HEAD_TIME'));
+  this.titleHeaderElement = element(by.binding('PUBLISH.EDITOR.HEAD_TITLE'));
   this.newButtonElement = element(by.binding('CORE.UI.FORM_NEW'));
   this.editButtonElement = element(by.binding('CORE.UI.FORM_EDIT'));
   this.removeButtonElement = element(by.css('.media-viewer')).element(by.binding('CORE.UI.REMOVE'));
@@ -39,15 +39,15 @@ function ChapterPage(mediaId) {
   this.timeBarLabelElements = this.timeBarElement.all(by.css('ov-multirange-labels span'));
 }
 
-module.exports = ChapterPage;
-util.inherits(ChapterPage, BackEndPage);
+module.exports = EditorPage;
+util.inherits(EditorPage, BackEndPage);
 
 /**
  * Checks if the page is loaded.
  *
  * @return {Promise} Promise resolving when page is fully loaded
  */
-ChapterPage.prototype.onLoaded = function() {
+EditorPage.prototype.onLoaded = function() {
   return browser.wait(this.EC.presenceOf(this.pageDescriptionElement), 5000, 'Missing chapters page description');
 };
 
@@ -125,26 +125,26 @@ function moveTimeBarElement(index, percent) {
  * @param {ElementFinder} Search engine element
  * @return {Object} The list of fields
  */
-ChapterPage.prototype.getAddFormFields = function(form) {
+EditorPage.prototype.getAddFormFields = function(form) {
   var fields = {};
 
   // Time field
   fields.time = new OvpTimeField({
-    name: this.translations.PUBLISH.CHAPTER.FORM_TIME,
+    name: this.translations.PUBLISH.EDITOR.FORM_TIME,
     baseElement: form
   });
 
   // Title field
   fields.title = Field.get({
     type: 'text',
-    name: this.translations.PUBLISH.CHAPTER.FORM_TITLE,
+    name: this.translations.PUBLISH.EDITOR.FORM_TITLE,
     baseElement: form
   });
 
   // Description field
   fields.description = Field.get({
     type: 'tinymce',
-    name: this.translations.PUBLISH.CHAPTER.FORM_DESCRIPTION,
+    name: this.translations.PUBLISH.EDITOR.FORM_DESCRIPTION,
     baseElement: form
   });
 
@@ -158,7 +158,7 @@ ChapterPage.prototype.getAddFormFields = function(form) {
  * @param {String} [type="chapter"] Line type
  * @return {Object} The list of fields
  */
-ChapterPage.prototype.getEditFormFields = function(form, type) {
+EditorPage.prototype.getEditFormFields = function(form, type) {
   var fields = this.getAddFormFields(form);
 
   if (type === 'cut')
@@ -174,7 +174,7 @@ ChapterPage.prototype.getEditFormFields = function(form, type) {
  * @param {Boolean} [cancel] Boolean indicating if chapter must be saved or cancelled, true to cancel
  * @return {Promise} Promise resolving when chapter is added
  */
-ChapterPage.prototype.addChapter = function(data, cancel) {
+EditorPage.prototype.addChapter = function(data, cancel) {
   var self = this;
 
   // Open add form
@@ -201,7 +201,7 @@ ChapterPage.prototype.addChapter = function(data, cancel) {
  * @param {Field} field Field corresponding to cut's title
  * @return {Promise} Promise resolving with the cut's title
  */
-ChapterPage.prototype.getCutTitle = function(field) {
+EditorPage.prototype.getCutTitle = function(field) {
   return field.getElement().then(function(fieldElement) {
     var titleElement = fieldElement.element(by.css('input')).all(by.xpath('preceding-sibling::div')).get(0);
     return titleElement.getText();
@@ -217,7 +217,7 @@ ChapterPage.prototype.getCutTitle = function(field) {
  * or the line element (tr element)
  * @param {String} value Value to look for in each column
  */
-ChapterPage.prototype.isLine = function(finder, value) {
+EditorPage.prototype.isLine = function(finder, value) {
   var deferred = protractor.promise.defer();
 
   this.getLine(finder).then(function(line) {
@@ -242,7 +242,7 @@ ChapterPage.prototype.isLine = function(finder, value) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving with the line (tr element)
  */
-ChapterPage.prototype.getLine = function(finder) {
+EditorPage.prototype.getLine = function(finder) {
   var self = this;
 
   if (typeof finder !== 'string')
@@ -272,7 +272,7 @@ ChapterPage.prototype.getLine = function(finder) {
  * @param {String} [type="chapter"] The line type
  * @return {Promise} Promise resolving with the line details
  */
-ChapterPage.prototype.getLineDetails = function(finder, type) {
+EditorPage.prototype.getLineDetails = function(finder, type) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -295,7 +295,7 @@ ChapterPage.prototype.getLineDetails = function(finder, type) {
  * @param {String} [type="chapter"] The line type
  * @return {Promise} Promise resolving with the line field values
  */
-ChapterPage.prototype.getLineFieldValues = function(finder, type) {
+EditorPage.prototype.getLineFieldValues = function(finder, type) {
   var self = this;
   var fieldValues = {};
 
@@ -347,7 +347,7 @@ ChapterPage.prototype.getLineFieldValues = function(finder, type) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving with all cell values
  */
-ChapterPage.prototype.getCellValues = function(finder) {
+EditorPage.prototype.getCellValues = function(finder) {
   var deferred = protractor.promise.defer();
   var values = [];
 
@@ -372,7 +372,7 @@ ChapterPage.prototype.getCellValues = function(finder) {
  * @param {String} name The title of the header to look for
  * @return {Promise} Promise resolving with the index of the header
  */
-ChapterPage.prototype.getTableHeaderIndex = function(name) {
+EditorPage.prototype.getTableHeaderIndex = function(name) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -405,7 +405,7 @@ ChapterPage.prototype.getTableHeaderIndex = function(name) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving when the line is selected
  */
-ChapterPage.prototype.selectLine = function(finder) {
+EditorPage.prototype.selectLine = function(finder) {
   var line;
 
   return this.getLine(finder).then(function(foundLine) {
@@ -430,7 +430,7 @@ ChapterPage.prototype.selectLine = function(finder) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving when the line is unselected
  */
-ChapterPage.prototype.unselectLine = function(finder) {
+EditorPage.prototype.unselectLine = function(finder) {
   var line;
 
   return this.getLine(finder).then(function(foundLine) {
@@ -453,7 +453,7 @@ ChapterPage.prototype.unselectLine = function(finder) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving when the line is checked
  */
-ChapterPage.prototype.checkLine = function(finder) {
+EditorPage.prototype.checkLine = function(finder) {
   var checkbox;
 
   return this.getLine(finder).then(function(foundLine) {
@@ -480,7 +480,7 @@ ChapterPage.prototype.checkLine = function(finder) {
  * or the line element (tr element)
  * @return {Promise} Promise resolving when the line is unchecked
  */
-ChapterPage.prototype.unCheckLine = function(finder) {
+EditorPage.prototype.unCheckLine = function(finder) {
   var checkbox;
 
   return this.getLine(finder).then(function(foundLine) {
@@ -505,7 +505,7 @@ ChapterPage.prototype.unCheckLine = function(finder) {
  * or the chapter element (tr element)
  * @return {Promise} Promise resolving when the chapter has been removed
  */
-ChapterPage.prototype.removeChapter = function(chapterFinder) {
+EditorPage.prototype.removeChapter = function(chapterFinder) {
   var self = this;
 
   return this.getLine(chapterFinder).then(function(chapter) {
@@ -525,7 +525,7 @@ ChapterPage.prototype.removeChapter = function(chapterFinder) {
  * @param {String} name The name of the chapter (each column will be compared to this value)
  * @return {Promise} Promise resolving with a boolean indicating if chapter is on the time bar or not
  */
-ChapterPage.prototype.isChapterOnTimeBar = function(name) {
+EditorPage.prototype.isChapterOnTimeBar = function(name) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -551,7 +551,7 @@ ChapterPage.prototype.isChapterOnTimeBar = function(name) {
  * @param {Boolean} isBeginCut true to search for the begin cut, false to search for the end cut
  * @return {Promise} Promise resolving with a boolean indicating if chapter is on the time bar or not
  */
-ChapterPage.prototype.isCutOnTimeBar = function(isBeginCut) {
+EditorPage.prototype.isCutOnTimeBar = function(isBeginCut) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -577,7 +577,7 @@ ChapterPage.prototype.isCutOnTimeBar = function(isBeginCut) {
  * @param {Boolean} [cancel] Boolean indicating if chapter must be saved or cancelled, true to cancel
  * @return {Promise} Promise resolving when chapter is saved
  */
-ChapterPage.prototype.editChapter = function(name, data, cancel) {
+EditorPage.prototype.editChapter = function(name, data, cancel) {
   var self = this;
 
   // Get chapter
@@ -619,7 +619,7 @@ ChapterPage.prototype.editChapter = function(name, data, cancel) {
  * @param {Boolean} [cancel=false] true to cancel edition, false to save the cut
  * @return {Promise} Promise resolving when cut is saved
  */
-ChapterPage.prototype.editCut = function(time, isBeginCut, cancel) {
+EditorPage.prototype.editCut = function(time, isBeginCut, cancel) {
   var self = this;
   var cutTitle = isBeginCut ? this.translations.CORE.UI.BEGIN : this.translations.CORE.UI.END;
 
@@ -655,7 +655,7 @@ ChapterPage.prototype.editCut = function(time, isBeginCut, cancel) {
  * @param {String} name Name of the chapter
  * @return {Promise} Promise resolving when mouse is over the chapter
  */
-ChapterPage.prototype.setMouseOverChapterOnTimeBar = function(name) {
+EditorPage.prototype.setMouseOverChapterOnTimeBar = function(name) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -691,7 +691,7 @@ ChapterPage.prototype.setMouseOverChapterOnTimeBar = function(name) {
  * @param {Boolean} isBeginCut true to move mouse over the begin cut, false to move mouse over the end cut
  * @return {Promise} Promise resolving when mouse is over the cut
  */
-ChapterPage.prototype.setMouseOverCutOnTimeBar = function(isBeginCut) {
+EditorPage.prototype.setMouseOverCutOnTimeBar = function(isBeginCut) {
   var self = this;
 
   return browser.waitForAngular().then(function() {
@@ -723,7 +723,7 @@ ChapterPage.prototype.setMouseOverCutOnTimeBar = function(isBeginCut) {
  * button
  * @return {Promise} Promise resolving when mouse is over the cut button
  */
-ChapterPage.prototype.setMouseOverCutButton = function(isBeginCut) {
+EditorPage.prototype.setMouseOverCutButton = function(isBeginCut) {
   var cutButton = isBeginCut ? this.beginCutButtonElement : this.endCutButtonElement;
   return browser.actions().mouseMove(cutButton).perform();
 };
@@ -738,7 +738,7 @@ ChapterPage.prototype.setMouseOverCutButton = function(isBeginCut) {
  * @param {Number} percent New chapter position in percent
  * @return {Promise} Promise resolving when chapter has been moved
  */
-ChapterPage.prototype.moveChapter = function(name, percent) {
+EditorPage.prototype.moveChapter = function(name, percent) {
   var self = this;
 
   return this.setMouseOverChapterOnTimeBar(name).then(function() {
@@ -769,7 +769,7 @@ ChapterPage.prototype.moveChapter = function(name, percent) {
  * @param {Boolean} isBeginCut true to set begin cut, false to set end cut
  * @return {Promise} Promise resolving when cut has been added
  */
-ChapterPage.prototype.addCut = function(percent, isBeginCut) {
+EditorPage.prototype.addCut = function(percent, isBeginCut) {
   var self = this;
   var cutButtonElement = isBeginCut ? this.beginCutButtonElement : this.endCutButtonElement;
 
@@ -803,7 +803,7 @@ ChapterPage.prototype.addCut = function(percent, isBeginCut) {
  * @param {Boolean} isBeginCut true to remove begin cut, false to remove end cut
  * @return {Promise} Promise resolving when cut has been removed
  */
-ChapterPage.prototype.removeCut = function(isBeginCut) {
+EditorPage.prototype.removeCut = function(isBeginCut) {
   var cutButtonElement = isBeginCut ? this.beginCutButtonElement : this.endCutButtonElement;
 
   return cutButtonElement.element(by.xpath('..')).getAttribute('class').then(function(classes) {
@@ -821,7 +821,7 @@ ChapterPage.prototype.removeCut = function(isBeginCut) {
  * @param {Boolean} isIn true to zoom in, false to zoom out
  * @return {Promise} Promise resolving when zoom is made
  */
-ChapterPage.prototype.zoom = function(isIn) {
+EditorPage.prototype.zoom = function(isIn) {
   var zoomButtonElement = isIn ? this.zoomInButtonElement : this.zoomOutButtonElement;
   return browserExt.click(zoomButtonElement);
 };
