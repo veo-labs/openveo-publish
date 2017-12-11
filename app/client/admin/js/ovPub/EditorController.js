@@ -93,7 +93,7 @@
           playerController = angular.element(myPlayer).controller('ovPlayer');
 
           // Set Duration
-          $scope.duration = duration / 1000;
+          $scope.duration = duration;
           init();
         }
       });
@@ -540,7 +540,7 @@
       } else {
         value = $scope.selectRow.value;
       }
-      playerController.setTime(parseInt(value * $scope.duration) * 1000);
+      playerController.setTime(parseInt(value * $scope.duration));
 
       // we only save the chnage if the time of the selected row has changed
       if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
@@ -590,13 +590,13 @@
     var changebyRange = true;
     $scope.updateTime = function() {
       if (changebyRange) {
-        $scope.editTime = parseInt($scope.modelToEdit.value * $scope.duration * 1000);
+        $scope.editTime = parseInt($scope.modelToEdit.value * $scope.duration);
       } else
         changebyRange = true;
     };
     $scope.updateRange = function() {
       if ($scope.myForm.time.$valid) {
-        $scope.modelToEdit.value = $scope.editTime / ($scope.duration * 1000);
+        $scope.modelToEdit.value = $scope.editTime / $scope.duration;
       }
     };
     $scope.$watch('modelToEdit.value', function() {

@@ -64,7 +64,7 @@
         <div class="col-sm-4">
           <div class="form-group" ng-class="{ 'has-error': myForm.time.$invalid }">
             <label class="control-label" for="time">{{ 'PUBLISH.EDITOR.FORM_TIME' | translate}}</label>
-            <ovp-time ng-change="updateRange()" ng-model="editTime" name="time" milliseconds-max="{{ duration * 1000 }}"></ovp-time>
+            <ovp-time ng-change="updateRange()" ng-model="editTime" name="time" milliseconds-max="{{ duration }}"></ovp-time>
           </div>
           <div class="form-group">
             <label for="title">{{ 'PUBLISH.EDITOR.FORM_TITLE' | translate}}*</label>
