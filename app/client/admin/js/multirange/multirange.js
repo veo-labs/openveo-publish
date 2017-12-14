@@ -376,7 +376,7 @@ angular.module('ov.utils', [])
           return d.getTime() / dayConst;
         },
         fromValueToTime: function(value, dayConst) {
-          var d = new Date(dayConst * value);
+          var d = new Date(Math.round(dayConst * value));
           return {
             hours: d.getUTCHours() + ((d.getUTCDate() - 1) * 24),
             minutes: d.getUTCMinutes(),
