@@ -24,8 +24,10 @@
      * Reconstructs ranges with chapters and cut array.
      */
     function updateRange() {
-      $scope.ranges = ($scope.media[$scope.selectedData.value] ? $scope.media[$scope.selectedData.value] : [])
-              .concat(($scope.media.cut ? $scope.media.cut : []));
+      $scope.ranges = ($scope.media[$scope.selectedData.value] || []).concat($scope.media.cut || []);
+      $scope.ranges.forEach(function(range) {
+        range.value = parseInt(range.value);
+      });
 
       orderBy($scope.ranges, '+value', false);
     }
@@ -48,6 +50,10 @@
       // If no cut add it
       if (!$scope.media.tags) {
         $scope.media.tags = [];
+      }
+
+      if (null === $scope.endCut.range.value) {
+        $scope.endCut.range.value = $scope.duration;
       }
 
       $scope.slider = {
@@ -274,7 +280,7 @@
       if ($scope.endCut.isInArray && $scope.beginCut.isInArray &&
         $scope.endCut.range.value <= $scope.beginCut.range.value) {
         // Reset end
-        $scope.endCut.range.value = 1;
+        $scope.endCut.range.value = $scope.duration;
         $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.EDITOR.DELETE_END_CUT'), 8000);
         toggleEnd(false);
 
@@ -336,9 +342,6 @@
 
     // Init object for player
     $scope.mediaPlayer = angular.copy($scope.media);
-    delete $scope.mediaPlayer.chapters;
-    delete $scope.mediaPlayer.tags;
-    delete $scope.mediaPlayer.cut;
 
     // Set player language
     $scope.playerLanguage = i18nService.getLanguage();
@@ -356,7 +359,7 @@
     $scope.endCut = {
       isInArray: undefined,
       range: {
-        value: 1,
+        value: null,
         name: 'CORE.UI.END',
         description: '',
         type: 'end'
@@ -540,7 +543,7 @@
       } else {
         value = $scope.selectRow.value;
       }
-      playerController.setTime(parseInt(value * $scope.duration));
+      playerController.setTime(value);
 
       // we only save the chnage if the time of the selected row has changed
       if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
@@ -590,13 +593,13 @@
     var changebyRange = true;
     $scope.updateTime = function() {
       if (changebyRange) {
-        $scope.editTime = parseInt($scope.modelToEdit.value * $scope.duration);
+        $scope.editTime = $scope.modelToEdit.value;
       } else
         changebyRange = true;
     };
     $scope.updateRange = function() {
       if ($scope.myForm.time.$valid) {
-        $scope.modelToEdit.value = $scope.editTime / $scope.duration;
+        $scope.modelToEdit.value = $scope.editTime;
       }
     };
     $scope.$watch('modelToEdit.value', function() {

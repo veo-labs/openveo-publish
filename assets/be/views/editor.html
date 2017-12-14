@@ -11,6 +11,9 @@
          ov-player-type="{{playerType}}"
          ov-data="mediaPlayer"
          ov-language="{{playerLanguage}}"
+         ov-hide-chapters-tab="true"
+         ov-hide-tags-tab="true"
+         ov-disable-cut="true"
          id="editorPlayer"
          ></ov-player>
     </div>
@@ -30,7 +33,7 @@
         <tbody>
           <tr ng-repeat="row in ranges| orderBy:'+value'" ng-dblclick="selectAndOpen(row)" ng-click="select(row)" ng-class="{'selected':row.select}" class="{{row.type?row.type:''}}">
             <td class="col-sm-3">
-            {{ duration ? (Math.floor(row.value * duration * 1000) | millisecondsToTime):'--:--:--' }}</td>
+            {{ row.value | millisecondsToTime }}</td>
             <td class="col-sm-8 chapter-title ">
               <span ng-bind="row.name | translate"></span>
             </td>
@@ -135,7 +138,7 @@
        <button class="btn btn-default" ng-disabled="slider.view == 0" ng-click="changeSliderView($event, -1)">
          <i class="glyphicon glyphicon-zoom-out"></i> </button>
      </div>
-     <ov-multirange class="row" ng-model="ranges" on-select="select" on-mouserelease="releaseRange" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></ov-multirange>
+     <ov-multirange class="row" duration="duration" ng-model="ranges" on-select="select" on-mouserelease="releaseRange" on-enableMouseOver="isCollapsed" views="slider.views" view="slider.view"></ov-multirange>
    </div>
 </div>
 <script>

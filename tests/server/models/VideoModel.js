@@ -536,6 +536,57 @@ describe('VideoModel', function() {
     });
   });
 
+  // conversion detection
+  describe('needPointsOfInterestUnitConversion', function() {
+
+    it('should mark video if points of interest conversion is needed', function() {
+      var videosIds = [50, 51, 52];
+
+      TestVideoProvider.prototype.getOne = function(id, filter, callback) {
+        var videos = {
+          50: {chapters: [{value: 0.5}, {value: 0}]},
+          51: {tags: [{value: 1}, {value: 0.5}]},
+          52: {cut: [{value: 0.25}]}
+        };
+        var video = videos[id];
+
+        video.metadata = {user: anonymousUserId};
+
+        callback(null, video);
+      };
+
+      videosIds.forEach(function(id) {
+        videoModel.getOne(id, {}, function(error, video) {
+          assert.isTrue(video.needPointsOfInterestUnitConversion);
+        });
+      });
+    });
+
+    it('shouldn\'t mark video if no conversion is needed', function() {
+      var videosIds = [60, 61, 62, 63];
+
+      TestVideoProvider.prototype.getOne = function(id, filter, callback) {
+        var videos = {
+          60: {},
+          61: {cut: [{value: 600000}, {value: 0}]},
+          62: {chapters: [{value: 300000}, {value: 1}]},
+          63: {tags: [{value: 1000}]}
+        };
+        var video = videos[id];
+
+        video.metadata = {user: anonymousUserId};
+
+        callback(null, video);
+      };
+
+      videosIds.forEach(function(id) {
+        videoModel.getOne(id, {}, function(error, video) {
+          assert.isNotTrue(video.needPointsOfInterestUnitConversion);
+        });
+      });
+    });
+  });
+
   // update method
   describe('update', function() {
 

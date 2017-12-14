@@ -37,6 +37,10 @@
         ngModelCtrl.$formatters.push($filter('millisecondsToTime'));
 
         ngModelCtrl.$render = function() {
+          if (undefined === ngModelCtrl.$viewValue) {
+            return;
+          }
+
           var matches = ngModelCtrl.$viewValue.match(/^([0-9]{2}):([0-5][0-9]):([0-5][0-9])$/);
 
           if (null === matches) {

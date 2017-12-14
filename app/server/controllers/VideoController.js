@@ -783,3 +783,65 @@ VideoController.prototype.removeTagsAction = function(request, response, next) {
       response.send(deletedTag);
   });
 };
+
+/**
+ * Convert points of interest (chapters, tags & cut) units
+ * from percents to milliseconds (depending on the video
+ * duration).
+ *
+ * @method updatePoiAction
+ * @return {VideoModel} The updated VideoModel instance
+ */
+VideoController.prototype.updatePoiAction = function(request, response, next) {
+  var params;
+
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.params, {
+      id: {type: 'string', required: true}
+    });
+  } catch (error) {
+    return next(HTTP_ERRORS.GET_VIDEO_READY_MISSING_PARAMETERS);
+  }
+
+  var model = this.getModel(request);
+  var duration = request.body.duration;
+
+  model.getOneReady(params.id, function(error, video) {
+    if (error && error instanceof AccessError)
+      next(HTTP_ERRORS.GET_VIDEO_READY_FORBIDDEN);
+    else if (error || (video.state === STATES.READY && !request.isAuthenticated()))
+      next(HTTP_ERRORS.GET_VIDEO_READY_ERROR);
+    else if (video.needPointsOfInterestUnitConversion === true) {
+      var properties = ['chapters', 'tags', 'cut'];
+
+      for (var i = 0; i < properties.length; i++) {
+        if (Array.isArray(video[properties[i]])) {
+          video[properties[i]].forEach(function(pointOfInterest) {
+            pointOfInterest.value = Math.floor(pointOfInterest.value * duration);
+          });
+        } else {
+          video[properties[i]] = [];
+        }
+      }
+
+      delete video.needPointsOfInterestUnitConversion;
+
+      model.update(params.id,
+        {
+          chapters: video.chapters,
+          cut: video.cut,
+          tags: video.tags
+        },
+        function(error, updateCount) {
+          if (error) {
+            next(HTTP_ERRORS.CONVERT_VIDEO_POI_ERROR);
+          } else {
+            response.send({
+              entity: video
+            });
+          }
+        }
+      );
+    }
+  });
+};

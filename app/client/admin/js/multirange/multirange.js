@@ -8,19 +8,35 @@ angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
         ngModel: '=',
         _views: '=views',
         _view: '=view',
+        duration: '=duration',
         onSelect: '=',
         onMouserelease: '=',
         onEnablemouseover: '='
       },
       template:
         '<div class="ov-multirange-mk2-container">' +
-        '<ov-multirange-labels render="renderedStyle" on-enablemouseover="onEnablemouseover" ' +
-        'on-select="onSelect" ng-model="ngModel"></ov-multirange-labels>' +
-        '<ov-multirange-lite ng-model="ngModel" on-select="onSelect" on-enablemouseover="onEnablemouseover" ' +
-        'on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step"></ov-multirange-lite>' +
+        '<ov-multirange-labels render="renderedStyle" duration="duration" on-enablemouseover="onEnablemouseover" ' +
+        'on-select="onSelect" ng-model="ranges"></ov-multirange-labels>' +
+        '<ov-multirange-lite ng-model="ranges" duration="duration" on-enablemouseover="onEnablemouseover" ' +
+        'on-select="onSelect" on-mouserelease="onMouserelease" ng-style="renderedStyle.multirange" step="step">' +
+        '</ov-multirange-lite>' +
         '<ov-multirange-hairlines render="renderedStyle" ng-model="units"></ov-multirange-hairlines>' +
         '</div>',
       link: function(scope) {
+        scope.ranges = [];
+
+        /**
+         * Update ranges if the duration is setted
+         */
+        function updateRanges() {
+          if (scope.duration !== undefined) {
+            scope.ranges = scope.ngModel;
+          }
+        }
+
+        scope.$watch('duration', updateRanges);
+        scope.$watch('ngModel', updateRanges);
+
         scope.getPercent = function(value) {
           return (value * 100) + '%';
         };
@@ -91,6 +107,7 @@ angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
       scope: {
         ngModel: '=',
         render: '=',
+        duration: '=',
         onSelect: '=',
         onEnablemouseover: '='
       },
@@ -112,7 +129,7 @@ angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
       link: function(scope) {
         scope.renderRange = function(range) {
           return {
-            left: (range.value * 100) + '%',
+            left: (range.value / scope.duration) * 100 + '%',
             zIndex: range._depth
           };
         };
@@ -271,6 +288,7 @@ angular.module('ov.multirange.lite', [])
       scope: {
         ngModel: '=',
         step: '=',
+        duration: '=',
         onSelect: '=',
         onMouserelease: '=',
         onEnablemouseover: '='
@@ -281,14 +299,14 @@ angular.module('ov.multirange.lite', [])
         '<div class="ov-multirange-wrapper" ng-repeat="range in ngModel" ng-style="computeDepth(range)" ' +
         'ng-mouseup="mouserelease(onMouserelease, range)" ' +
         'ng-mouseover="mouseover(range, onSelect, onEnablemouseover)" >' +
-        '<ov-range class="ov-multirange" ng-class="{\'active\':range.select}" position="range.value" min="0" ' +
-        'max="{{ precision }}" step="{{ preciseStep }}">' +
+        '<ov-range class="ov-multirange" duration="duration" ng-class="{\'active\':range.select}" ' +
+        'position="range.value" min="0" max="{{ duration }}" step="{{ preciseStep }}">' +
         '</div>' +
         '</div>',
       link: function(scope, elem) {
         var mousex;
-        scope.precision = 1000000;
-        scope.preciseStep = 1;
+        scope.precision = scope.duration;
+        scope.preciseStep = 1000;
         scope.onMouseMove = function(evt, condition) {
           if (condition) {
             var bound = elem[0].getBoundingClientRect();
@@ -303,62 +321,33 @@ angular.module('ov.multirange.lite', [])
             select(range);
         };
         scope.computeDepth = function(range) {
-          range._depth = 100 - Math.round(Math.abs(mousex - range.value) * 100);
+          range._depth = 100 - Math.round(Math.abs(mousex - range.value / scope.duration) * 100);
           return {
             zIndex: range._depth
           };
         };
-        scope.$watch('step', function() {
-          if (typeof scope.step == 'undefined') {
-            scope.preciseStep = 1;
-          } else {
-            scope.preciseStep = scope.step * scope.precision;
-          }
-        });
       }
     };
   })
   .directive('ovRange', function() {
     return {
-      template: '<input type="range" ng-model="rdh.mulValue">',
+      template: '<input type="range" ng-model="position">',
+      require: ['?ngModel'],
       restrict: 'E',
       replace: true,
       scope: {
         position: '='
       },
-      link: function(scope, elem, attr) {
+      link: function(scope, elem, attr, controllers) {
+        var ngModelCtrl = controllers[0];
+
+        ngModelCtrl.$parsers.push(function(n) {
+          return parseInt(n);
+        });
+
         elem.bind('click', function(event) {
           event.preventDefault();
           event.stopPropagation();
-        });
-
-        /**
-         * TODO
-         * Defines getter and setter on range data object.
-         * @param {Number} value
-         * @param {Number} multiplier
-         */
-        function RangeDataHelper(value, multiplier) {
-          this.value = isNaN(value) ? 0 : value;
-          this.multiplier = multiplier;
-          Object.defineProperty(this, 'mulValue', {
-            get: function() {
-              return String(parseFloat(this.value) * this.multiplier);
-            },
-            set: function(n) {
-              this.value = Math.ceil(n) / this.multiplier;
-              if (this.value + attr.step / attr.max >= 1) this.value = 1;
-              scope.position = this.value;
-            }
-          });
-        }
-        scope.$watch('position', function(n) {
-          if (typeof scope.rdh == 'undefined') {
-            scope.rdh = new RangeDataHelper(n, Math.ceil(attr.max) || 100);
-          } else {
-            // scope.rdh.multiplier = parseInt(attr.max) || 100;
-            scope.rdh.value = n;
-          }
         });
       }
     };

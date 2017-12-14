@@ -810,6 +810,50 @@ VideoModel.prototype.getOne = function(id, filter, callback) {
       });
     },
 
+    // Add flag to the video if the points of interest units need
+    // to be converted from percent to milliseconds.
+    function(callback) {
+
+      if (videoInfo === undefined) {
+        return callback();
+      }
+
+      var last;
+
+      // Order points of interest by (time) value
+      // instead of creation order
+      var ordering = function(a, b) {
+        switch (true) {
+          case a.value < b.value:
+            return -1;
+
+          case a.value > b.value:
+            return 1;
+
+          default:
+            return 0;
+        }
+      };
+
+      var pointsOfInterest = [videoInfo.chapters, videoInfo.tags, videoInfo.cut];
+      var poi;
+      for (var i = 0; i < pointsOfInterest.length; i++) {
+        poi = pointsOfInterest[i];
+
+        if (!poi || poi.length === 0) {
+          continue;
+        }
+
+        poi.sort(ordering);
+        last = poi[poi.length - 1];
+
+        videoInfo.needPointsOfInterestUnitConversion = last.value <= 1;
+        break;
+      }
+
+      return callback();
+    },
+
     // Retrieve video information from video platform
     function(callback) {
       if (videoInfo && videoInfo.type && videoInfo.mediaId) {

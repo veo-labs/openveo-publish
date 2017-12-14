@@ -107,16 +107,16 @@ function getTimeBarElements() {
  * Moves an element on the time bar.
  *
  * @param {Number} index The index of the element in the list of time bar elements
- * @param {Number} percent New element position in percent
+ * @param {Number} position New element position
  * @return {Promise} Promise resolving with the list of elements in the time bar
  */
-function moveTimeBarElement(index, percent) {
+function moveTimeBarElement(index, position) {
   return browser.executeScript('var scope = angular.element(arguments[0]).scope(); ' +
                                'scope.ranges[arguments[1]].value = arguments[2]; ' +
                                'scope.updateTime(); ' +
                                'scope.releaseRange(scope.ranges[arguments[1]]); ' +
                                'scope.$apply();',
-                               this.timeBarElement.getWebElement(), index, percent);
+                               this.timeBarElement.getWebElement(), index, position);
 }
 
 /**
@@ -735,10 +735,10 @@ EditorPage.prototype.setMouseOverCutButton = function(isBeginCut) {
  * by JavaScript.
  *
  * @param {String} name Name of the chapter to move
- * @param {Number} percent New chapter position in percent
+ * @param {Number} position New chapter position
  * @return {Promise} Promise resolving when chapter has been moved
  */
-EditorPage.prototype.moveChapter = function(name, percent) {
+EditorPage.prototype.moveChapter = function(name, position) {
   var self = this;
 
   return this.setMouseOverChapterOnTimeBar(name).then(function() {
@@ -757,7 +757,7 @@ EditorPage.prototype.moveChapter = function(name, percent) {
     }
 
     // Move chapter
-    return moveTimeBarElement.call(self, chapterIndex, percent);
+    return moveTimeBarElement.call(self, chapterIndex, position);
   });
 
 };
@@ -765,11 +765,11 @@ EditorPage.prototype.moveChapter = function(name, percent) {
 /**
  * Adds cut.
  *
- * @param {Number} percent Cut begin position in percent
+ * @param {Number} position Cut begin position
  * @param {Boolean} isBeginCut true to set begin cut, false to set end cut
  * @return {Promise} Promise resolving when cut has been added
  */
-EditorPage.prototype.addCut = function(percent, isBeginCut) {
+EditorPage.prototype.addCut = function(position, isBeginCut) {
   var self = this;
   var cutButtonElement = isBeginCut ? this.beginCutButtonElement : this.endCutButtonElement;
 
@@ -792,7 +792,7 @@ EditorPage.prototype.addCut = function(percent, isBeginCut) {
     }
 
     // Move begin cut
-    return moveTimeBarElement.call(self, index, percent);
+    return moveTimeBarElement.call(self, index, position);
   });
 
 };

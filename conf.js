@@ -5,7 +5,8 @@ module.exports = {
     routes: {
       public: {
         'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
-        'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
+        'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction',
+        'post /video/:id/updatePoi': 'app/server/controllers/VideoController.updatePoiAction'
       },
       private: {
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',

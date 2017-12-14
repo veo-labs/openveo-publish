@@ -597,4 +597,46 @@ describe('VideoController', function() {
     });
   });
 
+  // updatePoiAction method
+  describe('updatePoiAction', function() {
+    it('should convert points of interest values from percent to milliseconds', function(done) {
+      request.params.id = '42';
+      request.body = {duration: 600000};
+
+      videoModel.getOneReady = function(id, callback) {
+        var video = {
+          chapters: [{value: 0.25}, {value: 0.75}],
+          tags: [{value: 0.2}, {value: 0.4}, {value: 0.6}],
+          cut: [{value: 0}, {value: 1}],
+          needPointsOfInterestUnitConversion: true
+        };
+
+        callback(null, video);
+      };
+
+      videoModel.update = function(id, data, callback) {
+        var expectedData = {
+          chapters: [{value: 150000}, {value: 450000}],
+          cut: [{value: 0}, {value: 600000}],
+          tags: [{value: 120000}, {value: 240000}, {value: 360000}]
+        };
+
+        for (var prop in expectedData) {
+          for (var i in expectedData[prop]) {
+            assert.strictEqual(expectedData[prop][i].value, data[prop][i].value);
+          }
+        }
+
+        callback(null, data);
+      };
+
+      response.send = function(data) {
+        assert.isUndefined(data.needPointsOfInterestUnitConversion);
+        done();
+      };
+
+      videoController.updatePoiAction(request, response);
+    });
+  });
+
 });

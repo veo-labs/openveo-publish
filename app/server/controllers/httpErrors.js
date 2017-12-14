@@ -551,8 +551,20 @@ var HTTP_ERRORS = {
     code: 0x217,
     httpCode: 400,
     module: 'publish'
-  }
+  },
 
+  /**
+   * Convert points of interest error.
+   *
+   * @property CONVERT_VIDEO_POI_ERROR
+   * @type Object
+   * @final
+   */
+  CONVERT_VIDEO_POI_ERROR: {
+    code: 0x218,
+    httpCode: 500,
+    module: 'publish'
+  }
 };
 
 Object.freeze(HTTP_ERRORS);

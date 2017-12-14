@@ -61,25 +61,6 @@ describe('Editor page', function() {
   });
 
   /**
-   * Converts time in format hh:mm:ss to percent time of the media.
-   *
-   * This is relative to mediaFileDuration.
-   *
-   * @param {String} time Time in format hh:mm:ss
-   * @return {Number} The percent of the video corresponding to the given time
-   */
-  function convertTimeToPercent(time) {
-    var fields = time.split(':');
-    var seconds = 0;
-
-    for (var i = 0; i < fields.length; i++) {
-      seconds = seconds * 60 + parseInt(fields[i]);
-    }
-
-    return seconds * 1000 / mediaFileDuration;
-  }
-
-  /**
    * Converts percent of the media into time format hh:mm:ss.
    *
    * This is relative to mediaFileDuration.
@@ -271,7 +252,7 @@ describe('Editor page', function() {
 
     // Edit chapter
     expectedChapter.time = '00:05:05';
-    page.moveChapter(chapterToAdd.title, convertTimeToPercent(expectedChapter.time));
+    page.moveChapter(chapterToAdd.title, 305000);
 
     // Check chapter
     checkChapter(expectedChapter);
@@ -279,13 +260,13 @@ describe('Editor page', function() {
   });
 
   it('should be able to cut the beginning of the media', function() {
-    page.addCut(0.1, true);
+    page.addCut(61000, true);
     assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
     page.removeCut(true);
   });
 
   it('should be able to cut the end of the media', function() {
-    page.addCut(0.8, false);
+    page.addCut(488000, false);
     assert.isFulfilled(page.getLine(page.translations.CORE.UI.END));
     page.removeCut(false);
   });
@@ -293,7 +274,7 @@ describe('Editor page', function() {
   it('should be able to restore begin cut at its last position', function() {
 
     // Add and remove begin cut
-    page.addCut(0.1, true);
+    page.addCut(61000, true);
     page.removeCut(true);
 
     // Add begin cut without moving it
@@ -307,7 +288,7 @@ describe('Editor page', function() {
   it('should be able to restore end cut at its last position', function() {
 
     // Add and remove end cut
-    page.addCut(0.8, false);
+    page.addCut(488000, false);
     page.removeCut(false);
 
     // Add end cut without moving it
@@ -321,7 +302,7 @@ describe('Editor page', function() {
   it('should be able to edit begin cut', function() {
 
     // Add begin cut
-    page.addCut(0.1, true);
+    page.addCut(61000, true);
 
     // Edit cut
     page.editCut('00:05:05', true);
@@ -334,7 +315,7 @@ describe('Editor page', function() {
   it('should be able to edit end cut', function() {
 
     // Add end cut
-    page.addCut(0.8, false);
+    page.addCut(488000, false);
 
     // Edit cut
     page.editCut('00:08:00', false);
@@ -347,7 +328,7 @@ describe('Editor page', function() {
   it('should be able to cancel begin cut edition', function() {
 
     // Add begin cut
-    page.addCut(0.1, true);
+    page.addCut(61000, true);
 
     // Edit cut
     page.editCut('00:05:05', true, true);
@@ -360,7 +341,7 @@ describe('Editor page', function() {
   it('should be able to cancel end cut edition', function() {
 
     // Add end cut
-    page.addCut(0.1, false);
+    page.addCut(61000, false);
 
     // Edit cut
     page.editCut('00:05:05', false, true);
@@ -373,10 +354,10 @@ describe('Editor page', function() {
   it('should not be able to add a begin cut after the end cut', function() {
 
     // Add end cut
-    page.addCut(0.5, false);
+    page.addCut(305000, false);
 
     // Add begin cut
-    page.addCut(0.8, true);
+    page.addCut(488000, true);
 
     // Begin cut should live, not the end cut
     assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
@@ -387,10 +368,10 @@ describe('Editor page', function() {
   it('should not be able to add a end cut before the beginning cut', function() {
 
     // Add begin cut
-    page.addCut(0.5, true);
+    page.addCut(305000, true);
 
     // Add end cut
-    page.addCut(0.2, false);
+    page.addCut(122000, false);
 
     // Begin cut should live, not the end cut
     assert.isFulfilled(page.getLine(page.translations.CORE.UI.BEGIN));
