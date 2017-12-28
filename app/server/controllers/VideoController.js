@@ -315,6 +315,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           try {
             var validationDescriptor = {
               title: {type: 'string', required: true},
+              date: {type: 'number', default: Date.now()},
               description: {type: 'string', required: true},
               groups: {type: 'array<string>', in: groupsIds}
             };
@@ -364,6 +365,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
             originalPackagePath: request.files.file[0].path,
             originalFileName: pathDescriptor.name,
             title: params.title,
+            date: params.date,
             description: params.description,
             category: params.category,
             groups: params.groups,

@@ -4,6 +4,10 @@
 
 - OpenVeo Publish now requires OpenVeo Core &gt; 4.2.0 (excluding 4.2.0)
 
+## NEW FEATURES
+
+- The date of the video can be defined in add video form &amp; in the edit video form.
+
 ## BUG FIXES
 
 - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)

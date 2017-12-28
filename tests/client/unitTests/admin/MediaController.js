@@ -36,11 +36,13 @@ describe('MediaController', function() {
     scope.test.rows = [
       {
         id: 1,
+        date: new Date(),
         status: 1,
         properties: []
       },
       {
         id: 2,
+        date: new Date(),
         status: 1,
         properties: []
       }

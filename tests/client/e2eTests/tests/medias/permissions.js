@@ -70,6 +70,7 @@ describe('Media page', function() {
         id: '0',
         state: STATES.PUBLISHED,
         title: 'Media 1',
+        date: new Date('2017/10/01').getTime(),
         description: 'Media 1 description'
       };
 
@@ -77,6 +78,7 @@ describe('Media page', function() {
         id: '1',
         state: STATES.PUBLISHED,
         title: 'Media 2',
+        date: new Date('2017/11/20').getTime(),
         description: 'Media 2 description',
         groups: ['publishGroup1']
       };

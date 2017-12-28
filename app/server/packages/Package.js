@@ -362,7 +362,7 @@ Package.prototype.initPackage = function() {
               self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
               self.mediaPackage.originalPackagePath = originalPackagePath;
               self.mediaPackage.packageType = originalPackageType;
-              self.mediaPackage.date = Date.now();
+              if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
               callback();
             }
           } else {
@@ -374,7 +374,7 @@ Package.prototype.initPackage = function() {
             self.mediaPackage.metadata = self.mediaPackage.metadata || {};
             self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
             self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
-            self.mediaPackage.date = Date.now();
+            if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
             self.videoModel.add(self.mediaPackage, callback);
           }
         }

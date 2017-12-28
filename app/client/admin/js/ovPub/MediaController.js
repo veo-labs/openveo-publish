@@ -43,6 +43,7 @@
     // Define add form
     var scopeAddForm = $scope.addFormContainer = {};
     scopeAddForm.model = {
+      date: new Date(),
       properties: {}
     };
 
@@ -218,6 +219,7 @@
     function saveMedia(media) {
       return entityService.updateEntity(entityType, publishName, media.id, {
         title: media.title,
+        date: media.date.getTime(),
         description: media.description,
         properties: media.customProperties,
         category: media.category,
@@ -311,6 +313,15 @@
         }
       },
       {
+        key: 'date',
+        type: 'horizontalDatepicker',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DATE_DESC'),
+          required: true
+        }
+      },
+      {
         key: 'description',
         type: 'horizontalTinymce',
         templateOptions: {
@@ -393,6 +404,7 @@
 
       addMediaPromise = publishService.addMedia({
         title: model.title,
+        date: model.date.getTime(),
         description: model.description,
         category: model.category,
         groups: groups,
@@ -424,6 +436,14 @@
         type: 'horizontalEditableInput',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_TITLE'),
+          required: true
+        }
+      },
+      {
+        key: 'date',
+        type: 'horizontalEditableDatepicker',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
           required: true
         }
       },
@@ -646,6 +666,7 @@
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
       row.groups = row.metadata.groups;
       row.user = row.metadata.user;
+      row.date = new Date(row.date);
 
       // Build properties
       for (var propertyId in row.properties) {

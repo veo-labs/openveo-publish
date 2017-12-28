@@ -297,6 +297,7 @@ MediaHelper.prototype.setCategories = function(categories) {
 MediaHelper.prototype.getAddExample = function() {
   return {
     id: shortid.generate(),
+    date: new Date('2017/12/13').getTime(),
     title: 'Video example',
     description: 'Video example description',
     category: '1445433239636',
@@ -337,6 +338,7 @@ MediaHelper.prototype.getAddExample = function() {
  */
 MediaHelper.prototype.getUpdateExample = function() {
   return {
+    date: new Date('2017/12/14').getTime(),
     title: 'Video example new title',
     description: 'Video example new description',
     category: '1445433239640',

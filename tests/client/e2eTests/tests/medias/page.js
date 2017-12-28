@@ -213,6 +213,7 @@ describe('Media page', function() {
     var properties = page.getProperties();
     var name = 'test edition';
     var newName = 'test edition renamed';
+    var newDate = new Date('2017/12/16').getTime();
     var newDescription = 'test edition renamed description';
     var newCategory = categories[0].id;
     var propertiesById = {};
@@ -230,6 +231,7 @@ describe('Media page', function() {
     var linesToAdd = [
       {
         id: '0',
+        date: new Date('2017/12/15').getTime(),
         state: STATES.PUBLISHED,
         title: name,
         properties: getProperties()
@@ -240,16 +242,25 @@ describe('Media page', function() {
     mediaHelper.addEntities(linesToAdd);
     page.refresh();
 
-    // Edit property with a new name and new description
-    page.editMedia(name, {
-      name: newName,
-      description: newDescription,
-      category: newCategory,
-      properties: propertiesById
+    browser.executeScript(
+      'var $injector = angular.injector([\'ng\']);' +
+      'var $filter = $injector.get(\'$filter\');' +
+      'return $filter(\'date\')(' + newDate + ', \'shortDate\');'
+    ).then(function(date) {
+      // Edit property with a new name and new description
+      page.editMedia(name, {
+        name: newName,
+        date: date,
+        description: newDescription,
+        category: newCategory,
+        properties: propertiesById
+      });
+
+      assert.isFulfilled(page.getLine(newName));
+      assert.eventually.equal(page.getLineFieldText(newName, 'date'), date);
+      assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
+      assert.eventually.equal(page.getLineFieldText(newName, 'category'), categories[0].title);
     });
-    assert.isFulfilled(page.getLine(newName));
-    assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
-    assert.eventually.equal(page.getLineFieldText(newName, 'category'), categories[0].title);
   });
 
   it('should be able to cancel when removing a media', function() {
@@ -471,23 +482,32 @@ describe('Media page', function() {
       page.refresh();
 
       // Build search query
-      // Be careful dates are displayed in french format
-      var search = {date: '20/01/2015'};
+      var searchDate = new Date('2015/01/20').getTime();
 
-      // Get all line details
-      page.getAllLineDetails().then(function(datas) {
-        var regexp = new RegExp(search.date);
+      browser.executeScript(
+        'var $injector = angular.injector([\'ng\']);' +
+        'var $filter = $injector.get(\'$filter\');' +
+        'return $filter(\'date\')(' + searchDate + ', \'shortDate\');'
+      ).then(function(shortDate) {
+        // Get all line details
+        page.getAllLineDetails().then(function(datas) {
+          var regexp = new RegExp(shortDate);
 
-        // Predict values
-        var filteredDatas = datas.filter(function(data) {
-          return regexp.test(data.cells[3]);
+          // Predict values
+          var filteredDatas = datas.filter(function(data) {
+            return regexp.test(data.cells[3]);
+          });
+
+          for (var i = 0; i < filteredDatas.length; i++)
+            expectedValues.push(filteredDatas[i].cells[1]);
+
+        }).then(function() {
+          return tableAssert.checkSearch(
+            {date: shortDate},
+            expectedValues,
+            page.translations.PUBLISH.MEDIAS.NAME_COLUMN
+          );
         });
-
-        for (var i = 0; i < filteredDatas.length; i++)
-          expectedValues.push(filteredDatas[i].cells[1]);
-
-      }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 

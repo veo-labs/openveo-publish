@@ -962,6 +962,8 @@ VideoModel.prototype.update = function(id, data, callback) {
   var info = {};
   if (data.title)
     info.title = data.title;
+  if (data.date)
+    info.date = data.date;
   if (data.description)
     info.description = data.description;
   if (data.properties)

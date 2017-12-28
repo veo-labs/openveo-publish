@@ -91,6 +91,12 @@ MediaPage.prototype.getEditFormFields = function(form) {
     baseElement: form
   });
 
+  fields.date = Field.get({
+    type: 'date',
+    name: this.translations.PUBLISH.MEDIAS.ATTR_DATE,
+    baseElement: form
+  });
+
   // Description field
   fields.description = Field.get({
     type: 'tinymce',
@@ -146,6 +152,10 @@ MediaPage.prototype.editMedia = function(name, data) {
     // Set name
     if (data.name !== undefined)
       fields.name.setValue(data.name);
+
+    // Set date
+    if (data.date !== undefined)
+      fields.date.setValue(data.date);
 
     // Set description
     if (data.description !== undefined)
