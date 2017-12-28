@@ -220,6 +220,7 @@
       return entityService.updateEntity(entityType, publishName, media.id, {
         title: media.title,
         date: media.date.getTime(),
+        shortDescription: media.shortDescription,
         description: media.description,
         properties: media.customProperties,
         category: media.category,
@@ -322,6 +323,17 @@
         }
       },
       {
+        key: 'shortDescription',
+        type: 'horizontalTinymce',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_SHORT_DESCRIPTION'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_SHORT_DESCRIPTION_DESC')
+        },
+        data: {
+          tinymceOptions: tinyOptions
+        }
+      },
+      {
         key: 'description',
         type: 'horizontalTinymce',
         templateOptions: {
@@ -405,6 +417,7 @@
       addMediaPromise = publishService.addMedia({
         title: model.title,
         date: model.date.getTime(),
+        shortDescription: model.shortDescription,
         description: model.description,
         category: model.category,
         groups: groups,
@@ -445,6 +458,16 @@
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
           required: true
+        }
+      },
+      {
+        key: 'shortDescription',
+        type: 'horizontalEditableTinymce',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_SHORT_DESCRIPTION')
+        },
+        data: {
+          tinymceOptions: tinyOptions
         }
       },
       {

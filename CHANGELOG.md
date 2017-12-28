@@ -6,6 +6,7 @@
 
 ## NEW FEATURES
 
+- Add shortDescription field to the video entity.
 - The date of the video can be defined in add video form &amp; in the edit video form.
 
 ## BUG FIXES
