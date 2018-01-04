@@ -6,6 +6,7 @@
 
 ## NEW FEATURES
 
+- The preview thumbnail of the video can be specified in the add form.
 - Add shortDescription field to the video entity.
 - The date of the video can be defined in add video form &amp; in the edit video form.
 

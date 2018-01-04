@@ -180,6 +180,11 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
         name: 'file',
         destinationPath: publishConf.videoTmpDir,
         maxCount: 1
+      },
+      {
+        name: 'thumbnail',
+        destinationPath: publishConf.videoTmpDir,
+        maxCount: 1
       }
     ]);
 
@@ -364,6 +369,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 
           publishManager.publish({
             originalPackagePath: request.files.file[0].path,
+            originalThumbnailPath: request.files.thumbnail ? request.files.thumbnail[0].path : undefined,
             originalFileName: pathDescriptor.name,
             title: params.title,
             date: params.date,

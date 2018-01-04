@@ -304,11 +304,13 @@
      */
     function addMedia(data) {
       var file = data.file;
+      var thumbnail = data.thumbnail;
       delete data.file;
+      delete data.thumbnail;
 
       return Upload.upload({
         url: '/be/publish/addMedia',
-        data: {info: Upload.json(data), file: file}
+        data: {info: Upload.json(data), file: file, thumbnail: thumbnail}
       });
     }
 

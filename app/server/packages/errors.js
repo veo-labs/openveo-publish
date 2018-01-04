@@ -203,7 +203,17 @@ var ERRORS = {
    * @default 18
    * @final
    */
-  GET_METADATA: 18
+  GET_METADATA: 18,
+
+  /**
+   * Copying media thumbnail failed.
+   *
+   * @property COPY_THUMB
+   * @type Number
+   * @default 19
+   * @final
+   */
+  COPY_THUMB: 19
 };
 
 Object.freeze(ERRORS);

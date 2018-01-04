@@ -31,6 +31,7 @@
     $scope.users = users.data.entities;
     $scope.isCollapsed = true;
     $scope.fileToUpload = null;
+    $scope.thumbToAdd = null;
 
     // Fetch permissions of the connected user for MediaController features
     $scope.rights = {};
@@ -361,6 +362,21 @@
         }
       },
       {
+        key: 'thumbnail',
+        type: 'horizontalFile',
+        defaultValue: -1,
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_THUMBNAIL'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_THUMBNAIL_DESC'),
+          acceptedTypes: '.jpeg,.jpg',
+          required: false,
+          progressBar: false,
+          onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
+            $scope.thumbToAdd = file;
+          }
+        }
+      },
+      {
         key: 'category',
         type: 'horizontalSelect',
         defaultValue: null,
@@ -422,6 +438,7 @@
         category: model.category,
         groups: groups,
         file: $scope.fileToUpload,
+        thumbnail: $scope.thumbToAdd,
         properties: model.properties
       });
 

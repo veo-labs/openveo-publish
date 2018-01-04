@@ -428,13 +428,33 @@ Package.prototype.copyPackage = function() {
 Package.prototype.removeOriginalPackage = function() {
   var self = this;
 
-  // Try to remove the original package
-  process.logger.debug('Remove original package ' + this.mediaPackage.originalPackagePath);
-  fs.unlink(this.mediaPackage.originalPackagePath, function(error) {
-    if (error)
-      self.setError(new PackageError(error.message, ERRORS.UNLINK));
-    else
-      self.fsm.transition();
+  async.parallel([
+    function(callback) {
+      // Try to remove the original package
+      process.logger.debug('Remove original package ' + self.mediaPackage.originalPackagePath);
+      fs.unlink(self.mediaPackage.originalPackagePath, function(error) {
+        if (error)
+          self.setError(new PackageError(error.message, ERRORS.UNLINK));
+        else
+          callback();
+      });
+    },
+    function(callback) {
+      // Remove uploaded thumbnail (if it has been uploaded)
+      if (self.mediaPackage.originalThumbnailPath) {
+        process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+        fs.unlink(self.mediaPackage.originalThumbnailPath, function(error) {
+          if (error)
+            self.setError(new PackageError(error.message, ERRORS.UNLINK));
+          else
+            callback();
+        });
+      } else {
+        callback();
+      }
+    }
+  ], function() {
+    self.fsm.transition();
   });
 };
 
