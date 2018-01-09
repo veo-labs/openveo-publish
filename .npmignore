@@ -59,3 +59,6 @@ ehthumbs.db
 
 # Eslint
 .eslintrc
+
+# Images processing cache directories
+.cache

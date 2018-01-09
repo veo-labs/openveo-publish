@@ -41,3 +41,6 @@ nbproject
 
 # Grunt
 /.grunt
+
+# Images processing cache directories
+.cache

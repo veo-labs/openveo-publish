@@ -1,8 +1,12 @@
-# 5.0.2
+# 6.0.0 / YYYY-YY-YY
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core &gt; 4.2.0 (excluding 4.2.0)
 
 ## BUG FIXES
 
-  - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
+- Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
 
 # 5.0.1 / 2017-11-15
 

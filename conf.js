@@ -271,9 +271,17 @@ module.exports = {
     'app/client/front/views'
   ],
   imageProcessing: {
-    imagesFolders: ['assets/player/videos'],
-    imagesStyle: {
-      small: 200
-    }
+    folders: [
+      {
+        imagesDirectory: 'assets/player/videos'
+      }
+    ],
+    styles: [
+      {
+        id: 'publish-thumb-200',
+        type: 'thumb',
+        width: 200
+      }
+    ]
   }
 };

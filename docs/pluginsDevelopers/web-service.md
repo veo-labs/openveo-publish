@@ -102,14 +102,14 @@ HTTP Status Code | Details
         {
           "image" : {
             "large" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg", // Large image
-            "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?thumb=small" // Small image
+            "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?style=publish-thumb-200" // Small image
           },
           "timecode" : 0 // Timecode when to display the image (in ms)
         },
         {
           "image" : {
             "large" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg", // Large image
-            "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?thumb=small" // Small image
+            "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?style=publish-thumb-200" // Small image
           },
           "timecode" : 1400 // Timecode when to display the image (in ms)
         }
@@ -225,14 +225,14 @@ HTTP Status Code | Details
       {
         "image" : {
           "large" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg", // Large image
-          "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?thumb=small" // Small image
+          "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?style=publish-thumb-200" // Small image
         },
         "timecode" : 0 // Timecode when to display the image (in ms)
       },
       {
         "image" : {
           "large" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg", // Large image
-          "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?thumb=small" // Small image
+          "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?style=publish-thumb-200" // Small image
         },
         "timecode" : 1400 // Timecode when to display the image (in ms)
       }

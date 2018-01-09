@@ -515,11 +515,12 @@ TarPackage.prototype.saveTimecodes = function() {
 
           switch (timecodeType) {
             case 'image':
+              var style = 'publish-thumb-200';
               videoInfo.timecodes.push({
                 id: shortid.generate(),
                 timecode: currentTc.timecode,
                 image: {
-                  small: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?thumb=small',
+                  small: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?style=' + style,
                   large: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename
                 }
               });
