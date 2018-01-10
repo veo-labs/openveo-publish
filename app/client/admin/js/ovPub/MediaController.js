@@ -32,6 +32,7 @@
     $scope.isCollapsed = true;
     $scope.fileToUpload = null;
     $scope.thumbToAdd = null;
+    $scope.thumbToEdit = null;
 
     // Fetch permissions of the connected user for MediaController features
     $scope.rights = {};
@@ -218,11 +219,12 @@
      * @param {Object} media Media data
      */
     function saveMedia(media) {
-      return entityService.updateEntity(entityType, publishName, media.id, {
+      return publishService.updateMedia(media.id, {
         title: media.title,
         date: media.date.getTime(),
         shortDescription: media.shortDescription,
         description: media.description,
+        thumbnail: $scope.thumbToEdit,
         properties: media.customProperties,
         category: media.category,
         groups: media.groups,
@@ -499,6 +501,32 @@
         }
       },
       {
+        key: 'thumbnail',
+        type: 'horizontalEditableFile',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_THUMBNAIL'),
+          acceptedTypes: '.jpeg,.jpg',
+          disabled: true,
+          required: false,
+          progressBar: false,
+          onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
+            $scope.thumbToEdit = file;
+          }
+        },
+        link: function(scope, element, attrs) {
+          scope.show = function() {
+            if (!scope.originalModel.thumbnail)
+              return $filter('translate')('CORE.UI.EMPTY');
+
+            var src = new URL(scope.originalModel.thumbnail);
+
+            src.searchParams.append('style', 'publish-thumb-200');
+
+            return '<img class="img-thumbnail" src="' + src + '">';
+          };
+        }
+      },
+      {
         key: 'category',
         type: 'horizontalEditableSelect',
         templateOptions: {
@@ -704,6 +732,11 @@
     scopeEditForm.init = function(row) {
       var properties = {};
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
+      if (!row.mediaId)
+        scopeEditForm.fields = scopeEditForm.fields.filter(function(field) {
+          return field.key !== 'thumbnail';
+        });
+
       row.groups = row.metadata.groups;
       row.user = row.metadata.user;
       row.date = new Date(row.date);

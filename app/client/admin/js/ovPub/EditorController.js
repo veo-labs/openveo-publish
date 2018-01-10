@@ -291,7 +291,7 @@
 
       // CALL SAVE HTTP
       var objToSave = cleanObjectToSave('cut');
-      entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
+      publishService.updateMedia($scope.media.id, objToSave).success(function() {
         if ($scope.selectRow) {
           $scope.selectRow.select = false;
           $scope.selectRow = null;

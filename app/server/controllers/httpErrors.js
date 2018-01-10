@@ -564,6 +564,19 @@ var HTTP_ERRORS = {
     code: 0x218,
     httpCode: 500,
     module: 'publish'
+  },
+
+  /**
+   * Invalid video thumbnail
+   *
+   * @property INVALID_VIDEO_THUMBNAIL
+   * @type Object
+   * @final
+   */
+  INVALID_VIDEO_THUMBNAIL: {
+    code: 0x219,
+    httpCode: 500,
+    module: 'publish'
   }
 };
 

@@ -314,8 +314,29 @@
       });
     }
 
+    /**
+     * Update a media
+     *
+     * @param {Object} Information about the media
+     * @return {Promise} An HTTP promise resolving when media has been updated
+     * @method updateMedia
+     */
+    function updateMedia(id, data) {
+      var thumbnail = data.thumbnail;
+
+      delete data.thumbnail;
+
+      entityService.deleteCache('videos', publishName);
+
+      return Upload.upload({
+        url: '/be/publish/videos/' + id,
+        data: {info: Upload.json(data), thumbnail: thumbnail}
+      });
+    }
+
     return {
       addMedia: addMedia,
+      updateMedia: updateMedia,
       retryMedia: retryMedia,
       publishMedia: publishMedia,
       unpublishMedia: unpublishMedia,

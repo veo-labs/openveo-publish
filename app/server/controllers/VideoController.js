@@ -21,6 +21,7 @@ var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var MultipartParser = openVeoApi.multipart.MultipartParser;
 var AccessError = openVeoApi.errors.AccessError;
+var errors = process.requireApi('lib/controllers/httpErrors.js');
 var ContentController = openVeoApi.controllers.ContentController;
 var fileSystemApi = openVeoApi.fileSystem;
 
@@ -402,6 +403,122 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 
     // Missing body
     next(HTTP_ERRORS.ADD_MEDIA_MISSING_PARAMETERS);
+
+  }
+};
+
+/**
+ * Update a media
+ *
+ * @example
+ *
+ *     // Expected multipart body example
+ *     {
+ *       "info": {
+ *         "title" : 'Media title',
+ *         "description" : 'Media HTML description',
+ *         "category" : 'Media category',
+ *         "groups" : 'Media groups'
+ *       },
+ *       "thumbnail" : ...
+ *     }
+ *
+ * @method updateEntityAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+VideoController.prototype.updateEntityAction = function(request, response, next) {
+  var entityId = request.params.id;
+
+  if (request.body) {
+    var model = this.getModel(request);
+    var parser = new MultipartParser(request, [
+      {
+        name: 'thumbnail',
+        destinationPath: publishConf.videoTmpDir,
+        maxCount: 1
+      }
+    ]);
+
+    parser.parse(function(error) {
+      var info = JSON.parse(request.body.info);
+      var files = request.files;
+      var thumbnail = files.thumbnail ? files.thumbnail[0] : undefined;
+      var imageDir = path.normalize(process.rootPublish + '/assets/player/videos/' + entityId);
+
+      async.series([
+        function(callback) {
+          if (thumbnail) {
+            async.series([
+
+              // Validate the file
+              function(thumbCallback) {
+                openVeoApi.util.validateFiles(
+                  {thumbnail: thumbnail.path},
+                  {thumbnail: {in: [openVeoApi.fileSystem.FILE_TYPES.JPG]}},
+                  function(error, files) {
+                    if (error)
+                      process.logger.warn(error.message, {action: 'updateEntity', mediaId: entityId});
+
+                    if (!files.thumbnail.isValid)
+                      return next(new Error(HTTP_ERRORS.INVALID_VIDEO_THUMBNAIL));
+
+                    thumbCallback();
+                  }
+                );
+              },
+
+              // Copy the file
+              function(thumbCallback) {
+                openVeoApi.fileSystem.copy(thumbnail.path, path.join(imageDir, 'thumbnail.jpg'), function(error) {
+                  if (error)
+                    process.logger.warn(error.message,
+                                        {action: 'updateEntityAction', mediaId: entityId, thumbnail: thumbnail.path});
+                  thumbCallback();
+                });
+              },
+
+              // Update the video
+              function(thumbCallback) {
+                model.updateThumbnail(entityId, '/publish/' + entityId + '/thumbnail.jpg', function(error) {
+                  if (error) {
+                    process.logger.error((error && error.message) || 'Fail updating',
+                                         {method: 'updateEntityAction', entity: entityId});
+                  }
+                  thumbCallback(error);
+                });
+              }
+            ], function(error) {
+              callback(error);
+            });
+          } else {
+            callback();
+          }
+        },
+        function(callback) {
+          model.update(entityId, info, function(error, updateCount) {
+            if (error) {
+              process.logger.error((error && error.message) || 'Fail updating',
+                                   {method: 'updateEntityAction', entity: entityId});
+            }
+
+            callback(error);
+          });
+        }
+      ], function(error) {
+        if (error) {
+          next((error instanceof AccessError) ? errors.UPDATE_ENTITY_FORBIDDEN : errors.UPDATE_ENTITY_ERROR);
+        } else {
+          response.send({error: null, status: 'ok'});
+        }
+      });
+    });
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.UPDATE_MEDIA_MISSING_PARAMETERS);
 
   }
 };

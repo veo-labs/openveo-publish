@@ -187,14 +187,14 @@ describe('Media page', function() {
         assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'post', {
-          title: ownerLineToAdd.title
-        }).then(function(response) {
+          info: {title: ownerLineToAdd.title}
+        }, true).then(function(response) {
           assert.equal(response.status, 200, 'Expected anonymous video to be editable');
         });
 
         page.sendRequest('be/publish/videos/' + anonymousLineToAdd.id, 'post', {
-          title: anonymousLineToAdd.title
-        }).then(function(response) {
+          info: {title: anonymousLineToAdd.title}
+        }, true).then(function(response) {
           assert.equal(response.status, 200, 'Expected anonymous video to be editable');
         });
       });
@@ -218,14 +218,14 @@ describe('Media page', function() {
         assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'post', {
-          title: ownerLineToAdd.title
-        }).then(function(response) {
+          info: {title: ownerLineToAdd.title}
+        }, true).then(function(response) {
           assert.equal(response.status, 200, 'Expected anonymous video to be editable');
         });
 
         page.sendRequest('be/publish/videos/' + anonymousLineToAdd.id, 'post', {
-          title: anonymousLineToAdd.title
-        }).then(function(response) {
+          info: {title: anonymousLineToAdd.title}
+        }, true).then(function(response) {
           assert.equal(response.status, 200, 'Expected anonymous video to be editable');
         });
 
@@ -243,8 +243,8 @@ describe('Media page', function() {
         assert.isFulfilled(page.getLine(ownerLineNewTitle), 'Expected media ' + ownerLineNewTitle);
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'post', {
-          title: ownerLineToAdd.title
-        }).then(function(response) {
+          info: {title: ownerLineToAdd.title}
+        }, true).then(function(response) {
           assert.equal(response.status, 200, 'Expected video in the group to be editable');
         });
       });
@@ -261,8 +261,8 @@ describe('Media page', function() {
         assert.isRejected(page.getLine(ownerLineNewTitle));
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'post', {
-          title: ownerLineNewTitle
-        }).then(function(response) {
+          info: {title: ownerLineNewTitle}
+        }, true).then(function(response) {
           assert.equal(response.status, 403, 'Expected video in the group not to be editable');
         });
       });
