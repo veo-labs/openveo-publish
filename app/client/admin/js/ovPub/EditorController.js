@@ -8,6 +8,7 @@
   function EditorController(
           $window,
           $scope,
+          $http,
           $filter,
           $timeout,
           entityService,
@@ -104,6 +105,15 @@
         }
       });
     }
+
+    angular.element(myPlayer).on('needPoiConversion', function(event, duration) {
+      $http
+        .post('/publish/video/' + $scope.media.id + '/updatePoi', {duration: duration})
+        .then(function(response) {
+          $scope.media = response.data.entity;
+          preinit(duration);
+        });
+    });
 
     /**
      *  TAG
@@ -669,6 +679,7 @@
   EditorController.$inject = [
     '$window',
     '$scope',
+    '$http',
     '$filter',
     '$timeout',
     'entityService',

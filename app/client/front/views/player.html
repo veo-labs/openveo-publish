@@ -22,6 +22,7 @@
   <body>
     <div class="container" ng-class="{'full':isFullViewport}" ng-cloak>
       <ov-player
+        id="ov-player"
         ov-player-type="{{playerType}}"
         ov-full-viewport="isFullViewport"
         ov-data="data"
@@ -29,7 +30,7 @@
         ov-auto-play="{{autoPlay}}"
         ov-media-sources-icon="true"
         ov-remember-position="true"
-        ng-if="ready"
+        ng-show="ready"
       ></ov-player>
       <div class="disclaimer" ng-if="!ready && data">
         <span ng-bind-html="availabilityMessage">

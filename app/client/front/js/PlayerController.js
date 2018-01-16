@@ -5,10 +5,20 @@
   /**
    * Defines the player controller.
    */
-  function PlayerController($scope, $window, $location, $sce, mediaService, ovPublishTranslations) {
+  function PlayerController($scope, $window, $location, $sce, $http, mediaService, ovPublishTranslations) {
     $scope.ready = false;
+    $scope.autoPlay = false;
 
     var urlChunks = /.*\/([^\/]*)\/?/.exec($location.path());
+    var player = document.getElementById('ov-player');
+
+    angular.element(player).on('needPoiConversion', function(event, duration) {
+      $http
+        .post('/publish/video/' + $scope.data.id + '/updatePoi', {duration: duration})
+        .then(function(response) {
+          $scope.data = response.data.entity;
+        });
+    });
 
     // Got a media id from url
     if (urlChunks.length) {
@@ -40,6 +50,14 @@
   }
 
   app.controller('PlayerController', PlayerController);
-  PlayerController.$inject = ['$scope', '$window', '$location', '$sce', 'mediaService', 'ovPublishTranslations'];
+  PlayerController.$inject = [
+    '$scope',
+    '$window',
+    '$location',
+    '$sce',
+    '$http',
+    'mediaService',
+    'ovPublishTranslations'
+  ];
 
 })(angular.module('ov.publish.player'));
