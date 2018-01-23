@@ -506,7 +506,6 @@
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_THUMBNAIL'),
           acceptedTypes: '.jpeg,.jpg',
-          disabled: true,
           required: false,
           progressBar: false,
           onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
