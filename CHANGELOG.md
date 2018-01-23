@@ -1,3 +1,9 @@
+# 5.1.0 / YYYY-YY-YY
+
+## NEW FEATURES
+
+- Defragmentation of fragmented MP4 when importing a new video
+
 # 5.0.1 / 2017-11-15
 
 ## BUG FIXES

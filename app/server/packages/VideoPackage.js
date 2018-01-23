@@ -48,6 +48,7 @@ util.inherits(VideoPackage, Package);
  * @final
  */
 VideoPackage.STATES = {
+  MP4_DEFRAGMENTED: 'mp4Defragmented',
   THUMB_GENERATED: 'thumbGenerated',
   COPIED_IMAGES: 'copiedImages',
   METADATA_RETRIEVED: 'metadataRetrieved'
@@ -63,6 +64,7 @@ Object.freeze(VideoPackage.STATES);
  * @final
  */
 VideoPackage.TRANSITIONS = {
+  DEFRAGMENT_MP4: 'defragmentMp4',
   GENERATE_THUMB: 'generateThumb',
   COPY_IMAGES: 'copyImages',
   GET_METADATA: 'getMetadata'
@@ -80,6 +82,7 @@ Object.freeze(VideoPackage.TRANSITIONS);
 VideoPackage.stateTransitions = [
   Package.TRANSITIONS.INIT,
   Package.TRANSITIONS.COPY_PACKAGE,
+  VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
   VideoPackage.TRANSITIONS.GENERATE_THUMB,
   VideoPackage.TRANSITIONS.GET_METADATA,
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
@@ -100,13 +103,18 @@ Object.freeze(VideoPackage.stateTransitions);
  */
 VideoPackage.stateMachine = Package.stateMachine.concat([
   {
-    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    name: VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
     from: Package.STATES.PACKAGE_COPIED,
+    to: VideoPackage.STATES.MP4_DEFRAGMENTED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    from: VideoPackage.STATES.MP4_DEFRAGMENTED,
     to: VideoPackage.STATES.THUMB_GENERATED
   },
   {
     name: VideoPackage.TRANSITIONS.GET_METADATA,
-    from: Package.THUMB_GENERATED_STATE,
+    from: VideoPackage.STATES.THUMB_GENERATED,
     to: VideoPackage.STATES.METADATA_RETRIEVED
   },
   {
@@ -126,6 +134,78 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
   }
 ]);
 Object.freeze(VideoPackage.stateMachine);
+
+/**
+ * Defragment the MP4
+ *
+ * If the input file is fragmented, ffmpeg will be used to defragment
+ * the MP4. The fragmentation detection of the file is based on an un-
+ * known "nb_frames" property in ffprobe output metadata.
+ *
+ * @method defragmentMp4
+ */
+VideoPackage.prototype.defragmentMp4 = function() {
+  var self = this;
+  var filePath = this.getMediaFilePath();
+
+  this.updateState(this.mediaPackage.id, STATES.DEFRAGMENT_MP4, function() {
+    // Detect if file need defragmentation (unknown "nb_frames")
+    ffmpeg.ffprobe(filePath, function(error, metadata) {
+      if (Array.isArray(metadata.streams)) {
+        var fragmentedStreams = metadata.streams.filter(function(stream) {
+          if (stream.codec_type !== 'video')
+            return false;
+
+          return stream.nb_frames === 'N/A';
+        });
+
+        if (fragmentedStreams.length === 0) {
+          process.logger.debug('No defragmentation is needed (' + self.mediaPackage.id + ')');
+
+          return self.fsm.transition();
+        }
+
+        var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+        var defragmentedFile = path.join(destinationPath, 'video_defrag.mp4');
+
+        // MP4 defragmentation
+        ffmpeg(filePath)
+          .audioCodec('copy')
+          .videoCodec('copy')
+          .outputOptions('-movflags faststart')
+          .on('start', function() {
+            process.logger.debug('Starting defragmentation (' + self.mediaPackage.id + ') ' +
+                                 'of ' + filePath + ' to ' + defragmentedFile);
+          })
+          .on('error', function(error) {
+            self.setError(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
+          })
+          .on('end', function() {
+            process.logger.debug('Defragmentation complete (' + self.mediaPackage.id + ')');
+
+            // Replace original file
+            process.logger.debug('Removing fragmented file ' + filePath);
+            fs.unlink(filePath, function(error) {
+              if (error)
+                self.setError(new VideoPackageError(error.message, ERRORS.UNLINK_FRAGMENTED));
+
+              process.logger.debug('Replacing original file (' + self.mediaPackage.id + ') with ' + defragmentedFile);
+              fs.rename(defragmentedFile, filePath, function(error) {
+                if (error)
+                  self.setError(new VideoPackageError(error.message, ERRORS.REPLACE_FRAGMENTED));
+
+                process.logger.debug('Original file replaced (' + self.mediaPackage.id + ')');
+
+                return self.fsm.transition();
+              });
+            });
+          })
+          .save(defragmentedFile);
+      } else
+        return self.fsm.transition();
+    });
+  });
+};
 
 /**
  * Generates a thumbnail for the video.

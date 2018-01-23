@@ -100,6 +100,7 @@
     "STATE_12" : "Publié",
     "STATE_13" : "Generation de miniature",
     "STATE_14" : "Récupération des métadonnées",
+    "STATE_15" : "Défragmentation du MP4",
     "ADD_MEDIA" : "Ajouter une vidéo",
     "REMOVE_SUCCESS" : "La vidéo a été supprimée.",
     "RETRY_SUCCESS" : "Le traitement de la vidéo va être relancé.",

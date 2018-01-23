@@ -203,7 +203,47 @@ var ERRORS = {
    * @default 18
    * @final
    */
-  GET_METADATA: 18
+  GET_METADATA: 18,
+
+  /**
+   * Copying media thumbnail failed.
+   *
+   * @property COPY_THUMB
+   * @type Number
+   * @default 19
+   * @final
+   */
+  COPY_THUMB: 19,
+
+  /**
+   * Defragmentation of the mp4 failed
+   *
+   * @property DEFRAGMENTATION
+   * @type Number
+   * @default 20
+   * @final
+   */
+  DEFRAGMENTATION: 20,
+
+  /**
+   * Remove fragmented file
+   *
+   * @property UNLINK_FRAGMENTED
+   * @type Number
+   * @default 21
+   * @final
+   */
+  UNLINK_FRAGMENTED: 21,
+
+  /**
+   * Replacing fragmented file
+   *
+   * @property
+   * @type Number
+   * @default 22
+   * @final
+   */
+  REPLACE_FRAGMENTED: 22
 };
 
 Object.freeze(ERRORS);
