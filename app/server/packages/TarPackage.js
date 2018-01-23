@@ -124,6 +124,7 @@ TarPackage.stateTransitions = [
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
   TarPackage.TRANSITIONS.EXTRACT_PACKAGE,
   TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
+  VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
   VideoPackage.TRANSITIONS.GENERATE_THUMB,
   VideoPackage.TRANSITIONS.GET_METADATA,
   TarPackage.TRANSITIONS.PREPARE_PACKAGE,
@@ -150,8 +151,13 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
     to: TarPackage.STATES.PACKAGE_EXTRACTED
   },
   {
-    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    name: VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
     from: TarPackage.STATES.PACKAGE_VALIDATED,
+    to: VideoPackage.STATES.MP4_DEFRAGMENTED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    from: VideoPackage.STATES.MP4_DEFRAGMENTED,
     to: VideoPackage.STATES.THUMB_GENERATED
   },
   {

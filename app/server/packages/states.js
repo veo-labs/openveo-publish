@@ -161,7 +161,15 @@ var STATES = {
    * @default 14
    * @final
    */
-  GET_METADATA: 14
+  GET_METADATA: 14,
+
+  /**
+   * Package is defragmenting the mp4.
+   * @type Number
+   * @default 15
+   * @final
+   */
+  DEFRAGMENT_MP4: 15
 
 };
 Object.freeze(STATES);

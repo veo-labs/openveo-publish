@@ -106,6 +106,7 @@
     "STATE_12" : "Published",
     "STATE_13" : "Generating thumbnail",
     "STATE_14" : "Retrieving metadatas",
+    "STATE_15" : "Defragmenting MP4",
     "ADD_MEDIA" : "Add a video",
     "REMOVE_SUCCESS" : "Video successfully removed.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",

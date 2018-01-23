@@ -213,7 +213,37 @@ var ERRORS = {
    * @default 19
    * @final
    */
-  COPY_THUMB: 19
+  COPY_THUMB: 19,
+
+  /**
+   * Defragmentation of the mp4 failed
+   *
+   * @property DEFRAGMENTATION
+   * @type Number
+   * @default 20
+   * @final
+   */
+  DEFRAGMENTATION: 20,
+
+  /**
+   * Remove fragmented file
+   *
+   * @property UNLINK_FRAGMENTED
+   * @type Number
+   * @default 21
+   * @final
+   */
+  UNLINK_FRAGMENTED: 21,
+
+  /**
+   * Replacing fragmented file
+   *
+   * @property
+   * @type Number
+   * @default 22
+   * @final
+   */
+  REPLACE_FRAGMENTED: 22
 };
 
 Object.freeze(ERRORS);

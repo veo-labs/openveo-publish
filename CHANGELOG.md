@@ -6,6 +6,7 @@
 
 ## NEW FEATURES
 
+- Defragmentation of fragmented MP4 when importing a new video
 - The preview thumbnail of the video can be specified.
 - Add shortDescription field to the video entity.
 - The date of the video can be defined in add video form &amp; in the edit video form.
