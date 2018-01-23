@@ -323,7 +323,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
               title: {type: 'string', required: true},
               date: {type: 'number', default: Date.now()},
               shortDescription: {type: 'string'},
-              description: {type: 'string', required: true},
+              description: {type: 'string'},
               groups: {type: 'array<string>', in: groupsIds}
             };
 

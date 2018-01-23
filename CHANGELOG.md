@@ -13,6 +13,7 @@
 
 ## BUG FIXES
 
+- The video description is now optional
 - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
 
 # 5.0.1 / 2017-11-15

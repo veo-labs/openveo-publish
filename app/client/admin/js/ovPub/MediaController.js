@@ -341,8 +341,7 @@
         type: 'horizontalTinymce',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
-          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DESCRIPTION_DESC'),
-          required: true
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DESCRIPTION_DESC')
         },
         data: {
           tinymceOptions: tinyOptions
@@ -493,8 +492,7 @@
         key: 'description',
         type: 'horizontalEditableTinymce',
         templateOptions: {
-          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
-          required: true
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION')
         },
         data: {
           tinymceOptions: tinyOptions
