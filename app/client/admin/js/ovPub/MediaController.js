@@ -323,6 +323,12 @@
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
           description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DATE_DESC'),
           required: true
+        },
+        link: function(scope, el, attrs, ctrl) {
+          // Workaround: Formly doesn't reset this field properly
+          scope.options.resetModel = function() {
+            scope.model.date = new Date();
+          };
         }
       },
       {
