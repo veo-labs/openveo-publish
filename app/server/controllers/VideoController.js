@@ -9,6 +9,7 @@ var path = require('path');
 var fs = require('fs');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
+var coreApi = process.api.getCoreApi();
 var configDir = openVeoApi.fileSystem.getConfDir();
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
@@ -476,6 +477,16 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
                   if (error)
                     process.logger.warn(error.message,
                                         {action: 'updateEntityAction', mediaId: entityId, thumbnail: thumbnail.path});
+                  thumbCallback();
+                });
+              },
+
+              // Clear image thumbnail cache
+              function(thumbCallback) {
+                coreApi.clearImageCache(path.join(entityId, 'thumbnail.jpg'), 'publish', function(error) {
+                  if (error)
+                    process.logger.error(error.message);
+
                   thumbCallback();
                 });
               },
