@@ -388,7 +388,7 @@ VideoModel.prototype.add = function(media, callback) {
     id: String(media.id),
     available: media.available,
     title: media.title,
-    shortDescription: media.shortDescription,
+    leadParagraph: media.leadParagraph,
     description: media.description,
     state: media.state,
     date: media.date,
@@ -965,8 +965,8 @@ VideoModel.prototype.update = function(id, data, callback) {
     info.title = data.title;
   if (data.date)
     info.date = data.date;
-  if (data.shortDescription)
-    info.shortDescription = data.shortDescription;
+  if (data.leadParagraph)
+    info.leadParagraph = data.leadParagraph;
   if (data.description)
     info.description = data.description;
   if (data.properties)

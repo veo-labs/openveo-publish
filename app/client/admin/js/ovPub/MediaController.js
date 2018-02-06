@@ -222,7 +222,7 @@
       return publishService.updateMedia(media.id, {
         title: media.title,
         date: media.date.getTime(),
-        shortDescription: media.shortDescription,
+        leadParagraph: media.leadParagraph,
         description: media.description,
         thumbnail: $scope.thumbToEdit,
         properties: media.customProperties,
@@ -332,11 +332,11 @@
         }
       },
       {
-        key: 'shortDescription',
+        key: 'leadParagraph',
         type: 'horizontalTinymce',
         templateOptions: {
-          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_SHORT_DESCRIPTION'),
-          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_SHORT_DESCRIPTION_DESC')
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_LEAD_PARAGRAPH'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_LEAD_PARAGRAPH_DESC')
         },
         data: {
           tinymceOptions: tinyOptions
@@ -440,7 +440,7 @@
       addMediaPromise = publishService.addMedia({
         title: model.title,
         date: model.date.getTime(),
-        shortDescription: model.shortDescription,
+        leadParagraph: model.leadParagraph,
         description: model.description,
         category: model.category,
         groups: groups,
@@ -485,10 +485,10 @@
         }
       },
       {
-        key: 'shortDescription',
+        key: 'leadParagraph',
         type: 'horizontalEditableTinymce',
         templateOptions: {
-          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_SHORT_DESCRIPTION')
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_LEAD_PARAGRAPH')
         },
         data: {
           tinymceOptions: tinyOptions
