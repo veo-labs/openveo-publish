@@ -1,4 +1,4 @@
-# 5.1.0 / YYYY-YY-YY
+# 5.1.0 / 2018-02-23
 
 ## NEW FEATURES
 
