@@ -58,7 +58,8 @@ HTTP Status Code | Details
       "available" : true, // Indicates if video is available or is being encoded
       "thumbnail" : "http://openveo-cdn.local/1444396683105/thumbnail.jpg",
       "title" : "Video title",
-      "description" : "Video title",
+      "leadParagraph" : "Video lead paragraph",
+      "description" : "Video description",
       "chapters" : [ // Chapters
         {
           "name" : "Chapter 1", // Chapter name
@@ -181,7 +182,8 @@ HTTP Status Code | Details
     "available" : true, // Indicates if video is available or is being encoded
     "thumbnail" : "http://openveo-cdn.local//1444396683105/thumbnail.jpg",
     "title" : "Video title",
-    "description" : "Video title",
+    "leadParagraph" : "Video lead paragraph",
+    "description" : "Video description",
     "chapters" : [ // Chapters
       {
         "name" : "Chapter 1", // Chapter name
