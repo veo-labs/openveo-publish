@@ -18,6 +18,7 @@ dateStart | String/Number | No | - | To get videos after or equal to a date (in 
 dateEnd | String/Number | No | - | To get videos before a date (in any format supported by JavaScript Date object)
 categories | String/Array | No | - | To filter videos by category
 groups | String/Array | No | - | To filter videos by group
+user | String/Array | No | - | To filter videos by user
 sortBy | String | No | date | To sort videos by either **title**, **description**, **date**, **state**, **views** or **category**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 0 | The expected page
@@ -66,28 +67,22 @@ HTTP Status Code | Details
           "description" : "Chapter 1", // Chapter description
           "value" : 0.04 // Chapter timecode in percent (percentage of the video)
         },
-        {
-          "name" : "Chapter 2", // Chapter name
-          "description" : "Chapter 2", // Chapter description
-          "value" : 0.3 // Chapter timecode in percent (percentage of the video)
-        }
+        ...
       ],
       "tags" : [ // Tags
         {
           "name" : "Tag 1", // Tag name
           "description" : "Tag 1 description", // Tag description
-          "value" : 0.04 // Tag timecode in percent (percentage of the video)
-        },
-        {
-          "name" : "Tag 2", // Tag name
-          "description" : "Tag 2 description", // Tag description
           "value" : 0.3, // Tag timecode in percent (percentage of the video)
           "file" : { // Tag associated file
             "mimetype" : "video/mp4",
             "basePath" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
-            "originalname" : "original-name.mp4"
+            "originalname" : "original-name.mp4",
+            "filename" : "name.mp4",
+            "size" : 102458
           }
-        }
+        },
+        ...
       ],
       "cut" : [ // Cut information (begin and end)
         {
@@ -107,13 +102,6 @@ HTTP Status Code | Details
           },
           "timecode" : 0 // Timecode when to display the image (in ms)
         },
-        {
-          "image" : {
-            "large" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg", // Large image
-            "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?style=publish-thumb-200" // Small image
-          },
-          "timecode" : 1400 // Timecode when to display the image (in ms)
-        }
         ...
       ]
     }
@@ -174,7 +162,13 @@ HTTP Status Code | Details
     "errorCode" : -1, // Video error code or -1 if no error
     "category" : "", // Video category
     "properties" : { // Video custom properties
-      "1444809111034" : "Property value" // Custom property value by id
+      "1444809111034": { // Custom property id
+        "id" : 1444809111034, // Custom property id
+        "name" : "Property name", // Custom property name
+        "description" : "Property description", // Custom property description
+        "type" : "text", // Custom property type
+        "value" : "Property value" // Custom property value
+      },
       ...
     },
     "packageType" : "tar", // Initialize package type (either tar or mp4)
@@ -191,28 +185,22 @@ HTTP Status Code | Details
         "description" : "Chapter 1", // Chapter description
         "value" : 0.04 // Chapter timecode in percent (percentage of the video)
       },
-      {
-        "name" : "Chapter 2", // Chapter name
-        "description" : "Chapter 2", // Chapter description
-        "value" : 0.3 // Chapter timecode in percent (percentage of the video)
-      }
+      ...
     ],
     "tags" : [ // Tags
       {
         "name" : "Tag 1", // Tag name
         "description" : "Tag 1 description", // Tag description
-        "value" : 0.04 // Tag timecode in percent (percentage of the video)
-      },
-      {
-        "name" : "Tag 2", // Tag name
-        "description" : "Tag 2 description", // Tag description
         "value" : 0.3, // Tag timecode in percent (percentage of the video)
         "file" : { // Tag associated file
           "mimetype" : "video/mp4",
           "basePath" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
-          "originalname" : "original-name.mp4"
+          "originalname" : "original-name.mp4",
+          "filename" : "name.mp4",
+          "size" : 102458
         }
-      }
+      },
+      ...
     ],
     "cut" : [ // Cut information (begin and end)
       {
@@ -232,13 +220,6 @@ HTTP Status Code | Details
         },
         "timecode" : 0 // Timecode when to display the image (in ms)
       },
-      {
-        "image" : {
-          "large" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg", // Large image
-          "small" : "http://openveo-cdn.local/1440175380631/slide_00001.jpeg?style=publish-thumb-200" // Small image
-        },
-        "timecode" : 1400 // Timecode when to display the image (in ms)
-      }
       ...
     ]
   }
@@ -403,7 +384,8 @@ HTTP Status Code | Details
 {
   "types": [
     "text",
-    "list"
+    "list",
+    "boolean"
   ]
 }
 ```
