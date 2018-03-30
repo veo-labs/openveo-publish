@@ -144,6 +144,7 @@ Videos can be in different states:
 - **12** : The video is uploaded, ready and published
 - **13** : The video thumbnail is generated
 - **14** : The video metadatas are being retrieved
+- **15** : The video is defragmenting
 
 ---
 
