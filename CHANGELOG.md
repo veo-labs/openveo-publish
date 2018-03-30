@@ -2,7 +2,17 @@
 
 ## BREAKING CHANGES
 
-- OpenVeo Publish now requires OpenVeo Core &gt; 4.2.0 (excluding 4.2.0)
+- OpenVeo Publish now requires OpenVeo Core 5.0.0
+- Controller / Model / Provider / Database system has been revised into a Controller / Provider / Storage system with the following important consequences:
+  - Web service endpoint GET /videos/:id now return an HTTP code 404 if video is not found
+  - Web service endpoint GET /videos/:id now includes information from the video platform
+  - Web service endpoint POST /videos/:id has been removed
+  - Web service endpoint DELETE /videos/:id now returns property **total** with the number of deleted videos
+  - Web service endpoint PUT /properties now returns a property **entities** with the list of added properties and **total** the number of inserted properties
+  - Web service endpoint GET /properties/:id now return an HTTP code 404 if property is not found
+  - Web service endpoint POST /properties/:id now returns property **total** with value **1** if everything went fine
+  - Web service endpoint DELETE /properties/:id now returns property **total** with the number of deleted properties
+  - HTTP error codes have changed. See **app/server/controllers/httpErrors.js** for the complete list of error codes
 
 ## NEW FEATURES
 
@@ -10,11 +20,18 @@
 - The preview thumbnail of the video can be specified.
 - Add lead paragraph field to the video entity.
 - The date of the video can be defined in add video form &amp; in the edit video form.
+- Hook **properties.deleted** is now executed when properties have been deleted
+- Web service endpoint GET /properties now accepts **include** and **exclude** parameters to filter returned applications fields
+- Web service endpoint GET /properties/:id now accepts **include** and **exclude** parameters to filter returned property fields
+- Web service endpoint GET /videos now accepts **include** and **exclude** parameters to filter returned videos fields
+- Web service endpoint GET /videos/:id now accepts **include** and **exclude** parameters to filter returned video fields
 
 ## BUG FIXES
 
 - The video description is now optional
 - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
+- Fix OpenVeo Publish upgrade when upgrading from a version prior to version 2.0.0 with more than one media
+- Fix 3.0.0 migration by adding ids to chapters so that they can be updated instead of recreated
 
 # 5.0.1 / 2017-11-15
 

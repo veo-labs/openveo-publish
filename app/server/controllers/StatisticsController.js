@@ -7,10 +7,9 @@
 var util = require('util');
 var openVeoApi = require('@openveo/api');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var Controller = openVeoApi.controllers.Controller;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Defines a controller to handle actions relative to statistics' routes.
@@ -57,15 +56,29 @@ StatisticsController.prototype.statisticsAction = function(request, response, ne
             }
             var coreApi = process.api.getCoreApi();
             var videoProvider = new VideoProvider(coreApi.getDatabase());
-            var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-            var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-            videoModel.increaseVideoViews(request.params.id, body.count, function(error, done) {
-              if (error || !done) {
-                next(HTTP_ERRORS.STATISTICS_UPDATE_ERROR);
-              } else {
-                response.send({done: done});
+            var filter = new ResourceFilter().equal('id', request.params.id);
+
+            videoProvider.getOne(
+              filter,
+              {
+                include: ['id', 'views']
+              },
+              function(getOneError, media) {
+                if (getOneError) return next(HTTP_ERRORS.STATISTICS_GET_ONE_ERROR);
+                var views = media.views ? (media.views + body.count) : body.count;
+
+                videoProvider.updateOne(
+                  filter,
+                  {
+                    views: views
+                  },
+                  function(updateError, total) {
+                    if (updateError) return next(HTTP_ERRORS.STATISTICS_UPDATE_ERROR);
+                    response.send({done: total});
+                  }
+                );
               }
-            });
+            );
           } else {
 
             // Missing type and / or id of the video

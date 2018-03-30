@@ -32,7 +32,7 @@
      * @param {Function} reload The reload Function to force reloading the table
      */
     function removeRows(selected, reload) {
-      entityService.removeEntity(entityType, publishName, selected.join(','))
+      entityService.removeEntities(entityType, publishName, selected.join(','))
         .then(function() {
           publishService.cacheClear(entityType);
           $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.PROPERTIES.REMOVE_SUCCESS'), 4000);
@@ -46,7 +46,7 @@
      * @param {Object} property Property data
      */
     function addProperty(property) {
-      return entityService.addEntity(entityType, publishName, property)
+      return entityService.addEntities(entityType, publishName, [property])
         .then(function() {
           publishService.cacheClear(entityType);
         });

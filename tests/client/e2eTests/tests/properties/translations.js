@@ -4,9 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var browserExt = e2e.browser;
 
@@ -15,7 +13,9 @@ var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Property page translations', function() {
-  var page, propertyHelper;
+  var page;
+  var propertyHelper;
+  var defaultSettings;
 
   /**
    * Checks translations.
@@ -34,7 +34,7 @@ describe('Property page translations', function() {
           {
             name: 'test translations',
             description: 'test translations description',
-            type: PropertyModel.TYPES.TEXT
+            type: PropertyProvider.TYPES.TEXT
           }
         ]).then(function(addedLines) {
           lines = addedLines;
@@ -127,10 +127,13 @@ describe('Property page translations', function() {
   before(function() {
     var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
-    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
-    propertyHelper = new PropertyHelper(propertyModel);
-    page = new PropertyPage(propertyModel);
+    var propertyProvider = new PropertyProvider(database);
+    propertyHelper = new PropertyHelper(propertyProvider);
+    page = new PropertyPage(propertyProvider);
     page.logAsAdmin();
+    propertyHelper.getEntities().then(function(settings) {
+      defaultSettings = settings;
+    });
     page.load();
   });
 
@@ -141,7 +144,7 @@ describe('Property page translations', function() {
 
   // Remove all properties after each tests then reload the page
   afterEach(function() {
-    propertyHelper.removeAllEntities();
+    propertyHelper.removeAllEntities(defaultSettings);
     page.refresh();
   });
 

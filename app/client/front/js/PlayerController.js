@@ -14,7 +14,7 @@
 
     angular.element(player).on('needPoiConversion', function(event, duration) {
       $http
-        .post('/publish/video/' + $scope.data.id + '/updatePoi', {duration: duration})
+        .post('/publish/videos/' + $scope.data.id + '/poi/convert', {duration: duration})
         .then(function(response) {
           $scope.data = response.data.entity;
         });
@@ -44,7 +44,6 @@
           }
         } else
           $window.location.href = '/notFound';
-
       });
     }
   }

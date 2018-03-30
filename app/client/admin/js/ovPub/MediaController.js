@@ -206,7 +206,7 @@
      * @param {Function} reload Function to reload the datatable
      */
     function removeRows(selected, reload) {
-      entityService.removeEntity(entityType, publishName, selected.join(','))
+      entityService.removeEntities(entityType, publishName, selected.join(','))
         .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.REMOVE_SUCCESS'), 4000);
           reload();

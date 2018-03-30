@@ -166,12 +166,10 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
 
     // Check auth
     function(callback) {
-      self.googleOAuthHelper.getFreshToken(function(error, tokens) {
-        if (error) {
-          callback(error);
-          return;
-        }
-        self.googleOAuthHelper.oauth2Client.setCredentials(tokens);
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        self.googleOAuthHelper.oauth2Client.setCredentials(token);
         callback();
       });
     },
@@ -219,12 +217,10 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
 
     // Check auth
     function(callback) {
-      self.googleOAuthHelper.getFreshToken(function(error, tokens) {
-        if (error) {
-          callback(error);
-          return;
-        }
-        uploadParams.auth = tokens;
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        uploadParams.auth = token;
         callback();
       });
     },
@@ -326,12 +322,10 @@ YoutubeProvider.prototype.remove = function(mediaIds, callback) {
   var series = [];
 
   series.push(function(callback) {
-    self.googleOAuthHelper.getFreshToken(function(error, tokens) {
-      if (error) {
-        callback(error);
-        return;
-      }
-      self.googleOAuthHelper.oauth2Client.setCredentials(tokens);
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
       callback();
     });
   });

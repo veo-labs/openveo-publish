@@ -1,27 +1,26 @@
 'use strict';
 
 var async = require('async');
+var openVeoApi = require('@openveo/api');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 5.0.2 migration launched.');
-  var db = process.api.getCoreApi().getDatabase();
+  var roleProvider = process.api.getCoreApi().roleProvider;
 
   async.series([
 
     // Rename permissions names
     function(callback) {
-      db.get('core_roles', {}, null, null, function(error, value) {
-        if (error) {
-          callback(error);
-          return;
-        }
+      roleProvider.getAll(null, null, {id: 'desc'}, function(error, roles) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!value || !value.length) return callback();
+        if (!roles || !roles.length) return callback();
 
         var asyncActions = [];
 
-        value.forEach(function(role) {
+        roles.forEach(function(role) {
           if (role.permissions) {
             var permissions = [];
             role['permissions'].forEach(function(permission) {
@@ -35,11 +34,12 @@ module.exports.update = function(callback) {
               }
             });
 
-
             asyncActions.push(function(callback) {
-              db.update('core_roles', {id: role.id}, {permissions: permissions}, function(error) {
-                callback(error);
-              });
+              roleProvider.updateOne(
+                new ResourceFilter().equal('id', role.id),
+                {permissions: permissions},
+                callback
+              );
             });
           }
         });
@@ -47,11 +47,8 @@ module.exports.update = function(callback) {
         async.series(asyncActions, callback);
       });
     }
-  ], function(err) {
-    if (err) {
-      callback(err);
-      return;
-    }
+  ], function(error) {
+    if (error) return callback(error);
     process.logger.info('Publish 5.0.2 migration done.');
     callback();
   });

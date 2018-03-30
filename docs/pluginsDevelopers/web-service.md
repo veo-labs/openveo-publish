@@ -22,13 +22,15 @@ user | String/Array | No | - | To filter videos by user
 sortBy | String | No | date | To sort videos by either **title**, **description**, **date**, **state**, **views** or **category**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 0 | The expected page
-limit | Number | No | - | To limit the number of videos per page. If not specified get all videos
-properties | Object | No | - | A list of custom properties with the property id as the key and the expected property value as the value. (e.g. **properties[property1Id]=property1Value**)
-
+limit | Number | No | 10 | To limit the number of videos per page
+properties | Object | No | - | A list of custom properties with the property id as the key and the expected property value as the value. (e.g.
+**properties[property1Id]=property1Value**)
+include | Array | No | - | The list of fields to include from returned videos
+exclude | Array | No | - | The list of fields to exclude from returned videos. Ignored if include is also specified
 
 HTTP Status Code | Details
 ---- | ----
-200 | Got the list of videos (even if the list is empty)
+200 | Got the list of videos
 500 | An error occured on the server side
 400 | Wrong list of parameters
 401 | Authentication to the web service failed
@@ -136,13 +138,14 @@ Videos can be in different states:
 
 ---
 
-Get information about a video.
+Get a video.
 
     GET WEB_SERVICE_URL/publish/videos/{video_id}
 
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
-video_id | String | Yes | - | The id of the video to fetch
+include | Array | No | - | The list of fields to include from returned video
+exclude | Array | No | - | The list of fields to exclude from returned video. Ignored if include is also specified
 
 HTTP Status Code | Details
 ---- | ----
@@ -151,6 +154,7 @@ HTTP Status Code | Details
 400 | The id of the video is missing
 401 | Authentication to the web service failed
 403 | Authorization forbidden for this end point
+404 | Video not found
 
 ```json
 {
@@ -228,67 +232,23 @@ HTTP Status Code | Details
 
 ---
 
-Add video information.
-
-    PUT WEB_SERVICE_URL/publish/videos
-
-HTTP Status Code | Details
----- | ----
-200 | The video has been added
-500 | An error occured on the server side
-400 | Wrong PUT parameters
-401 | Authentication to the web service failed
-403 | Authorization forbidden for this end point
-
-```json
-{
-  "entity" : {
-    "id" : 1444396683105, // Id of the video
-    "state" : 12, // Video state
-    ...
-  }
-}
-```
-
----
-
-Update a video.
-
-    POST WEB_SERVICE_URL/publish/videos/{video_id}
-
-HTTP Status Code | Details
----- | ----
-200 | The video has been updated
-500 | An error occured on the server side
-400 | Missing the video id
-401 | Authentication to the web service failed
-403 | Authorization forbidden for this end point
-
-```json
-{
-  "error": null,
-  "status": "ok"
-}
-```
-
----
-
-Delete a video.
+Delete videos.
 
     DELETE WEB_SERVICE_URL/publish/videos/{video_id}
 
+With **{video_id}** a comma separated list of video ids to delete.
+
 HTTP Status Code | Details
 ---- | ----
-200 | The video has been deleted
+200 | The videos have been deleted
 500 | An error occured on the server side
-400 | Missing the video id
+400 | Missing the video ids
 401 | Authentication to the web service failed
 403 | Authorization forbidden for this end point
 
 ```json
 {
-  "error": null,
-  "status": "ok"
+  "total": 42
 }
 ```
 
@@ -305,11 +265,13 @@ types | String/Array | No | - | To filter properties by type
 sortBy | String | No | name | To sort properties by either **name** or **description**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 0 | The expected page
-limit | Number | No | - | To limit the number of properties per page. If not specified get all properties
+limit | Number | No | 10 | To limit the number of properties per page
+include | Array | No | - | The list of fields to include from returned properties
+exclude | Array | No | - | The list of fields to exclude from returned properties. Ignored if include is also specified
 
 HTTP Status Code | Details
 ---- | ----
-200 | Got the list of properties (even if the list is empty)
+200 | Got the list of properties
 500 | An error occured on the server side
 400 | Wrong list of parameters
 401 | Authentication to the web service failed
@@ -343,13 +305,16 @@ HTTP Status Code | Details
 
 ---
 
-Get information about a property.
+Get a property.
 
     GET WEB_SERVICE_URL/publish/properties/{property_id}
 
+With **{property_id}** the id of the property to retrieve.
+
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
-property_id | String | Yes | - | The id of the property to fetch
+include | Array | No | - | The list of fields to include from returned property
+exclude | Array | No | - | The list of fields to exclude from returned property. Ignored if include is also specified
 
 HTTP Status Code | Details
 ---- | ----
@@ -358,6 +323,7 @@ HTTP Status Code | Details
 400 | The id of the property is missing
 401 | Authentication to the web service failed
 403 | Authorization forbidden for this end point
+404 | Property not found
 
 ```json
 {
@@ -392,13 +358,22 @@ HTTP Status Code | Details
 
 ---
 
-Add a property.
+Add custom properties.
 
     PUT WEB_SERVICE_URL/publish/properties
 
+Expects an Array of objects containing:
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+name | String | Yes | - | The custom property name
+description | String | Yes | - | The custom property description
+type | String | Yes | - | The custom property type (either **text**, **list**, or **boolean**)
+values | Array | No | - | The custom property values if type is **list**
+
 HTTP Status Code | Details
 ---- | ----
-200 | The property has been added
+200 | The properties have been added
 500 | An error occured on the server side
 400 | Wrong PUT parameters
 401 | Authentication to the web service failed
@@ -406,12 +381,16 @@ HTTP Status Code | Details
 
 ```json
 {
-  "entity": {
-    "id": "NyiBTYjTe",
-    "name": "Property name",
-    "description": "Property description",
-    "type": "text"
-  }
+  "entities": [
+    {
+      "id": "4JMy6htjpe",
+      "name": "Property name",
+      "description": "Property description",
+      "type": "list",
+      "values": ["value1", "value2"]
+    },
+    ...
+  ]
 }
 ```
 
@@ -420,6 +399,15 @@ HTTP Status Code | Details
 Update a property.
 
     POST WEB_SERVICE_URL/publish/properties/{property_id}
+
+With **{property_id}** the id of the property to update.
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+name | String | No | - | The custom property name
+description | String | No | - | The custom property description
+type | String | No | - | The custom property type (either **text**, **list**, or **boolean**)
+values | Array | No | - | The custom property values if type is **list**
 
 HTTP Status Code | Details
 ---- | ----
@@ -431,28 +419,28 @@ HTTP Status Code | Details
 
 ```json
 {
-  "error": null,
-  "status": "ok"
+  "total": 1
 }
 ```
 
 ---
 
-Delete a property.
+Delete properties.
 
     DELETE WEB_SERVICE_URL/publish/properties/{property_id}
 
+With **{property_id}** a comma separated list of property ids to delete.
+
 HTTP Status Code | Details
 ---- | ----
-200 | The property has been deleted
+200 | The properties have been deleted
 500 | An error occured on the server side
-400 | Missing the property id
+400 | Missing the property ids
 401 | Authentication to the web service failed
 403 | Authorization forbidden for this end point
 
 ```json
 {
-  "error": null,
-  "status": "ok"
+  "total": 42
 }
 ```

@@ -6,13 +6,19 @@ module.exports = {
       public: {
         'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
         'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction',
-        'post /video/:id/updatePoi': 'app/server/controllers/VideoController.updatePoiAction'
+        'post /videos/:id/poi/convert': 'app/server/controllers/VideoController.convertPoiAction'
       },
       private: {
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
         'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
-        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction',
+        'post /videos/:id/chapters/:chapterid': 'app/server/controllers/VideoController.updateChapterAction',
+        'post /videos/:id/chapters': 'app/server/controllers/VideoController.updateChapterAction',
+        'post /videos/:id/tags/:tagid': 'app/server/controllers/VideoController.updateTagAction',
+        'post /videos/:id/tags': 'app/server/controllers/VideoController.updateTagAction',
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction',
+        'delete /videos/:id/chapters/:chaptersids': 'app/server/controllers/VideoController.removeChaptersAction',
+        'delete /videos/:id/tags/:tagsids': 'app/server/controllers/VideoController.removeTagsAction',
         'post /addMedia': 'app/server/controllers/VideoController.addEntityAction',
         'post /retryVideo/:ids': 'app/server/controllers/VideoController.retryVideosAction',
         'post /startUpload/:ids/:platform': 'app/server/controllers/VideoController.startUploadAction',
@@ -22,17 +28,14 @@ module.exports = {
         'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
         'get /configuration/googleOAuthAssociation':
         'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
-        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration',
-        'post /updateVideoTags/:id': 'app/server/controllers/VideoController.updateTagsAction',
-        'post /removeVideoTags/:id': 'app/server/controllers/VideoController.removeTagsAction'
+        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
       },
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
         'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction',
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
-        'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
-        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction'
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction'
       }
     }
   },
@@ -152,8 +155,8 @@ module.exports = {
           name: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_NAME',
           description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION',
           paths: [
-            'post /publish/updateVideoTags*',
-            'post /publish/removeVideoTags*'
+            'post /publish/videos/*',
+            'delete /publish/videos/*'
           ]
         },
         {

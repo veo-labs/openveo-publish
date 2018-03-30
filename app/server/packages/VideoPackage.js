@@ -29,11 +29,10 @@ var acceptedImagesExtensions = [
  * @extends Package
  * @constructor
  * @param {Object} mediaPackage Information about the video
- * @param {VideoModel} videoModel A video model
- * @param {ConfigurationModel} configurationModel A configuration model
+ * @param {VideoProvider} videoProvider A video provider
  */
-function VideoPackage(mediaPackage, videoModel, configurationModel) {
-  VideoPackage.super_.call(this, mediaPackage, videoModel, configurationModel);
+function VideoPackage(mediaPackage, videoProvider) {
+  VideoPackage.super_.call(this, mediaPackage, videoProvider);
 }
 
 module.exports = VideoPackage;
@@ -235,7 +234,7 @@ VideoPackage.prototype.generateThumb = function() {
             self.setError(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
           }
 
-          self.videoModel.updateThumbnail(
+          self.videoProvider.updateThumbnail(
             self.mediaPackage.id,
             '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
             function() {
@@ -254,7 +253,7 @@ VideoPackage.prototype.generateThumb = function() {
       }).on('error', function(error) {
         self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
       }).on('end', function() {
-        self.videoModel.updateThumbnail(
+        self.videoProvider.updateThumbnail(
           self.mediaPackage.id,
           '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
           function() {
@@ -323,7 +322,7 @@ VideoPackage.prototype.getMetadata = function() {
           // Got video stream associated to the video file
           if (videoStream) {
             self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-            self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
+            self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
               self.fsm.transition();
             });
           } else

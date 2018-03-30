@@ -81,10 +81,10 @@
 
       // If no categories exist : Do create
       if ($scope.categoryTaxonomy.id === undefined) {
-        entityService.addEntity('taxonomies', null, {
+        entityService.addEntities('taxonomies', null, [{
           name: 'categories',
           tree: $scope.list
-        }).success(function(data) {
+        }]).success(function(data) {
           successCb(data);
         }).error(errorCb);
       } else {

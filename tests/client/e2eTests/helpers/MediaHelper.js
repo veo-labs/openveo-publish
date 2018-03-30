@@ -9,6 +9,7 @@ var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
 var STATES = process.requirePublish('app/server/packages/states.js');
 var fileSystem = openVeoApi.fileSystem;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/');
 
@@ -17,12 +18,12 @@ var publicDirectory = path.normalize(process.rootPublish + '/assets/player/video
  *
  * Each function is inserting in protractor's control flow.
  *
- * @param {VideoModel} model The entity model that will be used by the Helper
+ * @param {VideoProvider} provider The entity provider that will be used by the Helper
  * @param {Array} properties A list of properties to associate to videos to create
  * @param {Array} categories A list of categories to associate to videos to create
  */
-function MediaHelper(model, properties, categories) {
-  MediaHelper.super_.call(this, model);
+function MediaHelper(provider, properties, categories) {
+  MediaHelper.super_.call(this, provider);
 
   // The list of available media properties
   this.properties = properties || [];
@@ -110,9 +111,10 @@ MediaHelper.prototype.addEntitiesAuto = function(name, total, offset) {
  * @param {String} mediaFileName Name of the media package file
  * @param {Number} mediaState State of the media
  * @param {Array} groups A list of group ids
+ * @param {String} userId The id of the owner
  * @return {Promise} Promise resolving with create media information
  */
-MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileName, mediaState, groups) {
+MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileName, mediaState, groups, userId) {
   var self = this;
 
   return this.flow.execute(function() {
@@ -151,6 +153,7 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
         state: mediaState,
         title: 'Test',
         groups: groups,
+        user: userId,
         sources: {
           files: [{
             width: 1920,
@@ -254,15 +257,19 @@ MediaHelper.prototype.clearChapters = function(mediaId) {
   return this.flow.execute(function() {
     var deferred = protractor.promise.defer();
 
-    self.model.update(mediaId, {
-      cut: [],
-      chapters: []
-    }, function(error) {
-      if (error)
-        throw error;
-      else
-        deferred.fulfill();
-    });
+    self.provider.updateOne(
+      new ResourceFilter().equal('id', mediaId),
+      {
+        cut: [],
+        chapters: []
+      },
+      function(error) {
+        if (error)
+          throw error;
+        else
+          deferred.fulfill();
+      }
+    );
     return deferred.promise;
   });
 };

@@ -10,9 +10,9 @@ module.exports = {
     src: [
       'tests/server/init.js',
       'tests/server/controllers/*.js',
-      'tests/server/models/*.js',
       'tests/server/providers/*.js',
-      'tests/server/watcher/*.js'
+      'tests/server/watcher/*.js',
+      'tests/server/migrations/*.js'
     ]
   }
 

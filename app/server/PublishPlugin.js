@@ -6,10 +6,10 @@ var express = require('express');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var Watcher = process.requirePublish('app/server/watcher/Watcher.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
+var PublishPluginApi = process.requirePublish('app/server/PublishPluginApi.js');
 var listener = process.requirePublish('app/server/listener.js');
 
 var configDir = openVeoApi.fileSystem.getConfDir();
@@ -55,7 +55,16 @@ function PublishPlugin() {
      * @type Router
      * @final
      */
-    webServiceRouter: {value: express.Router()}
+    webServiceRouter: {value: express.Router()},
+
+    /**
+     * Publish APIs.
+     *
+     * @property api
+     * @type PluginApi
+     * @final
+     */
+    api: {value: new PublishPluginApi()}
 
   });
 }
@@ -64,15 +73,17 @@ module.exports = PublishPlugin;
 util.inherits(PublishPlugin, openVeoApi.plugin.Plugin);
 
 /**
- * Sets listeners on core events.
+ * Sets listeners on events.
  *
- * @method setCoreListeners
+ * @method setListeners
  * @private
  */
-function setCoreListeners() {
+function setListeners() {
   var coreApi = process.api.getCoreApi();
   var CORE_HOOKS = coreApi.getHooks();
+  var PUBLISH_HOOKS = this.api.getHooks();
   coreApi.registerAction(CORE_HOOKS.USERS_DELETED, listener.onUsersDeleted);
+  coreApi.registerAction(PUBLISH_HOOKS.PROPERTIES_DELETED, listener.onPropertiesDeleted);
 }
 
 /**
@@ -95,7 +106,7 @@ PublishPlugin.prototype.init = function(callback) {
   ];
 
   // Set event listeners on core and plugins
-  setCoreListeners.call(this);
+  setListeners.call(this);
 
   providers.forEach(function(provider) {
     if (provider.createIndexes) {
@@ -126,8 +137,8 @@ PublishPlugin.prototype.start = function(callback) {
   if (!process.isWebService) {
     var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
-    var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
-    var publishManager = PublishManager.get(videoModel, publishConf.maxConcurrentPackage);
+    var videoProvider = new VideoProvider(database);
+    var publishManager = PublishManager.get(videoProvider, publishConf.maxConcurrentPackage);
     var watcher = new Watcher();
     var hotFoldersPaths = [];
 

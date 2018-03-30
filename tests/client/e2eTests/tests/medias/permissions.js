@@ -3,9 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
@@ -21,10 +19,8 @@ describe('Media page', function() {
   // Prepare page
   before(function() {
     var videoProvider = new VideoProvider(coreApi.getDatabase());
-    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-    mediaHelper = new MediaHelper(videoModel);
-    page = new MediaPage(videoModel);
+    mediaHelper = new MediaHelper(videoProvider);
+    page = new MediaPage(videoProvider);
   });
 
   // Logout after tests
@@ -52,20 +48,17 @@ describe('Media page', function() {
   describe('medias', function() {
     var ownerLineToAdd;
     var anonymousLineToAdd;
-    var mediaHelperWithUser;
 
     before(function() {
-      var videoProvider = new VideoProvider(coreApi.getDatabase());
-      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-      var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
-      var videoModelWithUser = new VideoModel(owner, videoProvider, propertyProvider);
-      mediaHelperWithUser = new MediaHelper(videoModelWithUser);
-
       page.logAs(datas.users.publishGuest);
     });
 
     // Log with a user without access permission
     beforeEach(function() {
+      var owner = process.protractorConf.getUser(
+        datas.users.publishMedias1.name
+      );
+
       anonymousLineToAdd = {
         id: '0',
         state: STATES.PUBLISHED,
@@ -78,13 +71,13 @@ describe('Media page', function() {
         id: '1',
         state: STATES.PUBLISHED,
         title: 'Media 2',
+        user: owner.id,
         date: new Date('2017/11/20').getTime(),
         description: 'Media 2 description',
         groups: ['publishGroup1']
       };
 
-      mediaHelper.addEntities([anonymousLineToAdd]);
-      return mediaHelperWithUser.addEntities([ownerLineToAdd]);
+      return mediaHelper.addEntities([anonymousLineToAdd, ownerLineToAdd]);
     });
 
     // Remove all medias after each tests then reload the page
@@ -340,7 +333,7 @@ describe('Media page', function() {
         assert.isRejected(page.removeLine(ownerLineToAdd.title));
 
         page.sendRequest('be/publish/videos/' + ownerLineToAdd.id, 'delete').then(function(response) {
-          assert.equal(response.status, 500);
+          assert.equal(response.status, 403);
         });
       });
     });

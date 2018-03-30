@@ -1,10 +1,17 @@
 'use strict';
 
 var async = require('async');
+var openVeoApi = require('@openveo/api');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var databaseErrors = openVeoApi.storages.databaseErrors;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 6.0.0 migration launched.');
-  var db = process.api.getCoreApi().getDatabase();
+  var coreApi = process.api.getCoreApi();
+  var db = coreApi.getDatabase();
+  var videoProvider = new VideoProvider(db);
+  var settingProvider = coreApi.settingProvider;
 
   async.series([
 
@@ -17,52 +24,147 @@ module.exports.update = function(callback) {
      * Therefore image processing is now launched using style=publish-thumb-200 instead of thumb=small.
      */
     function(callback) {
-      db.get('publish_videos', null, null, null, function(error, videos) {
-        if (error)
-          return callback(error);
+      videoProvider.getAll(null, null, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!videos || !videos.length)
-          return callback();
-        else {
-          var asyncActions = [];
+        if (!medias || !medias.length) return callback();
+        var asyncActions = [];
 
-          videos.forEach(function(video) {
-            if (video.timecodes) {
-              video.timecodes.forEach(function(timecode) {
-                if (timecode.image && timecode.image.small)
-                  timecode.image.small = timecode.image.small.replace('thumb=small', 'style=publish-thumb-200');
-              });
+        medias.forEach(function(media) {
+          if (media.timecodes) {
+            var needUpdate = false;
 
-              asyncActions.push(function(callback) {
-                db.update(
-                  'publish_videos',
-                  {
-                    id: video.id
-                  },
-                  {
-                    timecodes: video.timecodes
-                  },
-                  function(error) {
-                    if (!error)
-                      process.logger.info('Timecodes of video "' + video.id + '" updated');
+            media.timecodes.forEach(function(timecode) {
+              if (timecode.image && timecode.image.small) {
+                timecode.image.small = timecode.image.small.replace('thumb=small', 'style=publish-thumb-200');
+                needUpdate = true;
+              }
+            });
 
-                    callback(error);
-                  }
-                );
+            if (!needUpdate) return;
+
+            asyncActions.push(function(callback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                {
+                  timecodes: media.timecodes
+                },
+                callback
+              );
+            });
+          }
+        });
+
+        async.parallel(asyncActions, callback);
+      });
+    },
+
+    /**
+     * Migrates publish configuration to core settings.
+     *
+     * OpenVeo Core now offers a setting provider for its own use and for plugins.
+     * OpenVeo Publish defines two configurations:
+     *   - The configuration to set default owner and group for a media detected by the watcher
+     *   - The Google authentication tokens when a Youtube account is associated to OpenVeo
+     * This two settings are now stored by OpenVeo Core, thus existing publish configurations have to be migrated to
+     * OpenVeo Core settings.
+     */
+    function(callback) {
+      db.get('publish_configurations', null, null, 2, null, null, function(error, configurations) {
+        var settings = [];
+        if (error) return callback(error);
+
+        configurations.forEach(function(configuration) {
+          if (configuration.googleOAuthTokens) {
+            settings.push(
+              {
+                id: 'publish-googleOAuthTokens',
+                value: configuration.googleOAuthTokens
+              }
+            );
+          } else if (configuration.publishDefaultUpload) {
+            settings.push(
+              {
+                id: 'publish-defaultUpload',
+                value: configuration.publishDefaultUpload
+              }
+            );
+          }
+        });
+
+        settingProvider.add(settings, callback);
+      });
+    },
+
+    /**
+     * Removes collection "publish_configurations".
+     *
+     * OpenVeo Publish configuration is now in OpenVeo Core settings, collection "publish_configurations" is not
+     * used anymore.
+     */
+    function(callback) {
+      db.removeCollection('publish_configurations', function(error) {
+        if (error && error.code === databaseErrors.REMOVE_COLLECTION_NOT_FOUND_ERROR) return callback();
+        callback(error);
+      });
+    },
+
+    /**
+     * Removes system paths from media tags.
+     *
+     * Tags associated to medias could have related files. These related files references was full system paths.
+     * This migration removes all tags system paths from database.
+     */
+    function(callback) {
+      videoProvider.getAll(
+        null,
+        {
+          include: ['id', 'tags']
+        },
+        {
+          id: 'desc'
+        },
+        function(error, medias) {
+          if (error) return callback(error);
+          if (!medias || !medias.length) return callback();
+
+          var asyncFunctions = [];
+
+          medias.forEach(function(media) {
+            var needUpdate = false;
+
+            if (media.tags && media.tags.length) {
+              media.tags.forEach(function(tag) {
+                if (tag.file) {
+                  delete tag.file.path;
+                  delete tag.file.destination;
+                  needUpdate = true;
+                }
               });
             }
+
+            if (!needUpdate) return;
+
+            asyncFunctions.push(function(updateCallback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                {
+                  tags: media.tags
+                },
+                updateCallback
+              );
+            });
+
           });
 
-          async.parallel(asyncActions, callback);
+          async.parallel(asyncFunctions, callback);
         }
-      });
+      );
     }
 
   ], function(error, results) {
-    if (error)
-      return callback(error);
-
+    if (error) return callback(error);
     process.logger.info('Publish 6.0.0 migration done.');
     callback();
   });

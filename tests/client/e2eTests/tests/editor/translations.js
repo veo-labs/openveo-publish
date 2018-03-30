@@ -7,9 +7,7 @@ var e2e = require('@openveo/test').e2e;
 var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var browserExt = e2e.browser;
 
@@ -29,11 +27,9 @@ describe('Editor page translations', function() {
   before(function() {
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
-    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-    var mediaPage = new MediaPage(videoModel);
+    var mediaPage = new MediaPage(videoProvider);
     page = new EditorPage(mediaId);
-    mediaHelper = new MediaHelper(videoModel);
+    mediaHelper = new MediaHelper(videoProvider);
 
     mediaPage.logAsAdmin();
     mediaPage.load();

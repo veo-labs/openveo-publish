@@ -6,11 +6,11 @@
 
 var google = require('googleapis');
 var path = require('path');
-var async = require('async');
 var OAuth2 = google.auth.OAuth2;
 var openVeoApi = require('@openveo/api');
 var configDir = openVeoApi.fileSystem.getConfDir();
 var publishConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 var config;
 
 /**
@@ -18,11 +18,9 @@ var config;
  *
  * @class GoogleOAuthHelper
  * @constructor
- * @param {ConfigurationModel} configurationModel The configuration model to use store / update / delete
- * Google API authentication
  * @throws {TypeError} If configuration is missing
  */
-function GoogleOAuthHelper(configurationModel) {
+function GoogleOAuthHelper() {
   if (publishConf.youtube && publishConf.youtube.googleOAuth)
     config = publishConf.youtube.googleOAuth;
 
@@ -40,16 +38,7 @@ function GoogleOAuthHelper(configurationModel) {
      */
     oauth2Client: {
       value: new OAuth2(config.clientId, config.clientSecret, config.redirectUrl)
-    },
-
-    /**
-     * Configuration model.
-     *
-     * @property confModel
-     * @type ConfigurationModel
-     * @final
-     */
-    confModel: {value: configurationModel}
+    }
 
   });
 }
@@ -59,49 +48,23 @@ function GoogleOAuthHelper(configurationModel) {
  *
  * @method saveToken
  * @param {Object} tokens The tokens retrieved from Google
- * @param {Function} [callback] Callback function with :
+ * @param {Function} [callback] Callback function with:
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** The saved token object
  */
 GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
-  var configuration;
-  var self = this;
-  async.series([
+  var settingProvider = process.api.getCoreApi().settingProvider;
 
-    // Retrieve token information from database
-    function(callback) {
-      self.confModel.get({googleOAuthTokens: {$ne: null}}, function(error, result) {
-        if (error || !result || result.length < 1) {
-          callback(error);
-          return;
-        } else {
-          configuration = result[0];
-        }
-        callback();
-      });
-    }],
-
-    function(error) {
-      if (error) {
-        callback(error);
-        return;
-      } else {
-        var cb = function(err, addedCount, data) {
-          if (err) {
-            process.logger.error('Error while saving configuration data', err);
-          } else {
-            process.logger.debug('Configuration data has been saved');
-          }
-
-          if (callback)
-            callback(err, tokens);
-        };
-
-        if (configuration && configuration.id)
-          self.confModel.update(configuration.id, {googleOAuthTokens: tokens}, cb);
-        else
-          self.confModel.add({googleOAuthTokens: tokens}, cb);
+  settingProvider.add(
+    [
+      {
+        id: 'publish-googleOAuthTokens',
+        value: tokens
       }
+    ],
+    function(error, addedCount, data) {
+      if (callback) return callback(error, data[0].value);
+      if (error) process.logger.error('Saving token failed with message: ' + error.message, error);
     }
   );
 };
@@ -115,23 +78,16 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
  *   - **Object** The token object
  */
 GoogleOAuthHelper.prototype.fetchToken = function(callback) {
-  this.confModel.get({googleOAuthTokens: {$ne: null}}, function(error, result) {
+  var settingProvider = process.api.getCoreApi().settingProvider;
 
-    if (error) {
-      process.logger.error('Error while retrieving configuration data', error);
-      callback(error);
-      return;
-    } else if (!result || result.length < 1) {
-      callback();
-      return;
-    } else {
-      var conf = result[0];
-      process.logger.debug('Configuration id retrieved', result && conf && conf.id);
-      var tokens = conf && conf.hasOwnProperty('googleOAuthTokens') ? conf.googleOAuthTokens : null;
-      process.logger.debug('Token retrieved from DB', tokens);
-      callback(null, tokens);
+  settingProvider.getOne(
+    new ResourceFilter().equal('id', 'publish-googleOAuthTokens'),
+    null,
+    function(error, googleOAuthSettings) {
+      if (error) return callback(error);
+      callback(null, googleOAuthSettings && googleOAuthSettings.value);
     }
-  });
+  );
 };
 
 /**
@@ -167,16 +123,13 @@ GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
  */
 GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
   var self = this;
-  self.oauth2Client.getToken(code, function(err, tokens, response) {
-    if (err) {
-      process.logger.error('Error while trying to retrieve access token', err);
-      process.logger.error(response.body);
-      callback(err, null);
-    } else if (tokens && Object.keys(tokens).length > 0) {
-      process.logger.debug('Token as been retrieved sucessfully', tokens);
-      self.saveToken(tokens, callback);
+  self.oauth2Client.getToken(code, function(error, token, response) {
+    if (error) return callback(error);
+    else if (token && Object.keys(token).length > 0) {
+      process.logger.debug('Token as been retrieved sucessfully', token);
+      self.saveToken(token, callback);
     } else if (callback) {
-      callback(null, null);
+      callback();
     }
   });
 };
@@ -190,8 +143,8 @@ GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
  *   - **Boolean** true a token exists, false otherwise
  */
 GoogleOAuthHelper.prototype.hasToken = function(callback) {
-  this.fetchToken(function(error, tokens) {
-    callback(error, new Boolean(tokens && Object.keys(tokens).length > 0));
+  this.fetchToken(function(error, token) {
+    callback(error, token ? true : false);
   });
 };
 
@@ -207,30 +160,24 @@ GoogleOAuthHelper.prototype.hasToken = function(callback) {
  */
 GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
   var self = this;
-  this.fetchToken(function(err, tokens) {
-    if (err) {
-      process.logger.error('Error while retrieving the token', err);
-      callback(err, null);
-    } else if (!tokens || Object.keys(tokens).length <= 0) {
-      callback(new Error('No token was previously set'), null);
-    } else {
-      var tokenHasExpired = tokens.expiry_date ? tokens.expiry_date <= (new Date()).getTime() : false;
+  this.fetchToken(function(error, token) {
+    if (error) return callback(error);
+    if (!token) return callback(new Error('No token was previously set'));
+    else {
+      var tokenHasExpired = token.expiry_date ? token.expiry_date <= (new Date()).getTime() : false;
       if (!tokenHasExpired) {
         process.logger.debug('Token found and up to date');
-        callback(null, tokens);
+        callback(null, token);
       } else {
         process.logger.debug('Token found but has expired, querying for a new one');
 
-        // hint : the tokens object also contains our refresh token
-        self.oauth2Client.setCredentials(tokens);
-        self.oauth2Client.refreshAccessToken(function(err, freshTokens) {
-          if (err) {
-            process.logger.error('Error while trying to refresh the access token', err);
-            callback(err, freshTokens);
-            return;
-          }
-          process.logger.debug('Token as been retrieved sucessfully', freshTokens);
-          self.saveToken(freshTokens, callback);
+        // hint: the token object also contains our refresh token
+        self.oauth2Client.setCredentials(token);
+        self.oauth2Client.refreshAccessToken(function(refreshError, freshToken) {
+          if (refreshError) return callback(refreshError, freshToken);
+
+          process.logger.debug('Token as been retrieved sucessfully', freshToken);
+          self.saveToken(freshToken, callback);
         });
       }
     }

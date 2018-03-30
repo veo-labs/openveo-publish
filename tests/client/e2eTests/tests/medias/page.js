@@ -4,12 +4,9 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
@@ -32,11 +29,10 @@ describe('Media page', function() {
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-    categoryHelper = new CategoryHelper(new CategoryModel());
-    propertyHelper = new PropertyHelper(new PropertyModel(propertyProvider, videoProvider));
-    mediaHelper = new MediaHelper(videoModel);
-    page = new MediaPage(videoModel);
+    categoryHelper = new CategoryHelper(coreApi.taxonomyProvider);
+    propertyHelper = new PropertyHelper(propertyProvider);
+    mediaHelper = new MediaHelper(videoProvider);
+    page = new MediaPage(videoProvider);
     tableAssert = new TableAssert(page, mediaHelper);
   });
 
@@ -56,18 +52,18 @@ describe('Media page', function() {
         properties.push({
           name: propertyNames[i] + ' text',
           description: propertyNames[i] + ' text description',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         });
         properties.push({
           name: propertyNames[i] + ' list',
           description: propertyNames[i] + ' list description',
-          type: PropertyModel.TYPES.LIST,
+          type: PropertyProvider.TYPES.LIST,
           values: ['tag1', 'tag2']
         });
         properties.push({
           name: propertyNames[i] + ' boolean',
           description: propertyNames[i] + ' boolean description',
-          type: PropertyModel.TYPES.BOOLEAN
+          type: PropertyProvider.TYPES.BOOLEAN
         });
       }
 
@@ -220,11 +216,11 @@ describe('Media page', function() {
 
     // Set custom properties values
     for (var i = 0; i < properties.length; i++) {
-      if (properties[i].type === PropertyModel.TYPES.TEXT)
+      if (properties[i].type === PropertyProvider.TYPES.TEXT)
         propertiesById[properties[i].id] = 'test edition ' + properties[i].name + ' value';
-      else if (properties[i].type === PropertyModel.TYPES.LIST)
+      else if (properties[i].type === PropertyProvider.TYPES.LIST)
         propertiesById[properties[i].id] = properties[i].values[0];
-      else if (properties[i].type === PropertyModel.TYPES.BOOLEAN)
+      else if (properties[i].type === PropertyProvider.TYPES.BOOLEAN)
         propertiesById[properties[i].id] = true;
     }
 

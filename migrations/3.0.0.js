@@ -2,12 +2,15 @@
 
 var path = require('path');
 var async = require('async');
+var shortid = require('shortid');
 var openVeoApi = require('@openveo/api');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var configDir = openVeoApi.fileSystem.getConfDir();
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 3.0.0 migration launched.');
-  var db = process.api.getCoreApi().getDatabase();
+  var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
 
   async.series([
 
@@ -22,50 +25,77 @@ module.exports.update = function(callback) {
 
       // Anonymous user id is not in configuration or is '1'
       // Nothing to do
-      if (!conf.anonymousUserId || conf.anonymousUserId === '1')
-        return callback();
+      if (!conf.anonymousUserId || conf.anonymousUserId === '1') return callback();
 
-      db.get('publish_videos', null, null, null, function(error, videos) {
-        if (error)
-          return callback(error);
+      videoProvider.getAll(null, null, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!videos || !videos.length)
-          return callback();
-        else {
-          var asyncActions = [];
+        if (!medias || !medias.length) return callback();
 
-          videos.forEach(function(video) {
-            if (
-              video.metadata &&
-              video.metadata.user === conf.anonymousUserId
-            ) {
-              asyncActions.push(function(callback) {
-                db.update(
-                  'publish_videos',
-                  {
-                    id: video.id
-                  },
-                  {
-                    'metadata.user': '1'
-                  },
-                  function(error) {
-                    callback(error);
-                  }
-                );
+        var asyncActions = [];
+
+        medias.forEach(function(media) {
+          if (media.metadata && media.metadata.user === conf.anonymousUserId) {
+            asyncActions.push(function(callback) {
+              videoProvider.updateOne(new ResourceFilter().equal('id', media.id), {user: '1'}, callback);
+            });
+          }
+        });
+
+        async.parallel(asyncActions, callback);
+      });
+    },
+
+    /**
+     * Adds ids to medias chapters.
+     *
+     * Each media chapter has now an id. Add an id to chapters missing it.
+     */
+    function(callback) {
+      videoProvider.getAll(
+        null,
+        {
+          include: ['id', 'chapters']
+        },
+        {
+          id: 'desc'
+        },
+        function(error, medias) {
+          var asyncFunctions = [];
+
+          medias.forEach(function(media) {
+            var needUpdate = false;
+
+            if (media.chapters && media.chapters.length) {
+              media.chapters.forEach(function(chapter) {
+                if (!chapter.id) {
+                  chapter.id = shortid.generate();
+                  needUpdate = true;
+                }
               });
             }
+
+            if (!needUpdate) return;
+
+            asyncFunctions.push(function(updateCallback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                {
+                  chapters: media.chapters
+                },
+                updateCallback
+              );
+            });
           });
 
-          async.parallel(asyncActions, callback);
+          async.parallel(asyncFunctions, callback);
         }
-      });
+      );
     }
 
   ], function(error, results) {
-    if (error)
-      return callback(error);
-
+    if (error) return callback(error);
     process.logger.info('Publish 3.0.0 migration done.');
     callback();
   });

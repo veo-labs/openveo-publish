@@ -6,9 +6,7 @@ var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -30,11 +28,9 @@ describe('Editor page', function() {
     // Create a media content
     before(function() {
       var videoProvider = new VideoProvider(coreApi.getDatabase());
-      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-      var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-      var mediaPage = new MediaPage(videoModel);
+      var mediaPage = new MediaPage(videoProvider);
       page = new EditorPage(mediaId);
-      mediaHelper = new MediaHelper(videoModel);
+      mediaHelper = new MediaHelper(videoProvider);
 
       mediaPage.logAsAdmin();
       mediaPage.load();
@@ -73,11 +69,16 @@ describe('Editor page', function() {
     // Create a media content
     before(function() {
       var videoProvider = new VideoProvider(coreApi.getDatabase());
-      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-      var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
-      mediaHelper = new MediaHelper(new VideoModel(owner, videoProvider, propertyProvider));
+      mediaHelper = new MediaHelper(videoProvider);
       page = new EditorPage(mediaId);
-      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED, 'publishGroup1').then(
+      mediaHelper.createMedia(
+        mediaId,
+        mediaFilePath,
+        mediaFileName,
+        STATES.PUBLISHED,
+        'publishGroup1',
+        process.api.getCoreApi().getSuperAdminId()
+      ).then(
         function(mediasAdded) {
           medias = mediasAdded;
           return page.logAsAdmin();

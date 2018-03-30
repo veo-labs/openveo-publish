@@ -11,7 +11,6 @@
           $http,
           $filter,
           $timeout,
-          entityService,
           i18nService,
           ovMultirangeViews,
           media,
@@ -108,7 +107,7 @@
 
     angular.element(myPlayer).on('needPoiConversion', function(event, duration) {
       $http
-        .post('/publish/video/' + $scope.media.id + '/updatePoi', {duration: duration})
+        .post('/publish/videos/' + $scope.media.id + '/poi/convert', {duration: duration})
         .then(function(response) {
           $scope.media = response.data.entity;
           preinit(duration);
@@ -204,7 +203,7 @@
      */
     function saveChapterSuccessCb(resp) {
       $scope.file = null;
-      $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
+      $scope.modelToEdit = resp.data[$scope.selectedData.value === 'chapters' ? 'chapter' : 'tag'];
       $scope.simpleMimeType = $scope.getFileMimeType();
 
       var i = searchPosition($scope.modelToEdit.id);
@@ -228,7 +227,11 @@
      */
     function saveChapter() {
       var objToSave = cleanObjectToSave($scope.selectedData.value, true);
-      $scope.upload = publishService.updateTags($scope.media.id, $scope.file, objToSave);
+
+      if ($scope.selectedData.value === 'tags')
+        $scope.upload = publishService.updateTag($scope.media.id, $scope.file, objToSave.tags[0]);
+      else if ($scope.selectedData.value === 'chapters')
+        $scope.upload = publishService.updateChapter($scope.media.id, objToSave.chapters[0]);
 
       $scope.upload.then(
         saveChapterSuccessCb,
@@ -568,20 +571,26 @@
 
     // remove chapter and tags
     $scope.remove = function() {
+      var removeMethodPromise;
       var ranges = $scope.media[$scope.selectedData.value];
-      var tagsToRemove = {};
-      var rangesToRemove = tagsToRemove[$scope.selectedData.value] = [];
+      var pointsOfInterestToRemove = {};
+      var rangesToRemove = pointsOfInterestToRemove[$scope.selectedData.value] = [];
       for (var i = 0; i < ranges.length; i++) {
-        if (ranges[i].check) rangesToRemove.push(ranges[i]);
+        if (ranges[i].check) rangesToRemove.push(ranges[i].id);
       }
       $scope.selectRow = null;
 
-      publishService.removeTags($scope.media.id, tagsToRemove).then(function(resp) {
+      if ($scope.selectedData.value === 'tags')
+        removeMethodPromise = publishService.removeTags($scope.media.id, pointsOfInterestToRemove.tags);
+      else if ($scope.selectedData.value === 'chapters')
+        removeMethodPromise = publishService.removeChapters($scope.media.id, pointsOfInterestToRemove.chapters);
+
+      removeMethodPromise.then(function(resp) {
         if ($scope.checkAllSelected) {
           $scope.media[$scope.selectedData.value] = [];
           $scope.checkAllSelected = false;
-        } else for (var i = 0; i < tagsToRemove[$scope.selectedData.value].length; i++) {
-          var id = tagsToRemove[$scope.selectedData.value][i]['id'];
+        } else for (var i = 0; i < pointsOfInterestToRemove[$scope.selectedData.value].length; i++) {
+          var id = pointsOfInterestToRemove[$scope.selectedData.value][i];
           var k = searchPosition(id);
           if (k >= 0) {
             $scope.media[$scope.selectedData.value].splice(k, 1);
@@ -684,7 +693,6 @@
     '$http',
     '$filter',
     '$timeout',
-    'entityService',
     'i18nService',
     'ovMultirangeViews',
     'media',

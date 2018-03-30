@@ -6,11 +6,10 @@
 
 var util = require('util');
 var openVeoApi = require('@openveo/api');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var EntityController = openVeoApi.controllers.EntityController;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Defines a controller to handle actions relative to properties' routes.
@@ -37,32 +36,49 @@ util.inherits(PropertyController, EntityController);
  */
 PropertyController.prototype.getPropertyTypesAction = function(request, response, next) {
   response.send({
-    types: PropertyModel.availableTypes
+    types: PropertyProvider.availableTypes
   });
 };
 
 /**
- * Gets a list of properties.
+ * Gets custom properties.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "entities" : [ ... ],
+ *       "pagination" : {
+ *         "limit": ..., // The limit number of custom properties by page
+ *         "page": ..., // The actual page
+ *         "pages": ..., // The total number of pages
+ *         "size": ... // The total number of custom properties
+ *     }
  *
  * @method getEntitiesAction
  * @async
  * @param {Request} request ExpressJS HTTP Request
- * @param {Object} request.query Request's query
- * @param {String} request.query.query Search query to search on both properties name and description
- * @param {Array} request.query.types To filter properties by type
- * @param {String} request.query.page The expected page
- * @param {String} request.query.limit The expected limit
- * @param {String} request.query.sortBy To sort properties by name or description (default is name)
- * @param {String} request.query.sortOrder Sort order (either asc or desc)
+ * @param {Object} [request.query] Request's query
+ * @param {String|Array} [request.query.include] The list of fields to include from returned properties
+ * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned properties. Ignored if
+ * include is also specified.
+ * @param {String} [request.query.query] Search query to search on both name and description
+ * @param {Array} [request.query.types] To filter properties by type
+ * @param {String} [request.query.page=0] The expected page
+ * @param {String} [request.query.limit=10] The expected limit
+ * @param {String} [request.query.sortBy="name"] The field to sort properties by (either **name** or **description**)
+ * @param {String} [request.query.sortOrder="desc"] The sort order (either **asc** or **desc**)
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 PropertyController.prototype.getEntitiesAction = function(request, response, next) {
-  var model = this.getModel(request);
   var params;
+  var provider = this.getProvider();
 
   try {
     params = openVeoApi.util.shallowValidateObject(request.query, {
+      include: {type: 'array<string>'},
+      exclude: {type: 'array<string>'},
       query: {type: 'string'},
       types: {type: 'array<string>'},
       limit: {type: 'number', gt: 0},
@@ -76,53 +92,45 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
 
   // Build sort
   var sort = {};
-  sort[params.sortBy] = params.sortOrder === 'asc' ? 1 : -1;
+  sort[params.sortBy] = params.sortOrder;
 
   // Build filter
-  var filter = {};
+  var filter = new ResourceFilter();
 
   // Add search query
-  if (params.query) {
-    filter.$text = {
-      $search: '"' + params.query + '"'
-    };
-  }
+  if (params.query) filter.search('"' + params.query + '"');
 
   // Add property types
-  if (params.types && params.types.length) {
-    filter.type = {
-      $in: params.types
-    };
-  }
+  if (params.types && params.types.length) filter.in('type', params.types);
 
-  model.getPaginatedFilteredEntities(
+  provider.get(
     filter,
+    {
+      exclude: params.exclude,
+      include: params.include
+    },
     params.limit,
     params.page,
     sort,
-    null,
-    function(error, entities, pagination) {
+    function(error, customProperties, pagination) {
       if (error) {
         process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
-        next(HTTP_ERRORS.GET_PROPERTIES_ERROR);
-      } else {
-        response.send({
-          entities: entities,
-          pagination: pagination
-        });
+        return next(HTTP_ERRORS.GET_PROPERTIES_ERROR);
       }
+      response.send({
+        entities: customProperties,
+        pagination: pagination
+      });
     }
   );
 };
 
 /**
- * Gets an instance of the property model.
+ * Gets associated provider.
  *
- * @method getModel
- * @param {Object} request The HTTP request
- * @return {PropertyModel} The PropertyModel instance
+ * @method getProvider
+ * @return {PropertyProvider} The provider associated to the controller
  */
-PropertyController.prototype.getModel = function(request) {
-  var database = process.api.getCoreApi().getDatabase();
-  return new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
+PropertyController.prototype.getProvider = function(request) {
+  return new PropertyProvider(process.api.getCoreApi().getDatabase());
 };

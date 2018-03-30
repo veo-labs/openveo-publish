@@ -9,10 +9,10 @@ var Helper = e2e.helpers.Helper;
  *
  * Each function is inserting in protractor's control flow.
  *
- * @param {ConfigurationModel} model The entity model that will be used by the Helper
+ * @param {SettingProvider} provider The settings provider that will be used by the Helper
  */
-function ConfigurationHelper(model) {
-  ConfigurationHelper.super_.call(this, model);
+function ConfigurationHelper(provider) {
+  ConfigurationHelper.super_.call(this, provider);
 }
 
 module.exports = ConfigurationHelper;

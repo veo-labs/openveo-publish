@@ -15,6 +15,7 @@ var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js')
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 var shortid = require('shortid');
 
@@ -62,11 +63,10 @@ var shortid = require('shortid');
  * @extends Package
  * @constructor
  * @param {Object} mediaPackage The media description object
- * @param {VideoModel} videoModel A video model
- * @param {ConfigurationModel} configurationModel A configuration model
+ * @param {VideoProvider} videoProvider A video provider
  */
-function TarPackage(mediaPackage, videoModel, configurationModel) {
-  TarPackage.super_.call(this, mediaPackage, videoModel, configurationModel);
+function TarPackage(mediaPackage, videoProvider) {
+  TarPackage.super_.call(this, mediaPackage, videoProvider);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
@@ -364,7 +364,7 @@ function saveTimecodes(xmlTimecodeFilePath, callback) {
       if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
       openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: formattedTimecodes});
 
-      self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+      self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
         callback(error, formattedTimecodes);
       });
     }
@@ -453,11 +453,11 @@ TarPackage.prototype.validatePackage = function() {
 
         async.parallel([
           function(callback) {
-            self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, callback);
+            self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, callback);
           },
           function(callback) {
             if (self.mediaPackage.metadata.date)
-              self.videoModel.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000, callback);
+              self.videoProvider.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000, callback);
             else callback();
           }
         ], function() {
@@ -543,9 +543,13 @@ TarPackage.prototype.saveTimecodes = function() {
             default:
           }
         }
-        self.videoModel.update(self.mediaPackage.id, videoInfo, function(error) {
-          return callback(error);
-        });
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          videoInfo,
+          function(error) {
+            return callback(error);
+          }
+        );
       } else {
         callback();
       }

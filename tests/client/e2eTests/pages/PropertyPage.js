@@ -9,8 +9,8 @@ var browserExt = e2e.browser;
 /**
  * Creates a new PropertyPage representing the properties back end page.
  */
-function PropertyPage(model) {
-  PropertyPage.super_.call(this, model);
+function PropertyPage(provider) {
+  PropertyPage.super_.call(this, provider);
 
   // Page path
   this.path = 'be/publish/properties-list';
