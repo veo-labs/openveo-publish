@@ -326,8 +326,10 @@
     // Listen to player errors
     // If an error occurs go back to catalog with an alert
     angular.element(myPlayer).on('error', function(event, error) {
-      $scope.$emit('setAlert', 'danger', error.message);
-      $scope.back();
+      if (error) {
+        $scope.$emit('setAlert', 'danger', error.message);
+        $scope.back();
+      }
     });
 
     // inject Math
