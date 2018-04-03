@@ -83,6 +83,7 @@ function setListeners() {
   var CORE_HOOKS = coreApi.getHooks();
   var PUBLISH_HOOKS = this.api.getHooks();
   coreApi.registerAction(CORE_HOOKS.USERS_DELETED, listener.onUsersDeleted);
+  coreApi.registerAction(CORE_HOOKS.GROUPS_DELETED, listener.onGroupsDeleted);
   coreApi.registerAction(PUBLISH_HOOKS.PROPERTIES_DELETED, listener.onPropertiesDeleted);
 }
 

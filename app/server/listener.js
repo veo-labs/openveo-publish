@@ -124,3 +124,45 @@ module.exports.onPropertiesDeleted = function(ids, callback) {
 
   async.series(asyncFunctions, callback);
 };
+
+/**
+ * Handles event when groups have been deleted.
+ *
+ * If one of the removed groups is the one choosed as the default group for the watcher,
+ * it must be reset.
+ *
+ * @method onGroupsDeleted
+ * @static
+ * @param {Array} The list of deleted groups ids
+ * @param {Function} callback Function to call when it's done
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+module.exports.onGroupsDeleted = function(ids, callback) {
+  var settingProvider = process.api.getCoreApi().settingProvider;
+
+  settingProvider.getOne(
+    new ResourceFilter().equal('id', 'publish-defaultUpload'),
+    null,
+    function(error, defaultUploadSettings) {
+      if (error) return callback(error);
+
+      if (defaultUploadSettings &&
+          defaultUploadSettings.value &&
+          defaultUploadSettings.value.group &&
+          ids.indexOf(defaultUploadSettings.value.group.value) >= 0) {
+        defaultUploadSettings.value.group = {
+          name: null,
+          value: null
+        };
+        settingProvider.updateOne(
+          new ResourceFilter().equal('id', 'publish-defaultUpload'),
+          {
+            value: defaultUploadSettings.value
+          },
+          callback
+        );
+      } else
+        callback();
+    }
+  );
+};

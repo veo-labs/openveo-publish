@@ -282,4 +282,112 @@ describe('Listeners', function() {
 
   });
 
+  describe('onGroupsDeleted', function() {
+
+    it('should remove deleted groups references from configuration', function(done) {
+      var deletedGroupsIds = ['42'];
+      expectedSettings = [
+        {
+          id: 'publish-defaultUpload',
+          value: {
+            group: {
+              name: 'Group name',
+              value: deletedGroupsIds[0]
+            }
+          }
+        }
+      ];
+
+      settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+        assert.deepEqual(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          'publish-defaultUpload',
+          'Wrong setting'
+        );
+        callback(null, expectedSettings[0]);
+      });
+
+      settingProvider.updateOne = chai.spy(function(filter, modifications, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          'publish-defaultUpload',
+          'Wrong updated setting'
+        );
+        assert.isNull(modifications.value.group.name, 'Unexpected group name');
+        assert.isNull(modifications.value.group.value, 'Unexpected group id');
+        callback(null, 1);
+      });
+
+      listener.onGroupsDeleted(deletedGroupsIds, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        settingProvider.getOne.should.have.been.called.exactly(1);
+        settingProvider.updateOne.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should not reset configuration if deleted group is not part of configuration', function(done) {
+      var deletedGroupsIds = ['Something else'];
+      expectedSettings = [
+        {
+          id: 'publish-defaultUpload',
+          value: {
+            group: {
+              name: 'Group name',
+              value: '42'
+            }
+          }
+        }
+      ];
+
+      listener.onGroupsDeleted(deletedGroupsIds, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+        settingProvider.getOne.should.have.been.called.exactly(1);
+        settingProvider.updateOne.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if getting settings failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+
+      settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+        callback(expectedError);
+      });
+
+      listener.onGroupsDeleted(['42'], function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        settingProvider.getOne.should.have.been.called.exactly(1);
+        settingProvider.updateOne.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if updating settings failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      expectedSettings = [
+        {
+          id: 'publish-defaultUpload',
+          value: {
+            group: {
+              name: 'Group name',
+              value: '42'
+            }
+          }
+        }
+      ];
+
+      settingProvider.updateOne = chai.spy(function(filter, modifications, callback) {
+        callback(expectedError);
+      });
+
+      listener.onGroupsDeleted(['42'], function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        settingProvider.getOne.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+  });
+
 });
