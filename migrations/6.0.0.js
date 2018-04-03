@@ -12,6 +12,7 @@ module.exports.update = function(callback) {
   var db = coreApi.getDatabase();
   var videoProvider = new VideoProvider(db);
   var settingProvider = coreApi.settingProvider;
+  var roleProvider = coreApi.roleProvider;
 
   async.series([
 
@@ -161,6 +162,44 @@ module.exports.update = function(callback) {
           async.parallel(asyncFunctions, callback);
         }
       );
+    },
+
+    // Rename permission "publish-chapter-videos" into "publish-editor-videos"
+    function(callback) {
+      roleProvider.getAll(null, null, {id: 'desc'}, function(error, roles) {
+        if (error) return callback(error);
+
+        // No need to change anything
+        if (!roles || !roles.length) return callback();
+
+        var asyncActions = [];
+
+        roles.forEach(function(role) {
+          if (role.permissions) {
+            var permissions = [];
+            role['permissions'].forEach(function(permission) {
+              switch (permission) {
+                case 'publish-chapter-videos':
+                  permissions.push('publish-editor-videos');
+                  break;
+                default:
+                  permissions.push(permission);
+                  break;
+              }
+            });
+
+            asyncActions.push(function(callback) {
+              roleProvider.updateOne(
+                new ResourceFilter().equal('id', role.id),
+                {permissions: permissions},
+                callback
+              );
+            });
+          }
+        });
+
+        async.series(asyncActions, callback);
+      });
     }
 
   ], function(error, results) {

@@ -17,13 +17,16 @@ describe('Migration 6.0.0', function() {
   var database;
   var VideoProvider;
   var expectedMedias;
+  var expectedRoles;
   var coreApi;
   var realCoreApi;
   var settingProvider;
+  var roleProvider;
 
   // Mocks
   beforeEach(function() {
     expectedMedias = [];
+    expectedRoles = [];
 
     VideoProvider = function() {};
     VideoProvider.prototype.getAll = function(filter, fields, sort, callback) {
@@ -36,6 +39,15 @@ describe('Migration 6.0.0', function() {
     settingProvider = {
       add: chai.spy(function(settings, callback) {
         callback(null, settings);
+      })
+    };
+
+    roleProvider = {
+      getAll: function(filter, fields, sort, callback) {
+        callback(null, expectedRoles);
+      },
+      updateOne: chai.spy(function(filter, modifications, callback) {
+        callback(null, 1);
       })
     };
 
@@ -55,7 +67,8 @@ describe('Migration 6.0.0', function() {
       getCoreApi: function() {
         return coreApi;
       },
-      settingProvider: settingProvider
+      settingProvider: settingProvider,
+      roleProvider: roleProvider
     };
 
     realCoreApi = process.api;
@@ -331,6 +344,72 @@ describe('Migration 6.0.0', function() {
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(expectedError);
     });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      done();
+    });
+  });
+
+  it('should rename "publish-chapter-videos" into "publish-editor-videos"', function(done) {
+    expectedRoles = [
+      {
+        id: '42',
+        permissions: ['publish-chapter-videos']
+      }
+    ];
+
+    roleProvider.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedRoles[0].id,
+        'Wrong id'
+      );
+      assert.equal(modifications.permissions[0], 'publish-editor-videos', 'Wrong permission id');
+      callback(null, 1);
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      roleProvider.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should not update roles if no roles found', function(done) {
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      roleProvider.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting roles failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    roleProvider.getAll = function(filter, fields, sort, callback) {
+      callback(expectedError);
+    };
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      roleProvider.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if updating a role failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+    expectedRoles = [
+      {
+        id: '42',
+        permissions: ['publish-chapter-videos']
+      }
+    ];
+
+    roleProvider.updateOne = function(filter, modifications, callback) {
+      callback(expectedError);
+    };
 
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Wrong error');
