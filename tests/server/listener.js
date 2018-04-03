@@ -185,6 +185,28 @@ describe('Listeners', function() {
       });
     });
 
+    it('should not reset configuration if deleted user is not part of configuration', function(done) {
+      var deletedUsersIds = ['Something else'];
+      expectedSettings = [
+        {
+          id: 'publish-defaultUpload',
+          value: {
+            owner: {
+              name: 'User name',
+              value: '42'
+            }
+          }
+        }
+      ];
+
+      listener.onUsersDeleted(deletedUsersIds, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        settingProvider.getOne.should.have.been.called.exactly(1);
+        settingProvider.updateOne.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
     it('should execute callback with an error if getting settings failed', function(done) {
       var expectedError = new Error('Something went wrong');
 

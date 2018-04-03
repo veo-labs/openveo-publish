@@ -75,7 +75,10 @@ module.exports.onUsersDeleted = function(ids, callback) {
         function(error, defaultUploadSettings) {
           if (error) return callback(error);
 
-          if (defaultUploadSettings && defaultUploadSettings.value) {
+          if (defaultUploadSettings &&
+              defaultUploadSettings.value &&
+              defaultUploadSettings.value.owner &&
+              ids.indexOf(defaultUploadSettings.value.owner.value) >= 0) {
             defaultUploadSettings.value.owner = {
               name: null,
               value: null

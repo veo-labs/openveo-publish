@@ -32,6 +32,7 @@
 - Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
 - Fix OpenVeo Publish upgrade when upgrading from a version prior to version 2.0.0 with more than one media
 - Fix 3.0.0 migration by adding ids to chapters so that they can be updated instead of recreated
+- Removing a user won't remove the default owner for medias uploaded through the watcher when the owner is not the removed user
 
 # 5.0.1 / 2017-11-15
 
