@@ -12,7 +12,8 @@ module.exports = {
       'tests/server/controllers/*.js',
       'tests/server/providers/*.js',
       'tests/server/watcher/*.js',
-      'tests/server/migrations/*.js'
+      'tests/server/migrations/*.js',
+      'tests/server/listener.js'
     ]
   }
 
