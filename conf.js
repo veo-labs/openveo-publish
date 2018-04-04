@@ -284,6 +284,13 @@ module.exports = {
         id: 'publish-thumb-200',
         type: 'thumb',
         width: 200
+      },
+      {
+        id: 'publish-square-142',
+        type: 'thumb',
+        width: 142,
+        height: 142,
+        crop: true
       }
     ]
   }
