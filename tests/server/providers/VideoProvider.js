@@ -159,7 +159,6 @@ describe('VideoProvider', function() {
     });
 
     it('should execute callback without parameters if media has not been found', function(done) {
-      var expectedFilter = new ResourceFilter();
       expectedMedias = [];
 
       provider.getOne(new ResourceFilter(), null, function(error, media) {
@@ -1296,24 +1295,22 @@ describe('VideoProvider', function() {
       );
     });
 
-     it('should execute callback with an error if media is not found', function(done) {
-        var expectedError = new Error('Something went wrong');
+    it('should execute callback with an error if media is not found', function(done) {
+      provider.getOne = function(filter, fields, callback) {
+        callback();
+      };
 
-        provider.getOne = function(filter, fields, callback) {
-          callback();
-        };
-
-        provider.updateOne = chai.spy(function(filter, modifications, callback) {
-          callback(null, 1);
-        });
-
-        provider.updateOneTag(new ResourceFilter(), {}, {}, function(error, total) {
-          assert.instanceOf(error, NotFoundError, 'Wrong error');
-          provider.updateOne.should.have.been.called.exactly(0);
-          openVeoApi.fileSystem.rm.should.have.been.called.exactly(0);
-          done();
-        });
+      provider.updateOne = chai.spy(function(filter, modifications, callback) {
+        callback(null, 1);
       });
+
+      provider.updateOneTag(new ResourceFilter(), {}, {}, function(error, total) {
+        assert.instanceOf(error, NotFoundError, 'Wrong error');
+        provider.updateOne.should.have.been.called.exactly(0);
+        openVeoApi.fileSystem.rm.should.have.been.called.exactly(0);
+        done();
+      });
+    });
 
   });
 
@@ -1365,8 +1362,6 @@ describe('VideoProvider', function() {
     });
 
     it('should execute callback with an error if media is not found', function(done) {
-      var expectedError = new Error('Something went wrong');
-
       provider.getOne = function(filter, fields, callback) {
         callback();
       };
@@ -1560,8 +1555,6 @@ describe('VideoProvider', function() {
     });
 
     it('should execute callback with an error if media is not found', function(done) {
-      var expectedError = new Error('Something went wrong');
-
       provider.getOne = function(filter, fields, callback) {
         callback();
       };
