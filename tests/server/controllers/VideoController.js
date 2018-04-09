@@ -1404,6 +1404,27 @@ describe('VideoController', function() {
       });
     });
 
+    it('should be able to update the media owner as a manager', function(done) {
+      request.user.permissions = ['publish-manage-videos'];
+      expectedInfo.user = 'newUserId';
+      request.body.info = JSON.stringify(expectedInfo);
+
+      VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+        assert.equal(modifications.user, expectedInfo.user, 'Wrong user');
+        callback(null, 1);
+      });
+
+      response.send = function(data) {
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.updateEntityAction(request, response, function(error, total) {
+        assert.ok(false, 'Unexpected call to next function');
+        done();
+      });
+    });
+
     it('should execute next function with an error if parsing body failed', function(done) {
       MultipartParser.prototype.parse = function(callback) {
         callback(new Error('Something went wrong'));

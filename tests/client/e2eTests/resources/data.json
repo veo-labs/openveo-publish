@@ -110,6 +110,12 @@
         "update-group-publishGroup1"
       ]
     },
+    "publishMediasManager": {
+      "name": "publish-medias-manager",
+      "permissions": [
+        "publish-manage-videos"
+      ]
+    },
     "publishEditorEdit": {
       "name": "publish-editor-edit",
       "permissions": [
@@ -208,6 +214,12 @@
       "email": "publish-medias-group-no-delete@veo-labs.com",
       "password": "publish-medias-group-no-delete",
       "roles": [ "publishMediasGroupNoDelete", "publishMedias" ]
+    },
+    "publishMediasManager": {
+      "name": "publish-medias-manager",
+      "email": "publish-medias-manager@veo-labs.com",
+      "password": "publish-medias-manager",
+      "roles": [ "publishMediasManager", "publishMedias" ]
     },
     "publishEditorEdit": {
       "name": "publish-editor-edit",

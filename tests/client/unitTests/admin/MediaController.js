@@ -32,6 +32,9 @@ describe('MediaController', function() {
     scope.checkAccess = function() {
       return true;
     };
+    scope.hasPermission = function() {
+      return true;
+    };
     scope.test = {};
     scope.test.rows = [
       {

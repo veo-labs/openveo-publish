@@ -23,6 +23,7 @@
   i18nService,
   publishName) {
     var entityType = 'videos';
+    var isUserManager = $scope.hasPermission('publish-manage-videos');
     var addMediaPromise = null;
 
     $scope.properties = properties.data.entities;
@@ -659,7 +660,7 @@
         label: $filter('translate')('PUBLISH.MEDIAS.PUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
-            $scope.checkContentAccess(row, 'update') &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             row.state == 11 &&
             !row.saving;
         },
@@ -674,7 +675,7 @@
         label: $filter('translate')('PUBLISH.MEDIAS.UNPUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
-            $scope.checkContentAccess(row, 'update') &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             row.state == 12 &&
             !row.saving;
         },
@@ -689,7 +690,7 @@
         label: $filter('translate')('PUBLISH.MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
           return $scope.rights.editor &&
-            $scope.checkContentAccess(row, 'update') &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             !row.saving &&
             (row.state == 11 || row.state == 12);
         },
@@ -700,7 +701,10 @@
       {
         label: $filter('translate')('PUBLISH.MEDIAS.RETRY'),
         condition: function(row) {
-          return $scope.rights.retry && $scope.checkContentAccess(row, 'update') && row.state == 0 && !row.saving;
+          return $scope.rights.retry &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+            row.state == 0 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           retryMedia([row.id], reload);
@@ -709,7 +713,7 @@
       {
         label: $filter('translate')('CORE.UI.REMOVE'),
         condition: function(row) {
-          return $scope.checkContentAccess(row, 'delete') &&
+          return ($scope.checkContentAccess(row, 'delete') || isUserManager) &&
             !row.locked &&
             !row.saving &&
             (row.state === 6 || row.state === 11 || row.state === 12 || row.state === 0);
@@ -730,7 +734,10 @@
       scopeDataTable.actions.push({
         label: $filter('translate')('PUBLISH.MEDIAS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
-          return $scope.rights.upload && $scope.checkContentAccess(row, 'update') && row.state == 6 && !row.saving;
+          return $scope.rights.upload &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+            row.state == 6 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           startMediaUpload([row.id], this.platform, reload);
@@ -760,7 +767,10 @@
       row.customProperties = properties;
 
       // User field
-      if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == openVeoSettings.superAdminId) {
+      if (row.metadata.user == $scope.userInfo.id ||
+          $scope.userInfo.id == openVeoSettings.superAdminId ||
+          isUserManager
+         ) {
         var opt = utilService.buildSelectOptions($scope.users);
         scopeEditForm.fields.push({
           key: 'user',
@@ -788,7 +798,7 @@
     };
 
     scopeEditForm.conditionEditDetail = function(row) {
-      return $scope.checkContentAccess(row, 'update') && !row.locked && row.state !== 0;
+      return ($scope.checkContentAccess(row, 'update') || isUserManager) && !row.locked && row.state !== 0;
     };
     scopeEditForm.onSubmit = function(model) {
       return saveMedia(model);

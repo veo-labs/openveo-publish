@@ -737,8 +737,11 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
             if (self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE)) {
 
               // User is authorized to update but he must be owner to update the owner
-              if (!self.isUserOwner(media, request.user) && !self.isUserAdmin(request.user))
+              if (!self.isUserOwner(media, request.user) &&
+                  !self.isUserAdmin(request.user) &&
+                  !self.isUserManager(request.user)) {
                 delete info['user'];
+              }
 
               callback();
             } else
@@ -1713,6 +1716,25 @@ VideoController.prototype.getSuperAdminId = function() {
  */
 VideoController.prototype.getAnonymousId = function() {
   return process.api.getCoreApi().getAnonymousUserId();
+};
+
+/**
+ * Tests if user is a contents manager.
+ *
+ * A contents manager can perform CRUD operations on medias.
+ *
+ * @method isUserManager
+ * @param {Object} user The user to test
+ * @param {Array} user.permissions The user's permissions
+ * @return {Boolean} true if the user has permission to manage medias, false otherwise
+ */
+VideoController.prototype.isUserManager = function(user) {
+  if (!user || !user.permissions) return false;
+
+  for (var i = 0; i < user.permissions.length; i++) {
+    if (user.permissions[i] === 'publish-manage-videos') return true;
+  }
+  return false;
 };
 
 /**

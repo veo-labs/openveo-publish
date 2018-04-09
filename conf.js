@@ -160,6 +160,11 @@ module.exports = {
           id: 'publish-upload-videos',
           name: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_NAME',
           description: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION'
+        },
+        {
+          id: 'publish-manage-videos',
+          name: 'PUBLISH.PERMISSIONS.MANAGE_VIDEOS_NAME',
+          description: 'PUBLISH.PERMISSIONS.MANAGE_VIDEOS_DESCRIPTION'
         }
       ]
     }

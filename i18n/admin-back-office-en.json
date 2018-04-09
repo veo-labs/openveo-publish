@@ -50,6 +50,8 @@
     "RETRY_VIDEO_DESCRIPTION": "Retry to launch manually the video saving process",
     "UPLOAD_VIDEO_NAME": "Launch video upload",
     "UPLOAD_VIDEO_DESCRIPTION": "Launch manually the video upload",
+    "MANAGE_VIDEOS_NAME": "Manage all videos",
+    "MANAGE_VIDEOS_DESCRIPTION": "Manage videos of all users",
     "GROUP_PROPERTIES" : "Publish: Properties",
     "GROUP_VIDEOS" : "Publish: Videos",
     "GROUP_CONFIGURATION" : "Publish: Configuration",

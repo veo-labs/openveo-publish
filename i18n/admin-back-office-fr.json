@@ -50,6 +50,8 @@
     "RETRY_VIDEO_DESCRIPTION": "Relancer manuellement le processus d'enregistrement de la vidéo",
     "UPLOAD_VIDEO_NAME": "Lancer l'upload de la vidéo",
     "UPLOAD_VIDEO_DESCRIPTION": "Lancer manuellement l'upload la vidéo",
+    "MANAGE_VIDEOS_NAME": "Gèrer toutes les vidéos",
+    "MANAGE_VIDEOS_DESCRIPTION": "Gèrer les vidéos de tous les utilisateurs",
     "GROUP_PROPERTIES" : "Publish : Propriétés",
     "GROUP_VIDEOS" : "Publish : Vidéos",
     "GROUP_CONFIGURATION" : "Publish : Configuration",
