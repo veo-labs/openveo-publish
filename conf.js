@@ -60,14 +60,6 @@ module.exports = {
       ]
     },
     {
-      id: 'publish-update-videos',
-      name: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_NAME',
-      description: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_DESCRIPTION',
-      paths: [
-        'post /publish/videos*'
-      ]
-    },
-    {
       id: 'publish-delete-videos',
       name: 'PUBLISH.WS_SCOPES.DELETE_VIDEOS_NAME',
       description: 'PUBLISH.WS_SCOPES.DELETE_VIDEOS_DESCRIPTION',
