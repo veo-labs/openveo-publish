@@ -666,7 +666,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
     });
   }
   if (data.hasOwnProperty('user'))
-    modifications['metadata.user'] = data.user;
+    modifications['metadata.user'] = data.user || process.api.getCoreApi().getAnonymousUserId();
 
   VideoProvider.super_.prototype.updateOne.call(self, filter, modifications, function(updateError, total) {
     self.executeCallback(callback, updateError, total);

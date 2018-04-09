@@ -1051,6 +1051,22 @@ describe('VideoProvider', function() {
       });
     });
 
+    it('should set media user to the anonymous id if user is specified but not valid', function(done) {
+      var expectedModifications = {
+        user: null
+      };
+
+      EntityProvider.prototype.updateOne = function(filter, modifications, callback) {
+        assert.equal(modifications['metadata.user'], anonymousId, 'Wrong owner');
+        callback(null, 1);
+      };
+
+      provider.updateOne(new ResourceFilter(), expectedModifications, function(error, total) {
+        assert.isNull(error, 'Unexpected error');
+        done();
+      });
+    });
+
     it('should execute callback with an error if updating media failed', function(done) {
       var expectedError = new Error('Something went wrong');
       var expectedModifications = {
