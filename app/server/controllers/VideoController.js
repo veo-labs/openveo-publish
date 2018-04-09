@@ -327,6 +327,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
     var provider = this.getProvider();
     var self = this;
     var query;
+    var fields;
     request.query = request.query || {};
 
     try {
@@ -338,12 +339,16 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
       return next(HTTP_ERRORS.GET_MEDIA_WRONG_PARAMETERS);
     }
 
+    // Make sure "metadata" field is not excluded
+    fields = this.removeMetatadaFromFields({
+      exclude: query.exclude,
+      include: query.include
+    });
+
     provider.getOne(
       new ResourceFilter().equal('id', entityId),
-      {
-        exclude: query.exclude,
-        include: query.include
-      }, function(error, media) {
+      fields,
+      function(error, media) {
         if (error) {
           process.logger.error(error.message, {error: error, method: 'getEntityAction', entity: entityId});
           return next(HTTP_ERRORS.GET_MEDIA_ERROR);
@@ -856,6 +861,7 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
  */
 VideoController.prototype.getEntitiesAction = function(request, response, next) {
   var params;
+  var fields;
   var self = this;
   var medias = [];
   var properties = [];
@@ -917,16 +923,19 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
     });
   }
 
+  // Make sure "metadata" field is not excluded
+  fields = this.removeMetatadaFromFields({
+    exclude: params.exclude,
+    include: params.include
+  });
+
   async.parallel([
 
     // Get the list of medias
     function(callback) {
       provider.get(
         self.addAccessFilter(filter, request.user),
-        {
-          exclude: params.exclude,
-          include: params.include
-        },
+        fields,
         params.limit,
         params.page,
         sort,

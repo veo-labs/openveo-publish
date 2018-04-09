@@ -835,6 +835,39 @@ describe('VideoController', function() {
       });
     });
 
+    it('should not exclude "metadata" property', function(done) {
+      expectedMedias = [
+        {
+          id: '42'
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+      request.query.exclude = ['metadata'];
+      request.query.include = ['metadata'];
+
+      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+        assert.notInclude(fields.exclude,
+          'metadata',
+          'Unexpected excluded field "metadata"'
+        );
+        assert.include(fields.include,
+          'metadata',
+          'Expected "metadata" field to be included'
+        );
+        callback(null, expectedMedias[0]);
+      });
+
+      response.send = function(data) {
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
   });
 
   describe('addEntityAction', function() {
@@ -1587,11 +1620,39 @@ describe('VideoController', function() {
       request.query = {include: ['field1']};
 
       VideoProvider.prototype.get = function(filter, fields, page, limit, sort, callback) {
-        assert.deepEqual(fields.include, request.query.include, 'Wrong included fields');
+        assert.deepEqual(fields.include, request.query.include.concat(['metadata']), 'Wrong included fields');
         callback(null, expectedMedias, expectedPagination);
       };
 
       response.send = function(data) {
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function() {
+        assert.equal(false, 'Unexpected error');
+      });
+    });
+
+    it('should not exclude "metadata" property', function(done) {
+      expectedMedias = [{id: 42}];
+      request.query = {exclude: ['metadata'], include: ['field']};
+
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
+        assert.notInclude(
+          fields.exclude,
+          'metadata',
+          'Unexpected excluded field "metadata"'
+        );
+        assert.include(
+          fields.include,
+          'metadata',
+          'Expected field "metadata" to be included'
+        );
+        callback(null, expectedMedias, expectedPagination);
+      });
+
+      response.send = function(data) {
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
         done();
       };
 
