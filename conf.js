@@ -288,6 +288,20 @@ module.exports = {
         width: 142,
         height: 142,
         crop: true
+      },
+      {
+        id: 'publish-16by9-300',
+        type: 'thumb',
+        width: 300,
+        height: 169,
+        crop: true
+      },
+      {
+        id: 'publish-16by9-142',
+        type: 'thumb',
+        width: 142,
+        height: 80,
+        crop: true
       }
     ]
   }
