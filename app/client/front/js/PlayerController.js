@@ -29,6 +29,12 @@
 
           // Retrieve url parameters
           var urlParams = $location.search();
+          $scope.defaultMode = 'both';
+          if (media.metadata) {
+            var template = media.metadata.template || '';
+            if (template.match(/^mix-/))
+              $scope.defaultMode = 'media';
+          }
           $scope.data = media;
           $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
           $scope.publishLanguage = ovPublishTranslations[$scope.language] ? angular.copy($scope.language) : 'en';
