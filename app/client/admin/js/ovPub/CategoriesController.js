@@ -106,9 +106,9 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
-    $scope.rights.edit = $scope.checkAccess('publish-update-' + entityType);
-    $scope.rights.delete = $scope.checkAccess('publish-delete-' + entityType);
+    $scope.rights.add = $scope.checkAccess('core-add-taxonomies');
+    $scope.rights.edit = $scope.checkAccess('core-update-taxonomies');
+    $scope.rights.delete = $scope.checkAccess('core-delete-taxonomies');
 
   }
 
