@@ -650,7 +650,6 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (data.views) modifications.views = data.views;
   if (data.thumbnail) modifications.thumbnail = data.thumbnail;
   if (data.sources) modifications.sources = data.sources;
-  if (data.state) modifications.state = data.state;
   if (data.lastState) modifications.lastState = data.lastState;
   if (data.lastTransition) modifications.lastTransition = data.lastTransition;
   if (data.type) modifications.type = data.type;
@@ -658,6 +657,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (data.packageType) modifications.packageType = data.packageType;
   if (data.mediaId) modifications.mediaId = data.mediaId;
   if (data.link) modifications.link = data.link;
+  if (typeof data.state !== 'undefined') modifications.state = data.state;
   if (typeof data.errorCode !== 'undefined') modifications.errorCode = data.errorCode;
   if (typeof data.available !== 'undefined') modifications.available = Boolean(data.available);
   if (data.groups) {
