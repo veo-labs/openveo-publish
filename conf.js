@@ -34,6 +34,7 @@ module.exports = {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
         'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction',
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
+        'post /videos/:id/poi/convert': 'app/server/controllers/VideoController.convertPoiAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
         'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction'
       }
@@ -56,7 +57,8 @@ module.exports = {
       name: 'PUBLISH.WS_SCOPES.GET_VIDEOS_NAME',
       description: 'PUBLISH.WS_SCOPES.GET_VIDEOS_DESCRIPTION',
       paths: [
-        'get /publish/videos*'
+        'get /publish/videos*',
+        'post /publish/videos/*'
       ]
     },
     {
