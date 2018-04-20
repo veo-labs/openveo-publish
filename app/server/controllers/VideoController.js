@@ -1657,6 +1657,8 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
       }
 
       if (!media.needPointsOfInterestUnitConversion) {
+        resolveResourcesUrls([media]);
+
         return response.send({
           entity: media
         });
@@ -1688,6 +1690,8 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
             process.logger.error(updateError.message, {error: updateError, method: 'convertPoiAction'});
             return next(HTTP_ERRORS.CONVERT_VIDEO_POI_ERROR);
           }
+
+          resolveResourcesUrls([media]);
 
           response.send({
             entity: media
