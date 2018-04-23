@@ -639,27 +639,27 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
 
   if (data.title) modifications.title = data.title;
   if (data.date) modifications.date = data.date;
-  if (data.leadParagraph) modifications.leadParagraph = data.leadParagraph;
-  if (data.description) modifications.description = data.description;
   if (data.properties) modifications.properties = data.properties;
-  if (data.hasOwnProperty('category')) modifications.category = data.category;
   if (data.cut) modifications.cut = data.cut;
   if (data.timecodes) modifications.timecodes = data.timecodes;
   if (data.chapters) modifications.chapters = data.chapters;
   if (data.tags) modifications.tags = data.tags;
-  if (data.views) modifications.views = data.views;
   if (data.thumbnail) modifications.thumbnail = data.thumbnail;
   if (data.sources) modifications.sources = data.sources;
-  if (data.lastState) modifications.lastState = data.lastState;
   if (data.lastTransition) modifications.lastTransition = data.lastTransition;
   if (data.type) modifications.type = data.type;
   if (data.metadata) modifications.metadata = data.metadata;
   if (data.packageType) modifications.packageType = data.packageType;
   if (data.mediaId) modifications.mediaId = data.mediaId;
   if (data.link) modifications.link = data.link;
-  if (typeof data.state !== 'undefined') modifications.state = data.state;
-  if (typeof data.errorCode !== 'undefined') modifications.errorCode = data.errorCode;
-  if (typeof data.available !== 'undefined') modifications.available = Boolean(data.available);
+  if (data.hasOwnProperty('lastState')) modifications.lastState = data.lastState;
+  if (data.hasOwnProperty('views')) modifications.views = parseInt(data.views);
+  if (data.hasOwnProperty('category')) modifications.category = data.category;
+  if (data.hasOwnProperty('leadParagraph')) modifications.leadParagraph = data.leadParagraph;
+  if (data.hasOwnProperty('description')) modifications.description = data.description;
+  if (data.hasOwnProperty('state')) modifications.state = data.state;
+  if (data.hasOwnProperty('errorCode')) modifications.errorCode = data.errorCode;
+  if (data.hasOwnProperty('available')) modifications.available = Boolean(data.available);
   if (data.groups) {
     modifications['metadata.groups'] = data.groups.filter(function(group) {
       return group ? true : false;
