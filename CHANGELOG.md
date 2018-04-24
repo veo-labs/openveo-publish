@@ -34,6 +34,7 @@
 - Fix OpenVeo Publish upgrade when upgrading from a version prior to version 2.0.0 with more than one media
 - Fix 3.0.0 migration by adding ids to chapters so that they can be updated instead of recreated
 - Removing a user won't remove the default owner for medias uploaded through the watcher when the owner is not the removed user
+- Fix permissions on categories, a user with "add" and "update" privileges on taxonomies could not add / update categories, consequently only the super administrator could create new categories
 
 # 5.0.1 / 2017-11-15
 

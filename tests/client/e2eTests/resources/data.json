@@ -46,24 +46,24 @@
       "name": "publish-categories-no-write",
       "permissions": [
         "publish-access-categories-page",
-        "publish-update-categories",
-        "publish-delete-categories"
+        "core-update-taxonomies",
+        "core-delete-taxonomies"
       ]
     },
     "publishCategoriesNoUpdate": {
       "name": "publish-categories-no-update",
       "permissions": [
         "publish-access-categories-page",
-        "publish-add-categories",
-        "publish-delete-categories"
+        "core-add-taxonomies",
+        "core-delete-taxonomies"
       ]
     },
     "publishCategoriesNoDelete": {
       "name": "publish-categories-no-delete",
       "permissions": [
         "publish-access-categories-page",
-        "publish-add-categories",
-        "publish-update-categories"
+        "core-add-taxonomies",
+        "core-update-taxonomies"
       ]
     },
     "publishCategoriesNoManage": {

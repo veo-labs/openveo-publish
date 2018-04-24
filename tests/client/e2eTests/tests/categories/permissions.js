@@ -57,13 +57,7 @@ describe('Category page', function() {
     });
 
     it('should not be able to create the tree', function() {
-      page.addCategory('Test create without permission');
-      page.saveCategoryModifications();
-      page.getAlertMessages().then(function(messages) {
-        assert.equal(messages.length, 1);
-        assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-      });
-      page.closeAlerts();
+      assert.isRejected(page.addCategory('Test create without permission'));
     });
 
     it('should not be able to create the tree by requesting the server directly', function() {
@@ -143,19 +137,6 @@ describe('Category page', function() {
     afterEach(function() {
       categoryHelper.removeAllEntities();
       page.refresh();
-    });
-
-    it('should not have delete action to remove a category', function() {
-      var name = 'Test remove without permission';
-      var initialTree = [
-        {
-          title: 'Test remove a',
-          items: []
-        }
-      ];
-      categoryHelper.addEntities(initialTree);
-      page.refresh();
-      assert.isRejected(page.removeCategory(name));
     });
 
     it('should not be able to remove category by requesting the server directly', function() {

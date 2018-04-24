@@ -12,8 +12,8 @@
     /**
      * Handles success when a category is added or updated.
      */
-    function successCb(data) {
-      $scope.categoryTaxonomy.id = data.entity.id;
+    function successCb(taxonomy) {
+      $scope.categoryTaxonomy.id = taxonomy.id;
       $scope.saveIsDisabled = $scope.list.length == 0;
       $scope.listback = angular.copy($scope.list);
       publishService.cacheClear(entityType);
@@ -85,7 +85,9 @@
           name: 'categories',
           tree: $scope.list
         }]).success(function(data) {
-          successCb(data);
+          $scope.rights.add = false;
+          $scope.rights.edit = $scope.rights.save = $scope.checkAccess('core-update-taxonomies');
+          successCb(data.entities[0]);
         }).error(errorCb);
       } else {
 
@@ -94,7 +96,7 @@
           tree: $scope.list
         }).success(function(data) {
           data.entity = {id: $scope.categoryTaxonomy.id};
-          successCb(data);
+          successCb(data.entity);
         }).error(errorCb);
 
       }
@@ -106,10 +108,11 @@
      *
      */
     $scope.rights = {};
-    $scope.rights.add = $scope.checkAccess('core-add-taxonomies');
-    $scope.rights.edit = $scope.checkAccess('core-update-taxonomies');
-    $scope.rights.delete = $scope.checkAccess('core-delete-taxonomies');
-
+    $scope.rights.add = $scope.checkAccess('core-add-taxonomies') && !$scope.categoryTaxonomy.id;
+    $scope.rights.edit = (
+      $scope.checkAccess('core-update-taxonomies') && $scope.categoryTaxonomy.id
+    ) || $scope.rights.add;
+    $scope.rights.save = $scope.rights.add || $scope.rights.edit;
   }
 
   app.controller('CategoriesController', CategoriesController);
