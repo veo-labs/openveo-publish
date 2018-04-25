@@ -779,7 +779,16 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
               {error: error, action: 'updateEntityAction', mediaId: mediaId, thumbnail: thumbnail.path}
             );
           }
-          callback();
+
+          fileSystemApi.rm(thumbnail.path, function(error) {
+            if (error) {
+              process.logger.warn(
+                error.message,
+                {error: error, action: 'updateEntityAction', mediaId: mediaId, thumbnail: thumbnail.path}
+              );
+            }
+            callback();
+          });
         });
       },
 

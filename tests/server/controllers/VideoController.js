@@ -129,6 +129,9 @@ describe('VideoController', function() {
         FILE_TYPES: api.fileSystem.FILE_TYPES,
         copy: chai.spy(function(filePath, destinationPath, callback) {
           callback();
+        }),
+        rm: chai.spy(function(filePath, callback) {
+          callback();
         })
       },
       multipart: {
@@ -1353,6 +1356,7 @@ describe('VideoController', function() {
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         coreApi.clearImageCache.should.have.been.called.exactly(1);
         openVeoApi.fileSystem.copy.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
         done();
       };
 
