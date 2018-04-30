@@ -382,8 +382,9 @@ describe('Videos web service', function() {
         webServiceClient.get('/publish/videos?include[]=' + expectedField).then(function(results) {
           var videos = results.entities;
           check(function() {
-            assert.property(videos[0], expectedField);
-            assert.equal(Object.keys(videos[0]).length, 1, 'Wrong fields');
+            assert.property(videos[0], expectedField, 'Expected field "' + expectedField + '"');
+            assert.property(videos[0], 'metadata', 'Expected field "metadata"');
+            assert.equal(Object.keys(videos[0]).length, 2, 'Wrong fields');
           }, done);
         }).catch(function(error) {
           check(function() {
