@@ -535,7 +535,7 @@ TarPackage.prototype.saveTimecodes = function() {
             case 'tag':
               videoInfo.tags.push({
                 id: shortid.generate(),
-                value: currentTc.timecode / (self.mediaPackage.metadata.duration * 1000),
+                value: currentTc.timecode,
                 name: currentTc.data && currentTc.data.tagname ?
                   currentTc.data.tagname : 'Tag' + (videoInfo.tags.length + 1)
               });
