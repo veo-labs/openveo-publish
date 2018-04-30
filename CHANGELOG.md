@@ -36,6 +36,12 @@
 - Removing a user won't remove the default owner for medias uploaded through the watcher when the owner is not the removed user
 - Fix permissions on categories, a user with "add" and "update" privileges on taxonomies could not add / update categories, consequently only the super administrator could create new categories
 
+## DEPENDENCIES
+
+- **dashjs** has been updated from 2.5.0 to **2.6.7**
+- **videojs-contrib-dash** has been updated from 2.4.0 to **2.9.0**
+- **videojs-contrib-hls** has been updated from 5.5.3 to **5.14.1**
+
 # 5.0.1 / 2017-11-15
 
 ## BUG FIXES
