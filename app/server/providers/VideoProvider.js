@@ -758,8 +758,9 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
 
             found = true;
 
-            // Mark old file as to be deleted
-            if (mediaTag.file)
+            // No more file associated to the tag
+            // Mark old file as "to be deleted"
+            if (!tag.file && mediaTag.file)
               fileNameToRemove = mediaTag.file.filename;
 
             if (file) {
@@ -775,8 +776,12 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
                 basePath: getTagFilePath(media.id, file)
               };
 
-            } else
+            } else if (!tag.file) {
+
+              // No new file and no more file associated to the tag
+
               delete mediaTag.file;
+            }
 
             if (tag.name) mediaTag.name = tag.name;
             if (tag.description) mediaTag.description = tag.description;
