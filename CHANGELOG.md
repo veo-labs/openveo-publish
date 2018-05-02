@@ -17,9 +17,9 @@
 ## NEW FEATURES
 
 - Defragmentation of fragmented MP4 when importing a new video
-- The preview thumbnail of the video can be specified.
-- Add lead paragraph field to the video entity.
-- The date of the video can be defined in add video form &amp; in the edit video form.
+- The preview thumbnail of the video can be specified
+- Add lead paragraph field to the video entity
+- The date of the video can be defined in add video form &amp; in the edit video form
 - Hook **properties.deleted** is now executed when properties have been deleted
 - Web service endpoint GET /properties now accepts **include** and **exclude** parameters to filter returned applications fields
 - Web service endpoint GET /properties/:id now accepts **include** and **exclude** parameters to filter returned property fields
@@ -35,6 +35,9 @@
 - Fix 3.0.0 migration by adding ids to chapters so that they can be updated instead of recreated
 - Removing a user won't remove the default owner for medias uploaded through the watcher when the owner is not the removed user
 - Fix permissions on categories, a user with "add" and "update" privileges on taxonomies could not add / update categories, consequently only the super administrator could create new categories
+- Player now displays only the video by default if video stream contains both video and presentation
+- The format of dates now respects the language of the administration interface
+- The date field in the add form of the catalog is now properly reset when form is submitted
 
 ## DEPENDENCIES
 
