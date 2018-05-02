@@ -784,8 +784,8 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
             }
 
             if (tag.name) mediaTag.name = tag.name;
-            if (tag.description) mediaTag.description = tag.description;
-            if (tag.value) mediaTag.value = tag.value;
+            if (tag.hasOwnProperty('description')) mediaTag.description = tag.description;
+            if (tag.hasOwnProperty('value')) mediaTag.value = tag.value;
 
             tagToAdd = mediaTag;
             break;
