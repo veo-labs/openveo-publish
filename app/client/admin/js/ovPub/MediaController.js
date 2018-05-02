@@ -42,6 +42,8 @@
     $scope.rights.editor = $scope.checkAccess('publish-editor-' + entityType);
     $scope.rights.retry = $scope.checkAccess('publish-retry-' + entityType);
     $scope.rights.upload = $scope.checkAccess('publish-upload-' + entityType);
+    $scope.rights.update = $scope.checkAccess('publish-update-' + entityType);
+    $scope.rights.remove = $scope.checkAccess('publish-delete-' + entityType);
 
     // Define add form
     var scopeAddForm = $scope.addFormContainer = {};
@@ -713,7 +715,8 @@
       {
         label: $filter('translate')('CORE.UI.REMOVE'),
         condition: function(row) {
-          return ($scope.checkContentAccess(row, 'delete') || isUserManager) &&
+          return $scope.rights.remove &&
+            ($scope.checkContentAccess(row, 'delete') || isUserManager) &&
             !row.locked &&
             !row.saving &&
             (row.state === 6 || row.state === 11 || row.state === 12 || row.state === 0);
@@ -798,7 +801,10 @@
     };
 
     scopeEditForm.conditionEditDetail = function(row) {
-      return ($scope.checkContentAccess(row, 'update') || isUserManager) && !row.locked && row.state !== 0;
+      return $scope.rights.update &&
+        ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+        !row.locked &&
+        row.state !== 0;
     };
     scopeEditForm.onSubmit = function(model) {
       return saveMedia(model);

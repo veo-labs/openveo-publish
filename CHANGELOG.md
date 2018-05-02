@@ -39,6 +39,7 @@
 - The format of dates now respects the language of the administration interface
 - The date field in the add form of the catalog is now properly reset when form is submitted
 - Fix "Manage Publish configuration" permission which did not authorize the user to manage publish configuration
+- Fix "Edit videos" and "Remove videos" permissions, a user without these permissions could access the "edit" and "remove" buttons for a video (even if the actions were blocked)
 
 ## DEPENDENCIES
 
