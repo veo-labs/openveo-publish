@@ -908,8 +908,8 @@ VideoProvider.prototype.updateOneChapter = function(filter, chapter, callback) {
             found = true;
 
             if (chapter.name) mediaChapter.name = chapter.name;
-            if (chapter.description) mediaChapter.description = chapter.description;
-            if (chapter.value) mediaChapter.value = chapter.value;
+            if (chapter.hasOwnProperty('description')) mediaChapter.description = chapter.description;
+            if (chapter.hasOwnProperty('value')) mediaChapter.value = chapter.value;
 
             chapterToAdd = chapter;
             break;
