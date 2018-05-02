@@ -38,6 +38,7 @@
 - Player now displays only the video by default if video stream contains both video and presentation
 - The format of dates now respects the language of the administration interface
 - The date field in the add form of the catalog is now properly reset when form is submitted
+- Fix "Manage Publish configuration" permission which did not authorize the user to manage publish configuration
 
 ## DEPENDENCIES
 
