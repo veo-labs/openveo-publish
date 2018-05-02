@@ -330,8 +330,10 @@ Package.prototype.initPackage = function() {
         new ResourceFilter()
         .equal('id', 'publish-defaultUpload'),
         null,
-        function(error, defaultUploadSettings) {
+        function(error, setting) {
           if (error) return callback(error);
+          var defaultUploadSettings = setting.value;
+
           if (defaultUploadSettings) {
             if (defaultUploadSettings.owner && defaultUploadSettings.owner.value)
               self.mediaPackage.user = defaultUploadSettings.owner.value;
