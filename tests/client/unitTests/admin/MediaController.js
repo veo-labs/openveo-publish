@@ -16,7 +16,7 @@ describe('MediaController', function() {
     module('ov.publish');
     module('ov.entity');
     module('ov.tableForm');
-    module('ov.utilService');
+    module('ov.util');
   });
 
   // Dependencies injections

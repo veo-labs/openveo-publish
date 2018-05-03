@@ -21,7 +21,8 @@
   users,
   tableReloadEventService,
   i18nService,
-  publishName) {
+  publishName,
+  OvUrlFactory) {
     var entityType = 'videos';
     var isUserManager = $scope.hasPermission('publish-manage-videos');
     var addMediaPromise = null;
@@ -526,14 +527,13 @@
             if (!scope.originalModel.thumbnail)
               return $filter('translate')('CORE.UI.EMPTY');
 
-            var src = new URL(scope.originalModel.thumbnail);
-
-            src.searchParams.append('style', 'publish-thumb-200');
+            var src = scope.originalModel.thumbnail;
+            src = OvUrlFactory.setUrlParameter(scope.originalModel.thumbnail, 'style', 'publish-thumb-200');
 
             // Workaround: add timestamp to src
             // As the URL don't change even if a new thumbnail is submitted,
             // adding this parameter will force regeneration of the tag.
-            src.searchParams.append('ts', ts);
+            src = OvUrlFactory.setUrlParameter(src, 'ts', ts);
 
             return '<img class="img-thumbnail" src="' + src + '">';
           };
@@ -839,7 +839,8 @@
     'users',
     'tableReloadEventService',
     'i18nService',
-    'publishName'
+    'publishName',
+    'OvUrlFactory'
   ];
 
 })(angular.module('ov.publish'));
