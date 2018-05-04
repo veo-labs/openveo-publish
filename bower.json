@@ -5,7 +5,7 @@
     "angular": "1.5.5",
     "html5shiv": "3.7.3",
     "angular-animate": "1.5.5",
-    "openveo-player": "3.*",
+    "openveo-player": "4.*",
     "angular-cookies": "1.5.5",
     "video.js": "5.19.2",
     "dashjs": "2.6.7",

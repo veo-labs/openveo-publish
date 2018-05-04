@@ -1,4 +1,4 @@
-# 6.0.0 / YYYY-YY-YY
+# 6.0.0 / 2018-05-04
 
 ## BREAKING CHANGES
 

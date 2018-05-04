@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -63,7 +63,7 @@
     "mock-require": "3.0.1"
   },
   "peerDependencies": {
-    "@openveo/core": "4.* >=4.1.0"
+    "@openveo/core": "5.*"
   },
   "scripts": {
     "prepack": "grunt prod",
