@@ -14,6 +14,7 @@
   - Web service endpoint DELETE /properties/:id now returns property **total** with the number of deleted properties
   - HTTP error codes have changed. See **app/server/controllers/httpErrors.js** for the complete list of error codes
 - Drop support for NodeJS &lt; 8.9.4 and NPM &lt; 5.6.0
+- Directory assets/player/videos will no longer be saved when executing *npm install*. assets/player/videos should be a symbolic link to a directory outside the project to prevent videos from being deleted when executing *npm install*
 
 ## NEW FEATURES
 
