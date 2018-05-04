@@ -13,6 +13,7 @@
   - Web service endpoint POST /properties/:id now returns property **total** with value **1** if everything went fine
   - Web service endpoint DELETE /properties/:id now returns property **total** with the number of deleted properties
   - HTTP error codes have changed. See **app/server/controllers/httpErrors.js** for the complete list of error codes
+- Drop support for NodeJS &lt; 8.9.4 and NPM &lt; 5.6.0
 
 ## NEW FEATURES
 
