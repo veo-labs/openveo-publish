@@ -28,6 +28,7 @@
 - Web service endpoint GET /videos now accepts **include** and **exclude** parameters to filter returned videos fields
 - Web service endpoint GET /videos/:id now accepts **include** and **exclude** parameters to filter returned video fields
 - Add a new permission "Manage all videos" to authorize manipulation of all videos no matter the owner or groups
+- Add NPM npm-shrinkwrap.json file
 
 ## BUG FIXES
 
