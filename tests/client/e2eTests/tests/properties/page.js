@@ -4,9 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var TableAssert = e2e.asserts.TableAssert;
 
@@ -21,9 +19,9 @@ describe('Property page', function() {
   before(function() {
     var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
-    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
-    propertyHelper = new PropertyHelper(propertyModel);
-    page = new PropertyPage(propertyModel);
+    var propertyProvider = new PropertyProvider(database);
+    propertyHelper = new PropertyHelper(propertyProvider);
+    page = new PropertyPage(propertyProvider);
     tableAssert = new TableAssert(page, propertyHelper);
     page.logAsAdmin();
     page.load();
@@ -210,10 +208,10 @@ describe('Property page', function() {
     // Add lines
     beforeEach(function() {
       linesToAdd = [
-        {name: 'test search 0', description: 'test search', type: PropertyModel.TYPES.TEXT},
-        {name: 'test search 1', description: 'test search', type: PropertyModel.TYPES.TEXT},
-        {name: 'test search 2', description: 'test search', type: PropertyModel.TYPES.LIST, values: ['value1']},
-        {name: 'test search 3', description: 'test search', type: PropertyModel.TYPES.BOOLEAN}
+        {name: 'test search 0', description: 'test search', type: PropertyProvider.TYPES.TEXT},
+        {name: 'test search 1', description: 'test search', type: PropertyProvider.TYPES.TEXT},
+        {name: 'test search 2', description: 'test search', type: PropertyProvider.TYPES.LIST, values: ['value1']},
+        {name: 'test search 3', description: 'test search', type: PropertyProvider.TYPES.BOOLEAN}
       ];
 
       propertyHelper.addEntities(linesToAdd);
@@ -263,12 +261,12 @@ describe('Property page', function() {
         {
           name: 'first name',
           description: 'first name description',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         },
         {
           name: 'second name',
           description: 'second description after first',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         }
       ];
 
@@ -312,7 +310,7 @@ describe('Property page', function() {
         // Predict values
         expectedValues = values.filter(function(element) {
           for (var i = 0; i < linesToAdd.length; i++) {
-            if (element === linesToAdd[i].name && linesToAdd[i].type === PropertyModel.TYPES.LIST)
+            if (element === linesToAdd[i].name && linesToAdd[i].type === PropertyProvider.TYPES.LIST)
               return true;
           }
           return false;

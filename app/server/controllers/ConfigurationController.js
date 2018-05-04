@@ -12,15 +12,15 @@ var GoogleOAuthHelper = process.requirePublish('app/server/providers/videoPlatfo
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
-var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
-var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
-var EntityController = openVeoApi.controllers.EntityController;
+var Controller = openVeoApi.controllers.Controller;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var utilExt = openVeoApi.util;
 
 /**
  * Defines a controller to handle actions relative to configuration's routes.
  *
  * @class ConfigurationController
- * @extends EntityController
+ * @extends Controller
  * @constructor
  */
 function ConfigurationController() {
@@ -28,7 +28,7 @@ function ConfigurationController() {
 }
 
 module.exports = ConfigurationController;
-util.inherits(ConfigurationController, EntityController);
+util.inherits(ConfigurationController, Controller);
 
 /**
  * Retrieves publish plugin configurations.
@@ -40,7 +40,6 @@ util.inherits(ConfigurationController, EntityController);
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 ConfigurationController.prototype.getConfigurationAllAction = function(request, response, next) {
-  var model = this.getModel(request);
   var configurations = {};
 
   async.series([
@@ -49,9 +48,8 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     function(callback) {
       if (videoPlatformConf['youtube']) {
         var youtubeConf = configurations['youtube'] = {};
-        var database = process.api.getCoreApi().getDatabase();
-        var configurationModel = new ConfigurationModel(new ConfigurationProvider(database));
-        var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
+        var googleOAuthHelper = new GoogleOAuthHelper();
+
         googleOAuthHelper.hasToken(function(error, hasToken) {
           if (error) {
             process.logger.error('Error while retrieving Google account token with message : ' + error.message);
@@ -74,15 +72,18 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     },
     function(callback) {
       configurations['publishDefaultUpload'] = {};
-      model.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
-        if (error || !result || result.length < 1) {
-          callback(error);
-          return;
-        } else {
-          configurations['publishDefaultUpload'] = result[0].publishDefaultUpload;
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-defaultUpload'),
+        null,
+        function(error, defaultUploadSettings) {
+          if (error) return callback(error);
+
+          configurations['publishDefaultUpload'] = defaultUploadSettings && defaultUploadSettings.value;
+          callback();
         }
-        callback();
-      });
+      );
     }
   ], function(error, results) {
     if (error)
@@ -106,17 +107,28 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
  */
 ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response, next) {
   var code = request.query.code;
-  var coreApi = process.api.getCoreApi();
-  var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
-  var googleOAuthHelper = new GoogleOAuthHelper(configurationModel);
+  var googleOAuthHelper = new GoogleOAuthHelper();
+
   process.logger.debug('Code received ', code);
-  googleOAuthHelper.persistTokenWithCode(code, function() {
+  googleOAuthHelper.persistTokenWithCode(code, function(error) {
+    if (error)
+      process.logger.error('Error while trying to retrieve access token', error);
+
     response.redirect('/be/publish/configuration');
   });
 };
 
 /**
  * Saves upload configuration.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "setting" : {
+ *         "owner": ..., // The id of the owner that will be associated to medias uploaded through the watcher
+ *         "group": ... // The id of the content group that will be associated to medias uploaded through the watcher
+ *     }
  *
  * @method saveUploadConfiguration
  * @async
@@ -128,63 +140,37 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 ConfigurationController.prototype.saveUploadConfiguration = function(request, response, next) {
-  var model = this.getModel(request);
-  var configuration;
-  var body = request.body;
-  async.series([
+  if (request.body) {
+    var settingProvider = process.api.getCoreApi().settingProvider;
+    var parsedBody;
 
-    // Retrieve token information from database
-    function(callback) {
-      model.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
-        if (error || !result || result.length < 1) {
-          callback(error);
-          return;
-        } else {
-          configuration = result[0];
-        }
-        callback();
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        owner: {type: 'object', required: true},
+        group: {type: 'object', required: true}
       });
-    }],
-
-    function(error) {
-      if (error) {
-        next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
-        return;
-      } else {
-        var cb = function(err, addedCount, data) {
-          if (err) {
-            process.logger.error('Error while saving configuration data', err);
-          } else {
-            process.logger.debug('Configuration data has been saved');
-          }
-          if (error)
-            next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
-          else
-            response.status(200).send();
-        };
-
-        var saveConf = {
-          publishDefaultUpload: {
-            owner: body.owner,
-            group: body.group
-          }
-        };
-
-        if (configuration && configuration.id)
-          model.update(configuration.id, saveConf, cb);
-        else
-          model.add(saveConf, cb);
-      }
+    } catch (error) {
+      return next(HTTP_ERRORS.SET_CONFIGURATION_WRONG_PARAMETERS);
     }
-    );
-};
 
-/**
- * Gets an instance of the entity model associated to the controller.
- *
- * @method getModel
- * @return {EntityModel} The entity model
- */
-ConfigurationController.prototype.getModel = function() {
-  return new ConfigurationModel(new ConfigurationProvider(process.api.getCoreApi().getDatabase()));
+    settingProvider.add(
+      [
+        {
+          id: 'publish-defaultUpload',
+          value: parsedBody
+        }
+      ], function(error, total, settings) {
+      if (error) {
+        process.logger.error(error.message, {error: error, method: 'saveUploadConfiguration'});
+        next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
+      } else {
+        response.send({setting: settings[0].value, total: total});
+      }
+    });
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SET_CONFIGURATION_MISSING_PARAMETERS);
+
+  }
 };

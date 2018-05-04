@@ -63,8 +63,9 @@
      */
     function loadProperties() {
       if (!properties) {
-        return entityService.getAllEntities('properties', publishName).success(function(propertiesObj) {
-          properties = propertiesObj.entities;
+        return entityService.getAllEntities('properties', publishName).then(function(results) {
+          properties = results.data.entities;
+          return $q.when(results);
         });
       }
 
@@ -93,8 +94,9 @@
      */
     function loadPlatforms() {
       if (!platforms) {
-        return $http.get(basePath + 'publish/getPlatforms').success(function(platformsObj) {
-          platforms = platformsObj.platforms;
+        return $http.get(basePath + 'publish/getPlatforms').then(function(results) {
+          platforms = results.data.platforms;
+          return $q.when(results);
         });
       }
 
@@ -206,12 +208,15 @@
      */
     function loadMedia(id) {
       if (!mediaChapter[id]) {
-        return entityService.getEntity('videos', publishName, id).success(function(obj) {
-          mediaChapter[id] = obj;
+        return entityService.getEntity('videos', publishName, id).then(function(results) {
+          mediaChapter[id] = results.data.entity;
+          return $q.when(results);
         });
       }
       return $q.when({
-        data: mediaChapter[id]
+        data: {
+          entity: mediaChapter[id]
+        }
       });
     }
 
@@ -227,39 +232,69 @@
     }
 
     /**
-     * Upload file and Update Tags and .
+     * Updates a chapter associated to the specified media.
      *
+     * @method updateChapter
+     * @param {String} id The media id
+     * @param {Object} chapter Information about the chapter
+     * @param {String} [chapter.id] The chapter id
+     * @param {Number} [chapter.value] The chapter time in milliseconds
+     * @param {String} [chapter.name] The chapter name
+     * @param {String} [chapter.description] The chapter description
+     * @return {HttpPromise} The HTTP promise
+     */
+    function updateChapter(id, chapter) {
+      return $http.post(basePath + 'publish/videos/' + id + '/chapters/' + (chapter.id || ''), chapter);
+    }
+
+    /**
+     * Updates a tag associated to the specified media.
+     *
+     * @method updateTag
      * @param {String} id The media id
      * @param {Object} file The file to upload
-     * @param {Object} the data to add/update
+     * @param {Object} tag Information about the tag
+     * @param {String} [tag.id] The tag id
+     * @param {Number} [tag.value] The tag time in milliseconds
+     * @param {String} [tag.name] The tag name
+     * @param {String} [tag.description] The tag description
      * @return {Promise} The HTTP promise
-     * @method updateTags
      */
-    function updateTags(id, file, data) {
-
+    function updateTag(id, file, tag) {
       return Upload.upload({
-        url: '/be/publish/updateVideoTags/' + id,
-        data: {info: Upload.json(data), file: file}
+        url: '/be/publish/videos/' + id + '/tags/' + (tag.id || ''),
+        data: {info: Upload.json(tag), file: file}
       });
     }
 
      /**
-     * Remove tags from video.
+     * Remove tags from media.
      *
-     * @param {String} id The media id
-     * @param {Object} data The upload configuration object
-     * @return {Promise} The HTTP promise
      * @method removeTags
+     * @param {String} id The media id
+     * @param {Array} tagIds The list of tag ids to remove
+     * @return {Promise} The HTTP promise
      */
-    function removeTags(id, data) {
-      return $http.post(basePath + 'publish/removeVideoTags/' + id, data);
+    function removeTags(id, tagIds) {
+      return $http.delete(basePath + 'publish/videos/' + id + '/tags/' + tagIds.join(','));
     }
 
+     /**
+     * Removes chapters from media.
+     *
+     * @method removeChapters
+     * @param {String} id The media id
+     * @param {Array} chapterIds The list of chapter ids to remove
+     * @return {HttpPromise} The HTTP promise
+     */
+    function removeChapters(id, chapterIds) {
+      return $http.delete(basePath + 'publish/videos/' + id + '/chapters/' + chapterIds.join(','));
+    }
 
     /**
      * Clears a publish service cache.
      *
-     * @param {String} [type] The cache element to clear (**properties**, **categories** or **chapter**), null to
+     * @param {String} [type] The cache element to clear (**properties**, **categories** or **editor**), null to
      * clear all caches
      * @method cacheClear
      */
@@ -277,7 +312,7 @@
             categoriesOptions = null;
             categoriesByKey = null;
             break;
-          case 'chapter':
+          case 'editor':
             mediaChapter = {};
             break;
           default:
@@ -304,16 +339,39 @@
      */
     function addMedia(data) {
       var file = data.file;
+      var thumbnail = data.thumbnail;
       delete data.file;
+      delete data.thumbnail;
 
       return Upload.upload({
         url: '/be/publish/addMedia',
-        data: {info: Upload.json(data), file: file}
+        data: {info: Upload.json(data), file: file, thumbnail: thumbnail}
+      });
+    }
+
+    /**
+     * Update a media
+     *
+     * @param {Object} Information about the media
+     * @return {Promise} An HTTP promise resolving when media has been updated
+     * @method updateMedia
+     */
+    function updateMedia(id, data) {
+      var thumbnail = data.thumbnail;
+
+      delete data.thumbnail;
+
+      entityService.deleteCache('videos', publishName);
+
+      return Upload.upload({
+        url: '/be/publish/videos/' + id,
+        data: {info: Upload.json(data), thumbnail: thumbnail}
       });
     }
 
     return {
       addMedia: addMedia,
+      updateMedia: updateMedia,
       retryMedia: retryMedia,
       publishMedia: publishMedia,
       unpublishMedia: unpublishMedia,
@@ -329,8 +387,10 @@
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
       saveUploadConfig: saveUploadConfig,
-      updateTags: updateTags,
+      updateTag: updateTag,
+      updateChapter: updateChapter,
       removeTags: removeTags,
+      removeChapters: removeChapters,
       cacheClear: cacheClear
     };
 

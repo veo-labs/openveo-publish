@@ -4,23 +4,25 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
-var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
-var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
 
 // Load assertion library
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
 describe('Configuration page', function() {
-  var page, configurationHelper;
+  var page;
+  var configurationHelper;
+  var defaultSettings;
 
   // Prepare page
   before(function() {
     var coreApi = process.api.getCoreApi();
-    var model = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
-    configurationHelper = new ConfigurationHelper(model);
+    configurationHelper = new ConfigurationHelper(coreApi.settingProvider);
     page = new ConfigurationPage();
     page.logAsAdmin();
+    configurationHelper.getEntities().then(function(settings) {
+      defaultSettings = settings;
+    });
     page.load();
   });
 
@@ -31,7 +33,7 @@ describe('Configuration page', function() {
 
   // Reload page after each test and remove all configurations
   afterEach(function() {
-    configurationHelper.removeAllEntities();
+    configurationHelper.removeAllEntities(defaultSettings);
     page.refresh();
   });
 
@@ -61,7 +63,8 @@ describe('Configuration page', function() {
 
       // Associate a fake Google account
       configurationHelper.addEntities([{
-        googleOAuthTokens: {
+        id: 'publish-googleOAuthTokens',
+        value: {
           access_token: 'accessToken',
           token_type: 'Bearer',
           refresh_token: 'refreshToken',

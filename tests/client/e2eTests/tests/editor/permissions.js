@@ -3,11 +3,10 @@
 var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
-var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
+var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
+var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -15,11 +14,11 @@ var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
-describe('Chapter page', function() {
+describe('Editor page', function() {
   var coreApi = process.api.getCoreApi();
   var page;
   var medias;
-  var mediaId = 'test-chapters-page-permissions';
+  var mediaId = 'test-editor-page-permissions';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
   var mediaHelper;
@@ -29,9 +28,13 @@ describe('Chapter page', function() {
     // Create a media content
     before(function() {
       var videoProvider = new VideoProvider(coreApi.getDatabase());
-      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-      mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
-      page = new ChapterPage(mediaId);
+      var mediaPage = new MediaPage(videoProvider);
+      page = new EditorPage(mediaId);
+      mediaHelper = new MediaHelper(videoProvider);
+
+      mediaPage.logAsAdmin();
+      mediaPage.load();
+
       mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED).then(
         function(mediasAdded) {
           medias = mediasAdded;
@@ -66,11 +69,16 @@ describe('Chapter page', function() {
     // Create a media content
     before(function() {
       var videoProvider = new VideoProvider(coreApi.getDatabase());
-      var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-      var owner = process.protractorConf.getUser(datas.users.publishMedias1.name);
-      mediaHelper = new MediaHelper(new VideoModel(owner, videoProvider, propertyProvider));
-      page = new ChapterPage(mediaId);
-      mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED, 'publishGroup1').then(
+      mediaHelper = new MediaHelper(videoProvider);
+      page = new EditorPage(mediaId);
+      mediaHelper.createMedia(
+        mediaId,
+        mediaFilePath,
+        mediaFileName,
+        STATES.PUBLISHED,
+        'publishGroup1',
+        process.api.getCoreApi().getSuperAdminId()
+      ).then(
         function(mediasAdded) {
           medias = mediasAdded;
           return page.logAsAdmin();
@@ -80,7 +88,7 @@ describe('Chapter page', function() {
 
     // Log with a user with only edit chapters permission
     before(function() {
-      page.logAs(datas.users.publishChaptersEdit);
+      page.logAs(datas.users.publishEditorEdit);
       page.load();
     });
 
@@ -100,7 +108,7 @@ describe('Chapter page', function() {
       page.getAlertMessages().then(function(messages) {
         assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
+        assert.equal(messages[1], page.translations.PUBLISH.EDITOR.SAVE_ERROR);
       });
       page.closeAlerts();
     });
@@ -110,7 +118,7 @@ describe('Chapter page', function() {
       page.getAlertMessages().then(function(messages) {
         assert.equal(messages.length, 4);
         assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-        assert.equal(messages[1], page.translations.PUBLISH.CHAPTER.SAVE_ERROR);
+        assert.equal(messages[1], page.translations.PUBLISH.EDITOR.SAVE_ERROR);
       });
       page.closeAlerts();
     });

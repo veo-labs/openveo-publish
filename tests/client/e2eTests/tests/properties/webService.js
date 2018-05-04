@@ -5,9 +5,7 @@ var chaiAsPromised = require('chai-as-promised');
 var openVeoTest = require('@openveo/test');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 var check = openVeoTest.util.check;
@@ -27,9 +25,9 @@ describe('Properties web service', function() {
       datas.applications.publishApplicationsProperties.name
     );
     var database = coreApi.getDatabase();
-    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
+    var propertyProvider = new PropertyProvider(database);
     webServiceClient = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
-    propertyHelper = new PropertyHelper(propertyModel);
+    propertyHelper = new PropertyHelper(propertyProvider);
     page = new ConfigurationPage();
 
     page.logAsAdmin();
@@ -53,7 +51,7 @@ describe('Properties web service', function() {
         var types = results.types;
         check(function() {
           assert.isDefined(types);
-          assert.equal(types.length, PropertyModel.availableTypes.length);
+          assert.equal(types.length, PropertyProvider.availableTypes.length);
         }, done);
       }).catch(function(error) {
         check(function() {
@@ -71,12 +69,12 @@ describe('Properties web service', function() {
         {
           name: 'Get property name 1',
           description: 'Get property description 1',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         },
         {
           name: 'Get property name 2',
           description: 'Get property description 2',
-          type: PropertyModel.TYPES.LIST,
+          type: PropertyProvider.TYPES.LIST,
           values: ['tag1', 'tag2']
         }
       ];

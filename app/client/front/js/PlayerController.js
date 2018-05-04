@@ -5,10 +5,20 @@
   /**
    * Defines the player controller.
    */
-  function PlayerController($scope, $window, $location, $sce, mediaService, ovPublishTranslations) {
+  function PlayerController($scope, $window, $location, $sce, $http, mediaService, ovPublishTranslations) {
     $scope.ready = false;
+    $scope.autoPlay = false;
 
     var urlChunks = /.*\/([^\/]*)\/?/.exec($location.path());
+    var player = document.getElementById('ov-player');
+
+    angular.element(player).on('needPoiConversion', function(event, duration) {
+      $http
+        .post('/publish/videos/' + $scope.data.id + '/poi/convert', {duration: duration})
+        .then(function(response) {
+          $scope.data = response.data.entity;
+        });
+    });
 
     // Got a media id from url
     if (urlChunks.length) {
@@ -19,6 +29,12 @@
 
           // Retrieve url parameters
           var urlParams = $location.search();
+          $scope.defaultMode = 'both';
+          if (media.metadata) {
+            var template = media.metadata.template || '';
+            if (template.match(/^mix-/))
+              $scope.defaultMode = 'media';
+          }
           $scope.data = media;
           $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
           $scope.publishLanguage = ovPublishTranslations[$scope.language] ? angular.copy($scope.language) : 'en';
@@ -34,12 +50,19 @@
           }
         } else
           $window.location.href = '/notFound';
-
       });
     }
   }
 
   app.controller('PlayerController', PlayerController);
-  PlayerController.$inject = ['$scope', '$window', '$location', '$sce', 'mediaService', 'ovPublishTranslations'];
+  PlayerController.$inject = [
+    '$scope',
+    '$window',
+    '$location',
+    '$sce',
+    '$http',
+    'mediaService',
+    'ovPublishTranslations'
+  ];
 
 })(angular.module('ov.publish.player'));

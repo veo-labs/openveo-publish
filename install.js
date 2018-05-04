@@ -404,7 +404,7 @@ async.series([
   if (error)
     throw error;
   else {
-    process.stdout.write('Installation complete');
+    process.stdout.write('Installation complete\n');
     exit();
   }
 });

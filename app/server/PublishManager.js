@@ -15,6 +15,7 @@ var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishError = process.requirePublish('app/server/PublishError.js');
 var fileSystem = openVeoApi.fileSystem;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 var acceptedPackagesExtensions = [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4];
 var publishManager;
@@ -64,8 +65,8 @@ var publishManager;
  *     var coreApi = process.api.getCoreApi();
  *     var database = coreApi.getDatabase();
  *     var PublishManager = process.requirePublish('app/server/PublishManager.js');
- *     var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
- *     var publishManager = new PublishManager(videoModel, 5);
+ *     var videoProvider = new VideoProvider(database);
+ *     var publishManager = new PublishManager(videoProvider, 5);
  *
  *     // Listen publish manager's errors
  *     publishManager.on('error', function(error) {
@@ -95,10 +96,10 @@ var publishManager;
  *
  * @class PublishManager
  * @constructor
- * @param {VideoModel} videoModel The videoModel
+ * @param {VideoProvider} videoProvider The media provider
  * @param {Number} [maxConcurrentPackage=3] The maximum number of medias to treat in parallel
  */
-function PublishManager(videoModel, maxConcurrentPackage) {
+function PublishManager(videoProvider, maxConcurrentPackage) {
   if (publishManager)
     throw new Error('PublishManager already instanciated, use get method instead');
 
@@ -123,13 +124,13 @@ function PublishManager(videoModel, maxConcurrentPackage) {
     pendingPackages: {value: []},
 
     /**
-     * Video model.
+     * Media provider.
      *
-     * @property videoModel
-     * @type VideoModel
+     * @property videoProvider
+     * @type VideoProvider
      * @final
      */
-    videoModel: {value: videoModel},
+    videoProvider: {value: videoProvider},
 
     /**
      * Maximum number of medias to treat in parallel.
@@ -282,13 +283,13 @@ function addPackage(mediaPackage) {
  *
  * @method get
  * @static
- * @param {VideoModel} videoModel The videoModel
+ * @param {VideoProvider} videoProvider The media provider
  * @param {Number} [maxConcurrentPackage] The maximum number of medias to treat in parallel
  * @return {PublishManager} The PublishManager singleton instance
  */
-PublishManager.get = function(videoModel, maxConcurrentPackage) {
+PublishManager.get = function(videoProvider, maxConcurrentPackage) {
   if (!publishManager)
-    publishManager = new PublishManager(videoModel);
+    publishManager = new PublishManager(videoProvider);
 
   return publishManager;
 };
@@ -330,27 +331,33 @@ PublishManager.prototype.publish = function(mediaPackage) {
         mediaPackage.title = mediaPackage.title || pathDescriptor.name;
       }
 
-      self.videoModel.get({originalPackagePath: mediaPackage.originalPackagePath}, function(error, videos) {
-        if (error) {
-          self.emit('error', new PublishError('Getting medias with original package path "' +
-                                              mediaPackage.originalPackagePath + '" failed with message : ' +
-                                              error.message, ERRORS.UNKNOWN));
-        } else if (!videos || !videos.length) {
+      self.videoProvider.getOne(
+        new ResourceFilter().equal('originalPackagePath', mediaPackage.originalPackagePath),
+        {
+          include: ['id']
+        },
+        function(error, media) {
+          if (error) {
+            self.emit('error', new PublishError('Getting media with original package path "' +
+                                                mediaPackage.originalPackagePath + '" failed with message : ' +
+                                                error.message, ERRORS.UNKNOWN));
+          } else if (!media) {
 
-          // Package can be added to pending packages
-          if (addPackage.call(self, mediaPackage)) {
+            // Package can be added to pending packages
+            if (addPackage.call(self, mediaPackage)) {
 
-            // Media package does not exist
-            // Publish it
-            var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-            mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
-            mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
+              // Media package does not exist
+              // Publish it
+              var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+              mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
+              mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
+
+            }
 
           }
 
         }
-
-      });
+      );
     });
   } else
     this.emit('error', new PublishError('mediaPackage argument must be an Object', ERRORS.UNKNOWN));
@@ -368,38 +375,47 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
     var self = this;
 
     // Retrieve package information
-    this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
-      if (error) {
-        self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
-                                    ERRORS.UNKNOWN));
-      } else if (!mediaPackage) {
+    this.videoProvider.getOne(
+      new ResourceFilter().equal('id', packageId),
+      null,
+      function(error, mediaPackage) {
+        if (error) {
+          self.emit(
+            'error',
+            new PublishError(
+              'Getting package ' + packageId + ' failed with message : ' + error.message,
+              ERRORS.UNKNOWN
+            )
+          );
+        } else if (!mediaPackage) {
 
-        // Package does not exist
-        self.emit('error', new PublishError('Cannot retry package ' + packageId + ' (not found)',
-                                            ERRORS.PACKAGE_NOT_FOUND));
+          // Package does not exist
+          self.emit('error', new PublishError('Cannot retry package ' + packageId + ' (not found)',
+                                              ERRORS.PACKAGE_NOT_FOUND));
 
-      } else if (mediaPackage.state === STATES.ERROR || forceRetry) {
+        } else if (mediaPackage.state === STATES.ERROR || forceRetry) {
 
-        // Got package information
-        // Package is indeed in error
-        self.videoModel.updateState(mediaPackage.id, STATES.PENDING, function() {
+          // Got package information
+          // Package is indeed in error
+          self.videoProvider.updateState(mediaPackage.id, STATES.PENDING, function() {
 
-          // Retry officially started
-          self.emit('retry', mediaPackage);
-          self.emit('stateChanged', mediaPackage);
+            // Retry officially started
+            self.emit('retry', mediaPackage);
+            self.emit('stateChanged', mediaPackage);
 
-        });
+          });
 
-        var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        process.logger.info('Retry package ' + mediaPackage.id);
-        mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+          process.logger.info('Retry package ' + mediaPackage.id);
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
 
-        // Package can be added to pending packages
-        if (addPackage.call(self, mediaPackage))
-          mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+          // Package can be added to pending packages
+          if (addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+        }
+
       }
-
-    });
+    );
   }
 };
 
@@ -418,26 +434,30 @@ PublishManager.prototype.retryAll = function() {
   var self = this;
 
   // Retrieve all packages in a non stable state
-  this.videoModel.get({
-    state: {
-      $nin: [
-        STATES.ERROR,
-        STATES.WAITING_FOR_UPLOAD,
-        STATES.READY,
-        STATES.PUBLISHED
-      ]
+  this.videoProvider.getAll(
+    new ResourceFilter()
+    .notIn('state', [
+      STATES.ERROR,
+      STATES.WAITING_FOR_UPLOAD,
+      STATES.READY,
+      STATES.PUBLISHED
+    ]),
+    null,
+    {
+      id: 'desc'
+    },
+    function(error, mediaPackages) {
+      if (error)
+        return self.emit('error', new PublishError('Getting packages in non stable state failed with message : ' +
+                                                   error.message,
+                                              ERRORS.UNKNOWN));
+
+      mediaPackages.forEach(function(mediaPackage) {
+        self.retry(mediaPackage.id, true);
+      });
+
     }
-  }, function(error, mediaPackages) {
-    if (error)
-      return self.emit('error', new PublishError('Getting packages in non stable state failed with message : ' +
-                                                 error.message,
-                                            ERRORS.UNKNOWN));
-
-    mediaPackages.forEach(function(mediaPackage) {
-      self.retry(mediaPackage.id, true);
-    });
-
-  });
+  );
 
 };
 
@@ -453,39 +473,48 @@ PublishManager.prototype.upload = function(packageId, platform) {
     var self = this;
 
     // Retrieve package information
-    this.videoModel.getOne(packageId, null, function(error, mediaPackage) {
-      if (error) {
-        self.emit('error', new PublishError('Getting package ' + packageId + ' failed with message : ' + error.message,
-                                            ERRORS.UNKNOWN));
-      } else if (!mediaPackage) {
+    this.videoProvider.getOne(
+      new ResourceFilter().equal('id', packageId),
+      null,
+      function(error, mediaPackage) {
+        if (error) {
+          self.emit(
+            'error',
+            new PublishError(
+              'Getting package ' + packageId + ' failed with message : ' + error.message,
+              ERRORS.UNKNOWN
+            )
+          );
+        } else if (!mediaPackage) {
 
-        // Package does not exist
-        self.emit('error', new PublishError('Cannot upload package ' + packageId + ' (not found)',
-                                            ERRORS.PACKAGE_NOT_FOUND));
+          // Package does not exist
+          self.emit('error', new PublishError('Cannot upload package ' + packageId + ' (not found)',
+                                              ERRORS.PACKAGE_NOT_FOUND));
 
-      } else if (mediaPackage.state === STATES.WAITING_FOR_UPLOAD) {
+        } else if (mediaPackage.state === STATES.WAITING_FOR_UPLOAD) {
 
-        // Package is indeed waiting for upload
-        self.videoModel.updateState(mediaPackage.id, STATES.PENDING, function() {
+          // Package is indeed waiting for upload
+          self.videoProvider.updateState(mediaPackage.id, STATES.PENDING, function() {
 
-          // Upload officially started
-          self.emit('upload', mediaPackage);
-          self.emit('stateChanged', mediaPackage);
+            // Upload officially started
+            self.emit('upload', mediaPackage);
+            self.emit('stateChanged', mediaPackage);
 
-        });
-        self.videoModel.updateType(mediaPackage.id, platform);
+          });
+          self.videoProvider.updateType(mediaPackage.id, platform);
 
-        var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-        process.logger.info('Force upload package ' + mediaPackage.id);
-        mediaPackage.type = platform;
-        mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+          process.logger.info('Force upload package ' + mediaPackage.id);
+          mediaPackage.type = platform;
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
 
-        // Package can be added to pending packages
-        if (addPackage.call(self, mediaPackage))
-          mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+          // Package can be added to pending packages
+          if (addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+
+        }
 
       }
-
-    });
+    );
   }
 };

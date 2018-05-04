@@ -2,10 +2,13 @@
 
 var async = require('async');
 var shortid = require('shortid');
+var openVeoApi = require('@openveo/api');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 3.0.1 migration launched.');
-  var db = process.api.getCoreApi().getDatabase();
+  var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
 
   async.series([
 
@@ -16,60 +19,47 @@ module.exports.update = function(callback) {
      * Saves timecodes from synchro.json file into database.
      */
     function(callback) {
-      db.get('publish_videos', null, null, null, function(error, videos) {
-        if (error)
-          return callback(error);
+      videoProvider.getAll(null, null, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!videos || !videos.length)
-          return callback();
-        else {
-          var asyncActions = [];
+        if (!medias || !medias.length) return callback();
 
-          videos.forEach(function(video) {
-            if (video.metadata && video.metadata.indexes && !video.timecodes) {
-              video.timecodes = [];
-              for (var i = 0; i < video.metadata.indexes.length; i++) {
-                var timecode = video.metadata.indexes[i];
-                video.timecodes.push({
-                  id: shortid.generate(),
-                  timecode: timecode.timecode,
-                  image: {
-                    small: '/publish/' + video.id + '/' + timecode.data.filename + '?thumb=small',
-                    large: '/publish/' + video.id + '/' + timecode.data.filename
-                  }
-                });
-              }
+        var asyncActions = [];
 
-              asyncActions.push(function(callback) {
-                db.update(
-                  'publish_videos',
-                  {
-                    id: video.id
-                  },
-                  {
-                    timecodes: video.timecodes
-                  },
-                  function(error) {
-                    if (!error)
-                      process.logger.info('Timecodes of video "' + video.id + '" updated');
-
-                    callback(error);
-                  }
-                );
+        medias.forEach(function(media) {
+          if (media.metadata && media.metadata.indexes && !media.timecodes) {
+            media.timecodes = [];
+            for (var i = 0; i < media.metadata.indexes.length; i++) {
+              var timecode = media.metadata.indexes[i];
+              media.timecodes.push({
+                id: shortid.generate(),
+                timecode: timecode.timecode,
+                image: {
+                  small: '/publish/' + media.id + '/' + timecode.data.filename + '?thumb=small',
+                  large: '/publish/' + media.id + '/' + timecode.data.filename
+                }
               });
             }
-          });
 
-          async.parallel(asyncActions, callback);
-        }
+            asyncActions.push(function(callback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                {
+                  timecodes: media.timecodes
+                },
+                callback
+              );
+            });
+          }
+        });
+
+        async.parallel(asyncActions, callback);
       });
     }
 
   ], function(error, results) {
-    if (error)
-      return callback(error);
-
+    if (error) return callback(error);
     process.logger.info('Publish 3.0.1 migration done.');
     callback();
   });

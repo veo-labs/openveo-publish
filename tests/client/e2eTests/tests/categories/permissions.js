@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -16,9 +15,9 @@ describe('Category page', function() {
 
   // Prepare page
   before(function() {
-    var categoryModel = new CategoryModel();
-    categoryHelper = new CategoryHelper(categoryModel);
-    page = new CategoryPage(categoryModel);
+    var taxonomyProvider = process.api.getCoreApi().taxonomyProvider;
+    categoryHelper = new CategoryHelper(taxonomyProvider);
+    page = new CategoryPage(taxonomyProvider);
   });
 
   // Logout after tests
@@ -58,13 +57,7 @@ describe('Category page', function() {
     });
 
     it('should not be able to create the tree', function() {
-      page.addCategory('Test create without permission');
-      page.saveCategoryModifications();
-      page.getAlertMessages().then(function(messages) {
-        assert.equal(messages.length, 1);
-        assert.equal(messages[0], page.translations.CORE.ERROR.FORBIDDEN);
-      });
-      page.closeAlerts();
+      assert.isRejected(page.addCategory('Test create without permission'));
     });
 
     it('should not be able to create the tree by requesting the server directly', function() {
@@ -144,19 +137,6 @@ describe('Category page', function() {
     afterEach(function() {
       categoryHelper.removeAllEntities();
       page.refresh();
-    });
-
-    it('should not have delete action to remove a category', function() {
-      var name = 'Test remove without permission';
-      var initialTree = [
-        {
-          title: 'Test remove a',
-          items: []
-        }
-      ];
-      categoryHelper.addEntities(initialTree);
-      page.refresh();
-      assert.isRejected(page.removeCategory(name));
     });
 
     it('should not be able to remove category by requesting the server directly', function() {

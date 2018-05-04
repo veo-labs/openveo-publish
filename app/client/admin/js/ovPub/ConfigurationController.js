@@ -20,7 +20,7 @@
     };
 
     $scope.rights = {};
-    $scope.rights.edit = $scope.checkAccess('manage-publish-config');
+    $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
 
     $scope.saveOptions = function() {
       return publishService.saveUploadConfig($scope.default).success(function(obj) {

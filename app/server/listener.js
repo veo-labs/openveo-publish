@@ -5,11 +5,9 @@
  */
 
 var async = require('async');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
+var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
-var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Sets event listeners on core and plugins.
@@ -34,31 +32,137 @@ var ConfigurationProvider = process.requirePublish('app/server/providers/Configu
 module.exports.onUsersDeleted = function(ids, callback) {
   var coreApi = process.api.getCoreApi();
   var database = coreApi.getDatabase();
-  var videoModel = new VideoModel(null, new VideoProvider(database), new PropertyProvider(database));
-  var configurationModel = new ConfigurationModel(new ConfigurationProvider(database));
+  var settingProvider = coreApi.settingProvider;
+  var videoProvider = new VideoProvider(database);
 
   async.series([
     function(callback) {
-      videoModel.anonymizeByUser(ids, callback);
+      var updateFunctions = [];
+
+      videoProvider.getAll(
+        new ResourceFilter().in('metadata.user', ids),
+        {
+          include: ['id']
+        },
+        {
+          id: 'desc'
+        },
+        function(getAllError, medias) {
+          if (getAllError) return callback(getAllError);
+
+          medias.forEach(function(media) {
+            updateFunctions.push(function(callback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                {
+                  'metadata.user': null
+                },
+                callback
+              );
+            });
+          });
+
+          async.parallel(updateFunctions, callback);
+        }
+      );
     },
     function(callback) {
 
       // Get watcher configuration
-      configurationModel.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
-        if (error) return callback(error);
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-defaultUpload'),
+        null,
+        function(error, defaultUploadSettings) {
+          if (error) return callback(error);
 
-        if (result.length) {
-          result[0].publishDefaultUpload.owner = {
-            name: null,
-            value: null
-          };
-          configurationModel.update(result[0].id, result[0], callback);
-        } else
-          callback();
-      });
-
+          if (defaultUploadSettings &&
+              defaultUploadSettings.value &&
+              defaultUploadSettings.value.owner &&
+              ids.indexOf(defaultUploadSettings.value.owner.value) >= 0) {
+            defaultUploadSettings.value.owner = {
+              name: null,
+              value: null
+            };
+            settingProvider.updateOne(
+              new ResourceFilter().equal('id', 'publish-defaultUpload'),
+              {
+                value: defaultUploadSettings.value
+              },
+              callback
+            );
+          } else
+            callback();
+        }
+      );
     }
   ], function(error, results) {
     callback(error);
   });
+};
+
+/**
+ * Handles event when custom properties have been deleted.
+ *
+ * Remove custom properties referenced in videos.
+ *
+ * @method onPropertiesDeleted
+ * @static
+ * @param {Array} The list of deleted properties ids
+ * @param {Function} callback Function to call when it's done
+ *  - **Error** An error if something went wrong, null otherwise
+ *  - **Number** The number of updated medias
+ */
+module.exports.onPropertiesDeleted = function(ids, callback) {
+  var asyncFunctions = [];
+  var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
+
+  ids.forEach(function(id) {
+    asyncFunctions.push(function(callback) {
+      videoProvider.removeField('properties.' + id, null, callback);
+    });
+  });
+
+  async.series(asyncFunctions, callback);
+};
+
+/**
+ * Handles event when groups have been deleted.
+ *
+ * If one of the removed groups is the one choosed as the default group for the watcher,
+ * it must be reset.
+ *
+ * @method onGroupsDeleted
+ * @static
+ * @param {Array} The list of deleted groups ids
+ * @param {Function} callback Function to call when it's done
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+module.exports.onGroupsDeleted = function(ids, callback) {
+  var settingProvider = process.api.getCoreApi().settingProvider;
+
+  settingProvider.getOne(
+    new ResourceFilter().equal('id', 'publish-defaultUpload'),
+    null,
+    function(error, defaultUploadSettings) {
+      if (error) return callback(error);
+
+      if (defaultUploadSettings &&
+          defaultUploadSettings.value &&
+          defaultUploadSettings.value.group &&
+          ids.indexOf(defaultUploadSettings.value.group.value) >= 0) {
+        defaultUploadSettings.value.group = {
+          name: null,
+          value: null
+        };
+        settingProvider.updateOne(
+          new ResourceFilter().equal('id', 'publish-defaultUpload'),
+          {
+            value: defaultUploadSettings.value
+          },
+          callback
+        );
+      } else
+        callback();
+    }
+  );
 };

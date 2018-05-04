@@ -2,11 +2,7 @@
   "entities": [
     {
       "name": "properties",
-      "model": "app/server/models/PropertyModel.js",
-      "modelParameters": [
-        "app/server/providers/PropertyProvider.js",
-        "app/server/providers/VideoProvider.js"
-      ],
+      "provider": "app/server/providers/PropertyProvider.js",
       "helper": "tests/client/e2eTests/helpers/PropertyHelper.js",
       "application": "publish-applications-properties",
       "webServicePath": "/publish/properties"

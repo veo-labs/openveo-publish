@@ -3,7 +3,6 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var CategoryPage = process.requirePublish('tests/client/e2eTests/pages/CategoryPage.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 
 // Load assertion library
@@ -15,9 +14,9 @@ describe('Category page', function() {
 
   // Prepare page
   before(function() {
-    var categoryModel = new CategoryModel();
-    categoryHelper = new CategoryHelper(categoryModel);
-    page = new CategoryPage(categoryModel);
+    var taxonomyProvider = process.api.getCoreApi().taxonomyProvider;
+    categoryHelper = new CategoryHelper(taxonomyProvider);
+    page = new CategoryPage(taxonomyProvider);
     page.logAsAdmin();
     page.load();
   });

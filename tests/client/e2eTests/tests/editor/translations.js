@@ -4,11 +4,10 @@ var path = require('path');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
-var ChapterPage = process.requirePublish('tests/client/e2eTests/pages/ChapterPage.js');
+var EditorPage = process.requirePublish('tests/client/e2eTests/pages/EditorPage.js');
+var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var browserExt = e2e.browser;
 
@@ -16,10 +15,10 @@ var browserExt = e2e.browser;
 var assert = chai.assert;
 chai.use(chaiAsPromised);
 
-describe('Chapter page translations', function() {
+describe('Editor page translations', function() {
   var page;
   var medias;
-  var mediaId = 'test-chapters-page-translations';
+  var mediaId = 'test-editor-page-translations';
   var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
   var mediaFileName = 'blank.mp4';
   var mediaHelper;
@@ -28,9 +27,13 @@ describe('Chapter page translations', function() {
   before(function() {
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
-    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    mediaHelper = new MediaHelper(new VideoModel(null, videoProvider, propertyProvider));
-    page = new ChapterPage(mediaId);
+    var mediaPage = new MediaPage(videoProvider);
+    page = new EditorPage(mediaId);
+    mediaHelper = new MediaHelper(videoProvider);
+
+    mediaPage.logAsAdmin();
+    mediaPage.load();
+
     mediaHelper.createMedia(mediaId, mediaFilePath, mediaFileName, STATES.PUBLISHED).then(
       function(mediasAdded) {
         medias = mediasAdded;
@@ -66,8 +69,8 @@ describe('Chapter page translations', function() {
       return page.selectLanguage(languages[index]).then(function() {
 
         // Page translations
-        assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.CHAPTER.PAGE_TITLE);
-        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CHAPTER.INFO);
+        assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.EDITOR.PAGE_TITLE);
+        assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.EDITOR.INFO);
         assert.eventually.equal(page.backButtonElement.getText(), page.translations.CORE.UI.BACK);
         assert.eventually.equal(page.newButtonElement.getText(), page.translations.CORE.UI.FORM_NEW);
         assert.eventually.equal(page.editButtonElement.getText(), page.translations.CORE.UI.FORM_EDIT);
@@ -79,9 +82,9 @@ describe('Chapter page translations', function() {
         var timeField = addFormFields.time;
         var titleField = addFormFields.title;
         var descriptionField = addFormFields.description;
-        assert.eventually.equal(timeField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TIME);
-        assert.eventually.equal(titleField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TITLE);
-        assert.eventually.equal(descriptionField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_DESCRIPTION);
+        assert.eventually.equal(timeField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TIME);
+        assert.eventually.equal(titleField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TITLE);
+        assert.eventually.equal(descriptionField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_DESCRIPTION);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.CORE.UI.FORM_ADD);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.CORE.UI.FORM_CANCEL);
 
@@ -90,19 +93,19 @@ describe('Chapter page translations', function() {
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CHAPTER.ADD_BEGIN);
+          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.EDITOR.ADD_BEGIN);
 
         });
         var cutEditFormFields = page.getEditFormFields(page.formElement, 'cut');
         var cutTimeField = cutEditFormFields.time;
         var cutTitleField = cutEditFormFields.title;
         page.addCut(0.1, true);
-        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TIME);
-        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TITLE);
+        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.EDITOR.HEAD_TIME);
+        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.EDITOR.HEAD_TITLE);
         page.selectLine(page.translations.CORE.UI.BEGIN);
         browserExt.click(page.editButtonElement);
-        assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TIME);
-        assert.eventually.equal(cutTitleField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TITLE);
+        assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TIME);
+        assert.eventually.equal(cutTitleField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TITLE);
         assert.eventually.equal(page.getCutTitle(cutTitleField), page.translations.CORE.UI.BEGIN);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.CORE.UI.FORM_SAVE);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.CORE.UI.FORM_CANCEL);
@@ -110,7 +113,7 @@ describe('Chapter page translations', function() {
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CHAPTER.REMOVE_BEGIN);
+          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.EDITOR.REMOVE_BEGIN);
 
         });
         page.removeCut(true);
@@ -120,16 +123,16 @@ describe('Chapter page translations', function() {
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CHAPTER.ADD_END);
+          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.EDITOR.ADD_END);
 
         });
         page.addCut(0.8, false);
-        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TIME);
-        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.CHAPTER.HEAD_TITLE);
+        assert.eventually.equal(page.timeHeaderElement.getText(), page.translations.PUBLISH.EDITOR.HEAD_TIME);
+        assert.eventually.equal(page.titleHeaderElement.getText(), page.translations.PUBLISH.EDITOR.HEAD_TITLE);
         page.selectLine(page.translations.CORE.UI.END);
         browserExt.click(page.editButtonElement);
-        assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TIME);
-        assert.eventually.equal(cutTitleField.getLabel(), page.translations.PUBLISH.CHAPTER.FORM_TITLE);
+        assert.eventually.equal(cutTimeField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TIME);
+        assert.eventually.equal(cutTitleField.getLabel(), page.translations.PUBLISH.EDITOR.FORM_TITLE);
         assert.eventually.equal(page.getCutTitle(cutTitleField), page.translations.CORE.UI.END);
         assert.eventually.equal(page.saveButtonElements.get(0).getText(), page.translations.CORE.UI.FORM_SAVE);
         assert.eventually.equal(page.saveButtonElements.get(1).getText(), page.translations.CORE.UI.FORM_CANCEL);
@@ -137,7 +140,7 @@ describe('Chapter page translations', function() {
         page.popoverElement.getAttribute('content').then(function(text) {
 
           // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CHAPTER.REMOVE_END);
+          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.EDITOR.REMOVE_END);
 
         });
         page.removeCut(false);

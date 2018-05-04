@@ -5,13 +5,20 @@ module.exports = {
     routes: {
       public: {
         'get /video/*': 'app/server/controllers/VideoController.displayVideoAction',
-        'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction'
+        'get /getVideo/:id': 'app/server/controllers/VideoController.getVideoReadyAction',
+        'post /videos/:id/poi/convert': 'app/server/controllers/VideoController.convertPoiAction'
       },
       private: {
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
         'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
-        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction',
+        'post /videos/:id/chapters/:chapterid': 'app/server/controllers/VideoController.updateChapterAction',
+        'post /videos/:id/chapters': 'app/server/controllers/VideoController.updateChapterAction',
+        'post /videos/:id/tags/:tagid': 'app/server/controllers/VideoController.updateTagAction',
+        'post /videos/:id/tags': 'app/server/controllers/VideoController.updateTagAction',
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction',
+        'delete /videos/:id/chapters/:chaptersids': 'app/server/controllers/VideoController.removeChaptersAction',
+        'delete /videos/:id/tags/:tagsids': 'app/server/controllers/VideoController.removeTagsAction',
         'post /addMedia': 'app/server/controllers/VideoController.addEntityAction',
         'post /retryVideo/:ids': 'app/server/controllers/VideoController.retryVideosAction',
         'post /startUpload/:ids/:platform': 'app/server/controllers/VideoController.startUploadAction',
@@ -21,17 +28,15 @@ module.exports = {
         'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
         'get /configuration/googleOAuthAssociation':
         'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
-        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration',
-        'post /updateVideoTags/:id': 'app/server/controllers/VideoController.updateTagsAction',
-        'post /removeVideoTags/:id': 'app/server/controllers/VideoController.removeTagsAction'
+        'post /configuration/upload': 'app/server/controllers/ConfigurationController.saveUploadConfiguration'
       },
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',
         'post /statistics/:entity/:type/:id': 'app/server/controllers/StatisticsController.statisticsAction',
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
+        'post /videos/:id/poi/convert': 'app/server/controllers/VideoController.convertPoiAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
-        'post /videos/:id': 'app/server/controllers/VideoController.updateEntityAction',
-        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntityAction'
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction'
       }
     }
   },
@@ -52,15 +57,8 @@ module.exports = {
       name: 'PUBLISH.WS_SCOPES.GET_VIDEOS_NAME',
       description: 'PUBLISH.WS_SCOPES.GET_VIDEOS_DESCRIPTION',
       paths: [
-        'get /publish/videos*'
-      ]
-    },
-    {
-      id: 'publish-update-videos',
-      name: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_NAME',
-      description: 'PUBLISH.WS_SCOPES.UPDATE_VIDEOS_DESCRIPTION',
-      paths: [
-        'post /publish/videos*'
+        'get /publish/videos*',
+        'post /publish/videos/*'
       ]
     },
     {
@@ -147,12 +145,12 @@ module.exports = {
           ]
         },
         {
-          id: 'publish-chapter-videos',
+          id: 'publish-editor-videos',
           name: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_NAME',
           description: 'PUBLISH.PERMISSIONS.EDIT_CHAPTER_DESCRIPTION',
           paths: [
-            'post /publish/updateVideoTags*',
-            'post /publish/removeVideoTags*'
+            'post /publish/videos/*',
+            'delete /publish/videos/*'
           ]
         },
         {
@@ -164,6 +162,11 @@ module.exports = {
           id: 'publish-upload-videos',
           name: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_NAME',
           description: 'PUBLISH.PERMISSIONS.UPLOAD_VIDEO_DESCRIPTION'
+        },
+        {
+          id: 'publish-manage-videos',
+          name: 'PUBLISH.PERMISSIONS.MANAGE_VIDEOS_NAME',
+          description: 'PUBLISH.PERMISSIONS.MANAGE_VIDEOS_DESCRIPTION'
         }
       ]
     }
@@ -201,8 +204,7 @@ module.exports = {
       base: [
       ],
       dev: [
-        '/publish/multirange/multirange.js',
-        '/publish/timePolyfill/time-polyfill.js'
+        '/publish/multirange/multirange.js'
       ],
       prod: [
         '/publish/be/js/libOpenveoPublish.js'
@@ -221,9 +223,12 @@ module.exports = {
         '/publish/ovPub/MediaController.js',
         '/publish/ovPub/PropertiesController.js',
         '/publish/ovPub/CategoriesController.js',
-        '/publish/ovPub/ChapterController.js',
+        '/publish/ovPub/EditorController.js',
         '/publish/ovPub/ConfigurationController.js',
-        '/publish/ovPub/PublishService.js'
+        '/publish/ovPub/PublishService.js',
+        '/publish/ovPub/TimeDirective.js',
+        '/publish/ovPub/MillisecondsToTimeFilter.js',
+        '/publish/ovPub/TimeToMillisecondsFilter.js'
       ],
       prod: [
         '/publish/be/js/openveoPublish.js'
@@ -268,9 +273,38 @@ module.exports = {
     'app/client/front/views'
   ],
   imageProcessing: {
-    imagesFolders: ['assets/player/videos'],
-    imagesStyle: {
-      small: 200
-    }
+    folders: [
+      {
+        imagesDirectory: 'assets/player/videos'
+      }
+    ],
+    styles: [
+      {
+        id: 'publish-thumb-200',
+        type: 'thumb',
+        width: 200
+      },
+      {
+        id: 'publish-square-142',
+        type: 'thumb',
+        width: 142,
+        height: 142,
+        crop: true
+      },
+      {
+        id: 'publish-16by9-300',
+        type: 'thumb',
+        width: 300,
+        height: 169,
+        crop: true
+      },
+      {
+        id: 'publish-16by9-142',
+        type: 'thumb',
+        width: 142,
+        height: 80,
+        crop: true
+      }
+    ]
   }
 };

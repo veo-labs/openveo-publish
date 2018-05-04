@@ -29,11 +29,10 @@ var acceptedImagesExtensions = [
  * @extends Package
  * @constructor
  * @param {Object} mediaPackage Information about the video
- * @param {VideoModel} videoModel A video model
- * @param {ConfigurationModel} configurationModel A configuration model
+ * @param {VideoProvider} videoProvider A video provider
  */
-function VideoPackage(mediaPackage, videoModel, configurationModel) {
-  VideoPackage.super_.call(this, mediaPackage, videoModel, configurationModel);
+function VideoPackage(mediaPackage, videoProvider) {
+  VideoPackage.super_.call(this, mediaPackage, videoProvider);
 }
 
 module.exports = VideoPackage;
@@ -210,7 +209,8 @@ VideoPackage.prototype.defragmentMp4 = function() {
 /**
  * Generates a thumbnail for the video.
  *
- * It uses ffmpeg to extract an image from the video.
+ * If no thumbnail has been provided by the user form, ffmpeg will be
+ * used to extract an image from the video to generate a thumbnail.
  *
  * This is a transition.
  *
@@ -220,25 +220,48 @@ VideoPackage.prototype.generateThumb = function() {
   var self = this;
   var filePath = this.getMediaFilePath();
 
-  // Generate thumb
   this.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB, function() {
     var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
-    process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-    ffmpeg(filePath).screenshots({
-      timestamps: ['10%'],
-      filename: 'thumbnail.jpg',
-      folder: destinationPath
-    }).on('error', function(error) {
-      self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
-    }).on('end', function() {
-      self.videoModel.updateThumbnail(
-        self.mediaPackage.id,
-        '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
-        function() {
-          self.fsm.transition();
+
+    if (self.mediaPackage.originalThumbnailPath !== undefined) {
+    // Copy user's thumbnail
+      process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
+      openVeoApi.fileSystem.copy(
+        self.mediaPackage.originalThumbnailPath,
+        path.join(destinationPath, 'thumbnail.jpg'),
+        function(error) {
+          if (error) {
+            self.setError(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
+          }
+
+          self.videoProvider.updateThumbnail(
+            self.mediaPackage.id,
+            '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+            function() {
+              self.fsm.transition();
+            }
+          );
         }
       );
-    });
+    } else {
+    // Generate thumb
+      process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
+      ffmpeg(filePath).screenshots({
+        timestamps: ['10%'],
+        filename: 'thumbnail.jpg',
+        folder: destinationPath
+      }).on('error', function(error) {
+        self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
+      }).on('end', function() {
+        self.videoProvider.updateThumbnail(
+          self.mediaPackage.id,
+          '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+          function() {
+            self.fsm.transition();
+          }
+        );
+      });
+    }
   });
 };
 
@@ -299,7 +322,7 @@ VideoPackage.prototype.getMetadata = function() {
           // Got video stream associated to the video file
           if (videoStream) {
             self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-            self.videoModel.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
+            self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
               self.fsm.transition();
             });
           } else

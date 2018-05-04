@@ -21,8 +21,10 @@
   users,
   tableReloadEventService,
   i18nService,
-  publishName) {
+  publishName,
+  OvUrlFactory) {
     var entityType = 'videos';
+    var isUserManager = $scope.hasPermission('publish-manage-videos');
     var addMediaPromise = null;
 
     $scope.properties = properties.data.entities;
@@ -31,18 +33,23 @@
     $scope.users = users.data.entities;
     $scope.isCollapsed = true;
     $scope.fileToUpload = null;
+    $scope.thumbToAdd = null;
+    $scope.thumbToEdit = null;
 
     // Fetch permissions of the connected user for MediaController features
     $scope.rights = {};
     $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
     $scope.rights.publish = $scope.checkAccess('publish-publish-' + entityType);
-    $scope.rights.chapter = $scope.checkAccess('publish-chapter-' + entityType);
+    $scope.rights.editor = $scope.checkAccess('publish-editor-' + entityType);
     $scope.rights.retry = $scope.checkAccess('publish-retry-' + entityType);
     $scope.rights.upload = $scope.checkAccess('publish-upload-' + entityType);
+    $scope.rights.update = $scope.checkAccess('publish-update-' + entityType);
+    $scope.rights.remove = $scope.checkAccess('publish-delete-' + entityType);
 
     // Define add form
     var scopeAddForm = $scope.addFormContainer = {};
     scopeAddForm.model = {
+      date: new Date(),
       properties: {}
     };
 
@@ -203,7 +210,7 @@
      * @param {Function} reload Function to reload the datatable
      */
     function removeRows(selected, reload) {
-      entityService.removeEntity(entityType, publishName, selected.join(','))
+      entityService.removeEntities(entityType, publishName, selected.join(','))
         .then(function() {
           $scope.$emit('setAlert', 'success', $filter('translate')('PUBLISH.MEDIAS.REMOVE_SUCCESS'), 4000);
           reload();
@@ -216,9 +223,12 @@
      * @param {Object} media Media data
      */
     function saveMedia(media) {
-      return entityService.updateEntity(entityType, publishName, media.id, {
+      return publishService.updateMedia(media.id, {
         title: media.title,
+        date: media.date.getTime(),
+        leadParagraph: media.leadParagraph,
         description: media.description,
+        thumbnail: $scope.thumbToEdit,
         properties: media.customProperties,
         category: media.category,
         groups: media.groups,
@@ -229,11 +239,11 @@
     }
 
     /**
-     * Routes to chapters edition.
+     * Routes to media editor.
      *
      * @param {Object} media The media to edit
      */
-    function editChapter(media) {
+    function mediaEditor(media) {
       $location.path('/publish/media/' + media.id);
     }
 
@@ -311,12 +321,37 @@
         }
       },
       {
+        key: 'date',
+        type: 'horizontalDatepicker',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DATE_DESC'),
+          required: true
+        },
+        link: function(scope, el, attrs, ctrl) {
+          // Workaround: Formly doesn't reset this field properly
+          scope.options.resetModel = function() {
+            scope.model.date = new Date();
+          };
+        }
+      },
+      {
+        key: 'leadParagraph',
+        type: 'horizontalTinymce',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_LEAD_PARAGRAPH'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_LEAD_PARAGRAPH_DESC')
+        },
+        data: {
+          tinymceOptions: tinyOptions
+        }
+      },
+      {
         key: 'description',
         type: 'horizontalTinymce',
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
-          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DESCRIPTION_DESC'),
-          required: true
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_DESCRIPTION_DESC')
         },
         data: {
           tinymceOptions: tinyOptions
@@ -334,6 +369,21 @@
           progressBar: false,
           onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
             $scope.fileToUpload = file;
+          }
+        }
+      },
+      {
+        key: 'thumbnail',
+        type: 'horizontalFile',
+        defaultValue: -1,
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_THUMBNAIL'),
+          description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_THUMBNAIL_DESC'),
+          acceptedTypes: '.jpeg,.jpg',
+          required: false,
+          progressBar: false,
+          onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
+            $scope.thumbToAdd = file;
           }
         }
       },
@@ -393,10 +443,13 @@
 
       addMediaPromise = publishService.addMedia({
         title: model.title,
+        date: model.date.getTime(),
+        leadParagraph: model.leadParagraph,
         description: model.description,
         category: model.category,
         groups: groups,
         file: $scope.fileToUpload,
+        thumbnail: $scope.thumbToAdd,
         properties: model.properties
       });
 
@@ -428,14 +481,62 @@
         }
       },
       {
-        key: 'description',
+        key: 'date',
+        type: 'horizontalEditableDatepicker',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DATE'),
+          required: true
+        }
+      },
+      {
+        key: 'leadParagraph',
         type: 'horizontalEditableTinymce',
         templateOptions: {
-          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION'),
-          required: true
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_LEAD_PARAGRAPH')
         },
         data: {
           tinymceOptions: tinyOptions
+        }
+      },
+      {
+        key: 'description',
+        type: 'horizontalEditableTinymce',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_DESCRIPTION')
+        },
+        data: {
+          tinymceOptions: tinyOptions
+        }
+      },
+      {
+        key: 'thumbnail',
+        type: 'horizontalEditableFile',
+        templateOptions: {
+          label: $filter('translate')('PUBLISH.MEDIAS.ATTR_THUMBNAIL'),
+          acceptedTypes: '.jpeg,.jpg',
+          required: false,
+          progressBar: false,
+          onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {
+            $scope.thumbToEdit = file;
+          }
+        },
+        link: function(scope, element, attrs) {
+          var ts = Date.now();
+
+          scope.show = function() {
+            if (!scope.originalModel.thumbnail)
+              return $filter('translate')('CORE.UI.EMPTY');
+
+            var src = scope.originalModel.thumbnail;
+            src = OvUrlFactory.setUrlParameter(scope.originalModel.thumbnail, 'style', 'publish-thumb-200');
+
+            // Workaround: add timestamp to src
+            // As the URL don't change even if a new thumbnail is submitted,
+            // adding this parameter will force regeneration of the tag.
+            src = OvUrlFactory.setUrlParameter(src, 'ts', ts);
+
+            return '<img class="img-thumbnail" src="' + src + '">';
+          };
         }
       },
       {
@@ -561,7 +662,7 @@
         label: $filter('translate')('PUBLISH.MEDIAS.PUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
-            $scope.checkContentAccess(row, 'update') &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             row.state == 11 &&
             !row.saving;
         },
@@ -576,7 +677,7 @@
         label: $filter('translate')('PUBLISH.MEDIAS.UNPUBLISH'),
         condition: function(row) {
           return $scope.rights.publish &&
-            $scope.checkContentAccess(row, 'update') &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             row.state == 12 &&
             !row.saving;
         },
@@ -590,19 +691,22 @@
       {
         label: $filter('translate')('PUBLISH.MEDIAS.CHAPTER_EDIT'),
         condition: function(row) {
-          return $scope.rights.chapter &&
-            $scope.checkContentAccess(row, 'update') &&
+          return $scope.rights.editor &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
             !row.saving &&
             (row.state == 11 || row.state == 12);
         },
         callback: function(row) {
-          editChapter(row);
+          mediaEditor(row);
         }
       },
       {
         label: $filter('translate')('PUBLISH.MEDIAS.RETRY'),
         condition: function(row) {
-          return $scope.rights.retry && $scope.checkContentAccess(row, 'update') && row.state == 0 && !row.saving;
+          return $scope.rights.retry &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+            row.state == 0 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           retryMedia([row.id], reload);
@@ -611,7 +715,8 @@
       {
         label: $filter('translate')('CORE.UI.REMOVE'),
         condition: function(row) {
-          return $scope.checkContentAccess(row, 'delete') &&
+          return $scope.rights.remove &&
+            ($scope.checkContentAccess(row, 'delete') || isUserManager) &&
             !row.locked &&
             !row.saving &&
             (row.state === 6 || row.state === 11 || row.state === 12 || row.state === 0);
@@ -632,7 +737,10 @@
       scopeDataTable.actions.push({
         label: $filter('translate')('PUBLISH.MEDIAS.UPLOAD_' + platformName.toUpperCase()),
         condition: function(row) {
-          return $scope.rights.upload && $scope.checkContentAccess(row, 'update') && row.state == 6 && !row.saving;
+          return $scope.rights.upload &&
+            ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+            row.state == 6 &&
+            !row.saving;
         },
         callback: function(row, reload) {
           startMediaUpload([row.id], this.platform, reload);
@@ -644,8 +752,14 @@
     scopeEditForm.init = function(row) {
       var properties = {};
       scopeEditForm.fields = angular.copy(scopeEditForm.fieldsBase);
+      if (!row.mediaId)
+        scopeEditForm.fields = scopeEditForm.fields.filter(function(field) {
+          return field.key !== 'thumbnail';
+        });
+
       row.groups = row.metadata.groups;
       row.user = row.metadata.user;
+      row.date = new Date(row.date);
 
       // Build properties
       for (var propertyId in row.properties) {
@@ -656,7 +770,10 @@
       row.customProperties = properties;
 
       // User field
-      if (row.metadata.user == $scope.userInfo.id || $scope.userInfo.id == openVeoSettings.superAdminId) {
+      if (row.metadata.user == $scope.userInfo.id ||
+          $scope.userInfo.id == openVeoSettings.superAdminId ||
+          isUserManager
+         ) {
         var opt = utilService.buildSelectOptions($scope.users);
         scopeEditForm.fields.push({
           key: 'user',
@@ -684,7 +801,10 @@
     };
 
     scopeEditForm.conditionEditDetail = function(row) {
-      return $scope.checkContentAccess(row, 'update') && !row.locked && row.state !== 0;
+      return $scope.rights.update &&
+        ($scope.checkContentAccess(row, 'update') || isUserManager) &&
+        !row.locked &&
+        row.state !== 0;
     };
     scopeEditForm.onSubmit = function(model) {
       return saveMedia(model);
@@ -719,7 +839,8 @@
     'users',
     'tableReloadEventService',
     'i18nService',
-    'publishName'
+    'publishName',
+    'OvUrlFactory'
   ];
 
 })(angular.module('ov.publish'));

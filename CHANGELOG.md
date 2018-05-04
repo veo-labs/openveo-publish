@@ -1,3 +1,54 @@
+# 6.0.0 / 2018-05-04
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core 5.0.0
+- Controller / Model / Provider / Database system has been revised into a Controller / Provider / Storage system with the following important consequences:
+  - Web service endpoint GET /videos/:id now return an HTTP code 404 if video is not found
+  - Web service endpoint GET /videos/:id now includes information from the video platform
+  - Web service endpoint POST /videos/:id has been removed
+  - Web service endpoint DELETE /videos/:id now returns property **total** with the number of deleted videos
+  - Web service endpoint PUT /properties now returns a property **entities** with the list of added properties and **total** the number of inserted properties
+  - Web service endpoint GET /properties/:id now return an HTTP code 404 if property is not found
+  - Web service endpoint POST /properties/:id now returns property **total** with value **1** if everything went fine
+  - Web service endpoint DELETE /properties/:id now returns property **total** with the number of deleted properties
+  - HTTP error codes have changed. See **app/server/controllers/httpErrors.js** for the complete list of error codes
+- Drop support for NodeJS &lt; 8.9.4 and NPM &lt; 5.6.0
+- Directory assets/player/videos will no longer be saved when executing *npm install*. assets/player/videos should be a symbolic link to a directory outside the project to prevent videos from being deleted when executing *npm install*
+
+## NEW FEATURES
+
+- The preview thumbnail of the video can be specified
+- Add lead paragraph field to the video entity
+- The date of the video can be defined in add video form &amp; in the edit video form
+- Hook **properties.deleted** is now executed when properties have been deleted
+- Web service endpoint GET /properties now accepts **include** and **exclude** parameters to filter returned applications fields
+- Web service endpoint GET /properties/:id now accepts **include** and **exclude** parameters to filter returned property fields
+- Web service endpoint GET /videos now accepts **include** and **exclude** parameters to filter returned videos fields
+- Web service endpoint GET /videos/:id now accepts **include** and **exclude** parameters to filter returned video fields
+- Add a new permission "Manage all videos" to authorize manipulation of all videos no matter the owner or groups
+- Add NPM npm-shrinkwrap.json file
+
+## BUG FIXES
+
+- The video description is now optional
+- Fix the time input format (depending on the browser localization) of the editor by replacing the field by three inputs (hours, minutes, seconds)
+- Fix OpenVeo Publish upgrade when upgrading from a version prior to version 2.0.0 with more than one media
+- Fix 3.0.0 migration by adding ids to chapters so that they can be updated instead of recreated
+- Removing a user won't remove the default owner for medias uploaded through the watcher when the owner is not the removed user
+- Fix permissions on categories, a user with "add" and "update" privileges on taxonomies could not add / update categories, consequently only the super administrator could create new categories
+- Player now displays only the video by default if video stream contains both video and presentation
+- The format of dates now respects the language of the administration interface
+- The date field in the add form of the catalog is now properly reset when form is submitted
+- Fix "Manage Publish configuration" permission which did not authorize the user to manage publish configuration
+- Fix "Edit videos" and "Remove videos" permissions, a user without these permissions could access the "edit" and "remove" buttons for a video (even if the actions were blocked)
+
+## DEPENDENCIES
+
+- **dashjs** has been updated from 2.5.0 to **2.6.7**
+- **videojs-contrib-dash** has been updated from 2.4.0 to **2.9.0**
+- **videojs-contrib-hls** has been updated from 5.5.3 to **5.14.1**
+
 # 5.1.0 / 2018-02-23
 
 ## NEW FEATURES

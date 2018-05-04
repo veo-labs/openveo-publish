@@ -1,6 +1,6 @@
 {
   "publishCategories": "e2eTests/tests/categories/*.js",
-  "publishChapters": "e2eTests/tests/chapters/*.js",
+  "publishEditor": "e2eTests/tests/editor/*.js",
   "publishConfiguration": "e2eTests/tests/configuration/*.js",
   "publishMedias": "e2eTests/tests/medias/*.js",
   "publishProperties": "e2eTests/tests/properties/*.js",

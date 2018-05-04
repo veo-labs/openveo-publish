@@ -9,18 +9,23 @@
 
 (function(angular) {
 
-  function UploadService($q) {
-    function upload() {
-      return $q.when();
+  function UploadService($http) {
+    function upload(request) {
+      return $http.post(request.url, request.info);
+    }
+
+    function json(data) {
+      return angular.toJson(data);
     }
 
     return {
-      upload: upload
+      upload: upload,
+      json: json
     };
   }
 
   var app = angular.module('ngFileUpload', []);
   app.factory('Upload', UploadService);
-  UploadService.$inject = ['$q'];
+  UploadService.$inject = ['$http'];
 
 })(angular);

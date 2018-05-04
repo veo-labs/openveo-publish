@@ -3,9 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var PropertyPage = process.requirePublish('tests/client/e2eTests/pages/PropertyPage.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
-var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
@@ -20,9 +18,9 @@ describe('Property page', function() {
   before(function() {
     var coreApi = process.api.getCoreApi();
     var database = coreApi.getDatabase();
-    var propertyModel = new PropertyModel(new PropertyProvider(database), new VideoProvider(database));
-    propertyHelper = new PropertyHelper(propertyModel);
-    page = new PropertyPage(propertyModel);
+    var propertyProvider = new PropertyProvider(database);
+    propertyHelper = new PropertyHelper(propertyProvider);
+    page = new PropertyPage(propertyProvider);
   });
 
   // Logout after tests
@@ -138,7 +136,7 @@ describe('Property page', function() {
         {
           name: name,
           description: 'test delete without permission description',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         }
       ]);
       page.refresh();

@@ -1,18 +1,20 @@
 'use strict';
 
 var util = require('util');
+var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Creates a new CategoryHelper to help manipulate categories without interacting with the web browser.
  *
  * Each function is inserting in protractor's control flow.
  *
- * @param {TaxonomyModel} model The entity model that will be used by the Helper
+ * @param {TaxonomyProvider} provider The entity provider that will be used by the Helper
  */
-function CategoryHelper(model) {
-  CategoryHelper.super_.call(this, model);
+function CategoryHelper(provider) {
+  CategoryHelper.super_.call(this, provider);
 }
 
 module.exports = CategoryHelper;
@@ -38,26 +40,26 @@ CategoryHelper.prototype.addEntities = function(tree) {
       tree: tree
     };
 
-    self.model.get({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories.length) {
-        self.model.add(categoriesToAdd, function(error, addedCount, data) {
+    self.provider.getOne(new ResourceFilter().equal('name', 'categories'), null, function(error, categories) {
+      if (error) deferred.reject(error);
+      else if (!categories) {
+        self.provider.add([categoriesToAdd], function(error, total, addedCategories) {
           if (error)
             deferred.reject(error);
           else
-            deferred.fulfill(data);
+            deferred.fulfill(addedCategories[0]);
         });
       } else {
-        self.model.update([self.treeId], categoriesToAdd, function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill(categoriesToAdd);
-        });
+        self.provider.updateOne(
+          new ResourceFilter().equal('id', self.treeId),
+          categoriesToAdd,
+          function(error) {
+            if (error)
+              deferred.reject(error);
+            else
+              deferred.fulfill(categoriesToAdd);
+          }
+        );
       }
     });
     return deferred.promise.then(function(data) {
@@ -79,23 +81,27 @@ CategoryHelper.prototype.removeAllEntities = function() {
   return this.flow.execute(function() {
     var deferred = protractor.promise.defer();
 
-    self.model.get({
-      name: 'categories'
-    },
-    function(error, categories) {
-      if (error)
-        deferred.reject(error);
-      else if (!categories.length)
-        deferred.fulfill();
-      else {
-        self.model.remove([categories[0].id], function(error) {
-          if (error)
-            deferred.reject(error);
-          else
-            deferred.fulfill();
-        });
+    self.provider.getOne(
+      new ResourceFilter().equal('name', 'categories'),
+      null,
+      function(error, category) {
+        if (error)
+          deferred.reject(error);
+        else if (!category)
+          deferred.fulfill();
+        else {
+          self.provider.remove(
+            new ResourceFilter().equal('id', category.id),
+            function(error, total) {
+              if (error)
+                deferred.reject(error);
+              else
+                deferred.fulfill();
+            }
+          );
+        }
       }
-    });
+    );
 
     return deferred.promise.then(function() {
       return protractor.promise.fulfilled();

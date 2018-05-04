@@ -8,7 +8,6 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     'ov.entity',
     'ov.player',
     'ov.multirange',
-    'angular-time-polyfill',
     'ui.tinymce',
     'ngFileUpload'
   ]);
@@ -121,10 +120,10 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
     // Add route /publish/medias/mediasId with authentication.
     // Also retrieve the list of medias
     $routeProvider.when('/publish/media/:mediaId', {
-      templateUrl: '/publish/be/views/chapter.html',
-      controller: 'ChapterController',
-      title: 'PUBLISH.CHAPTER.PAGE_TITLE',
-      access: 'publish-chapter-videos',
+      templateUrl: '/publish/be/views/editor.html',
+      controller: 'EditorController',
+      title: 'PUBLISH.EDITOR.PAGE_TITLE',
+      access: 'publish-editor-videos',
       resolve: {
         media: ['$q', 'publishService', 'alertService', '$route', '$filter',
           function($q, publishService, alertService, $route, $filter) {
@@ -136,7 +135,7 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
                 if (result.data.entity.available)
                   deferred.resolve.apply(deferred, arguments);
                 else {
-                  publishService.cacheClear('chapter');
+                  publishService.cacheClear('editor');
                   alertService.add('danger', $filter('translate')('PUBLISH.MEDIAS.NOT_READY'), 8000);
                   deferred.reject({redirect: '/publish/medias'});
                 }

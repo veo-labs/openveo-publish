@@ -5,12 +5,12 @@
   /**
    * Defines the categories controller for the categories page.
    */
-  function ChapterController(
+  function EditorController(
           $window,
           $scope,
+          $http,
           $filter,
           $timeout,
-          entityService,
           i18nService,
           ovMultirangeViews,
           media,
@@ -24,8 +24,10 @@
      * Reconstructs ranges with chapters and cut array.
      */
     function updateRange() {
-      $scope.ranges = ($scope.media[$scope.selectedData.value] ? $scope.media[$scope.selectedData.value] : [])
-              .concat(($scope.media.cut ? $scope.media.cut : []));
+      $scope.ranges = ($scope.media[$scope.selectedData.value] || []).concat($scope.media.cut || []);
+      $scope.ranges.forEach(function(range) {
+        range.value = parseInt(range.value);
+      });
 
       orderBy($scope.ranges, '+value', false);
     }
@@ -50,13 +52,17 @@
         $scope.media.tags = [];
       }
 
+      if (null === $scope.endCut.range.value) {
+        $scope.endCut.range.value = $scope.duration;
+      }
+
       $scope.slider = {
         views: ovMultirangeViews.TIME($scope.duration),
         view: 0
       };
     }
 
-    var myPlayer = document.getElementById('chapterPlayer');
+    var myPlayer = document.getElementById('editorPlayer');
     var playerController;
 
     /**
@@ -93,11 +99,20 @@
           playerController = angular.element(myPlayer).controller('ovPlayer');
 
           // Set Duration
-          $scope.duration = duration / 1000;
+          $scope.duration = duration;
           init();
         }
       });
     }
+
+    angular.element(myPlayer).on('needPoiConversion', function(event, duration) {
+      $http
+        .post('/publish/videos/' + $scope.media.id + '/poi/convert', {duration: duration})
+        .then(function(response) {
+          $scope.media = response.data.entity;
+          preinit(duration);
+        });
+    });
 
     /**
      *  TAG
@@ -170,12 +185,12 @@
 
       // emit alert
       if (uploadAborted) {
-        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.UPLOAD_CANCELED'), 4000);
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.EDITOR.UPLOAD_CANCELED'), 4000);
         uploadAborted = false;
       } else if (fileError) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_TAG_ERROR', null, fileError));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_TAG_ERROR', null, fileError));
       } else {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       }
@@ -188,7 +203,7 @@
      */
     function saveChapterSuccessCb(resp) {
       $scope.file = null;
-      $scope.modelToEdit = resp.data[$scope.selectedData.value][0];
+      $scope.modelToEdit = resp.data[$scope.selectedData.value === 'chapters' ? 'chapter' : 'tag'];
       $scope.simpleMimeType = $scope.getFileMimeType();
 
       var i = searchPosition($scope.modelToEdit.id);
@@ -212,7 +227,11 @@
      */
     function saveChapter() {
       var objToSave = cleanObjectToSave($scope.selectedData.value, true);
-      $scope.upload = publishService.updateTags($scope.media.id, $scope.file, objToSave);
+
+      if ($scope.selectedData.value === 'tags')
+        $scope.upload = publishService.updateTag($scope.media.id, $scope.file, objToSave.tags[0]);
+      else if ($scope.selectedData.value === 'chapters')
+        $scope.upload = publishService.updateChapter($scope.media.id, objToSave.chapters[0]);
 
       $scope.upload.then(
         saveChapterSuccessCb,
@@ -274,8 +293,8 @@
       if ($scope.endCut.isInArray && $scope.beginCut.isInArray &&
         $scope.endCut.range.value <= $scope.beginCut.range.value) {
         // Reset end
-        $scope.endCut.range.value = 1;
-        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.CHAPTER.DELETE_END_CUT'), 8000);
+        $scope.endCut.range.value = $scope.duration;
+        $scope.$emit('setAlert', 'warning', $filter('translate')('PUBLISH.EDITOR.DELETE_END_CUT'), 8000);
         toggleEnd(false);
 
         // the watch for endCut.isInArray will save everything
@@ -285,7 +304,7 @@
 
       // CALL SAVE HTTP
       var objToSave = cleanObjectToSave('cut');
-      entityService.updateEntity('videos', publishName, $scope.media.id, objToSave).success(function() {
+      publishService.updateMedia($scope.media.id, objToSave).success(function() {
         if ($scope.selectRow) {
           $scope.selectRow.select = false;
           $scope.selectRow = null;
@@ -293,7 +312,7 @@
         updateRange();
         $scope.isCollapsed = true;
       }).error(function(data, status) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
         if (status === 401)
           $scope.$parent.logout();
       });
@@ -310,8 +329,10 @@
     // Listen to player errors
     // If an error occurs go back to catalog with an alert
     angular.element(myPlayer).on('error', function(event, error) {
-      $scope.$emit('setAlert', 'danger', error.message);
-      $scope.back();
+      if (error) {
+        $scope.$emit('setAlert', 'danger', error.message);
+        $scope.back();
+      }
     });
 
     // inject Math
@@ -336,9 +357,6 @@
 
     // Init object for player
     $scope.mediaPlayer = angular.copy($scope.media);
-    delete $scope.mediaPlayer.chapters;
-    delete $scope.mediaPlayer.tags;
-    delete $scope.mediaPlayer.cut;
 
     // Set player language
     $scope.playerLanguage = i18nService.getLanguage();
@@ -356,7 +374,7 @@
     $scope.endCut = {
       isInArray: undefined,
       range: {
-        value: 1,
+        value: null,
         name: 'CORE.UI.END',
         description: '',
         type: 'end'
@@ -540,7 +558,7 @@
       } else {
         value = $scope.selectRow.value;
       }
-      playerController.setTime(parseInt(value * $scope.duration) * 1000);
+      playerController.setTime(value);
 
       // we only save the chnage if the time of the selected row has changed
       if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
@@ -553,20 +571,26 @@
 
     // remove chapter and tags
     $scope.remove = function() {
+      var removeMethodPromise;
       var ranges = $scope.media[$scope.selectedData.value];
-      var tagsToRemove = {};
-      var rangesToRemove = tagsToRemove[$scope.selectedData.value] = [];
+      var pointsOfInterestToRemove = {};
+      var rangesToRemove = pointsOfInterestToRemove[$scope.selectedData.value] = [];
       for (var i = 0; i < ranges.length; i++) {
-        if (ranges[i].check) rangesToRemove.push(ranges[i]);
+        if (ranges[i].check) rangesToRemove.push(ranges[i].id);
       }
       $scope.selectRow = null;
 
-      publishService.removeTags($scope.media.id, tagsToRemove).then(function(resp) {
+      if ($scope.selectedData.value === 'tags')
+        removeMethodPromise = publishService.removeTags($scope.media.id, pointsOfInterestToRemove.tags);
+      else if ($scope.selectedData.value === 'chapters')
+        removeMethodPromise = publishService.removeChapters($scope.media.id, pointsOfInterestToRemove.chapters);
+
+      removeMethodPromise.then(function(resp) {
         if ($scope.checkAllSelected) {
           $scope.media[$scope.selectedData.value] = [];
           $scope.checkAllSelected = false;
-        } else for (var i = 0; i < tagsToRemove[$scope.selectedData.value].length; i++) {
-          var id = tagsToRemove[$scope.selectedData.value][i]['id'];
+        } else for (var i = 0; i < pointsOfInterestToRemove[$scope.selectedData.value].length; i++) {
+          var id = pointsOfInterestToRemove[$scope.selectedData.value][i];
           var k = searchPosition(id);
           if (k >= 0) {
             $scope.media[$scope.selectedData.value].splice(k, 1);
@@ -574,7 +598,7 @@
         }
         updateRange();
       }).catch(function(error) {
-        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.CHAPTER.SAVE_ERROR'));
+        $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
       });
     };
 
@@ -590,20 +614,13 @@
     var changebyRange = true;
     $scope.updateTime = function() {
       if (changebyRange) {
-        var d = new Date(parseInt(Math.round($scope.modelToEdit.value * Math.round($scope.duration * 1000))));
-        var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-        var nd = new Date(utc);
-        nd.setMilliseconds(0);
-        $scope.editTime = nd;
+        $scope.editTime = $scope.modelToEdit.value;
       } else
         changebyRange = true;
     };
     $scope.updateRange = function() {
-      if ($scope.myForm.time.$valid && $scope.editTime) {
-        var d = new Date($scope.editTime.getTime());
-        var local = d.getTime() - (d.getTimezoneOffset() * 60000);
-        changebyRange = false;
-        $scope.modelToEdit.value = local / Math.round($scope.duration * 1000);
+      if ($scope.myForm.time.$valid) {
+        $scope.modelToEdit.value = $scope.editTime;
       }
     };
     $scope.$watch('modelToEdit.value', function() {
@@ -666,16 +683,16 @@
       deleteUpload();
     });
 
-    $scope.editTime = new Date(Date.UTC(1970, 0, 1, 0, 0, 0));
+    $scope.editTime = 0;
   }
 
-  app.controller('ChapterController', ChapterController);
-  ChapterController.$inject = [
+  app.controller('EditorController', EditorController);
+  EditorController.$inject = [
     '$window',
     '$scope',
+    '$http',
     '$filter',
     '$timeout',
-    'entityService',
     'i18nService',
     'ovMultirangeViews',
     'media',

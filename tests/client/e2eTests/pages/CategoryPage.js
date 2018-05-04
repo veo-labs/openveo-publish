@@ -9,10 +9,10 @@ var browserExt = e2e.browser;
 /**
  * Creates a new CategoryPage representing the categories back end page.
  *
- * @param {EntityModel} model The model for categories CRUD to be able to add / remove categories by passing the
- * user agent
+ * @param {EntityProvider} provider The provider for categories CRUD to be able to add / remove categories by passing
+ * the user agent
  */
-function CategoryPage(model) {
+function CategoryPage(provider) {
   CategoryPage.super_.call(this);
 
   // Page path
@@ -30,11 +30,11 @@ function CategoryPage(model) {
   // Category tree id to add a tree of categories by passing the user agent
   this.treeId = 'test';
 
-  // Category EntityModel
-  this.model = model;
+  // Category EntityProvider
+  this.provider = provider;
 
   // Category helper
-  this.helper = new CategoryHelper(this.model);
+  this.helper = new CategoryHelper(this.provider);
 }
 
 module.exports = CategoryPage;

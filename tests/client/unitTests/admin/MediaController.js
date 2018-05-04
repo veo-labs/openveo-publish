@@ -16,7 +16,7 @@ describe('MediaController', function() {
     module('ov.publish');
     module('ov.entity');
     module('ov.tableForm');
-    module('ov.utilService');
+    module('ov.util');
   });
 
   // Dependencies injections
@@ -32,15 +32,20 @@ describe('MediaController', function() {
     scope.checkAccess = function() {
       return true;
     };
+    scope.hasPermission = function() {
+      return true;
+    };
     scope.test = {};
     scope.test.rows = [
       {
         id: 1,
+        date: new Date(),
         status: 1,
         properties: []
       },
       {
         id: 2,
+        date: new Date(),
         status: 1,
         properties: []
       }

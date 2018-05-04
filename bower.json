@@ -5,12 +5,12 @@
     "angular": "1.5.5",
     "html5shiv": "3.7.3",
     "angular-animate": "1.5.5",
-    "openveo-player": "3.*",
+    "openveo-player": "4.*",
     "angular-cookies": "1.5.5",
     "video.js": "5.19.2",
-    "dashjs": "2.5.0",
-    "videojs-contrib-dash": "https://github.com/videojs/videojs-contrib-dash/releases/download/v2.9.0/videojs-dash.min.js",
-    "videojs-contrib-hls": "https://github.com/videojs/videojs-contrib-hls/releases/download/v5.5.3/videojs-contrib-hls.min.js"
+    "dashjs": "2.6.7",
+    "videojs-contrib-dash": "https://github.com/videojs/videojs-contrib-dash/releases/download/v2.9.1/videojs-dash.min.js",
+    "videojs-contrib-hls": "https://github.com/videojs/videojs-contrib-hls/releases/download/v5.14.1/videojs-contrib-hls.min.js"
   },
   "devDependencies": {
     "angular-route": "1.5.5",

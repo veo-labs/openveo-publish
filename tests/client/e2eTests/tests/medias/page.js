@@ -4,12 +4,9 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
-var VideoModel = process.requirePublish('app/server/models/VideoModel.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
-var CategoryModel = process.requirePublish('tests/client/e2eTests/models/CategoryModel.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
@@ -32,11 +29,10 @@ describe('Media page', function() {
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
-    var videoModel = new VideoModel(null, videoProvider, propertyProvider);
-    categoryHelper = new CategoryHelper(new CategoryModel());
-    propertyHelper = new PropertyHelper(new PropertyModel(propertyProvider, videoProvider));
-    mediaHelper = new MediaHelper(videoModel);
-    page = new MediaPage(videoModel);
+    categoryHelper = new CategoryHelper(coreApi.taxonomyProvider);
+    propertyHelper = new PropertyHelper(propertyProvider);
+    mediaHelper = new MediaHelper(videoProvider);
+    page = new MediaPage(videoProvider);
     tableAssert = new TableAssert(page, mediaHelper);
   });
 
@@ -56,18 +52,18 @@ describe('Media page', function() {
         properties.push({
           name: propertyNames[i] + ' text',
           description: propertyNames[i] + ' text description',
-          type: PropertyModel.TYPES.TEXT
+          type: PropertyProvider.TYPES.TEXT
         });
         properties.push({
           name: propertyNames[i] + ' list',
           description: propertyNames[i] + ' list description',
-          type: PropertyModel.TYPES.LIST,
+          type: PropertyProvider.TYPES.LIST,
           values: ['tag1', 'tag2']
         });
         properties.push({
           name: propertyNames[i] + ' boolean',
           description: propertyNames[i] + ' boolean description',
-          type: PropertyModel.TYPES.BOOLEAN
+          type: PropertyProvider.TYPES.BOOLEAN
         });
       }
 
@@ -213,23 +209,25 @@ describe('Media page', function() {
     var properties = page.getProperties();
     var name = 'test edition';
     var newName = 'test edition renamed';
+    var newDate = new Date('2017/12/16').getTime();
     var newDescription = 'test edition renamed description';
     var newCategory = categories[0].id;
     var propertiesById = {};
 
     // Set custom properties values
     for (var i = 0; i < properties.length; i++) {
-      if (properties[i].type === PropertyModel.TYPES.TEXT)
+      if (properties[i].type === PropertyProvider.TYPES.TEXT)
         propertiesById[properties[i].id] = 'test edition ' + properties[i].name + ' value';
-      else if (properties[i].type === PropertyModel.TYPES.LIST)
+      else if (properties[i].type === PropertyProvider.TYPES.LIST)
         propertiesById[properties[i].id] = properties[i].values[0];
-      else if (properties[i].type === PropertyModel.TYPES.BOOLEAN)
+      else if (properties[i].type === PropertyProvider.TYPES.BOOLEAN)
         propertiesById[properties[i].id] = true;
     }
 
     var linesToAdd = [
       {
         id: '0',
+        date: new Date('2017/12/15').getTime(),
         state: STATES.PUBLISHED,
         title: name,
         properties: getProperties()
@@ -240,16 +238,25 @@ describe('Media page', function() {
     mediaHelper.addEntities(linesToAdd);
     page.refresh();
 
-    // Edit property with a new name and new description
-    page.editMedia(name, {
-      name: newName,
-      description: newDescription,
-      category: newCategory,
-      properties: propertiesById
+    browser.executeScript(
+      'var $injector = angular.injector([\'ng\']);' +
+      'var $filter = $injector.get(\'$filter\');' +
+      'return $filter(\'date\')(' + newDate + ', \'shortDate\');'
+    ).then(function(date) {
+      // Edit property with a new name and new description
+      page.editMedia(name, {
+        name: newName,
+        date: date,
+        description: newDescription,
+        category: newCategory,
+        properties: propertiesById
+      });
+
+      assert.isFulfilled(page.getLine(newName));
+      assert.eventually.equal(page.getLineFieldText(newName, 'date'), date);
+      assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
+      assert.eventually.equal(page.getLineFieldText(newName, 'category'), categories[0].title);
     });
-    assert.isFulfilled(page.getLine(newName));
-    assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
-    assert.eventually.equal(page.getLineFieldText(newName, 'category'), categories[0].title);
   });
 
   it('should be able to cancel when removing a media', function() {
@@ -471,23 +478,32 @@ describe('Media page', function() {
       page.refresh();
 
       // Build search query
-      // Be careful dates are displayed in french format
-      var search = {date: '20/01/2015'};
+      var searchDate = new Date('2015/01/20').getTime();
 
-      // Get all line details
-      page.getAllLineDetails().then(function(datas) {
-        var regexp = new RegExp(search.date);
+      browser.executeScript(
+        'var $injector = angular.injector([\'ng\']);' +
+        'var $filter = $injector.get(\'$filter\');' +
+        'return $filter(\'date\')(' + searchDate + ', \'shortDate\');'
+      ).then(function(shortDate) {
+        // Get all line details
+        page.getAllLineDetails().then(function(datas) {
+          var regexp = new RegExp(shortDate);
 
-        // Predict values
-        var filteredDatas = datas.filter(function(data) {
-          return regexp.test(data.cells[3]);
+          // Predict values
+          var filteredDatas = datas.filter(function(data) {
+            return regexp.test(data.cells[3]);
+          });
+
+          for (var i = 0; i < filteredDatas.length; i++)
+            expectedValues.push(filteredDatas[i].cells[1]);
+
+        }).then(function() {
+          return tableAssert.checkSearch(
+            {date: shortDate},
+            expectedValues,
+            page.translations.PUBLISH.MEDIAS.NAME_COLUMN
+          );
         });
-
-        for (var i = 0; i < filteredDatas.length; i++)
-          expectedValues.push(filteredDatas[i].cells[1]);
-
-      }).then(function() {
-        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
       });
     });
 

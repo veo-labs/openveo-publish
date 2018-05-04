@@ -1,51 +1,46 @@
 'use strict';
 
 var async = require('async');
+var openVeoApi = require('@openveo/api');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
-  var coreApi = process.api.getCoreApi();
-  var db = coreApi.getDatabase();
   process.logger.info('Publish 2.0.2 migration launched.');
+  var coreApi = process.api.getCoreApi();
+  var videoProvider = new VideoProvider(coreApi.getDatabase());
 
   async.series([
 
     // Update publish properties collection
     function(callback) {
-
-      db.get('publish_videos', {}, null, null, function(error, value) {
-        if (error) {
-          callback(error);
-          return;
-        }
+      videoProvider.getAll(null, null, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!value || !value.length) return callback();
+        if (!medias || !medias.length) return callback();
 
         else {
           var series = [];
-          value.forEach(function(video) {
-            var metadata = video.metadata || {};
-            metadata.user = metadata && metadata.user || coreApi.getAnonymousUserId();
-            metadata.groups = metadata && metadata.groups || [];
+          medias.forEach(function(media) {
+            var modifications = {};
+            var metadata = media.metadata || {};
 
-            series.push(
-              function(callback) {
-                db.update('publish_videos', {id: video.id}, {metadata: metadata}, function(error) {
-                  callback(error);
-                });
-              }
-            );
+            if (!metadata.user) modifications.user = coreApi.getAnonymousUserId();
+            if (!metadata.groups) modifications.groups = [];
+
+            if (modifications.user || modifications.groups)
+              videoProvider.updateOne(new ResourceFilter().equal('id', media.id), modifications, callback);
+            else
+              callback();
           });
 
           async.series(series, callback);
         }
       });
     }
-  ], function(err) {
-    if (err) {
-      callback(err);
-      return;
-    }
+  ], function(error) {
+    if (error) return callback(error);
     process.logger.info('Publish 2.0.2 migration done.');
     callback();
   });

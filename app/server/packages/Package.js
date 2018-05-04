@@ -18,6 +18,7 @@ var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PackageError = process.requirePublish('app/server/packages/PackageError.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Fired when an error occurred while processing the package.
@@ -46,10 +47,9 @@ var PackageError = process.requirePublish('app/server/packages/PackageError.js')
  * @class Package
  * @constructor
  * @param {Object} mediaPackage Information about the media
- * @param {VideoModel} videoModel A video model
- * @param {ConfigurationModel} configurationModel A configuration model
+ * @param {VideoProvider} videoProvider Media provider
  */
-function Package(mediaPackage, videoModel, configurationModel) {
+function Package(mediaPackage, videoProvider) {
 
   Object.defineProperties(this, {
 
@@ -63,13 +63,13 @@ function Package(mediaPackage, videoModel, configurationModel) {
     publishConf: {value: publishConf},
 
     /**
-     * Video model.
+     * Media provider.
      *
-     * @property videoModel
-     * @type VideoModel
+     * @property videoProvider
+     * @type VideoProvider
      * @final
      */
-    videoModel: {value: videoModel},
+    videoProvider: {value: videoProvider},
 
     /**
      * Media package description object.
@@ -86,16 +86,7 @@ function Package(mediaPackage, videoModel, configurationModel) {
      * @type Object
      * @final
      */
-    videoPlatformConf: {value: videoPlatformConf},
-
-    /**
-     * Configuration model.
-     *
-     * @property configurationModel
-     * @type ConfigurationModel
-     * @final
-     */
-    configurationModel: {value: configurationModel}
+    videoPlatformConf: {value: videoPlatformConf}
 
   });
 
@@ -265,7 +256,7 @@ Package.prototype.init = function(initialState, initialTransition) {
 Package.prototype.updateState = function(id, state, callback) {
   var self = this;
 
-  this.videoModel.updateState(id, state, function(error, totalItems) {
+  this.videoProvider.updateState(id, state, function(error, totalItems) {
     self.emit('stateChanged', self.mediaPackage);
     callback(error, totalItems);
   });
@@ -286,10 +277,10 @@ Package.prototype.executeTransition = function(transition) {
   // Memorize the last state and last transition of the package
   async.parallel([
     function(callback) {
-      self.videoModel.updateLastState(self.mediaPackage.id, self.fsm.current, callback);
+      self.videoProvider.updateLastState(self.mediaPackage.id, self.fsm.current, callback);
     },
     function(callback) {
-      self.videoModel.updateLastTransition(self.mediaPackage.id, transition, callback);
+      self.videoProvider.updateLastTransition(self.mediaPackage.id, transition, callback);
     }
   ], function() {
 
@@ -333,36 +324,51 @@ Package.prototype.initPackage = function() {
 
   async.series([
     function(callback) {
-      self.configurationModel.get({publishDefaultUpload: {$ne: null}}, function(error, result) {
-        if (error)
-          callback(error);
-        else if (result && result.length >= 1) {
-          var conf = result[0].publishDefaultUpload;
-          if (conf.owner && conf.owner.value) self.mediaPackage.user = conf.owner.value;
-          if (conf.group && conf.owner.value) self.mediaPackage.groups = [conf.group.value];
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter()
+        .equal('id', 'publish-defaultUpload'),
+        null,
+        function(error, setting) {
+          if (error) return callback(error);
+          var defaultUploadSettings = setting.value;
+
+          if (defaultUploadSettings) {
+            if (defaultUploadSettings.owner && defaultUploadSettings.owner.value)
+              self.mediaPackage.user = defaultUploadSettings.owner.value;
+
+            if (defaultUploadSettings.group && defaultUploadSettings.owner.value)
+              self.mediaPackage.groups = [defaultUploadSettings.group.value];
+          }
+          callback();
         }
-        callback();
-      });
+      );
     },
     function(callback) {
-      self.videoModel.get({originalFileName: self.mediaPackage.originalFileName, type: self.mediaPackage.type},
-        function(error, result) {
-          if (error)
-            callback(error);
-          else if (result && result.length >= 1) {
-            if (result[0].errorCode != ERRORS.NO_ERROR)
-              callback(error);
+      var filter = new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName);
+      if (self.mediaPackage.type) filter.equal('type', self.mediaPackage.type);
+
+      self.videoProvider.getOne(
+        filter,
+        null,
+        function(getOneError, media) {
+          if (getOneError) return callback(getOneError);
+
+          if (media) {
+            if (media.errorCode != ERRORS.NO_ERROR)
+              callback();
             else {
               var originalPackagePath = self.mediaPackage.originalPackagePath;
               var originalPackageType = self.mediaPackage.packageType;
-              self.mediaPackage = result[0];
+              self.mediaPackage = media;
               self.mediaPackage.errorCode = ERRORS.NO_ERROR;
               self.mediaPackage.state = STATES.PENDING;
               self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
               self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
               self.mediaPackage.originalPackagePath = originalPackagePath;
               self.mediaPackage.packageType = originalPackageType;
-              self.mediaPackage.date = Date.now();
+              if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
               callback();
             }
           } else {
@@ -374,11 +380,11 @@ Package.prototype.initPackage = function() {
             self.mediaPackage.metadata = self.mediaPackage.metadata || {};
             self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
             self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
-            self.mediaPackage.date = Date.now();
-            self.videoModel.add(self.mediaPackage, callback);
+            if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
+            self.videoProvider.add([self.mediaPackage], callback);
           }
         }
-        );
+      );
     }],
     function(error) {
       if (error)
@@ -428,13 +434,33 @@ Package.prototype.copyPackage = function() {
 Package.prototype.removeOriginalPackage = function() {
   var self = this;
 
-  // Try to remove the original package
-  process.logger.debug('Remove original package ' + this.mediaPackage.originalPackagePath);
-  fs.unlink(this.mediaPackage.originalPackagePath, function(error) {
-    if (error)
-      self.setError(new PackageError(error.message, ERRORS.UNLINK));
-    else
-      self.fsm.transition();
+  async.parallel([
+    function(callback) {
+      // Try to remove the original package
+      process.logger.debug('Remove original package ' + self.mediaPackage.originalPackagePath);
+      fs.unlink(self.mediaPackage.originalPackagePath, function(error) {
+        if (error)
+          self.setError(new PackageError(error.message, ERRORS.UNLINK));
+        else
+          callback();
+      });
+    },
+    function(callback) {
+      // Remove uploaded thumbnail (if it has been uploaded)
+      if (self.mediaPackage.originalThumbnailPath) {
+        process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+        fs.unlink(self.mediaPackage.originalThumbnailPath, function(error) {
+          if (error)
+            self.setError(new PackageError(error.message, ERRORS.UNLINK));
+          else
+            callback();
+        });
+      } else {
+        callback();
+      }
+    }
+  ], function() {
+    self.fsm.transition();
   });
 };
 
@@ -464,14 +490,14 @@ Package.prototype.uploadMedia = function() {
           function(callback) {
             if (!self.mediaPackage.mediaId) {
               self.mediaPackage.mediaId = [mediaId];
-              self.videoModel.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id, callback);
+              self.videoProvider.updateLink(self.mediaPackage.id, '/publish/video/' + self.mediaPackage.id, callback);
             } else {
               self.mediaPackage.mediaId = self.mediaPackage.mediaId.concat([mediaId]);
               callback();
             }
           },
           function(callback) {
-            self.videoModel.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId, callback);
+            self.videoProvider.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId, callback);
           }
         ], function() {
           self.fsm.transition();
@@ -586,7 +612,7 @@ Package.prototype.setError = function(error) {
         self.updateState(self.mediaPackage.id, STATES.ERROR, callback);
       },
       function(callback) {
-        self.videoModel.updateErrorCode(self.mediaPackage.id, error.code, callback);
+        self.videoProvider.updateErrorCode(self.mediaPackage.id, error.code, callback);
       }
     ], function() {
       self.emit('error', error);

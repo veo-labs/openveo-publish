@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -59,15 +59,15 @@
     "mocha": "3.2.0",
     "pre-commit": "1.2.2",
     "yuidoc-theme-blue": "0.1.9",
-    "flightplan": "0.6.17"
+    "flightplan": "0.6.17",
+    "mock-require": "3.0.1"
   },
   "peerDependencies": {
-    "@openveo/core": "4.* >=4.1.0"
+    "@openveo/core": "5.*"
   },
   "scripts": {
-    "prepublish": "grunt prod",
-    "preuninstall": "node backup.js backup",
-    "postinstall": "bower install && node install.js && node backup.js restore",
+    "prepack": "grunt prod",
+    "postinstall": "bower install && node install.js",
     "eslint": "grunt eslint",
     "mocha": "grunt mochaTest",
     "karma": "grunt karma"
@@ -78,7 +78,7 @@
     "karma"
   ],
   "engines": {
-    "node": ">=7.4.0",
-    "npm": ">=4.0.5"
+    "node": ">=8.9.4",
+    "npm": ">=5.6.0"
   }
 }

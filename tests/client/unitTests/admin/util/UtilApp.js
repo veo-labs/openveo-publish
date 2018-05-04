@@ -1,27 +1,8 @@
 'use strict';
 
-/**
- * OpenVeo helper .
- *
- * @module ov.util
- * @main ov.util
- */
-
 (function(angular) {
-  var app = angular.module('ov.utilService', []);
 
-  /**
-   * Defines an Util service to expose helper function.
-   *
-   * @class utilService
-   */
   function UtilService($filter) {
-
-    /**
-     * Builds groups select options.
-     *
-     * @return {Array} The list of options
-     */
     function buildSelectOptions(entities) {
       var options = [{
         name: 'CORE.UI.NONE',
@@ -41,10 +22,24 @@
     return {
       buildSelectOptions: buildSelectOptions
     };
-
   }
 
+  function OvUrlFactory() {
+    function setUrlParameter(url, parameter, value) {
+      return url;
+    }
+
+    return {
+      setUrlParameter: setUrlParameter
+    };
+  }
+
+
+  var app = angular.module('ov.util', []);
   app.factory('utilService', UtilService);
   UtilService.$inject = ['$filter'];
+
+  app.factory('OvUrlFactory', OvUrlFactory);
+  OvUrlFactory.$inject = [];
 
 })(angular);

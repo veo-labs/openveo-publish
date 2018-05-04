@@ -33,15 +33,11 @@ module.exports.get = function(type, providerConf) {
         var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
       case TYPES.YOUTUBE:
-        var ConfigurationModel = process.requirePublish('app/server/models/ConfigurationModel.js');
-        var ConfigurationProvider = process.requirePublish('app/server/providers/ConfigurationProvider.js');
         var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
         var GoogleOAuthHelper = process.requirePublish(
           'app/server/providers/videoPlatforms/youtube/GoogleOAuthHelper.js'
         );
-        var coreApi = process.api.getCoreApi();
-        var configurationModel = new ConfigurationModel(new ConfigurationProvider(coreApi.getDatabase()));
-        return new YoutubeProvider(providerConf, new GoogleOAuthHelper(configurationModel));
+        return new YoutubeProvider(providerConf, new GoogleOAuthHelper());
       case TYPES.WOWZA:
         var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
         return new WowzaProvider(providerConf);

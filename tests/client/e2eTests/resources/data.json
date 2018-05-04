@@ -46,24 +46,24 @@
       "name": "publish-categories-no-write",
       "permissions": [
         "publish-access-categories-page",
-        "publish-update-categories",
-        "publish-delete-categories"
+        "core-update-taxonomies",
+        "core-delete-taxonomies"
       ]
     },
     "publishCategoriesNoUpdate": {
       "name": "publish-categories-no-update",
       "permissions": [
         "publish-access-categories-page",
-        "publish-add-categories",
-        "publish-delete-categories"
+        "core-add-taxonomies",
+        "core-delete-taxonomies"
       ]
     },
     "publishCategoriesNoDelete": {
       "name": "publish-categories-no-delete",
       "permissions": [
         "publish-access-categories-page",
-        "publish-add-categories",
-        "publish-update-categories"
+        "core-add-taxonomies",
+        "core-update-taxonomies"
       ]
     },
     "publishCategoriesNoManage": {
@@ -110,10 +110,16 @@
         "update-group-publishGroup1"
       ]
     },
-    "publishChaptersEdit": {
-      "name": "publish-chapters-edit",
+    "publishMediasManager": {
+      "name": "publish-medias-manager",
       "permissions": [
-        "publish-chapter-videos",
+        "publish-manage-videos"
+      ]
+    },
+    "publishEditorEdit": {
+      "name": "publish-editor-edit",
+      "permissions": [
+        "publish-editor-videos",
         "get-group-publishGroup1"
       ]
     },
@@ -209,11 +215,17 @@
       "password": "publish-medias-group-no-delete",
       "roles": [ "publishMediasGroupNoDelete", "publishMedias" ]
     },
-    "publishChaptersEdit": {
-      "name": "publish-chapters-edit",
-      "email": "publish-chapters-edit@veo-labs.com",
-      "password": "publish-chapters-edit",
-      "roles": [ "publishChaptersEdit" ]
+    "publishMediasManager": {
+      "name": "publish-medias-manager",
+      "email": "publish-medias-manager@veo-labs.com",
+      "password": "publish-medias-manager",
+      "roles": [ "publishMediasManager", "publishMedias" ]
+    },
+    "publishEditorEdit": {
+      "name": "publish-editor-edit",
+      "email": "publish-editor-edit@veo-labs.com",
+      "password": "publish-editor-edit",
+      "roles": [ "publishEditorEdit" ]
     },
     "publishConfigurationNoManage": {
       "name": "publish-configuration-no-manage",

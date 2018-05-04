@@ -5,16 +5,16 @@ var e2e = require('@openveo/test').e2e;
 var Field = e2e.fields.Field;
 var TablePage = e2e.pages.TablePage;
 var browserExt = e2e.browser;
-var PropertyModel = process.requirePublish('app/server/models/PropertyModel.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 
 /**
  * Creates a new MediaPage representing the medias back end page.
  *
- * @param {EntityModel} model The model for medias CRUD to be able to add / remove medias by passing the
+ * @param {EntityProvider} provider The provider for medias CRUD to be able to add / remove medias by passing the
  * user agent
  */
-function MediaPage(model) {
-  MediaPage.super_.call(this, model);
+function MediaPage(provider) {
+  MediaPage.super_.call(this, provider);
 
   // Page path
   this.path = 'be/publish/medias-list';
@@ -91,6 +91,12 @@ MediaPage.prototype.getEditFormFields = function(form) {
     baseElement: form
   });
 
+  fields.date = Field.get({
+    type: 'date',
+    name: this.translations.PUBLISH.MEDIAS.ATTR_DATE,
+    baseElement: form
+  });
+
   // Description field
   fields.description = Field.get({
     type: 'tinymce',
@@ -147,6 +153,10 @@ MediaPage.prototype.editMedia = function(name, data) {
     if (data.name !== undefined)
       fields.name.setValue(data.name);
 
+    // Set date
+    if (data.date !== undefined)
+      fields.date.setValue(data.date);
+
     // Set description
     if (data.description !== undefined)
       fields.description.setValue(data.description);
@@ -161,8 +171,8 @@ MediaPage.prototype.editMedia = function(name, data) {
         var property = self.getProperty(propertyId);
         var fieldType = 'text';
 
-        if (property.type === PropertyModel.TYPES.LIST) fieldType = 'select';
-        if (property.type === PropertyModel.TYPES.BOOLEAN) fieldType = 'checkbox';
+        if (property.type === PropertyProvider.TYPES.LIST) fieldType = 'select';
+        if (property.type === PropertyProvider.TYPES.BOOLEAN) fieldType = 'checkbox';
 
         var propertyField = Field.get({
           type: fieldType,

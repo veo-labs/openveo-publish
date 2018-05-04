@@ -1,44 +1,51 @@
 'use strict';
 
 var async = require('async');
+var openVeoApi = require('@openveo/api');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var databaseErrors = openVeoApi.storages.databaseErrors;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 2.0.0 migration launched.');
-  var db = process.api.getCoreApi().getDatabase();
+  var coreApi = process.api.getCoreApi();
+  var db = coreApi.getDatabase();
+  var roleProvider = coreApi.roleProvider;
+  var videoProvider = new VideoProvider(db);
 
   async.series([
 
     // Prefix collection with the module name : publish
     function(callback) {
-      db.renameCollection('properties', 'publish_properties', function(error, value) {
+      db.renameCollection('properties', 'publish_properties', function(error) {
+        if (error && error.code === databaseErrors.RENAME_COLLECTION_NOT_FOUND_ERROR) return callback();
         callback(error);
       });
     },
     function(callback) {
-      db.renameCollection('configurations', 'publish_configurations', function(error, value) {
+      db.renameCollection('configurations', 'publish_configurations', function(error) {
+        if (error && error.code === databaseErrors.RENAME_COLLECTION_NOT_FOUND_ERROR) return callback();
         callback(error);
       });
     },
     function(callback) {
-      db.renameCollection('videos', 'publish_videos', function(error, value) {
+      db.renameCollection('videos', 'publish_videos', function(error) {
+        if (error && error.code === databaseErrors.RENAME_COLLECTION_NOT_FOUND_ERROR) return callback();
         callback(error);
       });
     },
 
     // Rename permissions names
     function(callback) {
-      db.get('core_roles', {}, null, null, function(error, value) {
-        if (error) {
-          callback(error);
-          return;
-        }
+      roleProvider.getAll(null, null, {id: 'desc'}, function(error, roles) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!value || !value.length) return callback();
+        if (!roles || !roles.length) return callback();
 
         var asyncActions = [];
 
-        value.forEach(function(role) {
+        roles.forEach(function(role) {
           if (role.permissions) {
             var permissions = [];
             role['permissions'].forEach(function(permission) {
@@ -100,11 +107,14 @@ module.exports.update = function(callback) {
               }
             });
 
-
             asyncActions.push(function(callback) {
-              db.update('core_roles', {id: role.id}, {permissions: permissions}, function(error) {
-                callback(error);
-              });
+              roleProvider.updateOne(
+                new ResourceFilter().equal('id', role.id),
+                {permissions: permissions},
+                function(error) {
+                  callback(error);
+                }
+              );
             });
           }
         });
@@ -115,60 +125,48 @@ module.exports.update = function(callback) {
 
     // Update publish properties collection
     function(callback) {
-      db.get('publish_videos', {}, null, null, function(error, value) {
-        if (error) {
-          callback(error);
-          return;
-        }
+      videoProvider.getAll(null, null, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
 
         // No need to change anything
-        if (!value || !value.length) return callback();
+        if (!medias || !medias.length) return callback();
 
-        else {
+        var asyncFunctions = [];
 
-          value.forEach(function(video) {
+        medias.forEach(function(media) {
+          asyncFunctions.push(function(mediaCallback) {
             async.series([
-              function(callback) {
-                // backup files property in sources property
-                if (video.files && !video.sources) {
-                  db.update('publish_videos', {id: video.id}, {sources: {files: video.files}}, function(error) {
-                    callback(error);
-                  });
-                } else {
-                  callback();
-                }
+              function(updateCallback) {
+                var modifications = {};
+
+                if (media.files && !media.sources)
+                  modifications.sources = {files: media.files};
+
+                if (media.thumbnail && media.thumbnail.indexOf('/publish/') == -1)
+                  modifications.thumbnail = '/publish/' + media.thumbnail;
+
+                if (modifications.sources || modifications.thumbnail)
+                  videoProvider.updateOne(new ResourceFilter().equal('id', media.id), modifications, updateCallback);
+                else
+                  updateCallback();
               },
-              function(callback) {
+              function(updateCallback) {
                 // delete files property
-                if (video.files) {
-                  db.removeProp('publish_videos', 'files', {id: video.id}, function(error) {
-                    callback(error);
-                  });
-                } else {
-                  callback();
-                }
-              },
-              function(callback) {
-                // prefix thumbnail video url with publish
-                if (video.thumbnail && video.thumbnail.indexOf('/publish/') == -1) {
-                  db.update('publish_videos', {id: video.id}, {thumbnail: '/publish/' + video.thumbnail},
-                  function(error) {
-                    callback(error);
-                  });
-                } else {
-                  callback();
-                }
+                if (media.files)
+                  videoProvider.removeField('files', new ResourceFilter().equal('id', media.id), updateCallback);
+                else
+                  updateCallback();
+
               }
-            ], callback);
+            ], mediaCallback);
           });
-        }
+        });
+
+        async.parallel(asyncFunctions, callback);
       });
     }
-  ], function(err) {
-    if (err) {
-      callback(err);
-      return;
-    }
+  ], function(error) {
+    if (error) return callback(error);
     process.logger.info('Publish 2.0.0 migration done.');
     callback();
   });
