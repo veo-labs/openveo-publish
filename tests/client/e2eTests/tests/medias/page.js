@@ -209,7 +209,7 @@ describe('Media page', function() {
     var properties = page.getProperties();
     var name = 'test edition';
     var newName = 'test edition renamed';
-    var newDate = new Date('2017/12/16').getTime();
+    var newDate = new Date('2017/12/16');
     var newDescription = 'test edition renamed description';
     var newCategory = categories[0].id;
     var propertiesById = {};
@@ -238,25 +238,26 @@ describe('Media page', function() {
     mediaHelper.addEntities(linesToAdd);
     page.refresh();
 
+    // Edit property with new values
+    page.editMedia(name, {
+      name: newName,
+      date: newDate,
+      description: newDescription,
+      category: newCategory,
+      properties: propertiesById
+    });
+
     browser.executeScript(
       'var $injector = angular.injector([\'ng\']);' +
       'var $filter = $injector.get(\'$filter\');' +
-      'return $filter(\'date\')(' + newDate + ', \'shortDate\');'
-    ).then(function(date) {
-      // Edit property with a new name and new description
-      page.editMedia(name, {
-        name: newName,
-        date: date,
-        description: newDescription,
-        category: newCategory,
-        properties: propertiesById
-      });
-
+      'return $filter(\'date\')(' + newDate.getTime() + ', \'medium\');'
+    ).then(function(mediumDate) {
       assert.isFulfilled(page.getLine(newName));
-      assert.eventually.equal(page.getLineFieldText(newName, 'date'), date);
+      assert.eventually.equal(page.getLineFieldText(newName, 'date'), mediumDate);
       assert.eventually.equal(page.getLineFieldText(newName, 'description'), newDescription);
       assert.eventually.equal(page.getLineFieldText(newName, 'category'), categories[0].title);
     });
+
   });
 
   it('should be able to cancel when removing a media', function() {
@@ -485,6 +486,7 @@ describe('Media page', function() {
         'var $filter = $injector.get(\'$filter\');' +
         'return $filter(\'date\')(' + searchDate + ', \'shortDate\');'
       ).then(function(shortDate) {
+
         // Get all line details
         page.getAllLineDetails().then(function(datas) {
           var regexp = new RegExp(shortDate);

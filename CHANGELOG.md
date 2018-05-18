@@ -1,3 +1,9 @@
+# 6.1.0 / YYYY-MM-DD
+
+## NEW FEATURES
+
+- The date field of a video has been transformed into a date / time field to be able to also specify the time of the video
+
 # 6.0.0 / 2018-05-04
 
 ## BREAKING CHANGES

@@ -92,7 +92,7 @@ MediaPage.prototype.getEditFormFields = function(form) {
   });
 
   fields.date = Field.get({
-    type: 'date',
+    type: 'dateTime',
     name: this.translations.PUBLISH.MEDIAS.ATTR_DATE,
     baseElement: form
   });
