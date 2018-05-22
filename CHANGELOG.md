@@ -4,6 +4,10 @@
 
 - The date field of a video has been transformed into a date / time field to be able to also specify the time of the video
 
+## DEPENDENCIES
+
+- **angular-ui-tinymce** has been upgraded from 0.0.18 to **0.0.19**
+
 # 6.0.0 / 2018-05-04
 
 ## BREAKING CHANGES
