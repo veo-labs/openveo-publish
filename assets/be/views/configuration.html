@@ -4,7 +4,7 @@
 <div class="row">
   <div ng-if="youtubeConf" class="col-sd-12 col-md-4">
     <div class="panel panel-default">
-      <div uib-popover="{{'PUBLISH.CONFIGURATION.YOUTUBE_INFO' | translate}}" popover-trigger="mouseenter" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.YOUTUBE_TITLE' | translate"></div>
+      <div uib-popover="{{'PUBLISH.CONFIGURATION.YOUTUBE_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.YOUTUBE_TITLE' | translate"></div>
       <div class="panel-body">
         <p ng-if="youtubeConf.hasToken">
           {{ 'PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS' | translate}}
@@ -22,7 +22,7 @@
 
   <div class="col-sd-12 col-md-4">
     <div class="panel panel-default">
-      <div uib-popover="{{'PUBLISH.CONFIGURATION.UPLOAD_INFO' | translate}}" popover-trigger="mouseenter" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.UPLOAD_TITLE' | translate"></div>
+      <div uib-popover="{{'PUBLISH.CONFIGURATION.UPLOAD_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.UPLOAD_TITLE' | translate"></div>
       <div class="panel-body">
         <p>
           {{ 'PUBLISH.CONFIGURATION.UPLOAD_DEFAULT_OWNER' | translate}}

@@ -18,8 +18,8 @@
          ></ov-player>
     </div>
     <div class='col-sm-4 col-sm-pull-8' >
-    <uib-tabset active="activeJustified" justified="true">
-      <uib-tab ng-repeat="data in dataId" select="selectedData.value = data;" index="0" heading="{{ 'PUBLISH.EDITOR.CONTEXT.' + data.toUpperCase() + '_TITLE' | translate}}"></uib-tab>
+    <uib-tabset justified="true">
+      <uib-tab ng-repeat="data in dataId" select="selectedData.value = data;" index="$index" heading="{{ 'PUBLISH.EDITOR.CONTEXT.' + data.toUpperCase() + '_TITLE' | translate}}"></uib-tab>
     </uib-tabset>
       <table class="table table-striped table-condensed chapter-table" ng-show='ranges.length'>
         <thead>
@@ -123,10 +123,10 @@
 
    <div class="multirange-container" ng-swipe-disable-mouse>
      <div class="pull-left" style="margin-bottom: 5px">
-       <button uib-popover="{{!beginCut.isInArray?'PUBLISH.EDITOR.ADD_BEGIN':'PUBLISH.EDITOR.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="beginCut.isInArray" uib-btn-checkbox>
+       <button uib-popover="{{!beginCut.isInArray?'PUBLISH.EDITOR.ADD_BEGIN':'PUBLISH.EDITOR.REMOVE_BEGIN' | translate | noBreakSpace }}" popover-trigger="'mouseenter'" class="btn btn-default" ng-model="beginCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-out"></i>
        </button>
-       <button uib-popover="{{!endCut.isInArray?'PUBLISH.EDITOR.ADD_END':'PUBLISH.EDITOR.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="mouseenter" class="btn btn-default" ng-model="endCut.isInArray" uib-btn-checkbox>
+       <button uib-popover="{{!endCut.isInArray?'PUBLISH.EDITOR.ADD_END':'PUBLISH.EDITOR.REMOVE_END' | translate | noBreakSpace }}" popover-trigger="'mouseenter'" class="btn btn-default" ng-model="endCut.isInArray" uib-btn-checkbox>
          <i class="glyphicon glyphicon-log-in"></i>
        </button>
      </div>

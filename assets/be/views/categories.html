@@ -3,9 +3,9 @@
   <div class="well well-lg" ng-bind="'PUBLISH.CATEGORIES.INFO' | translate"></div>
   <div class="col-md-6">
     <div class="input-group" ng-if="rights.add || rights.edit">
-      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'PUBLISH.CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" uib-popover="{{'PUBLISH.CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="mouseenter">
+      <input type="text" class="form-control" name="newItem" ng-model="newitem.title" placeholder="{{'PUBLISH.CATEGORIES.NEW_ITEM' | translate}}" aria-describedby="basic-addon1" uib-popover="{{'PUBLISH.CATEGORIES.NAME_ELEMENT' | translate}}" popover-trigger="'mouseenter'">
       <div class="input-group-btn">
-        <div  uib-popover="{{'PUBLISH.CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="mouseenter">
+        <div  uib-popover="{{'PUBLISH.CATEGORIES.ADD_ELEMENT' | translate}}" popover-trigger="'mouseenter'">
           <button class="add btn btn-default" type="button" ng-click="newSubItem()"><span class="glyphicon glyphicon-plus"></span></button>
         </div>
       </div>

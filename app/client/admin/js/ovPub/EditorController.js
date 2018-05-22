@@ -304,16 +304,16 @@
 
       // CALL SAVE HTTP
       var objToSave = cleanObjectToSave('cut');
-      publishService.updateMedia($scope.media.id, objToSave).success(function() {
+      publishService.updateMedia($scope.media.id, objToSave).then(function() {
         if ($scope.selectRow) {
           $scope.selectRow.select = false;
           $scope.selectRow = null;
         }
         updateRange();
         $scope.isCollapsed = true;
-      }).error(function(data, status) {
+      }).catch(function(response) {
         $scope.$emit('setAlert', 'danger', $filter('translate')('PUBLISH.EDITOR.SAVE_ERROR'));
-        if (status === 401)
+        if (response.status === 401)
           $scope.$parent.logout();
       });
     }

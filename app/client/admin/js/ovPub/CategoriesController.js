@@ -22,11 +22,8 @@
 
     /**
      * Handles error when a category is added or updated.
-     *
-     * @param {Object} data Response data
-     * @param {Number} status HTTP code
      */
-    function errorCb(data, status) {
+    function errorCb() {
       $scope.saveIsDisabled = $scope.list.length == 0;
     }
 
@@ -84,20 +81,20 @@
         entityService.addEntities('taxonomies', null, [{
           name: 'categories',
           tree: $scope.list
-        }]).success(function(data) {
+        }]).then(function(response) {
           $scope.rights.add = false;
           $scope.rights.edit = $scope.rights.save = $scope.checkAccess('core-update-taxonomies');
-          successCb(data.entities[0]);
-        }).error(errorCb);
+          successCb(response.data.entities[0]);
+        }).catch(errorCb);
       } else {
 
         // Else : Do update
         entityService.updateEntity('taxonomies', null, $scope.categoryTaxonomy.id, {
           tree: $scope.list
-        }).success(function(data) {
-          data.entity = {id: $scope.categoryTaxonomy.id};
-          successCb(data.entity);
-        }).error(errorCb);
+        }).then(function(response) {
+          response.data.entity = {id: $scope.categoryTaxonomy.id};
+          successCb(response.data.entity);
+        }).catch(errorCb);
 
       }
     };

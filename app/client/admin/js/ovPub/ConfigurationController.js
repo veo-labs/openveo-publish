@@ -23,7 +23,7 @@
     $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
 
     $scope.saveOptions = function() {
-      return publishService.saveUploadConfig($scope.default).success(function(obj) {
+      return publishService.saveUploadConfig($scope.default).then(function() {
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
       });
     };
