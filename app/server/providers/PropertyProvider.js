@@ -35,7 +35,8 @@ util.inherits(PropertyProvider, openVeoApi.providers.EntityProvider);
 PropertyProvider.TYPES = {
   TEXT: 'text',
   LIST: 'list',
-  BOOLEAN: 'boolean'
+  BOOLEAN: 'boolean',
+  DATE_TIME: 'dateTime'
 };
 Object.freeze(PropertyProvider.TYPES);
 
@@ -50,7 +51,8 @@ Object.freeze(PropertyProvider.TYPES);
 PropertyProvider.availableTypes = [
   PropertyProvider.TYPES.TEXT,
   PropertyProvider.TYPES.LIST,
-  PropertyProvider.TYPES.BOOLEAN
+  PropertyProvider.TYPES.BOOLEAN,
+  PropertyProvider.TYPES.DATE_TIME
 ];
 Object.freeze(PropertyProvider.availableTypes);
 

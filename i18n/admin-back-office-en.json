@@ -135,6 +135,7 @@
     "FORM_ADD_TEXT_TYPE" : "Text",
     "FORM_ADD_LIST_TYPE" : "List",
     "FORM_ADD_BOOLEAN_TYPE" : "True / false",
+    "FORM_ADD_DATE_TIME_TYPE" : "Date time",
     "FORM_ADD_NAME_DESC" : "Name of the property as it will appear while editing a video",
     "FORM_ADD_DESCRIPTION_DESC" : "A short description of the property",
     "FORM_ADD_TYPE_DESC" : "Choose a form element that will be used to set the property value",

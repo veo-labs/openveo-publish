@@ -2,7 +2,6 @@
 
 window.assert = chai.assert;
 
-// MediaController.js
 describe('MediaController', function() {
   var $rootScope,
     $controller,
@@ -41,13 +40,13 @@ describe('MediaController', function() {
         id: 1,
         date: new Date(),
         status: 1,
-        properties: []
+        customProperties: {}
       },
       {
         id: 2,
         date: new Date(),
         status: 1,
-        properties: []
+        customProperties: {}
       }
     ];
     $controller('MediaController', {
@@ -93,7 +92,6 @@ describe('MediaController', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  // startMediaUpload method
   describe('startMediaUpload', function() {
 
     it('Should be able to start uploading a media if not saving', function(done) {
@@ -110,7 +108,6 @@ describe('MediaController', function() {
 
   });
 
-  // publishMedia method
   describe('publishMedia', function() {
 
     it('Should be able to publish a media if not saving', function(done) {
@@ -140,7 +137,6 @@ describe('MediaController', function() {
 
   });
 
-  // unpublishMedia method
   describe('unpublishMedia', function() {
 
     it('Should be able to unpublish a media if not saving', function(done) {
@@ -170,7 +166,6 @@ describe('MediaController', function() {
 
   });
 
-  // retryMedia method
   describe('retryMedia', function() {
 
     it('Should be able to retry a media if not saving', function(done) {
@@ -187,7 +182,6 @@ describe('MediaController', function() {
 
   });
 
-// removeMedia method
   describe('removeMedia', function() {
 
     it('Should be able to remove a media if not saving', function(done) {
@@ -216,7 +210,6 @@ describe('MediaController', function() {
 
   });
 
-// saveMedia method
   describe('saveMedia', function() {
 
     it('Should be able to save a media if not already saving', function(done) {
@@ -226,7 +219,56 @@ describe('MediaController', function() {
       $httpBackend.when('POST', '/be/publish/videos/1').respond(200);
       $httpBackend.expectPOST('/be/publish/videos/1');
 
-      scope.editFormContainer.onSubmit(scope.test.rows[0]).then(done(), function() {
+      scope.editFormContainer.onSubmit(scope.test.rows[0]).then(done, function() {
+        assert.notOk(true);
+      });
+
+      $httpBackend.flush();
+    });
+
+    it('Should send dates as timestamps', function(done) {
+      var expectedProperty = 'customProperty';
+      var expectedCustomPropertyDate = new Date();
+
+      $httpBackend.expect('POST', '/be/publish/videos/' + scope.test.rows[0].id, function(data) {
+        data = JSON.parse(data);
+        assert.equal(data.date, scope.test.rows[0].date.getTime(), 'Wrong date');
+        assert.equal(data.properties[expectedProperty], expectedCustomPropertyDate.getTime(), 'Wrong date time');
+        return true;
+      }).respond(200);
+
+      scope.test.rows[0].customProperties[expectedProperty] = expectedCustomPropertyDate;
+
+      scope.editFormContainer.onSubmit(scope.test.rows[0]).then(done, function() {
+        assert.notOk(true);
+      });
+
+      $httpBackend.flush();
+    });
+
+  });
+
+  describe('addMedia', function() {
+
+    it('Should be able to add a media', function(done) {
+      var expectedCustomProperty = 'customProperty';
+      var expectedDate = new Date();
+      var expectedCustomPropertyDate = new Date();
+      var expectedData = {
+        date: expectedDate,
+        properties: {}
+      };
+
+      expectedData.properties[expectedCustomProperty] = expectedCustomPropertyDate;
+
+      $httpBackend.expect('POST', '/be/publish/addMedia', function(data) {
+        data = JSON.parse(data);
+        assert.equal(data.date, expectedDate.getTime(), 'Wrong date');
+        assert.equal(data.properties[expectedCustomProperty], expectedCustomPropertyDate.getTime(), 'Wrong date time');
+        return true;
+      }).respond(200);
+
+      scope.addFormContainer.onSubmit(expectedData).then(done, function() {
         assert.notOk(true);
       });
 

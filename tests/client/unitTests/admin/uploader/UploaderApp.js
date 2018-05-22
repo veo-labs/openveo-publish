@@ -11,7 +11,7 @@
 
   function UploadService($http) {
     function upload(request) {
-      return $http.post(request.url, request.info);
+      return $http.post(request.url, request.data.info);
     }
 
     function json(data) {

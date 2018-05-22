@@ -558,6 +558,9 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
               else if (customProperty.type === PropertyProvider.TYPES.TEXT)
                 validationDescriptor[id] = {type: 'string'};
 
+              else if (customProperty.type === PropertyProvider.TYPES.DATE_TIME)
+                validationDescriptor[id] = {type: 'number'};
+
               break;
             }
           }
@@ -572,6 +575,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           process.logger.error(validationError.message, {error: validationError, method: 'addEntityAction'});
           return callback(HTTP_ERRORS.ADD_MEDIA_WRONG_PROPERTIES_PARAMETER);
         }
+
         callback();
       },
 

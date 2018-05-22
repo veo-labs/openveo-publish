@@ -223,13 +223,20 @@
      * @param {Object} media Media data
      */
     function saveMedia(media) {
+      var customProperties = {};
+
+      for (var id in media.customProperties) {
+        var value = media.customProperties[id];
+        customProperties[id] = (value instanceof Date) ? value.getTime() : value;
+      }
+
       return publishService.updateMedia(media.id, {
         title: media.title,
         date: media.date.getTime(),
         leadParagraph: media.leadParagraph,
         description: media.description,
         thumbnail: $scope.thumbToEdit,
-        properties: media.customProperties,
+        properties: customProperties,
         category: media.category,
         groups: media.groups,
         user: media.user
@@ -298,6 +305,15 @@
             key: property.id,
             type: inlineEditable ? 'horizontalEditableCheckbox' : 'horizontalCheckbox',
             defaultValue: false,
+            model: model,
+            templateOptions: {
+              label: property.name || property.id
+            }
+          });
+        } else if (property.type === 'dateTime') {
+          fields.push({
+            key: property.id,
+            type: inlineEditable ? 'horizontalEditableDateTimePicker' : 'horizontalDateTimePicker',
             model: model,
             templateOptions: {
               label: property.name || property.id
@@ -427,12 +443,18 @@
 
     scopeAddForm.onSubmit = function(model) {
       var groups = [];
+      var customProperties = {};
 
       // Remove group "null" from the list of selected groups
       if (model.groups) {
         groups = model.groups.filter(function(group) {
           return group;
         });
+      }
+
+      for (var id in model.properties) {
+        var value = model.properties[id];
+        customProperties[id] = (value instanceof Date) ? value.getTime() : value;
       }
 
       addMediaPromise = publishService.addMedia({
@@ -444,7 +466,7 @@
         groups: groups,
         file: $scope.fileToUpload,
         thumbnail: $scope.thumbToAdd,
-        properties: model.properties
+        properties: customProperties
       });
 
       return addMediaPromise.then(function() {

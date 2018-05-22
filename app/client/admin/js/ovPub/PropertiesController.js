@@ -10,6 +10,7 @@
     var TEXT_TYPE = 'text';
     var LIST_TYPE = 'list';
     var BOOLEAN_TYPE = 'boolean';
+    var DATE_TIME_TYPE = 'dateTime';
     var supportedTypes = [
       {
         value: TEXT_TYPE,
@@ -22,6 +23,10 @@
       {
         value: BOOLEAN_TYPE,
         name: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_BOOLEAN_TYPE')
+      },
+      {
+        value: DATE_TIME_TYPE,
+        name: $filter('translate')('PUBLISH.PROPERTIES.FORM_ADD_DATE_TIME_TYPE')
       }
     ];
 

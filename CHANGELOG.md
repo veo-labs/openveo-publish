@@ -3,6 +3,7 @@
 ## NEW FEATURES
 
 - The date field of a video has been transformed into a date / time field to be able to also specify the time of the video
+- Add a new custom property type *dateTime* to store a date time
 
 ## DEPENDENCIES
 
