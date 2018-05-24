@@ -932,20 +932,75 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   if (params.dateStart) filter.greaterThanEqual('date', params.dateStart);
   if (params.dateEnd) filter.lesserThan('date', params.dateEnd);
 
-  // Add custom properties
-  if (params.properties) {
-    Object.keys(params.properties).forEach(function(propertyId) {
-      filter.equal('properties.' + propertyId, params.properties[propertyId]);
-    });
-  }
-
   // Make sure "metadata" field is not excluded
   fields = this.removeMetatadaFromFields({
     exclude: params.exclude,
     include: params.include
   });
 
-  async.parallel([
+  async.series([
+
+    // Get the list of custom properties
+    function(callback) {
+      var database = coreApi.getDatabase();
+      var propertyProvider = new PropertyProvider(database);
+
+      propertyProvider.getAll(null, null, {id: 'desc'}, function(error, propertiesList) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
+          return callback(HTTP_ERRORS.GET_VIDEOS_GET_PROPERTIES_ERROR);
+        }
+        properties = propertiesList;
+        callback(error);
+      });
+    },
+
+    // Validate custom properties
+    function(callback) {
+      if (params.properties) {
+        var customPropertiesIds = Object.keys(params.properties);
+        var validationDescriptor = {};
+
+        for (var i = 0; i < customPropertiesIds.length; i++) {
+          for (var j = 0; j < properties.length; j++) {
+            if (properties[j].id === customPropertiesIds[i]) {
+
+              if (properties[j].type === PropertyProvider.TYPES.BOOLEAN)
+                validationDescriptor[properties[j].id] = {type: 'boolean', required: true};
+
+              else if (properties[j].type === PropertyProvider.TYPES.LIST)
+                validationDescriptor[properties[j].id] = {type: 'string', required: true};
+
+              else if (properties[j].type === PropertyProvider.TYPES.TEXT)
+                validationDescriptor[properties[j].id] = {type: 'string', required: true};
+
+              else if (properties[j].type === PropertyProvider.TYPES.DATE_TIME)
+                validationDescriptor[properties[j].id] = {type: 'number', required: true};
+
+              break;
+            }
+          }
+        }
+
+        try {
+          params.properties = openVeoApi.util.shallowValidateObject(
+            params.properties,
+            validationDescriptor
+          );
+        } catch (validationError) {
+          process.logger.error(validationError.message, {error: validationError, method: 'getEntitiesAction'});
+          return callback(HTTP_ERRORS.GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS);
+        }
+
+        // Add properties to filters
+        Object.keys(params.properties).forEach(function(propertyId) {
+          filter.equal('properties.' + propertyId, params.properties[propertyId]);
+        });
+
+      }
+
+      callback();
+    },
 
     // Get the list of medias
     function(callback) {
@@ -965,21 +1020,6 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
           callback();
         }
       );
-    },
-
-    // Get the list of custom properties
-    function(callback) {
-      var database = coreApi.getDatabase();
-      var propertyProvider = new PropertyProvider(database);
-
-      propertyProvider.getAll(null, null, {id: 'desc'}, function(error, propertiesList) {
-        if (error) {
-          process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
-          return callback(HTTP_ERRORS.GET_VIDEOS_GET_PROPERTIES_ERROR);
-        }
-        properties = propertiesList;
-        callback(error);
-      });
     }
 
   ], function(error) {

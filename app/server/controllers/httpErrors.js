@@ -1097,6 +1097,19 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Getting the list of videos failed, wrong custom properties values.
+   *
+   * @property GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS
+   * @type Object
+   * @final
+   */
+  GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS: {
+    code: 0x222,
+    httpCode: 400,
+    module: 'publish'
+  },
+
   // Not found errors
 
   /**

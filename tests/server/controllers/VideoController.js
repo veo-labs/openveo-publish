@@ -58,9 +58,9 @@ describe('VideoController', function() {
     VideoProvider.prototype.getOne = function(filter, fields, callback) {
       callback(null, expectedMedias[0]);
     };
-    VideoProvider.prototype.get = function(filter, fields, page, limit, sort, callback) {
+    VideoProvider.prototype.get = chai.spy(function(filter, fields, page, limit, sort, callback) {
       callback(null, expectedMedias, expectedPagination);
-    };
+    });
     VideoProvider.prototype.remove = function(filter, callback) {
       callback(null, expectedMedias.length);
     };
@@ -72,9 +72,9 @@ describe('VideoController', function() {
     };
 
     PropertyProvider = function() {};
-    PropertyProvider.prototype.getAll = function(filter, fields, sort, callback) {
+    PropertyProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedProperties);
-    };
+    });
     PropertyProvider.prototype.add = function(resources, callback) {
       callback(null, expectedProperties.length, resources);
     };
@@ -1835,28 +1835,139 @@ describe('VideoController', function() {
       });
     });
 
-    it('should be able to filter results by properties', function(done) {
-      var expectedPropertiesValues = {property1: 'value1'};
+    it('should be able to filter results by custom properties', function(done) {
+      var expectedQueryProperties = {};
       expectedMedias = [{id: 42}];
-      request.query = {properties: expectedPropertiesValues};
+      expectedProperties = [
+        {
+          id: 'property1',
+          name: 'Property 1',
+          description: 'Property 1 description',
+          type: PropertyProvider.TYPES.TEXT
+        },
+        {
+          id: 'property2',
+          name: 'Property 2',
+          description: 'Property 2 description',
+          type: PropertyProvider.TYPES.LIST
+        },
+        {
+          id: 'property3',
+          name: 'Property 3',
+          description: 'Property 3 description',
+          type: PropertyProvider.TYPES.BOOLEAN
+        },
+        {
+          id: 'property4',
+          name: 'Property 4',
+          description: 'Property 4 description',
+          type: PropertyProvider.TYPES.DATE_TIME
+        }
+      ];
+      expectedQueryProperties[expectedProperties[0].id] = 'value1';
+      expectedQueryProperties[expectedProperties[1].id] = 'value2';
+      expectedQueryProperties[expectedProperties[2].id] = true;
+      expectedQueryProperties[expectedProperties[3].id] = new Date().getTime();
+      request.query = {properties: expectedQueryProperties};
 
-      VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
         assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'properties.property1').value,
-          expectedPropertiesValues['property1'],
-          'Unexpected properties filter'
+          filter.getComparisonOperation(
+            ResourceFilter.OPERATORS.EQUAL,
+            'properties.' + expectedProperties[0].id
+          ).value,
+          expectedQueryProperties[expectedProperties[0].id],
+          'Wrong property ' + expectedProperties[0].id
+        );
+        assert.equal(
+          filter.getComparisonOperation(
+            ResourceFilter.OPERATORS.EQUAL,
+            'properties.' + expectedProperties[1].id
+          ).value,
+          expectedQueryProperties[expectedProperties[1].id],
+          'Wrong property ' + expectedProperties[1].id
+        );
+        assert.ok(
+          filter.getComparisonOperation(
+            ResourceFilter.OPERATORS.EQUAL,
+            'properties.' + expectedProperties[2].id
+          ).value,
+          'Wrong property ' + expectedProperties[2].id
+        );
+        assert.equal(
+          filter.getComparisonOperation(
+            ResourceFilter.OPERATORS.EQUAL,
+            'properties.' + expectedProperties[3].id
+          ).value,
+          expectedQueryProperties[expectedProperties[3].id],
+          'Wrong property ' + expectedProperties[3].id
         );
         callback(null, expectedMedias, expectedPagination);
-      };
+      });
 
       response.send = function(data) {
         assert.strictEqual(data.entities, expectedMedias);
         assert.strictEqual(data.pagination, expectedPagination);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
         done();
       };
 
       videoController.getEntitiesAction(request, response, function() {
         assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
+    it('should ignore unknown custom properties', function(done) {
+      var expectedQueryProperties = {};
+      var propertyId = 'unknownProperty';
+      expectedMedias = [{id: 42}];
+      expectedQueryProperties[propertyId] = 'value1';
+      request.query = {properties: expectedQueryProperties};
+
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
+        assert.isNull(filter.getComparisonOperation(
+          ResourceFilter.OPERATORS.EQUAL,
+          'properties.' + propertyId
+        ));
+        callback(null, expectedMedias, expectedPagination);
+      });
+
+      response.send = function(data) {
+        assert.strictEqual(data.entities, expectedMedias);
+        assert.strictEqual(data.pagination, expectedPagination);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function() {
+        assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
+    it('should execute next with an error if a custom property value is not valid', function(done) {
+      var expectedQueryProperties = {};
+      expectedMedias = [{id: 42}];
+      expectedProperties = [
+        {
+          id: 'property1',
+          name: 'Property 1',
+          description: 'Property 1 description',
+          type: PropertyProvider.TYPES.DATE_TIME
+        }
+      ];
+      expectedQueryProperties[expectedProperties[0].id] = {};
+      request.query = {properties: expectedQueryProperties};
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected call to send');
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS, 'Wrong error');
+        VideoProvider.prototype.get.should.have.been.called.exactly(0);
+        done();
       });
     });
 
