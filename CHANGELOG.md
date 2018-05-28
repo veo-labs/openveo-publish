@@ -1,4 +1,8 @@
-# 6.1.0 / YYYY-MM-DD
+# 7.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- Web service endpoint GET /videos now validates the *properties* parameter, note that custom properties of type "Date time" accept either a timestamp or a literal date
 
 ## NEW FEATURES
 
