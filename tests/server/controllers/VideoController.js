@@ -90,7 +90,8 @@ describe('VideoController', function() {
     PropertyProvider.TYPES = {
       TEXT: 'text',
       LIST: 'list',
-      BOOLEAN: 'boolean'
+      BOOLEAN: 'boolean',
+      DATE_TIME: 'dateTime'
     };
 
     MultipartParser = function(expressRequest, files) {
@@ -1836,6 +1837,16 @@ describe('VideoController', function() {
     });
 
     it('should be able to filter results by custom properties', function(done) {
+      var date = new Date();
+      var expectedStartDate = new Date(date);
+      expectedStartDate.setHours(0);
+      expectedStartDate.setMinutes(0);
+      expectedStartDate.setSeconds(0);
+      expectedStartDate.setMilliseconds(0);
+
+      var expectedEndDate = new Date(expectedStartDate);
+      expectedEndDate.setDate(expectedStartDate.getDate() + 1);
+
       var expectedQueryProperties = {};
       expectedMedias = [{id: 42}];
       expectedProperties = [
@@ -1867,7 +1878,7 @@ describe('VideoController', function() {
       expectedQueryProperties[expectedProperties[0].id] = 'value1';
       expectedQueryProperties[expectedProperties[1].id] = 'value2';
       expectedQueryProperties[expectedProperties[2].id] = true;
-      expectedQueryProperties[expectedProperties[3].id] = new Date().getTime();
+      expectedQueryProperties[expectedProperties[3].id] = date.getTime();
       request.query = {properties: expectedQueryProperties};
 
       VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
@@ -1896,10 +1907,18 @@ describe('VideoController', function() {
         );
         assert.equal(
           filter.getComparisonOperation(
-            ResourceFilter.OPERATORS.EQUAL,
+            ResourceFilter.OPERATORS.GREATER_THAN_EQUAL,
             'properties.' + expectedProperties[3].id
           ).value,
-          expectedQueryProperties[expectedProperties[3].id],
+          expectedStartDate.getTime(),
+          'Wrong property ' + expectedProperties[3].id
+        );
+        assert.equal(
+          filter.getComparisonOperation(
+            ResourceFilter.OPERATORS.LESSER_THAN,
+            'properties.' + expectedProperties[3].id
+          ).value,
+          expectedEndDate.getTime(),
           'Wrong property ' + expectedProperties[3].id
         );
         callback(null, expectedMedias, expectedPagination);

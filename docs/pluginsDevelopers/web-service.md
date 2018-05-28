@@ -23,8 +23,7 @@ sortBy | String | No | date | To sort videos by either **title**, **description*
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)
 page | Number | No | 0 | The expected page
 limit | Number | No | 10 | To limit the number of videos per page
-properties | Object | No | - | A list of custom properties with the property id as the key and the expected property value as the value. (e.g.
-**properties[property1Id]=property1Value**)
+properties | Object | No | - | A list of custom properties with the property id as the key and the expected property value as the value (e.g. **properties[property1Id]=property1Value**) **Date time** properties accept either timestamps or literal dates
 include | Array | No | - | The list of fields to include from returned videos
 exclude | Array | No | - | The list of fields to exclude from returned videos. Ignored if include is also specified
 

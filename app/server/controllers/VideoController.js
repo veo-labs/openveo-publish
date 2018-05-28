@@ -959,44 +959,54 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
     function(callback) {
       if (params.properties) {
         var customPropertiesIds = Object.keys(params.properties);
-        var validationDescriptor = {};
+        try {
+          for (var i = 0; i < customPropertiesIds.length; i++) {
+            for (var j = 0; j < properties.length; j++) {
+              if (properties[j].id === customPropertiesIds[i]) {
+                var validatedProperty;
+                var validationDescriptor = {};
 
-        for (var i = 0; i < customPropertiesIds.length; i++) {
-          for (var j = 0; j < properties.length; j++) {
-            if (properties[j].id === customPropertiesIds[i]) {
+                if (properties[j].type === PropertyProvider.TYPES.BOOLEAN)
+                  validationDescriptor[properties[j].id] = {type: 'boolean', required: true};
 
-              if (properties[j].type === PropertyProvider.TYPES.BOOLEAN)
-                validationDescriptor[properties[j].id] = {type: 'boolean', required: true};
+                else if (properties[j].type === PropertyProvider.TYPES.LIST)
+                  validationDescriptor[properties[j].id] = {type: 'string', required: true};
 
-              else if (properties[j].type === PropertyProvider.TYPES.LIST)
-                validationDescriptor[properties[j].id] = {type: 'string', required: true};
+                else if (properties[j].type === PropertyProvider.TYPES.TEXT)
+                  validationDescriptor[properties[j].id] = {type: 'string', required: true};
 
-              else if (properties[j].type === PropertyProvider.TYPES.TEXT)
-                validationDescriptor[properties[j].id] = {type: 'string', required: true};
+                else if (properties[j].type === PropertyProvider.TYPES.DATE_TIME)
+                  validationDescriptor[properties[j].id] = {type: 'date', required: true};
 
-              else if (properties[j].type === PropertyProvider.TYPES.DATE_TIME)
-                validationDescriptor[properties[j].id] = {type: 'number', required: true};
+                validatedProperty = openVeoApi.util.shallowValidateObject(
+                  params.properties,
+                  validationDescriptor
+                );
 
-              break;
+                if (validatedProperty[properties[j].id]) {
+                  if (properties[j].type === PropertyProvider.TYPES.DATE_TIME) {
+                    var startDate = new Date(validatedProperty[properties[j].id]);
+                    startDate.setHours(0);
+                    startDate.setMinutes(0);
+                    startDate.setSeconds(0);
+                    startDate.setMilliseconds(0);
+
+                    var endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 1);
+                    filter.greaterThanEqual('properties.' + properties[j].id, startDate.getTime());
+                    filter.lesserThan('properties.' + properties[j].id, endDate.getTime());
+                  } else
+                    filter.equal('properties.' + properties[j].id, validatedProperty[properties[j].id]);
+                }
+
+                break;
+              }
             }
           }
-        }
-
-        try {
-          params.properties = openVeoApi.util.shallowValidateObject(
-            params.properties,
-            validationDescriptor
-          );
         } catch (validationError) {
           process.logger.error(validationError.message, {error: validationError, method: 'getEntitiesAction'});
           return callback(HTTP_ERRORS.GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS);
         }
-
-        // Add properties to filters
-        Object.keys(params.properties).forEach(function(propertyId) {
-          filter.equal('properties.' + propertyId, params.properties[propertyId]);
-        });
-
       }
 
       callback();
