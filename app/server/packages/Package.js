@@ -332,7 +332,7 @@ Package.prototype.initPackage = function() {
         null,
         function(error, setting) {
           if (error) return callback(error);
-          var defaultUploadSettings = setting.value;
+          var defaultUploadSettings = setting && setting.value;
 
           if (defaultUploadSettings) {
             if (defaultUploadSettings.owner && defaultUploadSettings.owner.value)

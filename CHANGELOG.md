@@ -1,3 +1,9 @@
+# 6.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix server crash when uploading files through FTP or administration interface without having previously set Publish configuration in configuration page
+
 # 6.0.0 / 2018-05-04
 
 ## BREAKING CHANGES
