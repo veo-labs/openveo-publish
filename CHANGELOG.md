@@ -13,6 +13,12 @@
 
 - **angular-ui-tinymce** has been upgraded from 0.0.18 to **0.0.19**
 
+# 6.0.1 / 2018-05-31
+
+## BUG FIXES
+
+- Fix server crash when uploading files through FTP or administration interface without having previously set Publish configuration in configuration page
+
 # 6.0.0 / 2018-05-04
 
 ## BREAKING CHANGES
@@ -33,7 +39,6 @@
 
 ## NEW FEATURES
 
-- Defragmentation of fragmented MP4 when importing a new video
 - The preview thumbnail of the video can be specified
 - Add lead paragraph field to the video entity
 - The date of the video can be defined in add video form &amp; in the edit video form
@@ -64,6 +69,12 @@
 - **dashjs** has been updated from 2.5.0 to **2.6.7**
 - **videojs-contrib-dash** has been updated from 2.4.0 to **2.9.0**
 - **videojs-contrib-hls** has been updated from 5.5.3 to **5.14.1**
+
+# 5.1.0 / 2018-02-23
+
+## NEW FEATURES
+
+- Defragmentation of fragmented MP4 when importing a new video
 
 # 5.0.1 / 2017-11-15
 
