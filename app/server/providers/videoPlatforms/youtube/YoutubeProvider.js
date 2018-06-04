@@ -101,8 +101,8 @@ YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
   var uploadParams = {
     resource: {
       snippet: {
-        title: 'Video name',
-        description: 'Video description'
+        title: 'Media name',
+        description: 'Media description'
       },
       status: {
         privacyStatus: this.privacy
