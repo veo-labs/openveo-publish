@@ -5,7 +5,7 @@
  */
 
 /**
- * Defines the list of video platforms types.
+ * Defines the list of media platforms types.
  *
  * @class TYPES
  * @static

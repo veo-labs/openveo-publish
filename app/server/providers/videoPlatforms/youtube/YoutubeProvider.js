@@ -64,7 +64,7 @@ function YoutubeProvider(providerConf, googleOAuthHelper) {
     },
 
     /**
-     * Privacy to apply to uploaded videos either public, private or unlisted.
+     * Privacy to apply to uploaded medias either public, private or unlisted.
      *
      * @property privacy
      * @type String
@@ -88,44 +88,16 @@ module.exports = YoutubeProvider;
 util.inherits(YoutubeProvider, VideoPlatformProvider);
 
 /**
- * Uploads a video to the Youtube platform.
+ * Uploads a media to the Youtube platform.
  *
  * @method upload
  * @async
- * @param {String} videoFilePath System path of the video to upload
- * @param {Function} callback The function to call when the upload
- * is done
+ * @param {String} mediaFilePath The absolute path of the media to upload
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **String** The media id on the Youtube platform
  */
-YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
-
-  /* list of possible upload params :
-   * {
-   *  autoLevels: true,
-   *  stabilize: true,
-   *  resource: {
-   *    snippet: {
-   *      title: 'Video name',
-   *      description: 'Video description'
-   *      tags: [],
-   *      categoryId: undefined
-   *    },
-   *    status: {
-   *      publishAt: undefined,
-   *      privacyStatus: 'private'
-   *      embeddable: undefined,
-   *      publicStatsViewable: undefined,
-   *      license: undefined
-   *    }
-   *    recordingDetails: {
-   *      locationDescription: undefined,
-   *      location: {latitude: undefined, longitude: undefined},
-   *      recordingDate: undefined
-   *    }
-   *  }
-   * }
-   */
-
+YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
   var uploadParams = {
     resource: {
       snippet: {
@@ -138,28 +110,28 @@ YoutubeProvider.prototype.upload = function(videoFilePath, callback) {
     }
   };
   uploadParams.part = (['id'].concat(Object.keys(uploadParams.resource))).join(',');
-  this[this.uploadMethod](videoFilePath, uploadParams, callback);
+  this[this.uploadMethod](mediaFilePath, uploadParams, callback);
 };
 
 /**
- * Uploads to youtube in the classic way, using their api.
+ * Uploads to Youtube in the classic way, using Youtube API.
  *
  * @method uploadClassic
  * @async
- * @param {String} videoFilePath the path to the video to upload
- * @param {Object} uploadParams params to send to youtube when calling their api
- * @param {Function} callback callback function with :
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {Function} callback callback function with:
  *  - **Error** The error if an error occurred, null otherwise
- *  - **String** The uploaded media id
+ *  - **String** The media id on the Youtube platform
  */
-YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, callback) {
+YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, callback) {
   var self = this;
   var mediaId;
-  var video = fs.createReadStream(videoFilePath);
+  var media = fs.createReadStream(mediaFilePath);
 
   uploadParams.media = {
-    mediaType: mime.lookup(videoFilePath),
-    body: video
+    mediaType: mime.lookup(mediaFilePath),
+    body: media
   };
 
   async.series([
@@ -174,15 +146,15 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
       });
     },
 
-    // Upload video
+    // Upload media
     function(callback) {
       uploadParams.auth = self.googleOAuthHelper.oauth2Client;
-      youtube.videos.insert(uploadParams, function(error, video) {
+      youtube.videos.insert(uploadParams, function(error, response) {
         if (error) {
           callback(error);
           return;
         }
-        mediaId = video.id;
+        mediaId = response.id;
         callback();
       });
 
@@ -195,20 +167,20 @@ YoutubeProvider.prototype.uploadClassic = function(videoFilePath, uploadParams, 
 
 
 /**
- * Uploads to youtube in a fail safe way, using resumable uploads.
+ * Uploads to Youtube in a fail safe way, using resumable uploads.
  *
- * The upload can fail 3 times before failing globally, each times it fails it perform an upload again
- * starting where it previously failed (ie: not re-upoloading all the video)
+ * The upload can fail 3 times before failing globally, each times it fails it perform an upload again starting where
+ * it previously failed (ie: not re-uploading all the media)
  *
  * @method uploadResumable
  * @async
- * @param {String} videoFilePath the path to the video to upload
- * @param {Object} uploadParams params to send to youtube when calling their api
- * @param {Function} callback callback function with :
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {Function} callback callback function with:
  *  - **Error** The error if an error occurred, null otherwise
  *  - **String** The uploaded media id
  */
-YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams, callback) {
+YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams, callback) {
   var self = this;
   var mediaId;
   var stats;
@@ -227,17 +199,17 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
 
     // Get file size
     function(callback) {
-      fs.stat(videoFilePath, function(error, st) {
+      fs.stat(mediaFilePath, function(error, fileStats) {
         if (error) {
           callback(error);
           return;
         }
-        stats = st;
+        stats = fileStats;
         callback();
       });
     },
 
-    // Upload video
+    // Upload media
     function(callback) {
       if (!uploadParams.hasOwnProperty('auth') || !uploadParams.auth) {
         callback(new Error('Auth has not been set correctly'));
@@ -246,10 +218,10 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
       var resumableUpload = new YoutubeResumableUpload();
 
       resumableUpload.tokens = uploadParams.auth;
-      resumableUpload.filepath = videoFilePath;
+      resumableUpload.filepath = mediaFilePath;
       resumableUpload.stats = stats;
       resumableUpload.metadata = uploadParams.resource;
-      resumableUpload.retry = 3; // Maximum retries when upload failed.
+      resumableUpload.retry = 3;
 
       resumableUpload.on('progress', function(progress) {
         process.logger.debug('Upload progress', progress);
@@ -260,9 +232,9 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
           callback(error);
         }
       });
-      resumableUpload.on('success', function(video) {
-        video = JSON.parse(video);
-        mediaId = video.id;
+      resumableUpload.on('success', function(media) {
+        media = JSON.parse(media);
+        mediaId = media.id;
         callback();
       });
       resumableUpload.upload();
@@ -274,23 +246,14 @@ YoutubeProvider.prototype.uploadResumable = function(videoFilePath, uploadParams
 };
 
 /**
- * Gets information about a video hosted by Youtube.
- *
- * @example
- *     // Returned data example
- *     {
- *       available : true,
- *       pictures : [],
- *       sources : [],
- *       mediaId : '123456'
- *     }
+ * Gets information about a media hosted by Youtube.
  *
  * @method getVideoInfo
  * @async
- * @param {String} mediaId The Youtube id of the video
+ * @param {String} mediaId The Youtube id of the media
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the video
+ *   - **Object** Information about the media
  */
 YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback) {
   if (!mediaId) {
@@ -303,13 +266,12 @@ YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback)
 };
 
 /**
- * Removes a video from the Youtube platform.
+ * Removes a media from the Youtube platform.
  *
  * @method remove
  * @async
- * @param {Array} mediaIds Media Ids array of videos to remove
- * @param {Function} callback The function to call when the remove
- * is done
+ * @param {Array} mediaIds Youtube media ids to remove
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
 YoutubeProvider.prototype.remove = function(mediaIds, callback) {

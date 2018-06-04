@@ -8,16 +8,14 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
 /**
- * Defines a VideoPlatformProvider to interact with video
- * platforms. Use videoPlatformFactory to get an instance of the
- * appropriate VideoPlatformProvider.
+ * Defines a VideoPlatformProvider to interact with media platforms. Use factory to get an instance of the appropriate
+ * VideoPlatformProvider.
  *
  * @class VideoPlatformProvider
  * @extends EventEmitter
  * @constructor
- * @param {Object} providerConf A video platform configuration object
- * it's structure depend on the provider's type, see extended objects
- * for more information
+ * @param {Object} providerConf A media platform configuration object, it's structure depend on the provider's type, see
+ * extended objects for more information
  */
 function VideoPlatformProvider(providerConf) {
   VideoPlatformProvider.super_.call(this);
@@ -25,7 +23,7 @@ function VideoPlatformProvider(providerConf) {
   Object.defineProperties(this, {
 
     /**
-     * The video platform's configuration.
+     * The media platform's configuration.
      *
      * @property conf
      * @type Object
@@ -42,7 +40,7 @@ function VideoPlatformProvider(providerConf) {
 module.exports = VideoPlatformProvider;
 util.inherits(VideoPlatformProvider, EventEmitter);
 
-// Video qualities
+// Media qualities
 /**
  * @property QUALITIES
  * @type Object
@@ -57,44 +55,41 @@ VideoPlatformProvider.QUALITIES = {
 Object.freeze(VideoPlatformProvider.QUALITIES);
 
 /**
- * Uploads a video to the platform.
+ * Uploads a media to the platform.
  *
  * @method upload
  * @async
- * @param {String} videoFilePath System path of the video to upload
- * @param {Function} callback The function to call when the upload
- * is done
+ * @param {String} mediaFilePath The absolute path of the media to upload
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **String** The media id on the platform
  */
 VideoPlatformProvider.prototype.upload = function() {
-  throw new Error('upload method not implemented for this video platform provider');
+  throw new Error('upload method not implemented for this media platform provider');
 };
 
 /**
- * Removes a video from the platform.
+ * Removes a media from the platform.
  *
  * @method remove
  * @async
- * @param {Array} mediaIds Video media IDs array of videos to remove
- * @param {Function} callback The function to call when the remove
- * is done
+ * @param {Array} mediaIds Platform media ids to remove
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoPlatformProvider.prototype.remove = function() {
-  throw new Error('upload method not implemented for this video platform provider');
+  throw new Error('upload method not implemented for this media platform provider');
 };
 
 /**
- * Configures a video on the platform.
+ * Configures a media on the platform.
  *
- * Depending on the platform, some video properties must be set after the
- * upload of the video.
+ * Depending on the platform, some media properties must be set after the upload of the media.
  *
  * @method configure
  * @async
- * @param {String} mediaId The id of the video
- * @param {Function} callback The function to call when the upload
- * is done
+ * @param {String} mediaId The id of the media
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
 VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
@@ -102,42 +97,16 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
 };
 
 /**
- * Gets information about a video from video platform.
- *
- * Video is considered available if the expected video definition has been transcoded by the video platform.
- *
- * @example
- *     // Returned data example
- *     {
- *       available : true,
- *       sources: {
- *         files : [
- *           {
- *             quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *             width : 640,
- *             height : 360,
- *             link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
- *           },
- *           ...
- *         ],
- *         adaptive : [
- *           {
- *            link : 'http://streaming/platform/mp4:video.mp4/manifest.mpd'
- *            mimeType : 'application/dash+xml'
- *           },
- *           ...
- *         ]
- *       }
- *     }
+ * Gets information about a media from the platform.
  *
  * @method getVideoInfo
  * @async
- * @param {String} mediaId The platform id of the video
- * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080)
+ * @param {String} mediaId The platform id of the media
+ * @param {String} expectedDefintion The expected media definition
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the video
+ *   - **Object** Information about the media
  */
 VideoPlatformProvider.prototype.getVideoInfo = function() {
-  throw new Error('getVideoInfo method not implemented for this video platform provider');
+  throw new Error('getVideoInfo method not implemented for this media platform provider');
 };

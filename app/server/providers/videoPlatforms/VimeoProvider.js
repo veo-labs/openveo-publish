@@ -37,7 +37,7 @@ function VimeoProvider(providerConf) {
     vimeo: {value: new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken)},
 
     /**
-     * List of accepted video qualities.
+     * List of accepted media qualities.
      *
      * @property qualitiesMap
      * @type Object
@@ -58,20 +58,17 @@ module.exports = VimeoProvider;
 util.inherits(VimeoProvider, VideoPlatformProvider);
 
 /**
- * Uploads a video to the Vimeo platform.
+ * Uploads a media to the Vimeo platform.
  *
  * @method upload
  * @async
- * @param {String} videoFilePath System path of the video to upload
- * @param {Function} callback The function to call when the upload
- * is done
+ * @param {String} mediaFilePath The absolute system path of the media to upload
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
+ *   - **String** The media id on the Vimeo platform
  */
-VimeoProvider.prototype.upload = function(videoFilePath, callback) {
+VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
-
-  // Retrieve video tmp directory
-  // e.g E:/openveo/node_modules/@openveo/publish/tmp/
   var mediaId;
 
   async.series([
@@ -91,8 +88,8 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
         if (!body.upload_quota)
           callback(new Error('User does not have permission to upload on Vimeo'));
 
-        // Checks the size of the video to upload
-        fs.stat(videoFilePath, function(error, stats) {
+        // Checks the size of the media to upload
+        fs.stat(mediaFilePath, function(error, stats) {
           if (error)
             callback(error);
           else if (stats.size >= body.upload_quota.space.free)
@@ -105,28 +102,14 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
 
     },
 
-    // Upload video
+    // Upload media
     function(callback) {
-      self.vimeo.streamingUpload(videoFilePath, function(error, body, statusCode, headers) {
-
+      self.vimeo.streamingUpload(mediaFilePath, function(error, body, statusCode, headers) {
         if (error) {
           callback(error);
           return;
         }
 
-        // {
-        //   "date" : "Thu, 15 Jan 2015 11:00:27 GMT",
-        //   "server" : "Apache",
-        //   "vary" : "Accept,Vimeo-Client-Id,Accept-Encoding",
-        //   "cache-control" : "no-cache, max-age=315360000",
-        //   "location" : "/videos/116849110",
-        //   "expires" : "Sun, 12 Jan 2025 11:00:27 GMT",
-        //   "content-length" : "0",
-        //   "keep-alive" : "timeout=100, max=94",
-        //   "connection" : "Keep-Alive",
-        //   "content-type" : "text/html; charset=UTF-8",
-        //   "via" : "1.1 fra1-10"
-        // }
         mediaId = path.basename(headers.location);
         callback();
       });
@@ -139,34 +122,17 @@ VimeoProvider.prototype.upload = function(videoFilePath, callback) {
 };
 
 /**
- * Gets information about a video hosted by Vimeo.
+ * Gets information about a media hosted by Vimeo.
  *
- * Video is considered available if the expected video definition has been transcoded by the video platform.
- *
- * @example
- *     // Returned data example
- *     {
- *       available : true,
- *       sources : {
- *         files : [
- *           {
- *             quality : 0, // 0 = mobile, 1 = sd, 2 = hd
- *             width : 640,
- *             height : 360,
- *             link : "https://player.vimeo.com/external/135956519.sd.mp4?s=01ffd473e33e1af14c86effe71464d15&profile_id=112&oauth2_token_id=80850094"
- *           },
- *           ...
- *         ]
- *       }
- *     }
+ * Media is considered available if the expected media definition has been transcoded by the media platform.
  *
  * @method getVideoInfo
  * @async
- * @param {String} mediaId The Vimeo id of the video
- * @param {String} expectedDefintion The expected video definition (e.g. 720, 1080)
+ * @param {String} mediaId The Vimeo id of the media
+ * @param {String} expectedDefintion The expected media definition
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the video
+ *   - **Object** Information about the media
  */
 VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
   if (!mediaIds) {
@@ -180,14 +146,14 @@ VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
   mediaIds.forEach(function(mediaId) {
     parallel.push(function(cb) {
 
-      // Ask Vimeo for video information
+      // Ask Vimeo for media information
       self.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
         var available = !expectedDefinition ? true : false;
 
         if (!error) {
           var info = {};
 
-          // Got direct access to video files and formats
+          // Got direct access to media files and formats
           // Keep only files with supported quality (see qualitiesMap)
           if (body.files) {
             var files = [];
@@ -202,10 +168,10 @@ VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
                   link: file.link_secure
                 });
 
-                // Vimeo set the video as "available" as soon as any definition has been transcoded not when all
+                // Vimeo set the media as "available" as soon as any definition has been transcoded not when all
                 // definitions have been transcoded
-                // Set the video as "available" as soon as the expected definition has been transcoded
-                // If video height is not standard, Vimeo eventually change its definition to something close, thus
+                // Set the media as "available" as soon as the expected definition has been transcoded
+                // If media height is not standard, Vimeo eventually change its definition to something close, thus
                 // we add a factor error of 64 to deal with those cases
                 if (Math.abs(file.height - expectedDefinition) < 64)
                   available = true;
@@ -237,13 +203,12 @@ VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, ca
 
 
 /**
- * Removes a video from the Vimeo platform.
+ * Removes a media from the Vimeo platform.
  *
  * @method remove
  * @async
- * @param {Array} mediaIds Media Ids array of videos to remove
- * @param {Function} callback The function to call when the remove
- * is done
+ * @param {Array} mediaIds Vimeo media ids to remove
+ * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
 VimeoProvider.prototype.remove = function(mediaIds, callback) {
