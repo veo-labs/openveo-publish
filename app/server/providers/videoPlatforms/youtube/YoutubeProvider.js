@@ -248,14 +248,14 @@ YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams
 /**
  * Gets information about a media hosted by Youtube.
  *
- * @method getVideoInfo
+ * @method getMediaInfo
  * @async
  * @param {String} mediaId The Youtube id of the media
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-YoutubeProvider.prototype.getVideoInfo = function(mediaId, definition, callback) {
+YoutubeProvider.prototype.getMediaInfo = function(mediaId, definition, callback) {
   if (!mediaId) {
     callback(new Error('media id should be defined'), null);
     return;

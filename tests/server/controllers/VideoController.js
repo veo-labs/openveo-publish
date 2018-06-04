@@ -111,7 +111,7 @@ describe('VideoController', function() {
     };
 
     videoPlatformProvider = {
-      getVideoInfo: function(id, expectedDefinition, callback) {
+      getMediaInfo: function(id, expectedDefinition, callback) {
         callback({});
       }
     };
@@ -446,7 +446,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformProvider.getVideoInfo = chai.spy(function(ids, videoDefinition, callback) {
+      videoPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
         assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
         callback(null, expectedInfo);
@@ -465,7 +465,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        videoPlatformProvider.getVideoInfo.should.have.been.called.exactly(1);
+        videoPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -498,7 +498,7 @@ describe('VideoController', function() {
         return videoPlatformProvider;
       };
 
-      videoPlatformProvider.getVideoInfo = function(ids, videoDefinition, callback) {
+      videoPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
         callback(new Error('Something went wrong'));
       };
 
@@ -689,7 +689,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformProvider.getVideoInfo = chai.spy(function(ids, videoDefinition, callback) {
+      videoPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
         assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
         callback(null, expectedInfo);
@@ -708,7 +708,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        videoPlatformProvider.getVideoInfo.should.have.been.called.exactly(1);
+        videoPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -741,7 +741,7 @@ describe('VideoController', function() {
         return videoPlatformProvider;
       };
 
-      videoPlatformProvider.getVideoInfo = function(ids, videoDefinition, callback) {
+      videoPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
         callback(new Error('Something went wrong'));
       };
 

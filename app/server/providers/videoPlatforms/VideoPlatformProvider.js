@@ -99,7 +99,7 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
 /**
  * Gets information about a media from the platform.
  *
- * @method getVideoInfo
+ * @method getMediaInfo
  * @async
  * @param {String} mediaId The platform id of the media
  * @param {String} expectedDefintion The expected media definition
@@ -107,6 +107,6 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-VideoPlatformProvider.prototype.getVideoInfo = function() {
-  throw new Error('getVideoInfo method not implemented for this media platform provider');
+VideoPlatformProvider.prototype.getMediaInfo = function() {
+  throw new Error('getMediaInfo method not implemented for this media platform provider');
 };

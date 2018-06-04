@@ -126,7 +126,7 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
  *
  * Media is considered available if the expected media definition has been transcoded by the media platform.
  *
- * @method getVideoInfo
+ * @method getMediaInfo
  * @async
  * @param {String} mediaId The Vimeo id of the media
  * @param {String} expectedDefintion The expected media definition
@@ -134,7 +134,7 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-VimeoProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
+VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
     return;

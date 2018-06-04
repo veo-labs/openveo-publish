@@ -99,7 +99,7 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Gets information about a media hosted by Wowza.
  *
- * @method getVideoInfo
+ * @method getMediaInfo
  * @async
  * @param {String} mediaId The Wowza id of the media
  * @param {String} expectedDefintion The expected media definition, not used for this provider
@@ -107,7 +107,7 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-WowzaProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
+WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   var self = this;
 
   if (!mediaIds) {

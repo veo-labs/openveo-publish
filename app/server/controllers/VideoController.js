@@ -258,7 +258,7 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
       var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
 
       // Get video availability and sources
-      videoPlatformProvider.getVideoInfo(mediaId, expectedDefinition, function(getInfoError, info) {
+      videoPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
         if (getInfoError) {
           process.logger.error(getInfoError.message, {error: getInfoError, method: 'getVideoReadyAction'});
           return next(HTTP_ERRORS.GET_VIDEO_READY_GET_INFO_ERROR);
@@ -380,7 +380,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
         var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
 
         // Get video availability and sources
-        videoPlatformProvider.getVideoInfo(mediaId, expectedDefinition, function(getInfoError, info) {
+        videoPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
           if (getInfoError) {
             process.logger.error(getInfoError.message, {error: getInfoError, method: 'getEntityAction'});
             return next(HTTP_ERRORS.GET_MEDIA_GET_INFO_ERROR);

@@ -60,7 +60,7 @@ LocalProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Gets information about a media hosted by Local.
  *
- * @method getVideoInfo
+ * @method getMediaInfo
  * @async
  * @param {String} mediaId The local id of the media
  * @param {String} expectedDefintion The expected media definition, not used for this provider
@@ -68,7 +68,7 @@ LocalProvider.prototype.upload = function(mediaFilePath, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-LocalProvider.prototype.getVideoInfo = function(mediaIds, expectedDefinition, callback) {
+LocalProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   var self = this;
   if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
