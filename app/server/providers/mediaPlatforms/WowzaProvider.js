@@ -9,7 +9,7 @@ var util = require('util');
 var async = require('async');
 var FTPS = require('ftps');
 var shortid = require('shortid');
-var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
 
 /**
  * Defines a WowzaProvider class to interact with [wowza platform](https://wowza.com/).

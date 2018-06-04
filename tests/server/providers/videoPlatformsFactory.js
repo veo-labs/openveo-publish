@@ -3,12 +3,12 @@
 var util = require('util');
 var assert = require('chai').assert;
 var openVeoApi = require('@openveo/api');
-var factory = process.requirePublish('app/server/providers/videoPlatforms/factory.js');
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
-var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
-var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
-var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
-var LocalProvider = process.requirePublish('app/server/providers/videoPlatforms/LocalProvider.js');
+var factory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
+var YoutubeProvider = process.requirePublish('app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js');
+var VimeoProvider = process.requirePublish('app/server/providers/mediaPlatforms/VimeoProvider.js');
+var WowzaProvider = process.requirePublish('app/server/providers/mediaPlatforms/WowzaProvider.js');
+var LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
 
 // factory.js
 describe('Video platforms factory', function() {

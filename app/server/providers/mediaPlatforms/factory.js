@@ -4,12 +4,12 @@
  * @module providers
  */
 
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 
 /**
  * Defines a factory to create media platforms' providers.
  *
- * @class videoPlatformFactory
+ * @class mediaPlatformFactory
  * @static
  */
 
@@ -28,19 +28,19 @@ module.exports.get = function(type, providerConf) {
   if (type && providerConf) {
     switch (type) {
       case TYPES.VIMEO:
-        var VimeoProvider = process.requirePublish('app/server/providers/videoPlatforms/VimeoProvider.js');
+        var VimeoProvider = process.requirePublish('app/server/providers/mediaPlatforms/VimeoProvider.js');
         return new VimeoProvider(providerConf);
       case TYPES.YOUTUBE:
-        var YoutubeProvider = process.requirePublish('app/server/providers/videoPlatforms/youtube/YoutubeProvider.js');
+        var YoutubeProvider = process.requirePublish('app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js');
         var GoogleOAuthHelper = process.requirePublish(
-          'app/server/providers/videoPlatforms/youtube/GoogleOAuthHelper.js'
+          'app/server/providers/mediaPlatforms/youtube/GoogleOAuthHelper.js'
         );
         return new YoutubeProvider(providerConf, new GoogleOAuthHelper());
       case TYPES.WOWZA:
-        var WowzaProvider = process.requirePublish('app/server/providers/videoPlatforms/WowzaProvider.js');
+        var WowzaProvider = process.requirePublish('app/server/providers/mediaPlatforms/WowzaProvider.js');
         return new WowzaProvider(providerConf);
       case TYPES.LOCAL:
-        var LocalProvider = process.requirePublish('app/server/providers/videoPlatforms/LocalProvider.js');
+        var LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
         return new LocalProvider(providerConf);
 
       default:

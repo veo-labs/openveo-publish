@@ -8,7 +8,7 @@ var mock = require('mock-require');
 var api = require('@openveo/api');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var ResourceFilter = api.storages.ResourceFilter;
 
 var assert = chai.assert;
@@ -223,7 +223,7 @@ describe('VideoController', function() {
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), VideoProvider);
     mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
     mock(path.join(process.rootPublish, 'app/server/PublishManager.js'), PublishManager);
-    mock(path.join(process.rootPublish, 'app/server/providers/videoPlatforms/factory.js'), videoPlatformFactory);
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), videoPlatformFactory);
   });
 
   // Initializes tests

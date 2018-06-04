@@ -11,9 +11,9 @@ var async = require('async');
 var google = require('googleapis');
 var youtube = google.youtube('v3');
 var YoutubeResumableUpload = process.requirePublish(
-  'app/server/providers/videoPlatforms/youtube/YoutubeResumableUpload.js'
+  'app/server/providers/mediaPlatforms/youtube/YoutubeResumableUpload.js'
 );
-var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
 
 /**
  * Available upload methods.

@@ -15,7 +15,7 @@ process.requirePublish = function(filePath) {
   return require(path.join(process.rootPublish, filePath));
 };
 
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 
 // Create a readline interface to interact with the user
 var rl = readline.createInterface({

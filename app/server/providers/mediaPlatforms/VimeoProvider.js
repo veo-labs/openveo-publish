@@ -9,7 +9,7 @@ var util = require('util');
 var fs = require('fs');
 var vimeoAPI = require('vimeo');
 var async = require('async');
-var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
 
 /**
  * Defines a VimeoProvider class to interact with [vimeo platform](https://vimeo.com/).

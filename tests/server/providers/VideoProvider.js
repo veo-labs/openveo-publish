@@ -7,7 +7,7 @@ var spies = require('chai-spies');
 var api = require('@openveo/api');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
-var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var ResourceFilter = api.storages.ResourceFilter;
 var NotFoundError = api.errors.NotFoundError;
@@ -114,7 +114,7 @@ describe('VideoProvider', function() {
     mock('publish/videoPlatformConf.json', videoPlatformConf);
     mock('publish/publishConf.json', publishConf);
     mock('@openveo/api', openVeoApi);
-    mock(path.join(process.rootPublish, 'app/server/providers/videoPlatforms/factory.js'), videoPlatformFactory);
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), videoPlatformFactory);
   });
 
   // Initializes tests
