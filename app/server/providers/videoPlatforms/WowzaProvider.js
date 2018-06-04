@@ -9,13 +9,13 @@ var util = require('util');
 var async = require('async');
 var FTPS = require('ftps');
 var shortid = require('shortid');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
 
 /**
  * Defines a WowzaProvider class to interact with [wowza platform](https://wowza.com/).
  *
  * @class WowzaProvider
- * @extends VideoPlatformProvider
+ * @extends MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A wowza configuration object
  * @param {String} providerConf.host Server host
@@ -63,7 +63,7 @@ function WowzaProvider(providerConf) {
 }
 
 module.exports = WowzaProvider;
-util.inherits(WowzaProvider, VideoPlatformProvider);
+util.inherits(WowzaProvider, MediaPlatformProvider);
 
 /**
  * Uploads a media to the Wowza platform.

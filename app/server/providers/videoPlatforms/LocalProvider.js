@@ -9,13 +9,13 @@ var util = require('util');
 var async = require('async');
 var shortid = require('shortid');
 var openVeoApi = require('@openveo/api');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
 
 /**
  * Defines a LocalProvider class to interact with local platform.
  *
  * @class LocalProvider
- * @extends VideoPlatformProvider
+ * @extends MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf Local configuration
  * @param {String} providerConf.vodFilePath The absolute directory path where to store medias
@@ -26,7 +26,7 @@ function LocalProvider(providerConf) {
 }
 
 module.exports = LocalProvider;
-util.inherits(LocalProvider, VideoPlatformProvider);
+util.inherits(LocalProvider, MediaPlatformProvider);
 
 /**
  * Uploads a media to the Local platform.

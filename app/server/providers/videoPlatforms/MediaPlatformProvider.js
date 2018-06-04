@@ -8,17 +8,17 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
 /**
- * Defines a VideoPlatformProvider to interact with media platforms. Use factory to get an instance of the appropriate
- * VideoPlatformProvider.
+ * Defines a MediaPlatformProvider to interact with media platforms. Use factory to get an instance of the appropriate
+ * MediaPlatformProvider.
  *
- * @class VideoPlatformProvider
+ * @class MediaPlatformProvider
  * @extends EventEmitter
  * @constructor
  * @param {Object} providerConf A media platform configuration object, it's structure depend on the provider's type, see
  * extended objects for more information
  */
-function VideoPlatformProvider(providerConf) {
-  VideoPlatformProvider.super_.call(this);
+function MediaPlatformProvider(providerConf) {
+  MediaPlatformProvider.super_.call(this);
 
   Object.defineProperties(this, {
 
@@ -37,8 +37,8 @@ function VideoPlatformProvider(providerConf) {
     throw new Error('No provider configuration');
 }
 
-module.exports = VideoPlatformProvider;
-util.inherits(VideoPlatformProvider, EventEmitter);
+module.exports = MediaPlatformProvider;
+util.inherits(MediaPlatformProvider, EventEmitter);
 
 // Media qualities
 /**
@@ -47,12 +47,12 @@ util.inherits(VideoPlatformProvider, EventEmitter);
  * @static
  * @final
  */
-VideoPlatformProvider.QUALITIES = {
+MediaPlatformProvider.QUALITIES = {
   MOBILE: 0,
   SD: 1,
   HD: 2
 };
-Object.freeze(VideoPlatformProvider.QUALITIES);
+Object.freeze(MediaPlatformProvider.QUALITIES);
 
 /**
  * Uploads a media to the platform.
@@ -64,7 +64,7 @@ Object.freeze(VideoPlatformProvider.QUALITIES);
  *   - **Error** The error if an error occurred, null otherwise
  *   - **String** The media id on the platform
  */
-VideoPlatformProvider.prototype.upload = function() {
+MediaPlatformProvider.prototype.upload = function() {
   throw new Error('upload method not implemented for this media platform provider');
 };
 
@@ -77,7 +77,7 @@ VideoPlatformProvider.prototype.upload = function() {
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.remove = function() {
+MediaPlatformProvider.prototype.remove = function() {
   throw new Error('upload method not implemented for this media platform provider');
 };
 
@@ -92,7 +92,7 @@ VideoPlatformProvider.prototype.remove = function() {
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
+MediaPlatformProvider.prototype.configure = function(mediaId, callback) {
   callback();
 };
 
@@ -107,6 +107,6 @@ VideoPlatformProvider.prototype.configure = function(mediaId, callback) {
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
  */
-VideoPlatformProvider.prototype.getMediaInfo = function() {
+MediaPlatformProvider.prototype.getMediaInfo = function() {
   throw new Error('getMediaInfo method not implemented for this media platform provider');
 };

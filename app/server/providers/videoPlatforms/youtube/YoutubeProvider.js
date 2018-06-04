@@ -13,7 +13,7 @@ var youtube = google.youtube('v3');
 var YoutubeResumableUpload = process.requirePublish(
   'app/server/providers/videoPlatforms/youtube/YoutubeResumableUpload.js'
 );
-var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
 
 /**
  * Available upload methods.
@@ -41,7 +41,7 @@ Object.freeze(PRIVACY_STATUSES);
  * Defines a YoutubeProvider class to interact with [youtube platform](https://youtube.com/).
  *
  * @class YoutubeProvider
- * @extends VideoPlatformProvider
+ * @extends MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A youtube configuration object
  * @param {String} providerConf.uploadMethod The upload method to use (see UPLOAD_METHODS)
@@ -85,7 +85,7 @@ function YoutubeProvider(providerConf, googleOAuthHelper) {
 }
 
 module.exports = YoutubeProvider;
-util.inherits(YoutubeProvider, VideoPlatformProvider);
+util.inherits(YoutubeProvider, MediaPlatformProvider);
 
 /**
  * Uploads a media to the Youtube platform.

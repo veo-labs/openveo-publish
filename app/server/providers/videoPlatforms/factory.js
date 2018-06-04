@@ -14,14 +14,14 @@ var TYPES = process.requirePublish('app/server/providers/videoPlatforms/types.js
  */
 
 /**
- * Gets an instance of a VideoPlatformProvider giving a type and a configuration object.
+ * Gets an instance of a MediaPlatformProvider giving a type and a configuration object.
  *
  * @method get
  * @static
  * @param {String} type The type of the provider platform to instanciate
  * @param {Object} providerConf A media platform configuration object, it's structure depend on the provider's type,
  * see extended objects for more information
- * @return {VideoPlatformProvider} An instance of a VideoPlatformProvider sub class
+ * @return {MediaPlatformProvider} An instance of a MediaPlatformProvider sub class
  * @throws {Error} The configuration doesn't satisfy the provider or given type is not available
  */
 module.exports.get = function(type, providerConf) {

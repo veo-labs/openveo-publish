@@ -9,13 +9,13 @@ var util = require('util');
 var fs = require('fs');
 var vimeoAPI = require('vimeo');
 var async = require('async');
-var VideoPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/VideoPlatformProvider.js');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/videoPlatforms/MediaPlatformProvider.js');
 
 /**
  * Defines a VimeoProvider class to interact with [vimeo platform](https://vimeo.com/).
  *
  * @class VimeoProvider
- * @extends VideoPlatformProvider
+ * @extends MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A vimeo configuration object
  * @param {String} providerConf.clientId Vimeo client id
@@ -45,9 +45,9 @@ function VimeoProvider(providerConf) {
      */
     qualitiesMap: {
       value: {
-        sd: VideoPlatformProvider.QUALITIES.SD,
-        mobile: VideoPlatformProvider.QUALITIES.MOBILE,
-        hd: VideoPlatformProvider.QUALITIES.HD
+        sd: MediaPlatformProvider.QUALITIES.SD,
+        mobile: MediaPlatformProvider.QUALITIES.MOBILE,
+        hd: MediaPlatformProvider.QUALITIES.HD
       }
     }
 
@@ -55,7 +55,7 @@ function VimeoProvider(providerConf) {
 }
 
 module.exports = VimeoProvider;
-util.inherits(VimeoProvider, VideoPlatformProvider);
+util.inherits(VimeoProvider, MediaPlatformProvider);
 
 /**
  * Uploads a media to the Vimeo platform.
