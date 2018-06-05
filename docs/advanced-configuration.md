@@ -52,6 +52,13 @@ Open **~/.openveo/publish/videoPlatformConf.json**
   "local": {
     "vodFilePath": "/path/to/host/folder/",// path where the video will be uploaded on the local machine
     "streamPath": "stream/path/" //stream path exposed by local server relative to Openveo CDN to access the video
+  },
+  "tls": {
+    "nfsPath": "/absolute/path/to/nfs/directory", // path of the directory shared with TLS
+    "mediaDirectoryPath": "path/to/media/directory", // path of the directory holding medias (relative to nfsPath)
+    "accessToken": "TLS access token", // access token to use to authenticate requests to TLS web service
+    "url": "https://TLS_SERVER_HOST_NAME:TLS_SERVER_PORT/web/service/uri", // URL of the TLS web service
+    "certificate": "/absolute/path/to/full/chain/certificate.crt" // path to the full chain certificate if top authority is not part of system well known authorities
   }
 }
 ```

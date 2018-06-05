@@ -42,6 +42,9 @@ module.exports.get = function(type, providerConf) {
       case TYPES.LOCAL:
         var LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
         return new LocalProvider(providerConf);
+      case TYPES.TLS:
+        var TlsProvider = process.requirePublish('app/server/providers/mediaPlatforms/tls/TlsProvider.js');
+        return new TlsProvider(providerConf);
 
       default:
         throw new Error('Unknown media plateform type');

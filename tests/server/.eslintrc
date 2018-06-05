@@ -1,23 +1,24 @@
 {
 
   "env": {
-    
+
     // Add mocha environment globals
     "mocha": true
-    
+
   },
   "globals": {
-    
+
     // Add chai to environment globals but do not authorize to overwrite it
     chai: false,
-    assert: false
-    
+    assert: false,
+    Promise: false
+
   },
   "rules": {
-    
+
     // Require JSDoc comment
-    "require-jsdoc": 0  
-    
-  }  
-  
+    "require-jsdoc": 0
+
+  }
+
 }

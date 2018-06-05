@@ -124,6 +124,7 @@ function createVideoPlatformConf(callback) {
   var youtubeConf;
   var wowzaConf;
   var localConf;
+  var tlsConf;
 
   async.series([
     function(callback) {
@@ -305,6 +306,58 @@ function createVideoPlatformConf(callback) {
         if (answer !== '') localConf.streamPath = answer;
         callback();
       });
+    },
+
+    // TLS
+    function(callback) {
+      rl.question('Do you want to configure OpenVeo to host medias on TLS? (y/N):\n', function(answer) {
+        if (answer === 'y') tlsConf = {
+          nfsPath: path.join(__dirname, '/assets/player/videos'),
+          mediaDirectoryPath: 'tls'
+        };
+        callback();
+      });
+    },
+    function(callback) {
+      if (!tlsConf) return callback();
+      rl.question('Enter system path of the NFS root directory (default: "' + tlsConf.nfsPath + '"):\n',
+      function(answer) {
+        if (answer !== '') tlsConf.nfsPath = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!tlsConf) return callback();
+      rl.question('Enter path of the directory where to store medias, this is relative to NFS root directory ' +
+                  '(default: "' + tlsConf.mediaDirectoryPath + '"):\n',
+      function(answer) {
+        if (answer !== '') tlsConf.mediaDirectoryPath = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!tlsConf) return callback();
+      secureQuestion('Enter TLS access token:\n',
+      function(answer) {
+        if (answer !== '') tlsConf.accessToken = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!tlsConf) return callback();
+      rl.question('Enter TLS web service URL:\n',
+      function(answer) {
+        if (answer !== '') tlsConf.url = answer;
+        callback();
+      });
+    },
+    function(callback) {
+      if (!tlsConf) return callback();
+      rl.question('Enter the system path of the TLS web service full chain certificate:\n',
+      function(answer) {
+        if (answer !== '') tlsConf.certificate = answer;
+        callback();
+      });
     }
   ],
   function(error, results) {
@@ -317,6 +370,7 @@ function createVideoPlatformConf(callback) {
       if (youtubeConf) conf.youtube = youtubeConf;
       if (wowzaConf) conf.wowza = wowzaConf;
       if (localConf) conf.local = localConf;
+      if (tlsConf) conf.tls = tlsConf;
       fs.writeFile(confFile, JSON.stringify(conf, null, '\t'), {encoding: 'utf8'}, callback);
     }
   });
@@ -378,6 +432,17 @@ function createWatcherConf(callback) {
       rl.question('Enter Wowza hot folder path to listen to (default: ' + defaultPath + ') :\n', function(answer) {
         conf.hotFolders.push({
           type: TYPES.LOCAL,
+          path: (answer || defaultPath).replace(/\\/g, '/')
+        });
+        callback();
+      });
+    },
+    function(callback) {
+      if (!videoPlatformConf.tls) return callback();
+      var defaultPath = path.join(os.tmpdir(), 'openveo', 'publish', 'hotFolder', TYPES.TLS);
+      rl.question('Enter TLS hot folder path to listen to (default: ' + defaultPath + '):\n', function(answer) {
+        conf.hotFolders.push({
+          type: TYPES.TLS,
           path: (answer || defaultPath).replace(/\\/g, '/')
         });
         callback();

@@ -2,18 +2,31 @@
 
 var util = require('util');
 var assert = require('chai').assert;
-var openVeoApi = require('@openveo/api');
-var factory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
-var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
-var YoutubeProvider = process.requirePublish('app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js');
-var VimeoProvider = process.requirePublish('app/server/providers/mediaPlatforms/VimeoProvider.js');
-var WowzaProvider = process.requirePublish('app/server/providers/mediaPlatforms/WowzaProvider.js');
-var LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
 
 // factory.js
 describe('Video platforms factory', function() {
   var CorePlugin;
   var corePlugin;
+  var TlsProvider;
+  var openVeoApi;
+  var factory;
+  var TYPES;
+  var YoutubeProvider;
+  var VimeoProvider;
+  var WowzaProvider;
+  var LocalProvider;
+
+  // Requirements
+  before(function() {
+    TlsProvider = process.requirePublish('app/server/providers/mediaPlatforms/tls/TlsProvider.js');
+    openVeoApi = require('@openveo/api');
+    factory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
+    TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
+    YoutubeProvider = process.requirePublish('app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js');
+    VimeoProvider = process.requirePublish('app/server/providers/mediaPlatforms/VimeoProvider.js');
+    WowzaProvider = process.requirePublish('app/server/providers/mediaPlatforms/WowzaProvider.js');
+    LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
+  });
 
   // Mocks
   beforeEach(function() {
@@ -56,6 +69,15 @@ describe('Video platforms factory', function() {
         user: 'user',
         pwd: 'pwd'
       }), WowzaProvider);
+    });
+
+    it('should be able to instanciate a TlsProvider', function() {
+      assert.instanceOf(factory.get(TYPES.TLS, {
+        nfsPath: '/path/to/nfs/directory',
+        mediaDirectoryPath: 'path/to/media/directory',
+        accessToken: 'access token',
+        url: 'https://tls.local/ws'
+      }), TlsProvider);
     });
 
     it('should be able to instanciate a LocalProvider', function() {

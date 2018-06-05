@@ -71,6 +71,7 @@
     "UPLOAD_YOUTUBE" : "Envoyer sur Youtube",
     "UPLOAD_WOWZA" : "Envoyer sur Wowza",
     "UPLOAD_LOCAL" : "Envoyer sur la machine local",
+    "UPLOAD_TLS" : "Envoyer sur TLS",
     "PUBLISH" : "Publier",
     "UNPUBLISH" : "Dépublier",
     "CHAPTER_EDIT": "Editer le media",

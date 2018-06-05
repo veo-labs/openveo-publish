@@ -51,7 +51,17 @@ var TYPES = {
    * @default 'local'
    * @final
    */
-  LOCAL: 'local'
+  LOCAL: 'local',
+
+  /**
+   * TLS provider.
+   *
+   * @property TLS
+   * @type String
+   * @default 'tls'
+   * @final
+   */
+  TLS: 'tls'
 
 };
 Object.freeze(TYPES);

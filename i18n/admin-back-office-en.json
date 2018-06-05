@@ -71,6 +71,7 @@
     "UPLOAD_YOUTUBE" : "Upload to Youtube",
     "UPLOAD_WOWZA" : "Upload to Wowza",
     "UPLOAD_LOCAL" : "Upload to localhost",
+    "UPLOAD_TLS" : "Upload to TLS",
     "PUBLISH" : "Publish",
     "UNPUBLISH" : "Unpublish",
     "SHARECODE" : "To share the video, copy the HTML code below and paste it in your page :",
