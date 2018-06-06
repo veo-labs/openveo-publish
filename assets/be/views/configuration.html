@@ -24,18 +24,35 @@
       <div class="panel panel-default">
         <div uib-popover="{{'PUBLISH.CONFIGURATION.MEDIAS_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_TITLE' | translate"></div>
         <div class="panel-body">
-          <p>
-            {{ 'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER' | translate}}
-            <br>
-            <select ng-disabled="!rights.edit" class="form-control" ng-change="saveOptions()" ng-model="default.owner" ng-options="option.name for option in options.owners track by option.value"></select>
-          </p>
-          <p>
-            {{ 'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP' | translate}}
-            <br>
-            <select ng-disabled="!rights.edit" class="form-control" ng-change="saveOptions()" ng-model="default.group" ng-options="option.name for option in options.groups track by option.value"></select>
-          </p>
+
+          <form novalidate>
+            <div class="form-group">
+              <label for="media-default-owner" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER' | translate"></label>
+              <select
+                      ng-model="default.owner"
+                      ng-options="option.name for option in options.owners track by option.value"
+                      ng-disabled="!rights.edit"
+                      ng-change="saveOptions()"
+                      class="form-control"
+                      id="media-default-owner"
+              ></select>
+            </div>
+            <div class="form-group">
+              <label for="media-default-group" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP' | translate"></label>
+              <select
+                      ng-model="default.group"
+                      ng-options="option.name for option in options.groups track by option.value"
+                      ng-disabled="!rights.edit"
+                      ng-change="saveOptions()"
+                      class="form-control"
+                      id="media-default-group"
+              ></select>
+            </div>
+          </form>
+
         </div>
       </div>
     </div>
+
   </div>
 </div>
