@@ -189,15 +189,15 @@
     "PAGE_TITLE" : "Publish - Configuration",
     "TITLE" : "Publish - Configuration",
     "INFO" : "Configure OpenVeo publish plugin.",
-    "YOUTUBE_INFO" : "Publish needs to be connected to a Google Account that allow connection to Youtube API.",
+    "YOUTUBE_INFO" : "Connect Publish to your Google account to be able to upload medias on Youtube.",
     "YOUTUBE_PEER": "Associate to Google",
     "YOUTUBE_PEER_ASSOCIATED_STATUS": "Correctly associated to Google.",
     "YOUTUBE_PEER_NOT_ASSOCIATED_STATUS": "No Google account associated.",
     "YOUTUBE_TITLE": "Youtube",
     "YOUTUBE_MODIFY_PEER": "Edit the association",
-    "UPLOAD_TITLE": "Upload",
-    "UPLOAD_INFO": "You can to define default upload option as default owner or default group of a video.",
-    "UPLOAD_DEFAULT_OWNER": "Default video owner",
-    "UPLOAD_DEFAULT_GROUP": "Default video group"
+    "MEDIAS_TITLE": "Medias",
+    "MEDIAS_INFO": "Define default values for some media properties which will be attributed to newly uploaded medias.",
+    "MEDIAS_DEFAULT_OWNER": "Default medias owner",
+    "MEDIAS_DEFAULT_GROUP": "Default medias group"
   }
 }

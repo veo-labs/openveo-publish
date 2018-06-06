@@ -10,6 +10,10 @@
 - Add a new custom property type *dateTime* to store a date time
 - Add support for TLS as a media platform like Vimeo, Wowza and Youtube
 
+## BUG FIXES
+
+- Improve texts in configuration page to make it easy to understand
+
 ## DEPENDENCIES
 
 - **angular-ui-tinymce** has been upgraded from 0.0.18 to **0.0.19**

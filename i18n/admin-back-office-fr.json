@@ -189,15 +189,15 @@
     "PAGE_TITLE": "Publish - Configuration",
     "TITLE": "Publish - Configuration",
     "INFO" : "Configuration du plugin OpenVeo publish.",
-    "YOUTUBE_INFO" : "Publish a besoin de se connecter à un compte Google autorisant l'accès à l'API Youtube.",
+    "YOUTUBE_INFO" : "Connectez Publish à votre compte Google pour pouvoir ajouter des médias sur Youtube.",
     "YOUTUBE_PEER": "Associer un compte Google",
     "YOUTUBE_PEER_ASSOCIATED_STATUS": "Un compte Google est bien associé.",
     "YOUTUBE_PEER_NOT_ASSOCIATED_STATUS": "Aucun compte Google associé.",
     "YOUTUBE_TITLE": "Youtube",
     "YOUTUBE_MODIFY_PEER": "Changer le compte associé",
-    "UPLOAD_TITLE": "Upload",
-    "UPLOAD_INFO": "Vous pouvez définir les options par défaut de l'upload tel que le propriétaire ou le groupe par défaut d'une vidéo.",
-    "UPLOAD_DEFAULT_OWNER": "Propriétaire de la vidéo par défaut",
-    "UPLOAD_DEFAULT_GROUP": "Groupe de vidéos par défaut"
+    "MEDIAS_TITLE": "Médias",
+    "MEDIAS_INFO": "Définissez les valeurs par défaut de certaines propriétés de médias qui seront attribuées aux médias nouvellement ajoutés.",
+    "MEDIAS_DEFAULT_OWNER": "Propriétaire des médias par défaut",
+    "MEDIAS_DEFAULT_GROUP": "Groupe des médias par défaut"
   }
 }
