@@ -147,12 +147,9 @@ describe('Listeners', function() {
       var deletedUsersIds = ['42'];
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            owner: {
-              name: 'User name',
-              value: deletedUsersIds[0]
-            }
+            owner: deletedUsersIds[0]
           }
         }
       ];
@@ -160,7 +157,7 @@ describe('Listeners', function() {
       settingProvider.getOne = chai.spy(function(filter, fields, callback) {
         assert.deepEqual(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          'publish-defaultUpload',
+          'publish-medias',
           'Wrong setting'
         );
         callback(null, expectedSettings[0]);
@@ -169,11 +166,10 @@ describe('Listeners', function() {
       settingProvider.updateOne = chai.spy(function(filter, modifications, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          'publish-defaultUpload',
+          'publish-medias',
           'Wrong updated setting'
         );
-        assert.isNull(modifications.value.owner.name, 'Unexpected user name');
-        assert.isNull(modifications.value.owner.value, 'Unexpected user id');
+        assert.isNull(modifications.value.owner, 'Unexpected user id');
         callback(null, 1);
       });
 
@@ -189,12 +185,9 @@ describe('Listeners', function() {
       var deletedUsersIds = ['Something else'];
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            owner: {
-              name: 'User name',
-              value: '42'
-            }
+            owner: '42'
           }
         }
       ];
@@ -226,12 +219,9 @@ describe('Listeners', function() {
       var expectedError = new Error('Something went wrong');
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            owner: {
-              name: 'User name',
-              value: '42'
-            }
+            owner: '42'
           }
         }
       ];
@@ -288,12 +278,9 @@ describe('Listeners', function() {
       var deletedGroupsIds = ['42'];
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            group: {
-              name: 'Group name',
-              value: deletedGroupsIds[0]
-            }
+            group: deletedGroupsIds[0]
           }
         }
       ];
@@ -301,7 +288,7 @@ describe('Listeners', function() {
       settingProvider.getOne = chai.spy(function(filter, fields, callback) {
         assert.deepEqual(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          'publish-defaultUpload',
+          'publish-medias',
           'Wrong setting'
         );
         callback(null, expectedSettings[0]);
@@ -310,11 +297,10 @@ describe('Listeners', function() {
       settingProvider.updateOne = chai.spy(function(filter, modifications, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          'publish-defaultUpload',
+          'publish-medias',
           'Wrong updated setting'
         );
-        assert.isNull(modifications.value.group.name, 'Unexpected group name');
-        assert.isNull(modifications.value.group.value, 'Unexpected group id');
+        assert.isNull(modifications.value.group, 'Unexpected group id');
         callback(null, 1);
       });
 
@@ -330,12 +316,9 @@ describe('Listeners', function() {
       var deletedGroupsIds = ['Something else'];
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            group: {
-              name: 'Group name',
-              value: '42'
-            }
+            group: '42'
           }
         }
       ];
@@ -367,12 +350,9 @@ describe('Listeners', function() {
       var expectedError = new Error('Something went wrong');
       expectedSettings = [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: {
-            group: {
-              name: 'Group name',
-              value: '42'
-            }
+            group: '42'
           }
         }
       ];

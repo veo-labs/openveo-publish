@@ -6,24 +6,64 @@
    * Defines the configuration controller for the configuration page.
    */
   function ConfigurationController($scope, publishConf, publishService, utilService, $filter, groups, users) {
+    var publishMedias = publishConf.data.publishMedias;
+
+    /**
+     * Gets the name of a group.
+     *
+     * @param {String} id The id of the group
+     * @return {String} The name of the group
+     */
+    function getGroupName(id) {
+      for (var i = 0; i < groups.data.entities.length; i++) {
+        if (groups.data.entities[i].id === id)
+          return groups.data.entities[i].name;
+      }
+      return null;
+    }
+
+    /**
+     * Gets the name of a user.
+     *
+     * @param {String} id The id of the user
+     * @return {String} The name of the user
+     */
+    function getUserName(id) {
+      for (var i = 0; i < groups.data.entities.length; i++) {
+        if (users.data.entities[i].id === id)
+          return users.data.entities[i].name;
+      }
+      return null;
+    }
+
+    // Youtube settings
     $scope.youtubeConf = publishConf.data.youtube;
-    var publishDefaultUpload = publishConf.data.publishDefaultUpload;
 
-    $scope.default = {
-      owner: publishDefaultUpload ? publishDefaultUpload.owner : null,
-      group: publishDefaultUpload ? publishDefaultUpload.group : null
-    };
-
-    $scope.options = {
-      owners: utilService.buildSelectOptions(users.data.entities),
-      groups: utilService.buildSelectOptions(groups.data.entities)
+    // Medias settings
+    $scope.mediasSettings = {
+      owner: {
+        name: getUserName(publishMedias && publishMedias.owner),
+        value: publishMedias && publishMedias.owner
+      },
+      group: {
+        name: getGroupName(publishMedias && publishMedias.group),
+        value: publishMedias && publishMedias.group
+      },
+      availableOwners: utilService.buildSelectOptions(users.data.entities),
+      availableGroups: utilService.buildSelectOptions(groups.data.entities)
     };
 
     $scope.rights = {};
     $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
 
-    $scope.saveOptions = function() {
-      return publishService.saveUploadConfig($scope.default).then(function() {
+    /**
+     * Saves medias settings.
+     */
+    $scope.saveMediasSettings = function() {
+      return publishService.saveMediasSettings({
+        owner: $scope.mediasSettings.owner.value,
+        group: $scope.mediasSettings.group.value
+      }).then(function() {
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
       });
     };

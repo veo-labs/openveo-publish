@@ -328,18 +328,18 @@ Package.prototype.initPackage = function() {
 
       settingProvider.getOne(
         new ResourceFilter()
-        .equal('id', 'publish-defaultUpload'),
+        .equal('id', 'publish-medias'),
         null,
         function(error, setting) {
           if (error) return callback(error);
-          var defaultUploadSettings = setting && setting.value;
+          var mediasSettings = setting && setting.value;
 
-          if (defaultUploadSettings) {
-            if (defaultUploadSettings.owner && defaultUploadSettings.owner.value)
-              self.mediaPackage.user = defaultUploadSettings.owner.value;
+          if (mediasSettings) {
+            if (mediasSettings.owner)
+              self.mediaPackage.user = mediasSettings.owner;
 
-            if (defaultUploadSettings.group && defaultUploadSettings.owner.value)
-              self.mediaPackage.groups = [defaultUploadSettings.group.value];
+            if (mediasSettings.group)
+              self.mediaPackage.groups = [mediasSettings.group];
           }
           callback();
         }

@@ -71,16 +71,16 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
         callback();
     },
     function(callback) {
-      configurations['publishDefaultUpload'] = {};
+      configurations['publishMedias'] = {};
       var settingProvider = process.api.getCoreApi().settingProvider;
 
       settingProvider.getOne(
-        new ResourceFilter().equal('id', 'publish-defaultUpload'),
+        new ResourceFilter().equal('id', 'publish-medias'),
         null,
-        function(error, defaultUploadSettings) {
+        function(error, mediasSettings) {
           if (error) return callback(error);
 
-          configurations['publishDefaultUpload'] = defaultUploadSettings && defaultUploadSettings.value;
+          configurations['publishMedias'] = mediasSettings && mediasSettings.value;
           callback();
         }
       );
@@ -119,18 +119,20 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
 };
 
 /**
- * Saves upload configuration.
+ * Saves medias settings.
  *
  * @example
  *
  *     // Response example
  *     {
- *       "setting" : {
+ *       "settings" : {
  *         "owner": ..., // The id of the owner that will be associated to medias uploaded through the watcher
  *         "group": ... // The id of the content group that will be associated to medias uploaded through the watcher
+ *       },
+ *       "total": 1
  *     }
  *
- * @method saveUploadConfiguration
+ * @method saveMediasSettings
  * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body Request's body
@@ -139,38 +141,41 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
-ConfigurationController.prototype.saveUploadConfiguration = function(request, response, next) {
+ConfigurationController.prototype.saveMediasSettings = function(request, response, next) {
   if (request.body) {
     var settingProvider = process.api.getCoreApi().settingProvider;
     var parsedBody;
 
     try {
       parsedBody = utilExt.shallowValidateObject(request.body, {
-        owner: {type: 'object', required: true},
-        group: {type: 'object', required: true}
+        owner: {type: 'string', required: true},
+        group: {type: 'string', required: true}
       });
+
     } catch (error) {
-      return next(HTTP_ERRORS.SET_CONFIGURATION_WRONG_PARAMETERS);
+      return next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS);
     }
 
     settingProvider.add(
       [
         {
-          id: 'publish-defaultUpload',
+          id: 'publish-medias',
           value: parsedBody
         }
-      ], function(error, total, settings) {
-      if (error) {
-        process.logger.error(error.message, {error: error, method: 'saveUploadConfiguration'});
-        next(HTTP_ERRORS.SET_CONFIGURATION_ERROR);
-      } else {
-        response.send({setting: settings[0].value, total: total});
+      ],
+      function(error, total, settings) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'saveMediasSettings'});
+          next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_ERROR);
+        } else {
+          response.send({settings: settings[0].value, total: total});
+        }
       }
-    });
+    );
   } else {
 
     // Missing body
-    next(HTTP_ERRORS.SET_CONFIGURATION_MISSING_PARAMETERS);
+    next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS);
 
   }
 };

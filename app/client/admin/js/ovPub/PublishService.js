@@ -221,14 +221,14 @@
     }
 
     /**
-     * Save upload configuration.
+     * Saves medias settings.
      *
-     * @param {Object} data The upload configuration object
-     * @return {Promise} The HTTP promise
-     * @method saveUploadConfig
+     * @method saveMediasSettings
+     * @param {Object} data The medias settings
+     * @return {HttpPromise} The HTTP promise
      */
-    function saveUploadConfig(data) {
-      return $http.post(basePath + 'publish/configuration/upload/', data);
+    function saveMediasSettings(data) {
+      return $http.post(basePath + 'publish/configuration/medias/', data);
     }
 
     /**
@@ -386,7 +386,7 @@
       getPlatforms: getPlatforms,
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
-      saveUploadConfig: saveUploadConfig,
+      saveMediasSettings: saveMediasSettings,
       updateTag: updateTag,
       updateChapter: updateChapter,
       removeTags: removeTags,

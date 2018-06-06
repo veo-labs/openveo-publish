@@ -70,23 +70,19 @@ module.exports.onUsersDeleted = function(ids, callback) {
 
       // Get watcher configuration
       settingProvider.getOne(
-        new ResourceFilter().equal('id', 'publish-defaultUpload'),
+        new ResourceFilter().equal('id', 'publish-medias'),
         null,
-        function(error, defaultUploadSettings) {
+        function(error, mediasSettings) {
           if (error) return callback(error);
 
-          if (defaultUploadSettings &&
-              defaultUploadSettings.value &&
-              defaultUploadSettings.value.owner &&
-              ids.indexOf(defaultUploadSettings.value.owner.value) >= 0) {
-            defaultUploadSettings.value.owner = {
-              name: null,
-              value: null
-            };
+          if (mediasSettings &&
+              mediasSettings.value &&
+              ids.indexOf(mediasSettings.value.owner) >= 0) {
+            mediasSettings.value.owner = null;
             settingProvider.updateOne(
-              new ResourceFilter().equal('id', 'publish-defaultUpload'),
+              new ResourceFilter().equal('id', 'publish-medias'),
               {
-                value: defaultUploadSettings.value
+                value: mediasSettings.value
               },
               callback
             );
@@ -141,23 +137,19 @@ module.exports.onGroupsDeleted = function(ids, callback) {
   var settingProvider = process.api.getCoreApi().settingProvider;
 
   settingProvider.getOne(
-    new ResourceFilter().equal('id', 'publish-defaultUpload'),
+    new ResourceFilter().equal('id', 'publish-medias'),
     null,
-    function(error, defaultUploadSettings) {
+    function(error, mediasSettings) {
       if (error) return callback(error);
 
-      if (defaultUploadSettings &&
-          defaultUploadSettings.value &&
-          defaultUploadSettings.value.group &&
-          ids.indexOf(defaultUploadSettings.value.group.value) >= 0) {
-        defaultUploadSettings.value.group = {
-          name: null,
-          value: null
-        };
+      if (mediasSettings &&
+          mediasSettings.value &&
+          ids.indexOf(mediasSettings.value.group) >= 0) {
+        mediasSettings.value.group = null;
         settingProvider.updateOne(
-          new ResourceFilter().equal('id', 'publish-defaultUpload'),
+          new ResourceFilter().equal('id', 'publish-medias'),
           {
-            value: defaultUploadSettings.value
+            value: mediasSettings.value
           },
           callback
         );

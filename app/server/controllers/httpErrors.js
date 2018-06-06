@@ -127,13 +127,13 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Setting Publish plugin configuration failed.
+   * Saving medias settings failed.
    *
-   * @property SET_CONFIGURATION_ERROR
+   * @property SAVE_MEDIAS_SETTINGS_ERROR
    * @type Object
    * @final
    */
-  SET_CONFIGURATION_ERROR: {
+  SAVE_MEDIAS_SETTINGS_ERROR: {
     code: 0x008,
     httpCode: 500,
     module: 'publish'
@@ -877,26 +877,26 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Saving configuration failed, missing parameters.
+   * Saving medias settings failed, missing parameters.
    *
-   * @property SET_CONFIGURATION_MISSING_PARAMETERS
+   * @property SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS
    * @type Object
    * @final
    */
-  SET_CONFIGURATION_MISSING_PARAMETERS: {
+  SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS: {
     code: 0x211,
     httpCode: 400,
     module: 'publish'
   },
 
   /**
-   * Saving configuration failed, wrong parameters.
+   * Saving medias settings failed, wrong parameters.
    *
-   * @property SET_CONFIGURATION_WRONG_PARAMETERS
+   * @property SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS
    * @type Object
    * @final
    */
-  SET_CONFIGURATION_WRONG_PARAMETERS: {
+  SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS: {
     code: 0x212,
     httpCode: 400,
     module: 'publish'

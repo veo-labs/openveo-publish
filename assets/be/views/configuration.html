@@ -29,10 +29,10 @@
             <div class="form-group">
               <label for="media-default-owner" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER' | translate"></label>
               <select
-                      ng-model="default.owner"
-                      ng-options="option.name for option in options.owners track by option.value"
+                      ng-model="mediasSettings.owner"
+                      ng-options="option.name for option in mediasSettings.availableOwners track by option.value"
                       ng-disabled="!rights.edit"
-                      ng-change="saveOptions()"
+                      ng-changed="saveMediasSettings();"
                       class="form-control"
                       id="media-default-owner"
               ></select>
@@ -40,10 +40,10 @@
             <div class="form-group">
               <label for="media-default-group" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP' | translate"></label>
               <select
-                      ng-model="default.group"
-                      ng-options="option.name for option in options.groups track by option.value"
+                      ng-model="mediasSettings.group"
+                      ng-options="option.name for option in mediasSettings.availableGroups track by option.value"
                       ng-disabled="!rights.edit"
-                      ng-change="saveOptions()"
+                      ng-changed="saveMediasSettings();"
                       class="form-control"
                       id="media-default-group"
               ></select>
