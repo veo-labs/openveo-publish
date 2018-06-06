@@ -4,7 +4,7 @@ var util = require('util');
 var assert = require('chai').assert;
 
 // factory.js
-describe('Video platforms factory', function() {
+describe('Media platforms factory', function() {
   var CorePlugin;
   var corePlugin;
   var TlsProvider;
