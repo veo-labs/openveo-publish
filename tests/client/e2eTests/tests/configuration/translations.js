@@ -15,6 +15,66 @@ describe('Configuration page translations', function() {
   var defaultSettings;
 
   /**
+   * Validates Youtube settings translations.
+   */
+  function checkYoutubeSettings() {
+
+    // Youtube panel title
+    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE));
+    assert.eventually.equal(
+      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.YOUTUBE_INFO
+    );
+
+    // Youtube with no associated account
+    assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+                          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
+                          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
+                         );
+
+    // Youtube with an associated account
+    // Associate a fake Google account
+    configurationHelper.addEntities([{
+      id: 'publish-googleOAuthTokens',
+      value: {
+        access_token: 'accessToken',
+        token_type: 'Bearer',
+        refresh_token: 'refreshToken',
+        expiry_date: new Date().getTime()
+      }
+    }]);
+    page.refresh();
+    assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER);
+    assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+                            page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
+                            page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
+                           );
+  }
+
+  /**
+   * Validates medias settings translations.
+   */
+  function checkMediasSettings() {
+
+    // Medias panel title
+    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE));
+    assert.eventually.equal(
+      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.MEDIAS_INFO
+    );
+
+    // Medias without owner nor group
+    assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
+    assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+
+    // Medias formular button
+    page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+      assert.eventually.ok(panelElement.element(by.binding('CORE.UI.FORM_SAVE')).isPresent());
+    });
+
+  }
+
+  /**
    * Checks translations.
    *
    * @param {Number} [index] Index of the language to test in the list of languages
@@ -32,38 +92,8 @@ describe('Configuration page translations', function() {
         assert.eventually.equal(page.pageTitleElement.getText(), page.translations.PUBLISH.CONFIGURATION.TITLE);
         assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CONFIGURATION.INFO);
 
-        // Youtube block title
-        assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE));
-        assert.eventually.equal(
-          page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
-          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_INFO
-        );
-
-        // Youtube block with no associated account
-        assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
-                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
-                              page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
-                             );
-
-        // Youtube block with an associated account
-        // Associate a fake Google account
-        configurationHelper.addEntities([{
-          id: 'publish-googleOAuthTokens',
-          value: {
-            access_token: 'accessToken',
-            token_type: 'Bearer',
-            refresh_token: 'refreshToken',
-            expiry_date: new Date().getTime()
-          }
-        }]);
-        page.refresh();
-
-
-        assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER);
-        assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
-                                page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
-                                page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
-                               );
+        checkYoutubeSettings();
+        checkMediasSettings();
 
         configurationHelper.removeAllEntities(defaultSettings);
         page.refresh();

@@ -3,6 +3,8 @@
 var util = require('util');
 var e2e = require('@openveo/test').e2e;
 var BackEndPage = e2e.pages.BackEndPage;
+var Field = e2e.fields.Field;
+var browserExt = e2e.browser;
 
 /**
  * Creates a new ConfigurationPage representing the publish configuration back end page.
@@ -106,5 +108,70 @@ ConfigurationPage.prototype.getYoutubePeerLink = function(name) {
 
   return this.getPanel(self.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE).then(function(panelElement) {
     return panelElement.element(by.css('a')).getText();
+  });
+};
+
+/**
+ * Gets fields of the medias settings form.
+ *
+ * @param {Object} panelElement The panel element finder
+ * @return {Object} The list of fields
+ */
+ConfigurationPage.prototype.getMediasSettingsFields = function(panelElement) {
+  return {
+    owner: Field.get({
+      type: 'select',
+      name: this.translations.PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER,
+      baseElement: panelElement
+    }),
+    group: Field.get({
+      type: 'select',
+      name: this.translations.PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP,
+      baseElement: panelElement
+    })
+  };
+};
+
+/**
+ * Gets medias default owner.
+ *
+ * @return {Promise} Promise resolving with medias default owner
+ */
+ConfigurationPage.prototype.getMediasDefaultOwner = function() {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+    return self.getMediasSettingsFields(panelElement).owner.getValue();
+  });
+};
+
+/**
+ * Gets medias default group.
+ *
+ * @return {Promise} Promise resolving with medias default group
+ */
+ConfigurationPage.prototype.getMediasDefaultGroup = function() {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+    return self.getMediasSettingsFields(panelElement).group.getValue();
+  });
+};
+
+/**
+ * Sets medias settings.
+ *
+ * @param {String} ownerName The name of the default owner
+ * @param {String} group The name of the default group
+ * @return {Promise} Promise resolving when medias settings have been saved
+ */
+ConfigurationPage.prototype.editMediasSettings = function(owner, group) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+    var fields = self.getMediasSettingsFields(panelElement);
+    fields.owner.setValue(owner);
+    fields.group.setValue(group);
+    return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));
   });
 };

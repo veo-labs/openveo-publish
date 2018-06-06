@@ -4,6 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
+var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
 var assert = chai.assert;
@@ -47,7 +48,7 @@ describe('Configuration page', function() {
 
   describe('Youtube', function() {
 
-    it('should display configuration block', function() {
+    it('should display configuration panel', function() {
       assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE));
     });
 
@@ -78,6 +79,51 @@ describe('Configuration page', function() {
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
                              );
+    });
+
+  });
+
+  describe('Medias', function() {
+
+    it('should display configuration panel', function() {
+      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE));
+    });
+
+    it('should not display an owner nor a group by default', function() {
+      assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+    });
+
+    it('should display actual default owner and group if specified', function() {
+      var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
+      var expectedGroup = datas.groups.publishGroup1;
+      configurationHelper.addEntities([{
+        id: 'publish-medias',
+        value: {
+          owner: expectedOwner.id,
+          group: 'publishGroup1'
+        }
+      }]);
+
+      page.refresh();
+
+      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
+    });
+
+    it('should be able to change the default owner and group', function() {
+      var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
+      var expectedGroup = datas.groups.publishGroup1;
+
+      assert.isFulfilled(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+
+      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
+
+      page.refresh();
+
+      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
     });
 
   });

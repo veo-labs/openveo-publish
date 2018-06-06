@@ -56,6 +56,13 @@ describe('Configuration page', function() {
       assert.isRejected(page.getYoutubePeerLink());
     });
 
+    it('should not be able to edit medias settings', function() {
+      var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
+      var expectedGroup = datas.groups.publishGroup1;
+
+      assert.isRejected(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+    });
+
   });
 
 });
