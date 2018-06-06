@@ -50,7 +50,8 @@
         value: publishMedias && publishMedias.group
       },
       availableOwners: utilService.buildSelectOptions(users.data.entities),
-      availableGroups: utilService.buildSelectOptions(groups.data.entities)
+      availableGroups: utilService.buildSelectOptions(groups.data.entities),
+      isFormSaving: false
     };
 
     $scope.rights = {};
@@ -60,11 +61,16 @@
      * Saves medias settings.
      */
     $scope.saveMediasSettings = function() {
+      $scope.mediasSettings.isFormSaving = true;
+
       return publishService.saveMediasSettings({
         owner: $scope.mediasSettings.owner.value,
         group: $scope.mediasSettings.group.value
       }).then(function() {
+        $scope.mediasSettings.isFormSaving = false;
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
+      }).catch(function() {
+        $scope.mediasSettings.isFormSaving = false;
       });
     };
   }

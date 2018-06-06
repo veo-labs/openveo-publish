@@ -25,14 +25,13 @@
         <div uib-popover="{{'PUBLISH.CONFIGURATION.MEDIAS_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_TITLE' | translate"></div>
         <div class="panel-body">
 
-          <form novalidate>
+          <form novalidate ng-submit="saveMediasSettings();">
             <div class="form-group">
               <label for="media-default-owner" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER' | translate"></label>
               <select
                       ng-model="mediasSettings.owner"
                       ng-options="option.name for option in mediasSettings.availableOwners track by option.value"
                       ng-disabled="!rights.edit"
-                      ng-changed="saveMediasSettings();"
                       class="form-control"
                       id="media-default-owner"
               ></select>
@@ -43,10 +42,17 @@
                       ng-model="mediasSettings.group"
                       ng-options="option.name for option in mediasSettings.availableGroups track by option.value"
                       ng-disabled="!rights.edit"
-                      ng-changed="saveMediasSettings();"
                       class="form-control"
                       id="media-default-group"
               ></select>
+            </div>
+            <div ng-if="rights.edit" class="text-right">
+              <button
+                      class="btn btn-primary"
+                      type="submit"
+                      ng-disabled="mediasSettings.isFormSaving"
+                      ng-bind="'CORE.UI.FORM_SAVE' | translate"
+              ></button>
             </div>
           </form>
 

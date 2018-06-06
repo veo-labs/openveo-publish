@@ -9,6 +9,7 @@
 - The date field of a video has been transformed into a date / time field to be able to also specify the time of the video
 - Add a new custom property type *dateTime* to store a date time
 - Add support for TLS as a media platform like Vimeo, Wowza and Youtube
+- Configuration page no longer save settings on each modification, a button has been added to do it manually
 
 ## BUG FIXES
 
