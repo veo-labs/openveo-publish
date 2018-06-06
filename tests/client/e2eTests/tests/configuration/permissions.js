@@ -53,7 +53,7 @@ describe('Configuration page', function() {
     });
 
     it('should not have link to associate a Youtube account', function() {
-      assert.eventually.notOk(page.youtubePeerLinkElement.isPresent());
+      assert.isRejected(page.getYoutubePeerLink());
     });
 
   });

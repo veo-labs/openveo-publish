@@ -33,19 +33,14 @@ describe('Configuration page translations', function() {
         assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CONFIGURATION.INFO);
 
         // Youtube block title
-        page.youtubeConfigurationTitleElement.getText().then(function(title) {
-          assert.equal(title, page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE.toUpperCase());
-        });
-        page.setMouseOverYoutubeTitle();
-        page.popoverElement.getAttribute('content').then(function(text) {
-
-          // Spaces in popover are replaced by no-break space charaters
-          assert.equal(text.replace(/\u00A0/g, ' '), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_INFO);
-
-        });
+        assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE));
+        assert.eventually.equal(
+          page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_INFO
+        );
 
         // Youtube block with no associated account
-        assert.eventually.equal(page.getYoutubeBlockText(),
+        assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
                              );
@@ -62,8 +57,10 @@ describe('Configuration page translations', function() {
           }
         }]);
         page.refresh();
-        assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());
-        assert.eventually.equal(page.getYoutubeBlockText(),
+
+
+        assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER);
+        assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
                                 page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
                                 page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
                                );

@@ -16,9 +16,6 @@ function ConfigurationPage() {
   // Element finders specific to this page
   this.pageTitleElement = element(by.binding('PUBLISH.CONFIGURATION.TITLE'));
   this.pageDescriptionElement = element(by.binding('PUBLISH.CONFIGURATION.INFO'));
-  this.youtubeConfigurationTitleElement = element(by.binding('PUBLISH.CONFIGURATION.YOUTUBE_TITLE'));
-  this.youtubePeerLinkElement = element(by.binding('\'PUBLISH.CONFIGURATION.YOUTUBE_PEER\''));
-  this.youtubePeerModifyLinkElement = element(by.binding('PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER'));
 }
 
 module.exports = ConfigurationPage;
@@ -34,24 +31,80 @@ ConfigurationPage.prototype.onLoaded = function() {
 };
 
 /**
- * Moves mouse over Youtube's configuration block title.
+ * Gets a panel.
  *
- * @return {Promise} Promise resolving when mouse is over the title
+ * @param {String} name The title of the panel
+ * @return {Promise} Promise resolving with the panel (element finder)
  */
-ConfigurationPage.prototype.setMouseOverYoutubeTitle = function() {
-  return browser.actions().mouseMove(this.youtubeConfigurationTitleElement).perform();
+ConfigurationPage.prototype.getPanel = function(name) {
+  var panelElement;
+  var deferred = protractor.promise.defer();
+
+  // Get all panel headings
+  element.all(by.css('.panel-heading')).each(function(panelHeading, index) {
+
+    // Get panel title
+    panelHeading.getText().then(function(text) {
+
+      // Panel title corresponds to the searched title
+      // Return parent element
+      if (text.replace(/ ?[\*:]?$/, '') === name.toUpperCase())
+        panelElement = panelHeading.element(by.xpath('..'));
+
+    });
+  }).then(function() {
+    if (panelElement)
+      deferred.fulfill(panelElement);
+    else
+      deferred.reject(new Error('"' + name + '" panel not found'));
+  }, function(error) {
+    deferred.reject(new Error('"' + name + '" panel not found (' + error.message + ')'));
+  });
+
+  return deferred.promise;
 };
 
 /**
- * Gets Youtube block content as text.
+ * Gets panel information popover.
  *
- * @return {Promise} Promise resolving with block text
+ * @param {String} name The title of the panel
+ * @return {Promise} Promise resolving with the panel information text
  */
-ConfigurationPage.prototype.getYoutubeBlockText = function() {
+ConfigurationPage.prototype.getPanelInformation = function(name) {
   var self = this;
 
-  return browser.waitForAngular().then(function() {
-    var blockElement = self.youtubeConfigurationTitleElement.element(by.xpath('..')).element(by.css('.panel-body'));
-    return blockElement.getText();
+  return this.getPanel(name).then(function(panelElement) {
+    browser.actions().mouseMove(panelElement.element(by.css('.panel-heading'))).perform();
+    return self.popoverElement.getAttribute('content');
+  }).then(function(panelTitle) {
+
+    // Spaces in popover are replaced by no-break space charaters
+    return protractor.promise.fulfilled(panelTitle.replace(/\u00A0/g, ' '));
+
+  });
+};
+
+/**
+ * Gets panel body text.
+ *
+ * @param {String} name The title of the panel
+ * @return {Promise} Promise resolving with the panel text
+ */
+ConfigurationPage.prototype.getPanelText = function(name) {
+  return this.getPanel(name).then(function(panelElement) {
+    return panelElement.element(by.css('.panel-body')).getText();
+  });
+};
+
+/**
+ * Gets Youtube peer link.
+ *
+ * @return {Promise} Promise resolving with Youtube panel peer link
+ */
+ConfigurationPage.prototype.getYoutubePeerLink = function(name) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE).then(function(panelElement) {
+    return panelElement.element(by.css('a')).getText();
   });
 };

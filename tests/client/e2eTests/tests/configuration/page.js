@@ -45,15 +45,15 @@ describe('Configuration page', function() {
     assert.eventually.ok(page.pageDescriptionElement.isPresent());
   });
 
-  describe('Youtube block', function() {
+  describe('Youtube', function() {
 
     it('should display configuration block', function() {
-      assert.eventually.ok(page.youtubeConfigurationTitleElement.isPresent());
+      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE));
     });
 
     it('should display a specific message and link if no Google account is associated', function() {
-      assert.eventually.ok(page.youtubePeerLinkElement.isPresent());
-      assert.eventually.equal(page.getYoutubeBlockText(),
+      assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER);
+      assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
                              );
@@ -73,8 +73,8 @@ describe('Configuration page', function() {
       }]);
       page.refresh();
 
-      assert.eventually.ok(page.youtubePeerModifyLinkElement.isPresent());
-      assert.eventually.equal(page.getYoutubeBlockText(),
+      assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER);
+      assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
                               page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
                              );
