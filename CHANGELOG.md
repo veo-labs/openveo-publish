@@ -10,6 +10,7 @@
 - Add a new custom property type *dateTime* to store a date time
 - Add support for TLS as a media platform like Vimeo, Wowza and Youtube
 - Configuration page no longer save settings on each modification, a button has been added to do it manually
+- User without the permission to edit the configuration page won't see configuration page formulars anymore but simple non editable information
 
 ## BUG FIXES
 

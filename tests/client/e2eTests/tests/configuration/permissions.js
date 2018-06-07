@@ -3,6 +3,7 @@
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
+var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
@@ -11,10 +12,18 @@ chai.use(chaiAsPromised);
 
 describe('Configuration page', function() {
   var page;
+  var configurationHelper;
+  var defaultSettings;
 
   // Prepare page
   before(function() {
+    var coreApi = process.api.getCoreApi();
+    configurationHelper = new ConfigurationHelper(coreApi.settingProvider);
     page = new ConfigurationPage();
+    page.logAsAdmin();
+    configurationHelper.getEntities().then(function(settings) {
+      defaultSettings = settings;
+    });
   });
 
   // Logout after tests
@@ -47,8 +56,9 @@ describe('Configuration page', function() {
       page.load();
     });
 
-    // Reload page after each test
+    // Remove all entities added during tests and reload page after each test
     afterEach(function() {
+      configurationHelper.removeAllEntities(defaultSettings);
       page.refresh();
     });
 
@@ -56,13 +66,38 @@ describe('Configuration page', function() {
       assert.isRejected(page.getYoutubePeerLink());
     });
 
-    it('should not be able to edit medias settings', function() {
-      var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
-      var expectedGroup = datas.groups.publishGroup1;
+    describe('Medias', function() {
 
-      assert.isRejected(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+      it('should not be able to edit settings', function() {
+        var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
+        var expectedGroup = datas.groups.publishGroup1;
+
+        assert.isRejected(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+      });
+
+      it('should display settings as literals', function() {
+        var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
+        var expectedGroup = datas.groups.publishGroup1;
+        configurationHelper.addEntities([{
+          id: 'publish-medias',
+          value: {
+            owner: expectedOwner.id,
+            group: 'publishGroup1'
+          }
+        }]);
+
+        page.refresh();
+
+        assert.eventually.equal(page.getMediasDefaultOwner(true), expectedOwner.name);
+        assert.eventually.equal(page.getMediasDefaultGroup(true), expectedGroup.name);
+      });
+
+      it('should display a generic text if no values', function() {
+        assert.eventually.equal(page.getMediasDefaultOwner(true), page.translations.CORE.UI.NONE);
+        assert.eventually.equal(page.getMediasDefaultGroup(true), page.translations.CORE.UI.NONE);
+      });
+
     });
 
   });
-
 });

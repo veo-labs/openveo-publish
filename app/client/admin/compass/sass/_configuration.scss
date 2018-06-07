@@ -2,4 +2,16 @@
   label {
     font-weight: normal;
   }
+
+  .literal {
+    font-weight: bold;
+  }
+
+  /* Only display field literals in red if on error */
+  .formly-field .editable-empty {
+    color: #000000;
+  }
+  .formly-field .has-error .editable-empty {
+    color: #a94442;
+  }
 }

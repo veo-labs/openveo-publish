@@ -5,57 +5,56 @@
   /**
    * Defines the configuration controller for the configuration page.
    */
-  function ConfigurationController($scope, publishConf, publishService, utilService, $filter, groups, users) {
+  function ConfigurationController(
+  $scope,
+  publishConf,
+  publishService,
+  utilService,
+  $filter,
+  groups,
+  users
+  ) {
     var publishMedias = publishConf.data.publishMedias;
 
-    /**
-     * Gets the name of a group.
-     *
-     * @param {String} id The id of the group
-     * @return {String} The name of the group
-     */
-    function getGroupName(id) {
-      for (var i = 0; i < groups.data.entities.length; i++) {
-        if (groups.data.entities[i].id === id)
-          return groups.data.entities[i].name;
-      }
-      return null;
-    }
-
-    /**
-     * Gets the name of a user.
-     *
-     * @param {String} id The id of the user
-     * @return {String} The name of the user
-     */
-    function getUserName(id) {
-      for (var i = 0; i < groups.data.entities.length; i++) {
-        if (users.data.entities[i].id === id)
-          return users.data.entities[i].name;
-      }
-      return null;
-    }
+    $scope.rights = {};
+    $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
 
     // Youtube settings
     $scope.youtubeConf = publishConf.data.youtube;
 
     // Medias settings
     $scope.mediasSettings = {
-      owner: {
-        name: getUserName(publishMedias && publishMedias.owner),
-        value: publishMedias && publishMedias.owner
+      model: {
+        owner: publishMedias && publishMedias.owner,
+        group: publishMedias && publishMedias.group
       },
-      group: {
-        name: getGroupName(publishMedias && publishMedias.group),
-        value: publishMedias && publishMedias.group
+      fields: [
+        {
+          key: 'owner',
+          type: 'editableSelect',
+          wrapper: 'editableWrapper',
+          templateOptions: {
+            label: $filter('translate')('PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER'),
+            options: utilService.buildSelectOptions(users.data.entities)
+          }
+        },
+        {
+          key: 'group',
+          type: 'editableSelect',
+          wrapper: 'editableWrapper',
+          templateOptions: {
+            label: $filter('translate')('PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP'),
+            options: utilService.buildSelectOptions(groups.data.entities)
+          }
+        }
+      ],
+      options: {
+        formState: {
+          showForm: $scope.rights.edit
+        }
       },
-      availableOwners: utilService.buildSelectOptions(users.data.entities),
-      availableGroups: utilService.buildSelectOptions(groups.data.entities),
       isFormSaving: false
     };
-
-    $scope.rights = {};
-    $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
 
     /**
      * Saves medias settings.
@@ -64,8 +63,8 @@
       $scope.mediasSettings.isFormSaving = true;
 
       return publishService.saveMediasSettings({
-        owner: $scope.mediasSettings.owner.value,
-        group: $scope.mediasSettings.group.value
+        owner: $scope.mediasSettings.model.owner,
+        group: $scope.mediasSettings.model.group
       }).then(function() {
         $scope.mediasSettings.isFormSaving = false;
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);

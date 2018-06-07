@@ -135,26 +135,34 @@ ConfigurationPage.prototype.getMediasSettingsFields = function(panelElement) {
 /**
  * Gets medias default owner.
  *
+ * @param {Boolean} literal true to get the literal instead, false to get field value
  * @return {Promise} Promise resolving with medias default owner
  */
-ConfigurationPage.prototype.getMediasDefaultOwner = function() {
+ConfigurationPage.prototype.getMediasDefaultOwner = function(literal) {
   var self = this;
 
   return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
-    return self.getMediasSettingsFields(panelElement).owner.getValue();
+    if (literal)
+      return self.getMediasSettingsFields(panelElement).owner.getText();
+    else
+      return self.getMediasSettingsFields(panelElement).owner.getValue();
   });
 };
 
 /**
  * Gets medias default group.
  *
+ * @param {Boolean} literal true to get the literal instead, false to get field value
  * @return {Promise} Promise resolving with medias default group
  */
-ConfigurationPage.prototype.getMediasDefaultGroup = function() {
+ConfigurationPage.prototype.getMediasDefaultGroup = function(literal) {
   var self = this;
 
   return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
-    return self.getMediasSettingsFields(panelElement).group.getValue();
+    if (literal)
+      return self.getMediasSettingsFields(panelElement).group.getText();
+    else
+      return self.getMediasSettingsFields(panelElement).group.getValue();
   });
 };
 
