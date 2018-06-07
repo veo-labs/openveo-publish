@@ -107,9 +107,10 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
     }
 
   ], function(error, results) {
-    if (error)
+    if (error) {
+      process.logger.error(error.message, {error: error, method: 'getConfigurationAllAction'});
       next(HTTP_ERRORS.GET_CONFIGURATION_ERROR);
-    else
+    } else
       response.send(configurations);
   });
 };
