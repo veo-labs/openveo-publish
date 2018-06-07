@@ -133,6 +133,24 @@ ConfigurationPage.prototype.getMediasSettingsFields = function(panelElement) {
 };
 
 /**
+ * Gets fields of the TLS settings form.
+ *
+ * @param {Object} panelElement The panel element finder
+ * @param {Array} propertiesAvailableOptions The available options for properties field
+ * @return {Object} The list of fields
+ */
+ConfigurationPage.prototype.getTlsSettingsFields = function(panelElement, propertiesAvailableOptions) {
+  return {
+    properties: Field.get({
+      type: 'tags',
+      name: this.translations.PUBLISH.CONFIGURATION.TLS_PROPERTIES,
+      baseElement: panelElement,
+      availableOptions: propertiesAvailableOptions
+    })
+  };
+};
+
+/**
  * Gets medias default owner.
  *
  * @param {Boolean} literal true to get the literal instead, false to get field value
@@ -180,6 +198,46 @@ ConfigurationPage.prototype.editMediasSettings = function(owner, group) {
     var fields = self.getMediasSettingsFields(panelElement);
     fields.owner.setValue(owner);
     fields.group.setValue(group);
+    return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));
+  });
+};
+
+/**
+ * Gets TLS properties.
+ *
+ * @param {Boolean} literal true to get the literal instead, false to get field value
+ * @return {Promise} Promise resolving with the list of TLS properties
+ */
+ConfigurationPage.prototype.getTlsProperties = function(literal) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.TLS_TITLE).then(function(panelElement) {
+    if (literal)
+      return self.getTlsSettingsFields(panelElement).properties.getText();
+    else
+      return self.getTlsSettingsFields(panelElement).properties.getValue();
+  });
+};
+
+/**
+ * Sets TLS settings.
+ *
+ * @param {Array} properties The list of property names
+ * @param {Boolean} useAutoCompletion true to use auto completion to add properties, false to set properties manually
+ * @param {Array} propertiesAvailableOptions The list of available options for properties field
+ * @return {Promise} Promise resolving when TLS settings have been saved
+ */
+ConfigurationPage.prototype.editTlsSettings = function(properties, useAutoCompletion, propertiesAvailableOptions) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.TLS_TITLE).then(function(panelElement) {
+    var fields = self.getTlsSettingsFields(panelElement, propertiesAvailableOptions);
+
+    if (useAutoCompletion)
+      fields.properties.setValueUsingAutoCompletion(properties);
+    else
+      fields.properties.setValue(properties);
+
     return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));
   });
 };

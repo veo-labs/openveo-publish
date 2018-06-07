@@ -516,6 +516,32 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Getting custom properties failed while saving TLS settings.
+   *
+   * @property SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR
+   * @type Object
+   * @final
+   */
+  SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR: {
+    code: 0x026,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Saving TLS settings failed.
+   *
+   * @property SAVE_TLS_SETTINGS_ERROR
+   * @type Object
+   * @final
+   */
+  SAVE_TLS_SETTINGS_ERROR: {
+    code: 0x027,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -1106,6 +1132,32 @@ var HTTP_ERRORS = {
    */
   GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS: {
     code: 0x222,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Saving TLS settings failed, wrong parameters.
+   *
+   * @property SAVE_TLS_SETTINGS_WRONG_PARAMETERS
+   * @type Object
+   * @final
+   */
+  SAVE_TLS_SETTINGS_WRONG_PARAMETERS: {
+    code: 0x223,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Saving TLS settings failed, one or more custom properties do not exist.
+   *
+   * @property SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER
+   * @type Object
+   * @final
+   */
+  SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER: {
+    code: 0x224,
     httpCode: 400,
     module: 'publish'
   },

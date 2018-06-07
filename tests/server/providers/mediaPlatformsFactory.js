@@ -1,6 +1,8 @@
 'use strict';
 
+var path = require('path');
 var util = require('util');
+var mock = require('mock-require');
 var assert = require('chai').assert;
 
 // factory.js
@@ -26,6 +28,7 @@ describe('Media platforms factory', function() {
     VimeoProvider = process.requirePublish('app/server/providers/mediaPlatforms/VimeoProvider.js');
     WowzaProvider = process.requirePublish('app/server/providers/mediaPlatforms/WowzaProvider.js');
     LocalProvider = process.requirePublish('app/server/providers/mediaPlatforms/LocalProvider.js');
+    mock.reRequire(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/youtube/GoogleOAuthHelper.js'));
   });
 
   // Mocks

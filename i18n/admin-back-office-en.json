@@ -198,6 +198,9 @@
     "MEDIAS_TITLE": "Medias",
     "MEDIAS_INFO": "Define default values for some media properties which will be attributed to newly uploaded medias.",
     "MEDIAS_DEFAULT_OWNER": "Default medias owner",
-    "MEDIAS_DEFAULT_GROUP": "Default medias group"
+    "MEDIAS_DEFAULT_GROUP": "Default medias group",
+    "TLS_TITLE": "TLS",
+    "TLS_INFO": "Configure how OpenVeo interacts with TLS platform.",
+    "TLS_PROPERTIES": "Custom properties to send to TLS"
   }
 }

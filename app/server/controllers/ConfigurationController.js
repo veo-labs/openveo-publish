@@ -9,6 +9,7 @@ var path = require('path');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var GoogleOAuthHelper = process.requirePublish('app/server/providers/mediaPlatforms/youtube/GoogleOAuthHelper.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
 var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
@@ -84,7 +85,27 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
           callback();
         }
       );
+    },
+
+    // Get TLS configuration
+    function(callback) {
+      if (!videoPlatformConf['tls']) return callback();
+
+      configurations['publishTls'] = {};
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-tls'),
+        null,
+        function(error, tlsSettings) {
+          if (error) return callback(error);
+
+          configurations['publishTls'] = tlsSettings && tlsSettings.value;
+          callback();
+        }
+      );
     }
+
   ], function(error, results) {
     if (error)
       next(HTTP_ERRORS.GET_CONFIGURATION_ERROR);
@@ -176,6 +197,113 @@ ConfigurationController.prototype.saveMediasSettings = function(request, respons
 
     // Missing body
     next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS);
+
+  }
+};
+
+/**
+ * Saves TLS settings.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "settings" : {
+ *         "properties": ... // The list of custom property ids
+ *       },
+ *       "total": 1
+ *     }
+ *
+ * @method saveTlsSettingsAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {String} request.body.properties The list of custom property ids
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.saveTlsSettingsAction = function(request, response, next) {
+  if (request.body) {
+    var coreApi = process.api.getCoreApi();
+    var settingProvider = coreApi.settingProvider;
+    var customProperties;
+    var parsedBody;
+
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        properties: {type: 'array<string>'}
+      });
+    } catch (error) {
+      return next(HTTP_ERRORS.SAVE_TLS_SETTINGS_WRONG_PARAMETERS);
+    }
+
+    if (!parsedBody.properties) parsedBody.properties = [];
+
+    async.series([
+
+      // Get the list of custom properties
+      function(callback) {
+        var database = coreApi.getDatabase();
+        var propertyProvider = new PropertyProvider(database);
+
+        propertyProvider.getAll(null, null, {id: 'desc'}, function(error, properties) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'saveTlsSettings'});
+            return callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR);
+          }
+
+          customProperties = properties;
+          callback();
+        });
+      },
+
+      // Validate custom properties
+      function(callback) {
+        for (var i = 0; i < parsedBody.properties.length; i++) {
+          var found = false;
+
+          for (var j = 0; j < customProperties.length; j++) {
+            if (customProperties[j].id === parsedBody.properties[i]) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) return callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER);
+        }
+
+        callback();
+      },
+
+      // Save settings
+      function(callback) {
+        settingProvider.add(
+          [
+            {
+              id: 'publish-tls',
+              value: parsedBody
+            }
+          ],
+          function(error, total, settings) {
+            if (error) {
+              process.logger.error(error.message, {error: error, method: 'saveTlsSettingsAction'});
+              callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_ERROR);
+            } else {
+              callback(null, total, settings);
+            }
+          }
+        );
+      }
+
+    ], function(error, results) {
+      if (error) return next(error);
+      response.send({settings: results[2][1][0].value, total: results[2][0]});
+    });
+
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SAVE_TLS_SETTINGS_MISSING_PARAMETERS);
 
   }
 };

@@ -2,8 +2,10 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
@@ -13,12 +15,15 @@ chai.use(chaiAsPromised);
 describe('Configuration page', function() {
   var page;
   var configurationHelper;
+  var propertyHelper;
   var defaultSettings;
 
   // Prepare page
   before(function() {
     var coreApi = process.api.getCoreApi();
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     configurationHelper = new ConfigurationHelper(coreApi.settingProvider);
+    propertyHelper = new PropertyHelper(propertyProvider);
     page = new ConfigurationPage();
     page.logAsAdmin();
     configurationHelper.getEntities().then(function(settings) {
@@ -59,6 +64,7 @@ describe('Configuration page', function() {
     // Remove all entities added during tests and reload page after each test
     afterEach(function() {
       configurationHelper.removeAllEntities(defaultSettings);
+      propertyHelper.removeAllEntities();
       page.refresh();
     });
 
@@ -99,5 +105,61 @@ describe('Configuration page', function() {
 
     });
 
+    describe('TLS', function() {
+
+      it('should not be able to edit settings', function() {
+        var customPropertiesToAdd = [
+          {
+            id: 'tls-property-1',
+            name: 'TLS property 1',
+            description: 'TLS property 1 description',
+            type: PropertyProvider.TYPES.TEXT
+          }
+        ];
+        propertyHelper.addEntities(customPropertiesToAdd);
+
+        page.refresh();
+
+        assert.isRejected(page.editMediasSettings([customPropertiesToAdd[0].name]));
+      });
+
+      it('should display settings as literals', function() {
+        var customPropertiesToAdd = [
+          {
+            id: 'tls-property-1',
+            name: 'TLS property 1',
+            description: 'TLS property 1 description',
+            type: PropertyProvider.TYPES.TEXT
+          },
+          {
+            id: 'tls-property-2',
+            name: 'TLS property 2',
+            description: 'TLS property 2 description',
+            type: PropertyProvider.TYPES.TEXT
+          }
+        ];
+        propertyHelper.addEntities(customPropertiesToAdd);
+        configurationHelper.addEntities([{
+          id: 'publish-tls',
+          value: {
+            properties: [customPropertiesToAdd[0].id, customPropertiesToAdd[1].id]
+          }
+        }]);
+
+        page.refresh();
+
+        assert.eventually.equal(
+          page.getTlsProperties(true),
+          [customPropertiesToAdd[0].name, customPropertiesToAdd[1].name].join(', ')
+        );
+      });
+
+      it('should display a generic text if no values', function() {
+        assert.eventually.equal(page.getTlsProperties(true), page.translations.CORE.UI.EMPTY);
+      });
+
+    });
+
   });
+
 });

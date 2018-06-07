@@ -232,6 +232,17 @@
     }
 
     /**
+     * Saves TLS settings.
+     *
+     * @method saveTlsSettings
+     * @param {Object} data The TLS settings
+     * @return {HttpPromise} The HTTP promise
+     */
+    function saveTlsSettings(data) {
+      return $http.post(basePath + 'publish/configuration/tls/', data);
+    }
+
+    /**
      * Updates a chapter associated to the specified media.
      *
      * @method updateChapter
@@ -387,6 +398,7 @@
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
       saveMediasSettings: saveMediasSettings,
+      saveTlsSettings: saveTlsSettings,
       updateTag: updateTag,
       updateChapter: updateChapter,
       removeTags: removeTags,

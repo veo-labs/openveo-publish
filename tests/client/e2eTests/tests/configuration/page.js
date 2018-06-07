@@ -2,8 +2,10 @@
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var ConfigurationHelper = process.requirePublish('tests/client/e2eTests/helpers/ConfigurationHelper.js');
+var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 
 // Load assertion library
@@ -13,12 +15,15 @@ chai.use(chaiAsPromised);
 describe('Configuration page', function() {
   var page;
   var configurationHelper;
+  var propertyHelper;
   var defaultSettings;
 
   // Prepare page
   before(function() {
     var coreApi = process.api.getCoreApi();
+    var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     configurationHelper = new ConfigurationHelper(coreApi.settingProvider);
+    propertyHelper = new PropertyHelper(propertyProvider);
     page = new ConfigurationPage();
     page.logAsAdmin();
     configurationHelper.getEntities().then(function(settings) {
@@ -35,6 +40,7 @@ describe('Configuration page', function() {
   // Reload page after each test and remove all configurations
   afterEach(function() {
     configurationHelper.removeAllEntities(defaultSettings);
+    propertyHelper.removeAllEntities();
     page.refresh();
   });
 
@@ -131,6 +137,125 @@ describe('Configuration page', function() {
       page.refresh();
       assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
       assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+    });
+
+  });
+
+  describe('TLS', function() {
+
+    it('should display configuration panel', function() {
+      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.TLS_TITLE));
+    });
+
+    it('should not display custom properties by default', function() {
+      assert.eventually.deepEqual(page.getTlsProperties(), []);
+    });
+
+    it('should display actual properties if specified', function() {
+      var expectedPropertyId = 'tls-property';
+      var expectedPropertyName = 'TLS property';
+      propertyHelper.addEntities([
+        {
+          id: expectedPropertyId,
+          name: expectedPropertyName,
+          description: 'TLS property description',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ]);
+      configurationHelper.addEntities([{
+        id: 'publish-tls',
+        value: {
+          properties: [expectedPropertyId]
+        }
+      }]);
+
+      page.refresh();
+
+      assert.eventually.deepEqual(page.getTlsProperties(), [expectedPropertyName]);
+    });
+
+    it('should be able to change the properties', function() {
+      var customPropertiesToAdd = [
+        {
+          id: 'tls-property-1',
+          name: 'TLS property 1',
+          description: 'TLS property 1 description',
+          type: PropertyProvider.TYPES.TEXT
+        },
+        {
+          id: 'tls-property-2',
+          name: 'TLS property 2',
+          description: 'TLS property 2 description',
+          type: PropertyProvider.TYPES.LIST
+        }
+      ];
+      propertyHelper.addEntities(customPropertiesToAdd);
+      page.refresh();
+
+      assert.isFulfilled(page.editTlsSettings([customPropertiesToAdd[0].name, customPropertiesToAdd[1].name]));
+      assert.eventually.deepEqual(
+        page.getTlsProperties(),
+        [customPropertiesToAdd[0].name, customPropertiesToAdd[1].name]
+      );
+
+      page.refresh();
+
+      assert.eventually.deepEqual(
+        page.getTlsProperties(),
+        [customPropertiesToAdd[0].name, customPropertiesToAdd[1].name]
+      );
+    });
+
+    it('should be able to set no properties', function() {
+      var customPropertiesToAdd = [
+        {
+          id: 'tls-property-1',
+          name: 'TLS property 1',
+          description: 'TLS property 1 description',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      propertyHelper.addEntities(customPropertiesToAdd);
+      configurationHelper.addEntities([{
+        id: 'publish-tls',
+        value: {
+          properties: [customPropertiesToAdd[0].id]
+        }
+      }]);
+
+      page.refresh();
+
+      assert.isFulfilled(page.editTlsSettings([]));
+      assert.eventually.isEmpty(page.getTlsProperties());
+
+      page.refresh();
+
+      assert.eventually.isEmpty(page.getTlsProperties());
+    });
+
+    it('should be able to set properties using auto completion', function() {
+      var customPropertiesToAdd = [
+        {
+          id: 'tls-property-1',
+          name: 'TLS property 1',
+          description: 'TLS property 1 description',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      var availableCustomProperties = [{
+        name: customPropertiesToAdd[0].name,
+        value: customPropertiesToAdd[0].name
+      }];
+      propertyHelper.addEntities(customPropertiesToAdd);
+
+      page.refresh();
+
+      assert.isFulfilled(page.editTlsSettings([customPropertiesToAdd[0].name], true, availableCustomProperties));
+      assert.eventually.deepEqual(page.getTlsProperties(), [customPropertiesToAdd[0].name]);
+
+      page.refresh();
+
+      assert.eventually.deepEqual(page.getTlsProperties(), [customPropertiesToAdd[0].name]);
     });
 
   });

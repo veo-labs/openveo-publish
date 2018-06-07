@@ -3,12 +3,13 @@
 ## BREAKING CHANGES
 
 - Web service endpoint GET /videos now validates the *properties* parameter, note that custom properties of type "Date time" accept either a timestamp or a literal date
+- OpenVeo Publish now requires OpenVeo Core 5.1.0
 
 ## NEW FEATURES
 
 - The date field of a video has been transformed into a date / time field to be able to also specify the time of the video
 - Add a new custom property type *dateTime* to store a date time
-- Add support for TLS as a media platform like Vimeo, Wowza and Youtube
+- Add support for TLS as a media platform like Vimeo, Wowza and Youtube. Custom properties that should be sent to TLS can be configured in configuraton page
 - Configuration page no longer save settings on each modification, a button has been added to do it manually
 - User without the permission to edit the configuration page won't see configuration page formulars anymore but simple non editable information
 

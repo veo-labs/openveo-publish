@@ -75,6 +75,25 @@ describe('Configuration page translations', function() {
   }
 
   /**
+   * Validates TLS settings translations.
+   */
+  function checkTlsSettings() {
+
+    // TLS panel title
+    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.TLS_TITLE));
+    assert.eventually.equal(
+      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.TLS_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.TLS_INFO
+    );
+
+    // TLS formular button
+    page.getPanel(page.translations.PUBLISH.CONFIGURATION.TLS_TITLE).then(function(panelElement) {
+      assert.eventually.ok(panelElement.element(by.binding('CORE.UI.FORM_SAVE')).isPresent());
+    });
+
+  }
+
+  /**
    * Checks translations.
    *
    * @param {Number} [index] Index of the language to test in the list of languages
@@ -94,6 +113,7 @@ describe('Configuration page translations', function() {
 
         checkYoutubeSettings();
         checkMediasSettings();
+        checkTlsSettings();
 
         configurationHelper.removeAllEntities(defaultSettings);
         page.refresh();
