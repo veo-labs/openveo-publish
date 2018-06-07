@@ -126,6 +126,13 @@ describe('Configuration page', function() {
       assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
     });
 
+    it('should be able to set no default owner nor group', function() {
+      page.editMediasSettings(page.translations.CORE.UI.NONE, page.translations.CORE.UI.NONE);
+      page.refresh();
+      assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+    });
+
   });
 
 });

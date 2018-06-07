@@ -25,8 +25,8 @@
     // Medias settings
     $scope.mediasSettings = {
       model: {
-        owner: publishMedias && publishMedias.owner,
-        group: publishMedias && publishMedias.group
+        owner: (publishMedias && publishMedias.owner) || null,
+        group: (publishMedias && publishMedias.group) || null
       },
       fields: [
         {
@@ -63,8 +63,8 @@
       $scope.mediasSettings.isFormSaving = true;
 
       return publishService.saveMediasSettings({
-        owner: $scope.mediasSettings.model.owner,
-        group: $scope.mediasSettings.model.group
+        owner: $scope.mediasSettings.model.owner || undefined,
+        group: $scope.mediasSettings.model.group || undefined
       }).then(function() {
         $scope.mediasSettings.isFormSaving = false;
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);

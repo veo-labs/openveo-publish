@@ -148,8 +148,8 @@ ConfigurationController.prototype.saveMediasSettings = function(request, respons
 
     try {
       parsedBody = utilExt.shallowValidateObject(request.body, {
-        owner: {type: 'string', required: true},
-        group: {type: 'string', required: true}
+        owner: {type: 'string'},
+        group: {type: 'string'}
       });
 
     } catch (error) {
