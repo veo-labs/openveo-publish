@@ -476,13 +476,13 @@ Package.prototype.uploadMedia = function() {
 
   this.updateState(this.mediaPackage.id, STATES.UPLOADING, function() {
 
-    // Get video plaform provider from package type
-    var videoPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
+    // Get media plaform provider from package type
+    var mediaPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
       self.videoPlatformConf[self.mediaPackage.type]);
 
     // Start uploading the media to the platform
     process.logger.debug('Upload media ' + self.mediaPackage.id);
-    videoPlatformProvider.upload(self.getMediaFilePath(), function(error, mediaId) {
+    mediaPlatformProvider.upload(self.getMediaFilePath(), function(error, mediaId) {
       if (error)
         self.setError(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
       else {
@@ -522,13 +522,13 @@ Package.prototype.configureMedia = function() {
   this.updateState(this.mediaPackage.id, STATES.CONFIGURING, function() {
 
     // Get media plaform provider from package type
-    var videoPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
+    var mediaPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
       self.videoPlatformConf[self.mediaPackage.type]);
 
     var mediaId = self.mediaPackage.mediaId[self.mediaPackage.mediaId.length];
 
     // Configure media
-    videoPlatformProvider.configure(mediaId, function(error) {
+    mediaPlatformProvider.configure(mediaId, function(error) {
       if (error)
         self.setError(new PackageError(error.message, ERRORS.MEDIA_CONFIGURE));
       else

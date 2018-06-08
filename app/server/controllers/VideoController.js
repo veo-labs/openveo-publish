@@ -250,15 +250,15 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
         });
       }
 
-      // Get information about the video from the video platform
-      var videoPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
+      // Get information about the media from the medias platform
+      var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
       var expectedDefinition = media.metadata['profile-settings']['video-height'];
 
       // Compatibility with old mediaId format
       var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
 
-      // Get video availability and sources
-      videoPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
+      // Get media availability and sources
+      mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
         if (getInfoError) {
           process.logger.error(getInfoError.message, {error: getInfoError, method: 'getVideoReadyAction'});
           return next(HTTP_ERRORS.GET_VIDEO_READY_GET_INFO_ERROR);
@@ -372,15 +372,15 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
           });
         }
 
-        // Get information about the video from the video platform
-        var videoPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
+        // Get information about the media from the medias platform
+        var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
         var expectedDefinition = media.metadata['profile-settings']['video-height'];
 
         // Compatibility with old mediaId format
         var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
 
-        // Get video availability and sources
-        videoPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
+        // Get media availability and sources
+        mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
           if (getInfoError) {
             process.logger.error(getInfoError.message, {error: getInfoError, method: 'getEntityAction'});
             return next(HTTP_ERRORS.GET_MEDIA_GET_INFO_ERROR);

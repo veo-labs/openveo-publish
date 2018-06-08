@@ -139,10 +139,10 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
 
         // verify that media is uploaded before retreiving platformProvider
         if (mediaId.length) {
-          var videoPlatformProvider = mediaPlatformFactory.get(video.type, videoPlatformConf[video.type]);
+          var mediaPlatformProvider = mediaPlatformFactory.get(video.type, videoPlatformConf[video.type]);
 
-          if (videoPlatformProvider)
-            videoPlatformProvider.remove(mediaId, function(error) {
+          if (mediaPlatformProvider)
+            mediaPlatformProvider.remove(mediaId, function(error) {
               if (error) {
                 callback(error);
                 return;

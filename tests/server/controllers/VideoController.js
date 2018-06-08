@@ -36,7 +36,7 @@ describe('VideoController', function() {
   var originalCoreApi;
   var coreApi;
   var plugins;
-  var videoPlatformProvider;
+  var mediaPlatformProvider;
   var fs;
   var superAdminId = '0';
   var anonymousId = '1';
@@ -110,7 +110,7 @@ describe('VideoController', function() {
       publish: function() {}
     };
 
-    videoPlatformProvider = {
+    mediaPlatformProvider = {
       getMediaInfo: function(id, expectedDefinition, callback) {
         callback({});
       }
@@ -118,7 +118,7 @@ describe('VideoController', function() {
 
     mediaPlatformFactory = {
       get: function() {
-        return videoPlatformProvider;
+        return mediaPlatformProvider;
       }
     };
 
@@ -446,7 +446,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
         assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
         callback(null, expectedInfo);
@@ -465,7 +465,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        videoPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
+        mediaPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -495,10 +495,10 @@ describe('VideoController', function() {
       mediaPlatformFactory.get = function(type, configuration) {
         assert.equal(type, expectedMedias[0].type, 'Wrong type');
         assert.strictEqual(configuration, videoPlatformConf[expectedMedias[0].type], 'Wrong configuration');
-        return videoPlatformProvider;
+        return mediaPlatformProvider;
       };
 
-      videoPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
         callback(new Error('Something went wrong'));
       };
 
@@ -689,7 +689,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
         assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
         callback(null, expectedInfo);
@@ -708,7 +708,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        videoPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
+        mediaPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -738,10 +738,10 @@ describe('VideoController', function() {
       mediaPlatformFactory.get = function(type, configuration) {
         assert.equal(type, expectedMedias[0].type, 'Wrong type');
         assert.strictEqual(configuration, videoPlatformConf[expectedMedias[0].type], 'Wrong configuration');
-        return videoPlatformProvider;
+        return mediaPlatformProvider;
       };
 
-      videoPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
         callback(new Error('Something went wrong'));
       };
 
