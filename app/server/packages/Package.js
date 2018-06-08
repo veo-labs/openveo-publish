@@ -12,7 +12,7 @@ var async = require('async');
 var StateMachine = require('javascript-state-machine');
 var openVeoApi = require('@openveo/api');
 var configDir = openVeoApi.fileSystem.getConfDir();
-var videoPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
+var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
@@ -477,7 +477,7 @@ Package.prototype.uploadMedia = function() {
   this.updateState(this.mediaPackage.id, STATES.UPLOADING, function() {
 
     // Get video plaform provider from package type
-    var videoPlatformProvider = videoPlatformFactory.get(self.mediaPackage.type,
+    var videoPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
       self.videoPlatformConf[self.mediaPackage.type]);
 
     // Start uploading the media to the platform
@@ -521,8 +521,8 @@ Package.prototype.configureMedia = function() {
   process.logger.debug('Configure media ' + this.mediaPackage.id);
   this.updateState(this.mediaPackage.id, STATES.CONFIGURING, function() {
 
-    // Get video plaform provider from package type
-    var videoPlatformProvider = videoPlatformFactory.get(self.mediaPackage.type,
+    // Get media plaform provider from package type
+    var videoPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
       self.videoPlatformConf[self.mediaPackage.type]);
 
     var mediaId = self.mediaPackage.mediaId[self.mediaPackage.mediaId.length];

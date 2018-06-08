@@ -9,7 +9,7 @@ var path = require('path');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var shortid = require('shortid');
-var videoPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
+var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
@@ -139,7 +139,7 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
 
         // verify that media is uploaded before retreiving platformProvider
         if (mediaId.length) {
-          var videoPlatformProvider = videoPlatformFactory.get(video.type, videoPlatformConf[video.type]);
+          var videoPlatformProvider = mediaPlatformFactory.get(video.type, videoPlatformConf[video.type]);
 
           if (videoPlatformProvider)
             videoPlatformProvider.remove(mediaId, function(error) {

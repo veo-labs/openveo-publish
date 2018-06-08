@@ -29,7 +29,7 @@ describe('VideoController', function() {
   var PropertyProvider;
   var PublishManager;
   var MultipartParser;
-  var videoPlatformFactory;
+  var mediaPlatformFactory;
   var openVeoApi;
   var videoPlatformConf;
   var publishConf;
@@ -116,7 +116,7 @@ describe('VideoController', function() {
       }
     };
 
-    videoPlatformFactory = {
+    mediaPlatformFactory = {
       get: function() {
         return videoPlatformProvider;
       }
@@ -223,7 +223,7 @@ describe('VideoController', function() {
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), VideoProvider);
     mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
     mock(path.join(process.rootPublish, 'app/server/PublishManager.js'), PublishManager);
-    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), videoPlatformFactory);
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), mediaPlatformFactory);
   });
 
   // Initializes tests
@@ -492,7 +492,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         assert.equal(type, expectedMedias[0].type, 'Wrong type');
         assert.strictEqual(configuration, videoPlatformConf[expectedMedias[0].type], 'Wrong configuration');
         return videoPlatformProvider;
@@ -735,7 +735,7 @@ describe('VideoController', function() {
 
       request.params.id = expectedMedias[0].id;
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         assert.equal(type, expectedMedias[0].type, 'Wrong type');
         assert.strictEqual(configuration, videoPlatformConf[expectedMedias[0].type], 'Wrong configuration');
         return videoPlatformProvider;

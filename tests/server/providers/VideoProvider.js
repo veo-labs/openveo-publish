@@ -18,7 +18,7 @@ chai.use(spies);
 
 describe('VideoProvider', function() {
   var provider;
-  var videoPlatformFactory;
+  var mediaPlatformFactory;
   var openVeoApi;
   var videoPlatformConf;
   var publishConf;
@@ -89,7 +89,7 @@ describe('VideoProvider', function() {
       videoTmpDir: 'tmp'
     };
 
-    videoPlatformFactory = {
+    mediaPlatformFactory = {
       get: function() {
         return {
           remove: function(id, callback) {
@@ -114,7 +114,7 @@ describe('VideoProvider', function() {
     mock('publish/videoPlatformConf.json', videoPlatformConf);
     mock('publish/publishConf.json', publishConf);
     mock('@openveo/api', openVeoApi);
-    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), videoPlatformFactory);
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), mediaPlatformFactory);
   });
 
   // Initializes tests
@@ -803,7 +803,7 @@ describe('VideoProvider', function() {
         callback();
       });
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         return {
           remove: platformRemoveMock
         };
@@ -843,7 +843,7 @@ describe('VideoProvider', function() {
 
       videoPlatformConf[expectedMedias[0].type] = expectedVideoPlatformConfiguration;
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         assert.equal(type, expectedMedias[0].type, 'Wrong type');
         assert.equal(configuration, expectedVideoPlatformConfiguration, 'Wrong configuration');
         return {
@@ -872,7 +872,7 @@ describe('VideoProvider', function() {
         callback();
       });
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         return {
           remove: platformRemoveMock
         };
@@ -917,7 +917,7 @@ describe('VideoProvider', function() {
         callback(expectedError);
       });
 
-      videoPlatformFactory.get = function(type, configuration) {
+      mediaPlatformFactory.get = function(type, configuration) {
         return {
           remove: platformRemoveMock
         };

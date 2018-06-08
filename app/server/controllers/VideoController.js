@@ -17,7 +17,7 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
-var videoPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
+var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var platforms = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
@@ -251,7 +251,7 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
       }
 
       // Get information about the video from the video platform
-      var videoPlatformProvider = videoPlatformFactory.get(media.type, platforms[media.type]);
+      var videoPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
       var expectedDefinition = media.metadata['profile-settings']['video-height'];
 
       // Compatibility with old mediaId format
@@ -373,7 +373,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
         }
 
         // Get information about the video from the video platform
-        var videoPlatformProvider = videoPlatformFactory.get(media.type, platforms[media.type]);
+        var videoPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
         var expectedDefinition = media.metadata['profile-settings']['video-height'];
 
         // Compatibility with old mediaId format
