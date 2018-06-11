@@ -92,10 +92,11 @@ MediaPlatformProvider.prototype.remove = function() {
  * @param {Object} media The media
  * @param {Array} media.mediaId The list of media resource ids
  * @param {Object} data The media datas to update
+ * @param {Boolean} force true to force the update even if datas haven't changed, false otherwise
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-MediaPlatformProvider.prototype.update = function(media, data, callback) {
+MediaPlatformProvider.prototype.update = function(media, data, force, callback) {
   callback();
 };
 

@@ -526,7 +526,7 @@ Package.prototype.synchronizeMedia = function() {
       self.videoPlatformConf[self.mediaPackage.type]);
 
     // Synchronize media
-    mediaPlatformProvider.update(self.mediaPackage, self.mediaPackage, function(error) {
+    mediaPlatformProvider.update(self.mediaPackage, self.mediaPackage, true, function(error) {
       if (error)
         self.setError(new PackageError(error.message, ERRORS.MEDIA_SYNCHRONIZE));
       else

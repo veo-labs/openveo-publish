@@ -113,6 +113,9 @@ describe('VideoController', function() {
     mediaPlatformProvider = {
       getMediaInfo: function(id, expectedDefinition, callback) {
         callback({});
+      },
+      update: function(media, datas, force, callback) {
+        callback();
       }
     };
 
@@ -1227,7 +1230,8 @@ describe('VideoController', function() {
     beforeEach(function() {
       expectedMedias = [
         {
-          id: '42'
+          id: '42',
+          type: 'local'
         }
       ];
       expectedInfo = {
@@ -1504,6 +1508,57 @@ describe('VideoController', function() {
 
       videoController.updateEntityAction(request, response, function(error) {
         assert.equal(error, HTTP_ERRORS.UPDATE_MEDIA_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should synchronize the media with the media platform', function(done) {
+      expectedInfo = {
+        title: 'Media title'
+      };
+      request.body.info = JSON.stringify(expectedInfo);
+      request.params.id = '42';
+
+      MultipartParser.prototype.parse = function(callback) {
+        request.files = {};
+        callback();
+      };
+
+      mediaPlatformProvider.update = chai.spy(function(media, datas, force, callback) {
+        assert.equal(media.id, request.params.id, 'Wrong media id');
+        assert.deepEqual(datas, expectedInfo, 'Wrong datas');
+        callback();
+      });
+
+      mediaPlatformFactory.get = function(type, configuration) {
+        assert.equal(type, expectedMedias[0].type, 'Wrong type');
+        assert.strictEqual(configuration, videoPlatformConf[expectedMedias[0].type], 'Wrong configuration');
+        return mediaPlatformProvider;
+      };
+
+      response.send = function(datas) {
+        done();
+      };
+
+      videoController.updateEntityAction(request, response, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+      });
+    });
+
+    it('should execute next function with an error if synchronizing the media failed', function(done) {
+      request.body.info = JSON.stringify(expectedInfo);
+      request.params.id = '42';
+
+      mediaPlatformProvider.update = chai.spy(function(media, datas, force, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(datas) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      videoController.updateEntityAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.UPDATE_MEDIA_SYNCHRONIZE_ERROR, 'Wrong error');
         done();
       });
     });

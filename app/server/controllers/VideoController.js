@@ -702,6 +702,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 VideoController.prototype.updateEntityAction = function(request, response, next) {
   if (!request.body || !request.params.id) return next(HTTP_ERRORS.UPDATE_MEDIA_MISSING_PARAMETERS);
 
+  var media;
   var totalUpdated;
   var self = this;
   var mediaId = request.params.id;
@@ -730,13 +731,15 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
       // Verify that user has enough privilege to update the media
       function(callback) {
         provider.getOne(
-          new ResourceFilter().equal('id', mediaId), null, function(error, media) {
+          new ResourceFilter().equal('id', mediaId), null, function(error, fetchedMedia) {
             if (error) {
               process.logger.error(error.message, {error: error, method: 'updateEntityAction'});
               return callback(HTTP_ERRORS.UPDATE_MEDIA_GET_ONE_ERROR);
             }
 
-            if (!media) return callback(HTTP_ERRORS.UPDATE_MEDIA_NOT_FOUND_ERROR);
+            if (!fetchedMedia) return callback(HTTP_ERRORS.UPDATE_MEDIA_NOT_FOUND_ERROR);
+
+            media = fetchedMedia;
 
             if (self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE)) {
 
@@ -828,7 +831,22 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
             callback();
           }
         );
+      },
+
+      // Synchronize the media with the media platform
+      function(callback) {
+        var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
+
+        mediaPlatformProvider.update(media, info, false, function(error) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'updateEntityAction', entity: mediaId});
+            return callback(HTTP_ERRORS.UPDATE_MEDIA_SYNCHRONIZE_ERROR);
+          }
+
+          callback();
+        });
       }
+
     ], function(error) {
       if (error) return next(error);
       response.send({total: totalUpdated});
