@@ -4,6 +4,8 @@ var path = require('path');
 var chai = require('chai');
 var mock = require('mock-require');
 var spies = require('chai-spies');
+var api = require('@openveo/api');
+var ResourceFilter = api.storages.ResourceFilter;
 
 var assert = chai.assert;
 chai.should();
@@ -12,10 +14,19 @@ chai.use(spies);
 describe('TlsProvider', function() {
   var TlsClient;
   var TlsProvider;
+  var PropertyProvider;
+  var settingProvider;
   var openVeoApi;
+  var expectedProperties;
+  var expectedSettings;
+  var originalCoreApi;
+  var coreApi;
 
   // Mocks
   beforeEach(function() {
+    expectedProperties = [];
+    expectedSettings = [];
+
     TlsClient = chai.spy(function() {});
     TlsClient.prototype.put = chai.spy(function() {
       return Promise.resolve();
@@ -26,6 +37,24 @@ describe('TlsProvider', function() {
     TlsClient.prototype.delete = chai.spy(function() {
       return Promise.resolve();
     });
+    TlsClient.prototype.patch = chai.spy(function() {
+      return Promise.resolve();
+    });
+
+    PropertyProvider = function() {};
+    PropertyProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      callback(null, expectedProperties);
+    });
+    PropertyProvider.TYPES = {
+      TEXT: 'text',
+      DATE_TIME: 'dateTime'
+    };
+
+    settingProvider = {
+      getOne: chai.spy(function(filter, fields, callback) {
+        callback(null, expectedSettings[0]);
+      })
+    };
 
     openVeoApi = {
       fileSystem: {
@@ -35,10 +64,25 @@ describe('TlsProvider', function() {
         rm: chai.spy(function(resourcePath, callback) {
           callback();
         })
-      }
+      },
+      storages: api.storages
     };
 
+    coreApi = {
+      getCoreApi: function() {
+        return coreApi;
+      },
+      getDatabase: function() {
+        return {};
+      },
+      settingProvider: settingProvider
+    };
+
+    originalCoreApi = process.api;
+    process.api = coreApi;
+
     mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/tls/TlsClient.js'), TlsClient);
+    mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
     mock('@openveo/api', openVeoApi);
   });
 
@@ -52,6 +96,7 @@ describe('TlsProvider', function() {
   // Stop mocks
   afterEach(function() {
     mock.stopAll();
+    process.api = originalCoreApi;
   });
 
   describe('constructor', function() {
@@ -392,6 +437,405 @@ describe('TlsProvider', function() {
         assert.strictEqual(error, expectedError, 'Wrong error');
         TlsClient.prototype.delete.should.have.been.called.exactly(expectedMediaIds.length);
         openVeoApi.fileSystem.rm.should.have.been.called.exactly(expectedMediaIds.length);
+        done();
+      });
+    });
+
+  });
+
+  describe('update', function() {
+    var provider;
+
+    beforeEach(function() {
+      provider = new TlsProvider({
+        nfsPath: '/path/to/nfs/directory/',
+        mediaDirectoryPath: '/media/directory/path/'
+      });
+    });
+
+    it('should update title and properties of the media resources on the platform', function(done) {
+      var count = 0;
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42', 'resource-43']
+      };
+      var expectedDatas = {
+        title: 'Media title',
+        properties: {}
+      };
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: [expectedProperties[0].id]
+          }
+        }
+      ];
+      expectedDatas.properties[expectedProperties[0].id] = 'Property 42 value';
+
+      PropertyProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        assert.deepEqual(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          [expectedProperties[0].id],
+          'Wrong property ids'
+        );
+        callback(null, expectedProperties);
+      });
+
+      coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          'publish-tls',
+          'Wrong setting id'
+        );
+        callback(null, expectedSettings[0]);
+      });
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas) {
+        assert.equal(endPoint, 'videos/' + expectedMedia.mediaId[count], 'Wrong end point');
+        assert.equal(datas.title, expectedDatas.title, 'Wrong title');
+        assert.equal(
+          datas[expectedProperties[0].name],
+          expectedDatas.properties[expectedProperties[0].id],
+          'Wrong property value'
+        );
+        count++;
+        return Promise.resolve();
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        TlsClient.prototype.patch.should.have.been.called.exactly(expectedMedia.mediaId.length);
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should not do anything if no title nor properties in datas to update', function(done) {
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+
+      provider.update(expectedMedia, {}, false, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(0);
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(0);
+        TlsClient.prototype.patch.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should not do anything if no title and empty properties in datas to update', function(done) {
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+
+      provider.update(expectedMedia, {properties: {}}, false, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(0);
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(0);
+        TlsClient.prototype.patch.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should not update properties if no TLS settings', function(done) {
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        title: 'Media title',
+        properties: {}
+      };
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedDatas.properties[expectedProperties[0].id] = 'Property 42 value';
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas) {
+        assert.equal(endPoint, 'videos/' + expectedMedia.mediaId[0], 'Wrong end point');
+        assert.equal(datas.title, expectedDatas.title, 'Wrong title');
+        assert.notProperty(datas, expectedProperties[0].name, 'Unexpected property');
+        return Promise.resolve();
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        TlsClient.prototype.patch.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should not update properties if not corresponding to existing ones', function(done) {
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        title: 'Media title',
+        properties: {}
+      };
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: ['unknown-property']
+          }
+        }
+      ];
+      expectedDatas.properties[expectedSettings[0].value.properties[0]] = 'Property 42 value';
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas) {
+        assert.equal(endPoint, 'videos/' + expectedMedia.mediaId[0], 'Wrong end point');
+        assert.equal(datas.title, expectedDatas.title, 'Wrong title');
+        assert.notProperty(datas, expectedProperties[0].name, 'Unexpected property');
+        return Promise.resolve();
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        TlsClient.prototype.patch.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should convert date timestamps into Date objects', function(done) {
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        properties: {}
+      };
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.DATE_TIME
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: [expectedProperties[0].id]
+          }
+        }
+      ];
+      expectedDatas.properties[expectedSettings[0].value.properties[0]] = new Date();
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas) {
+        assert.equal(endPoint, 'videos/' + expectedMedia.mediaId[0], 'Wrong end point');
+        assert.notProperty(datas, 'title', 'Unexpected title');
+        assert.equal(
+          datas[expectedProperties[0].name],
+          expectedDatas.properties[expectedSettings[0].value.properties[0]].toString(),
+          'Wrong property value'
+        );
+        return Promise.resolve();
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        TlsClient.prototype.patch.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should not update platform if neither title nor properties have changed', function(done) {
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: [expectedProperties[0].id]
+          }
+        }
+      ];
+      var expectedDatas = {
+        properties: {},
+        title: 'Media title'
+      };
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42'],
+        title: expectedDatas.title,
+        properties: {}
+      };
+      expectedDatas.properties[expectedSettings[0].value.properties[0]] =
+      expectedMedia.properties[expectedSettings[0].value.properties[0]] = 'Property value';
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        TlsClient.prototype.patch.should.have.been.called.exactly(0);
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should update platform if neither title nor properties have changed and force is set to true', function(done) {
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: [expectedProperties[0].id]
+          }
+        }
+      ];
+      var expectedDatas = {
+        properties: {},
+        title: 'Media title'
+      };
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42'],
+        title: expectedDatas.title,
+        properties: {}
+      };
+      expectedDatas.properties[expectedSettings[0].value.properties[0]] =
+      expectedMedia.properties[expectedSettings[0].value.properties[0]] = 'Property value';
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas) {
+        assert.equal(datas.title, expectedDatas.title, 'Wrong title');
+        assert.equal(
+          datas[expectedProperties[0].name],
+          expectedDatas.properties[expectedSettings[0].value.properties[0]],
+          'Wrong property value'
+        );
+        return Promise.resolve();
+      });
+
+      provider.update(expectedMedia, expectedDatas, true, function(error) {
+        assert.isNull(error, 'Unexpected error');
+        TlsClient.prototype.patch.should.have.been.called.exactly(1);
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if getting settings failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        title: 'Media title'
+      };
+
+      coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+        callback(expectedError);
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(0);
+        TlsClient.prototype.patch.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if getting custom properties failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        title: 'Media title',
+        properties: {}
+      };
+      expectedProperties = [
+        {
+          id: 'property-42',
+          name: 'Property 42',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+      expectedSettings = [
+        {
+          id: 'publish-tls',
+          value: {
+            properties: [expectedProperties[0].id]
+          }
+        }
+      ];
+      expectedDatas.properties[expectedSettings[0].value.properties[0]] = 'Property 42 value';
+
+      PropertyProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(expectedError);
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
+        PropertyProvider.prototype.getAll.should.have.been.called.exactly(1);
+        TlsClient.prototype.patch.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if updating platform failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      var expectedMedia = {
+        id: 'media-42',
+        mediaId: ['resource-42']
+      };
+      var expectedDatas = {
+        title: 'Media title'
+      };
+
+      TlsClient.prototype.patch = chai.spy(function(endPoint, datas, callback) {
+        return Promise.reject(expectedError);
+      });
+
+      provider.update(expectedMedia, expectedDatas, false, function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        TlsClient.prototype.patch.should.have.been.called.exactly(1);
         done();
       });
     });

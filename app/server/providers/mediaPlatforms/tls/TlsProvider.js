@@ -10,7 +10,9 @@ var shortid = require('shortid');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var TlsClient = process.requirePublish('app/server/providers/mediaPlatforms/tls/TlsClient.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
  * Defines a TlsProvider to interact with TLS platform.
@@ -169,6 +171,129 @@ TlsProvider.prototype.remove = function(mediaIds, callback) {
 
       }).catch(callback);
 
+    });
+  });
+
+  async.series(asyncFunctions, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * Updates a media resources on the platform.
+ *
+ * If media has several resources on the platform, the same update will be performed for all resources.
+ * Actually only the media title and media custom properties are synchronized with TLS.
+ *
+ * @method update
+ * @async
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The datas to update
+ * @param {String} [data.title] The media title
+ * @param {Object} [data.properties] The media custom properties with id / value pairs, custom properties corresponding
+ * to the one in TLS configuration will be updated, others won't
+ * @param {Boolean} force true to force the update even if title and properties haven't changed, false otherwise
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+TlsProvider.prototype.update = function(media, data, force, callback) {
+  if (!data.title && (!data.properties || !Object.keys(data.properties).length)) return callback();
+
+  var self = this;
+  var asyncFunctions = [];
+  var properties = {};
+  var settings;
+
+  // Get TLS settings
+  asyncFunctions.push(function(callback) {
+    process.api.getCoreApi().settingProvider.getOne(
+      new ResourceFilter().equal('id', 'publish-tls'),
+      null,
+      function(error, tlsSettings) {
+        settings = tlsSettings && tlsSettings.value && tlsSettings.value.properties;
+        callback(error);
+      }
+    );
+  });
+
+  // Get more information about the custom properties being updated
+  asyncFunctions.push(function(callback) {
+    if (!data.properties || !settings || !settings.length) return callback();
+
+    var propertyProvider = new PropertyProvider(process.api.getCoreApi().getDatabase());
+
+    propertyProvider.getAll(
+      new ResourceFilter().in('id', Object.keys(data.properties)),
+      ['id', 'name', 'type'],
+      {id: 'desc'},
+      function(error, fetchedProperties) {
+        if (error) return callback(error);
+
+        // TLS expects the name of the custom property associated to its value
+        // Find the name of each custom property being updated
+        for (var id in data.properties) {
+          for (var j = 0; j < fetchedProperties.length; j++) {
+            var fetchedProperty = fetchedProperties[j];
+
+            if (fetchedProperty.id === id) {
+
+              // Property found
+
+              // Only custom properties defined in TLS settings can be updated
+              if (settings.indexOf(id) === -1) break;
+
+              var actualValue = media.properties && media.properties[id];
+
+              // Make sure property value has changed before doing anything (force by passes this verification)
+              if (fetchedProperty.type === PropertyProvider.TYPES.LIST && !force) {
+                actualValue = media.properties ? media.properties[id] || [] : [];
+                if (openVeoApi.util.intersectArray(data.properties[id], actualValue).length)
+                  break;
+              } else if (data.properties[id] === actualValue && !force)
+                break;
+
+              // TLS expects dates in their literal forms, not a timestamp
+              // Convert values of custom properties of type DATE_TIME into date literals
+              if (fetchedProperty.type === PropertyProvider.TYPES.DATE_TIME)
+                properties[fetchedProperty.name] = new Date(data.properties[id]);
+              else
+                properties[fetchedProperty.name] = data.properties[id];
+
+              break;
+            }
+
+          }
+        }
+
+        callback(error);
+      }
+    );
+  });
+
+  // Update resources on TLS platform
+  media.mediaId.forEach(function(mediaId) {
+    asyncFunctions.push(function(callback) {
+      var modifications = {};
+      var callbackHasBeenCalled = false;
+
+      // Make sure that title has changed if defined (force by passes this verification)
+      // If neither title nor properties have changed, there is nothing more to do
+      if ((!data.title || (data.title === media.title && !force)) &&
+        !Object.keys(properties).length) {
+        return callback();
+      }
+
+      if (data.title) modifications.title = data.title;
+      Object.assign(modifications, properties);
+
+      self.client.patch('videos/' + mediaId, modifications).then(function() {
+        if (!callbackHasBeenCalled) (callbackHasBeenCalled = true) && callback();
+      }).catch(function(error) {
+        if (!callbackHasBeenCalled)
+          (callbackHasBeenCalled = true) && callback(error);
+        else throw error;
+      });
     });
   });
 
