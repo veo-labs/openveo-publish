@@ -124,14 +124,14 @@ var ERRORS = {
   MEDIA_UPLOAD: 9,
 
   /**
-   * Configuring media in the media platform failed.
+   * Synchronizing media to the media platform failed.
    *
-   * @property MEDIA_CONFIGURE
+   * @property MEDIA_SYNCHRONIZE
    * @type Number
    * @default 10
    * @final
    */
-  MEDIA_CONFIGURE: 10,
+  MEDIA_SYNCHRONIZE: 10,
 
   /**
    * Scanning package temporary directory failed.

@@ -542,6 +542,19 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Synchronizing media with media platform failed while updating media.
+   *
+   * @property UPDATE_MEDIA_SYNCHRONIZE_ERROR
+   * @type Object
+   * @final
+   */
+  UPDATE_MEDIA_SYNCHRONIZE_ERROR: {
+    code: 0x028,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**

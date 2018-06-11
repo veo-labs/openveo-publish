@@ -94,14 +94,14 @@ var STATES = {
   UPLOADING: 7,
 
   /**
-   * Package's platform information is configuring.
+   * Media information are being synchronized with the platform.
    *
-   * @property CONFIGURING
+   * @property SYNCHRONIZING
    * @type Number
    * @default 8
    * @final
    */
-  CONFIGURING: 8,
+  SYNCHRONIZING: 8,
 
   /**
    * Package is saving timecodes.

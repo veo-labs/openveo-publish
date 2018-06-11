@@ -82,17 +82,20 @@ MediaPlatformProvider.prototype.remove = function() {
 };
 
 /**
- * Configures a media on the platform.
+ * Updates a media on the platform.
  *
- * Depending on the platform, some media properties must be set after the upload of the media.
+ * Depending on the platform and what is supported on it, some media properties might be updated and others not.
+ * If media has several resources on the platform, the same update will be performed on all resources.
  *
- * @method configure
+ * @method update
  * @async
- * @param {String} mediaId The id of the media
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The media datas to update
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-MediaPlatformProvider.prototype.configure = function(mediaId, callback) {
+MediaPlatformProvider.prototype.update = function(media, data, callback) {
   callback();
 };
 

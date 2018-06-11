@@ -129,7 +129,7 @@ TarPackage.stateTransitions = [
   VideoPackage.TRANSITIONS.GET_METADATA,
   TarPackage.TRANSITIONS.PREPARE_PACKAGE,
   Package.TRANSITIONS.UPLOAD_MEDIA,
-  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   TarPackage.TRANSITIONS.SAVE_TIMECODES,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY
@@ -182,7 +182,7 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
   },
   {
     name: TarPackage.TRANSITIONS.SAVE_TIMECODES,
-    from: Package.STATES.MEDIA_CONFIGURED,
+    from: Package.STATES.MEDIA_SYNCHRONIZED,
     to: TarPackage.STATES.TIMECODES_SAVED
   },
   {

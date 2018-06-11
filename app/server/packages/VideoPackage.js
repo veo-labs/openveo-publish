@@ -86,7 +86,7 @@ VideoPackage.stateTransitions = [
   VideoPackage.TRANSITIONS.GET_METADATA,
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
   Package.TRANSITIONS.UPLOAD_MEDIA,
-  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY
 ];
@@ -123,7 +123,7 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
   },
   {
     name: VideoPackage.TRANSITIONS.COPY_IMAGES,
-    from: Package.STATES.MEDIA_CONFIGURED,
+    from: Package.STATES.MEDIA_SYNCHRONIZED,
     to: VideoPackage.STATES.COPIED_IMAGES
   },
   {

@@ -100,7 +100,7 @@
     "STATE_5" : "Préparation",
     "STATE_6" : "En attente d'envoi",
     "STATE_7" : "Envoi en cours",
-    "STATE_8" : "Configuration en cours",
+    "STATE_8" : "Synchronisation",
     "STATE_9" : "Sauvegarde des codes temporels",
     "STATE_10" : "Copie des images",
     "STATE_11" : "Prêt",

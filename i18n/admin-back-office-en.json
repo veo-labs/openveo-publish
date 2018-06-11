@@ -100,7 +100,7 @@
     "STATE_5" : "Preparing",
     "STATE_6" : "Waiting for upload",
     "STATE_7" : "Uploading",
-    "STATE_8" : "Configuring",
+    "STATE_8" : "Synchronizing",
     "STATE_9" : "Saving timecodes",
     "STATE_10" : "Copying images",
     "STATE_11" : "Ready",

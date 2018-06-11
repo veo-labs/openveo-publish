@@ -113,7 +113,7 @@ Package.STATES = {
   PACKAGE_COPIED: 'packageCopied',
   ORIGINAL_PACKAGE_REMOVED: 'originalPackageRemoved',
   MEDIA_UPLOADED: 'mediaUploaded',
-  MEDIA_CONFIGURED: 'mediaConfigured',
+  MEDIA_SYNCHRONIZED: 'mediaSynchronized',
   DIRECTORY_CLEANED: 'directoryCleaned'
 };
 Object.freeze(Package.STATES);
@@ -131,7 +131,7 @@ Package.TRANSITIONS = {
   COPY_PACKAGE: 'copyPackage',
   REMOVE_ORIGINAL_PACKAGE: 'removeOriginalPackage',
   UPLOAD_MEDIA: 'uploadMedia',
-  CONFIGURE_MEDIA: 'configureMedia',
+  SYNCHRONIZE_MEDIA: 'synchronizeMedia',
   CLEAN_DIRECTORY: 'cleanDirectory'
 };
 Object.freeze(Package.TRANSITIONS);
@@ -149,7 +149,7 @@ Package.stateTransitions = [
   Package.TRANSITIONS.COPY_PACKAGE,
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
   Package.TRANSITIONS.UPLOAD_MEDIA,
-  Package.TRANSITIONS.CONFIGURE_MEDIA,
+  Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   Package.TRANSITIONS.CLEAN_DIRECTORY
 ];
 Object.freeze(Package.stateTransitions);
@@ -184,13 +184,13 @@ Package.stateMachine = [
     to: Package.STATES.MEDIA_UPLOADED
   },
   {
-    name: Package.TRANSITIONS.CONFIGURE_MEDIA,
+    name: Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
     from: Package.STATES.MEDIA_UPLOADED,
-    to: Package.STATES.MEDIA_CONFIGURED
+    to: Package.STATES.MEDIA_SYNCHRONIZED
   },
   {
     name: Package.TRANSITIONS.CLEAN_DIRECTORY,
-    from: Package.STATES.MEDIA_CONFIGURED,
+    from: Package.STATES.MEDIA_SYNCHRONIZED,
     to: Package.STATES.DIRECTORY_CLEANED
   }
 ];
@@ -509,28 +509,26 @@ Package.prototype.uploadMedia = function() {
 };
 
 /**
- * Configures uploaded media in video platform.
+ * Synchronizes uploaded media information with the media platform.
  *
  * This is a transition.
  *
- * @method configureMedia
+ * @method synchronizeMedia
  */
-Package.prototype.configureMedia = function() {
+Package.prototype.synchronizeMedia = function() {
   var self = this;
 
-  process.logger.debug('Configure media ' + this.mediaPackage.id);
-  this.updateState(this.mediaPackage.id, STATES.CONFIGURING, function() {
+  process.logger.debug('Synchronize media ' + this.mediaPackage.id);
+  this.updateState(this.mediaPackage.id, STATES.SYNCHRONIZING, function() {
 
     // Get media plaform provider from package type
     var mediaPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
       self.videoPlatformConf[self.mediaPackage.type]);
 
-    var mediaId = self.mediaPackage.mediaId[self.mediaPackage.mediaId.length];
-
-    // Configure media
-    mediaPlatformProvider.configure(mediaId, function(error) {
+    // Synchronize media
+    mediaPlatformProvider.update(self.mediaPackage, self.mediaPackage, function(error) {
       if (error)
-        self.setError(new PackageError(error.message, ERRORS.MEDIA_CONFIGURE));
+        self.setError(new PackageError(error.message, ERRORS.MEDIA_SYNCHRONIZE));
       else
         self.fsm.transition();
     });

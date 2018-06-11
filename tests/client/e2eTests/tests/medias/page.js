@@ -346,7 +346,7 @@ describe('Media page', function() {
     checkStateActions(STATES.VALIDATING, [], []);
     checkStateActions(STATES.PREPARING, [], []);
     checkStateActions(STATES.UPLOADING, [], []);
-    checkStateActions(STATES.CONFIGURING, [], []);
+    checkStateActions(STATES.SYNCHRONIZING, [], []);
     checkStateActions(STATES.SAVING_TIMECODES, [], []);
     checkStateActions(STATES.COPYING_IMAGES, [], []);
     checkStateActions(STATES.GENERATE_THUMB, [], []);
