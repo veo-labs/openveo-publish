@@ -88,6 +88,19 @@ module.exports = YoutubeProvider;
 util.inherits(YoutubeProvider, MediaPlatformProvider);
 
 /**
+ * Youtube category ids.
+ *
+ * @property CATEGORIES
+ * @type Object
+ * @static
+ * @final
+ */
+YoutubeProvider.CATEGORIES = {
+  EDUCATION: 27
+};
+Object.freeze(YoutubeProvider.CATEGORIES);
+
+/**
  * Uploads a media to the Youtube platform.
  *
  * @method upload
@@ -102,7 +115,8 @@ YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
     resource: {
       snippet: {
         title: 'Media name',
-        description: 'Media description'
+        description: 'Media description',
+        categoryId: YoutubeProvider.CATEGORIES.EDUCATION
       },
       status: {
         privacyStatus: this.privacy
@@ -306,6 +320,59 @@ YoutubeProvider.prototype.remove = function(mediaIds, callback) {
         }
         callback();
       });
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * Updates a media resources on the platform.
+ *
+ * If media has several resources on the platform, the same update will be performed for all resources.
+ * Actually only the media title is synchronized with Youtube.
+ *
+ * @method update
+ * @async
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The datas to update
+ * @param {String} [data.title] The media title. Be careful only the first 100 characters will be used, also
+ * "less than" and "greater than" characters will be removed
+ * @param {Boolean} force true to force the update even if title hasn't changed, false otherwise
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+YoutubeProvider.prototype.update = function(media, data, force, callback) {
+  if (!data.title || (data.title === media.title && !force)) return callback();
+
+  var self = this;
+  var series = [];
+
+  series.push(function(callback) {
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
+      callback();
+    });
+  });
+
+  media.mediaId.forEach(function(mediaId) {
+    series.push(function(callback) {
+      youtube.videos.update({
+        part: 'snippet',
+        auth: self.googleOAuthHelper.oauth2Client,
+        resource: {
+          id: mediaId,
+          snippet: {
+            title: data.title.substring(0, 100).replace(/<|>/g, ''),
+            categoryId: YoutubeProvider.CATEGORIES.EDUCATION
+          }
+        }
+      }, callback);
     });
   });
 
