@@ -12,7 +12,7 @@
 - Add support for TLS as a media platform like Vimeo, Wowza and Youtube. Custom properties that should be sent to TLS can be configured in configuraton page
 - Configuration page no longer save settings on each modification, a button has been added to do it manually
 - User without the permission to edit the configuration page won't see configuration page formulars anymore but simple non editable information
-- Youtube videos, associated to OpenVeo medias, have now their titles updated when title is updated on OpenVeo
+- Youtube and Vimeo videos, associated to OpenVeo medias, have now their titles updated when title is updated on OpenVeo
 - Youtube videos are now automatically associated to the *Education* category
 
 ## BUG FIXES
