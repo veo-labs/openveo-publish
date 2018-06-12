@@ -3,6 +3,7 @@
 ## BREAKING CHANGES
 
 - Web service endpoint GET /videos now validates the *properties* parameter, note that custom properties of type "Date time" accept either a timestamp or a literal date
+- Web service endpoint GET /videos now returns records having a date precisely equal to the value of the *dateEnd* parameter instead of strictly anterior records
 - OpenVeo Publish now requires OpenVeo Core 5.1.0
 
 ## NEW FEATURES

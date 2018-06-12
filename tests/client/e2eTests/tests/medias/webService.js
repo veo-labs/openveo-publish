@@ -240,13 +240,13 @@ describe('Videos web service', function() {
         }).then(function(results) {
           var videos = results.entities;
           check(function() {
-            assert.equal(videos.length, 2, 'Wrong number of results');
+            assert.equal(videos.length, 3, 'Wrong number of results');
           }, done, true);
           return webServiceClient.get('publish/videos?dateStart=' + dateLiteral2 + '&dateEnd=' + dateLiteral3);
         }).then(function(results) {
           var videos = results.entities;
           check(function() {
-            assert.equal(videos.length, 1, 'Wrong number of results');
+            assert.equal(videos.length, 2, 'Wrong number of results');
           }, done, true);
           return webServiceClient.get('publish/videos?dateStart=03/25/2016');
         }).then(function(results) {

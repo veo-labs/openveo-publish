@@ -1873,7 +1873,7 @@ describe('VideoController', function() {
           'Unexpected start date filter'
         );
         assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.LESSER_THAN, 'date').value,
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.LESSER_THAN_EQUAL, 'date').value,
           new Date(expectedEndDate).getTime(),
           'Unexpected end date filter'
         );

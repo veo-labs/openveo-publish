@@ -948,7 +948,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
 
   // Add date
   if (params.dateStart) filter.greaterThanEqual('date', params.dateStart);
-  if (params.dateEnd) filter.lesserThan('date', params.dateEnd);
+  if (params.dateEnd) filter.lesserThanEqual('date', params.dateEnd);
 
   // Make sure "metadata" field is not excluded
   fields = this.removeMetatadaFromFields({
