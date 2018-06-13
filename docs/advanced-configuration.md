@@ -63,19 +63,8 @@ Open **~/.openveo/publish/videoPlatformConf.json**
 }
 ```
 
-To upload videos on **Vimeo**, publish requires oauth credentials.<br/>
 To upload videos on **Youtube**, publish requires googleOAuth credentials.<br/>
 To upload videos on **Wowza**, you need to install **lftp** on your system.<br/>
-To upload videos on **Local Openveo Server**, you need to set this configuration:
-```json
-{
-  "local": {
-    "vodFilePath": "/path/to/publish/assets/player/videos/local",// path where the video will be uploaded on the local machine
-    "streamPath": "publish/player/videos/local" // stream path exposed by local server to access video
-  }
-}
-```
-<br/>
 
 # Configure the [watcher](watcher.md)
 
