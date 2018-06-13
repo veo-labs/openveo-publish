@@ -15,6 +15,7 @@
 - User without the permission to edit the configuration page won't see configuration page formulars anymore but simple non editable information
 - Youtube and Vimeo videos, associated to OpenVeo medias, have now their titles updated when title is updated on OpenVeo
 - Youtube videos are now automatically associated to the *Education* category
+- Medias search engine has been improved, it is now possible to search between two dates
 
 ## BUG FIXES
 

@@ -593,11 +593,17 @@
         value: '',
         label: $filter('translate')('PUBLISH.MEDIAS.QUERY_FILTER')
       }, {
-        key: 'date',
+        key: 'startDate',
         type: 'date',
-        param: 'date',
+        param: 'dateStart',
         value: '',
-        label: $filter('translate')('PUBLISH.MEDIAS.DATE_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.START_DATE_FILTER')
+      }, {
+        key: 'endDate',
+        type: 'date',
+        param: 'dateEnd',
+        value: '',
+        label: $filter('translate')('PUBLISH.MEDIAS.END_DATE_FILTER')
       }, {
         key: 'category',
         type: 'select',

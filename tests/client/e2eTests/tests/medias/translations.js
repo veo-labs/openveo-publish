@@ -44,10 +44,12 @@ describe('Media page translations', function() {
         page.openSearchEngine();
         var searchFields = page.getSearchFields(page.searchFormElement);
         var searchQueryField = searchFields.query;
-        var searchDateField = searchFields.date;
+        var searchFromField = searchFields.from;
+        var searchToField = searchFields.to;
         var searchCategoryField = searchFields.category;
         assert.eventually.equal(searchQueryField.getLabel(), publishTranslations.MEDIAS.QUERY_FILTER);
-        assert.eventually.equal(searchDateField.getLabel(), publishTranslations.MEDIAS.DATE_FILTER);
+        assert.eventually.equal(searchFromField.getLabel(), publishTranslations.MEDIAS.START_DATE_FILTER);
+        assert.eventually.equal(searchToField.getLabel(), publishTranslations.MEDIAS.END_DATE_FILTER);
         assert.eventually.equal(searchCategoryField.getLabel(), publishTranslations.MEDIAS.CATEGORY_FILTER);
         page.closeSearchEngine();
 

@@ -58,10 +58,17 @@ MediaPage.prototype.getSearchFields = function(form) {
     baseElement: form
   });
 
-  // Date field
-  fields.date = Field.get({
+  // From field
+  fields.from = Field.get({
     type: 'date',
-    name: this.translations.PUBLISH.MEDIAS.DATE_FILTER,
+    name: this.translations.PUBLISH.MEDIAS.START_DATE_FILTER,
+    baseElement: form
+  });
+
+  // To field
+  fields.to = Field.get({
+    type: 'date',
+    name: this.translations.PUBLISH.MEDIAS.END_DATE_FILTER,
     baseElement: form
   });
 

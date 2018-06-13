@@ -455,8 +455,64 @@ describe('Media page', function() {
       });
     });
 
-    it('should be able to search by date', function() {
+    it('should be able to search medias on specific day', function() {
+      var queryDate;
       var expectedValues = [];
+      var expectedDate = new Date('2016/01/20').getTime();
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Test search 0',
+          date: new Date('2016/01/20 16:20:42').getTime(),
+          properties: getProperties()
+        },
+        {
+          id: '1',
+          state: STATES.PUBLISHED,
+          title: 'Test search 1',
+          date: new Date('2015/01/20').getTime(),
+          properties: getProperties()
+        }
+      ];
+
+      // Add lines
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
+
+      browser.executeScript(
+        'var $injector = angular.injector([\'ng\']);' +
+        'var $filter = $injector.get(\'$filter\');' +
+        'return $filter(\'date\')(' + expectedDate + ', \'shortDate\');'
+      ).then(function(date) {
+        queryDate = date;
+        return mediaHelper.getEntities();
+      }).then(function(medias) {
+        var fromDate = new Date(expectedDate);
+        var endDate = new Date(expectedDate);
+        endDate.setDate(endDate.getDate() + 1);
+        endDate.setMilliseconds(endDate.getMilliseconds() - 1);
+
+        // Predict values
+        for (var i = 0; i < medias.length; i++) {
+          if (medias[i].date >= fromDate && medias[i].date <= endDate)
+            expectedValues.push(medias[i].title);
+        }
+
+      }).then(function() {
+        return tableAssert.checkSearch(
+          {from: queryDate, to: queryDate},
+          expectedValues,
+          page.translations.PUBLISH.MEDIAS.NAME_COLUMN
+        );
+      });
+    });
+
+    it('should be able to search medias between two dates', function() {
+      var queryDates;
+      var expectedValues = [];
+      var expectedStartDate = new Date('2015/01/01').getTime();
+      var expectedEndDate = new Date('2016/01/01').getTime();
       var linesToAdd = [
         {
           id: '0',
@@ -478,34 +534,32 @@ describe('Media page', function() {
       mediaHelper.addEntities(linesToAdd);
       page.refresh();
 
-      // Build search query
-      var searchDate = new Date('2015/01/20').getTime();
-
       browser.executeScript(
         'var $injector = angular.injector([\'ng\']);' +
         'var $filter = $injector.get(\'$filter\');' +
-        'return $filter(\'date\')(' + searchDate + ', \'shortDate\');'
-      ).then(function(shortDate) {
+        'return {' +
+        'from: $filter(\'date\')(' + expectedStartDate + ', \'shortDate\'),' +
+        'to: $filter(\'date\')(' + expectedEndDate + ', \'shortDate\')' +
+        '};'
+      ).then(function(dates) {
+        queryDates = dates;
+        return mediaHelper.getEntities();
+      }).then(function(medias) {
+        var fromDate = new Date(expectedStartDate);
+        var toDate = new Date(expectedEndDate);
 
-        // Get all line details
-        page.getAllLineDetails().then(function(datas) {
-          var regexp = new RegExp(shortDate);
+        // Predict values
+        for (var i = 0; i < medias.length; i++) {
+          if (medias[i].date >= fromDate && medias[i].date <= toDate)
+            expectedValues.push(medias[i].title);
+        }
 
-          // Predict values
-          var filteredDatas = datas.filter(function(data) {
-            return regexp.test(data.cells[3]);
-          });
-
-          for (var i = 0; i < filteredDatas.length; i++)
-            expectedValues.push(filteredDatas[i].cells[1]);
-
-        }).then(function() {
-          return tableAssert.checkSearch(
-            {date: shortDate},
-            expectedValues,
-            page.translations.PUBLISH.MEDIAS.NAME_COLUMN
-          );
-        });
+      }).then(function() {
+        return tableAssert.checkSearch(
+          {from: queryDates.from, to: queryDates.to},
+          expectedValues,
+          page.translations.PUBLISH.MEDIAS.NAME_COLUMN
+        );
       });
     });
 
