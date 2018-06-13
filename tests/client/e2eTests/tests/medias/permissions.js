@@ -4,6 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var MEDIA_PLATFORM_TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
@@ -64,7 +65,8 @@ describe('Media page', function() {
         state: STATES.PUBLISHED,
         title: 'Media 1',
         date: new Date('2017/10/01').getTime(),
-        description: 'Media 1 description'
+        description: 'Media 1 description',
+        type: MEDIA_PLATFORM_TYPES.LOCAL
       };
 
       ownerLineToAdd = {
@@ -74,7 +76,8 @@ describe('Media page', function() {
         user: owner.id,
         date: new Date('2017/11/20').getTime(),
         description: 'Media 2 description',
-        groups: ['publishGroup1']
+        groups: ['publishGroup1'],
+        type: MEDIA_PLATFORM_TYPES.LOCAL
       };
 
       return mediaHelper.addEntities([anonymousLineToAdd, ownerLineToAdd]);

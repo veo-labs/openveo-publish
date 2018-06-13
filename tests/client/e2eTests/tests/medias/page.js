@@ -6,6 +6,7 @@ var e2e = require('@openveo/test').e2e;
 var MediaPage = process.requirePublish('tests/client/e2eTests/pages/MediaPage.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var MEDIA_PLATFORM_TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
@@ -230,7 +231,8 @@ describe('Media page', function() {
         date: new Date('2017/12/15').getTime(),
         state: STATES.PUBLISHED,
         title: name,
-        properties: getProperties()
+        properties: getProperties(),
+        type: MEDIA_PLATFORM_TYPES.LOCAL
       }
     ];
 

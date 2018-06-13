@@ -7,6 +7,7 @@ var shortid = require('shortid');
 var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
+var MEDIA_PLATFORM_TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var fileSystem = openVeoApi.fileSystem;
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
@@ -148,19 +149,22 @@ MediaHelper.prototype.createMedia = function(mediaId, mediaFilePath, mediaFileNa
     var mediasToAdd = [
       {
         id: mediaId,
-        mediaId: mediaId,
+        mediaId: [mediaId],
         available: true,
         state: mediaState,
         title: 'Test',
         groups: groups,
         user: userId,
-        sources: {
-          files: [{
-            width: 1920,
-            height: 1080,
-            link: '/publish/player/videos/' + mediaId + '/' + mediaFileName
-          }]
-        }
+        sources: [
+          {
+            files: [{
+              width: 1920,
+              height: 1080,
+              link: '/publish/player/videos/' + mediaId + '/' + mediaFileName
+            }]
+          }
+        ],
+        type: MEDIA_PLATFORM_TYPES.LOCAL
       }
     ];
 
