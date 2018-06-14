@@ -114,9 +114,9 @@ describe('VideoController', function() {
       getMediaInfo: function(id, expectedDefinition, callback) {
         callback({});
       },
-      update: function(media, datas, force, callback) {
+      update: chai.spy(function(media, datas, force, callback) {
         callback();
-      }
+      })
     };
 
     mediaPlatformFactory = {
@@ -1516,6 +1516,13 @@ describe('VideoController', function() {
       expectedInfo = {
         title: 'Media title'
       };
+      expectedMedias = [
+        {
+          id: '42',
+          type: 'local',
+          mediaId: ['42']
+        }
+      ];
       request.body.info = JSON.stringify(expectedInfo);
       request.params.id = '42';
 
@@ -1537,6 +1544,62 @@ describe('VideoController', function() {
       };
 
       response.send = function(datas) {
+        mediaPlatformProvider.update.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.updateEntityAction(request, response, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+      });
+    });
+
+    it('should not synchronize the media with the media platform if no platform', function(done) {
+      expectedMedias = [
+        {
+          id: '42'
+        }
+      ];
+      expectedInfo = {
+        title: 'Media title'
+      };
+      request.body.info = JSON.stringify(expectedInfo);
+      request.params.id = '42';
+
+      MultipartParser.prototype.parse = function(callback) {
+        request.files = {};
+        callback();
+      };
+
+      response.send = function(datas) {
+        mediaPlatformProvider.update.should.have.been.called.exactly(0);
+        done();
+      };
+
+      videoController.updateEntityAction(request, response, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+      });
+    });
+
+    it('should not synchronize the media with the media platform if no media id', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          type: TYPES.LOCAL
+        }
+      ];
+      expectedInfo = {
+        title: 'Media title'
+      };
+      request.body.info = JSON.stringify(expectedInfo);
+      request.params.id = '42';
+
+      MultipartParser.prototype.parse = function(callback) {
+        request.files = {};
+        callback();
+      };
+
+      response.send = function(datas) {
+        mediaPlatformProvider.update.should.have.been.called.exactly(0);
         done();
       };
 
@@ -1546,6 +1609,13 @@ describe('VideoController', function() {
     });
 
     it('should execute next function with an error if synchronizing the media failed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          type: 'local',
+          mediaId: ['42']
+        }
+      ];
       request.body.info = JSON.stringify(expectedInfo);
       request.params.id = '42';
 

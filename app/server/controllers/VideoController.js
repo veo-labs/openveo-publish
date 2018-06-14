@@ -835,6 +835,8 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
 
       // Synchronize the media with the media platform
       function(callback) {
+        if (!media.type || !media.mediaId) return callback();
+
         var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
 
         mediaPlatformProvider.update(media, info, false, function(error) {
