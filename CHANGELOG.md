@@ -20,6 +20,7 @@
 ## BUG FIXES
 
 - Improve texts in configuration page to make it easy to understand
+- Fix bug when replacing a file associated to a tag, the old file was kept on the server
 
 ## DEPENDENCIES
 

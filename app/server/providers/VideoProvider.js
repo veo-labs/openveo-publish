@@ -766,7 +766,11 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
             if (file) {
 
               // New file uploaded
+
               // Old file should be deleted
+              // Mark old file as "to be deleted"
+              if (mediaTag.file)
+                fileNameToRemove = mediaTag.file.filename;
 
               mediaTag.file = {
                 originalname: file.originalname,

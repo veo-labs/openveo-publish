@@ -1198,7 +1198,7 @@ describe('VideoProvider', function() {
       });
     });
 
-    it('should remove old file associated to tag', function(done) {
+    it('should remove old file associated to tag if no file associated anymore', function(done) {
       var expectedFilenameToRemove = 'fileName';
       expectedMedias = [
         {
@@ -1236,6 +1236,57 @@ describe('VideoProvider', function() {
       });
 
       provider.updateOneTag(expectedFilter, expectedTag, null, function(error, total) {
+        assert.isNull(error, 'Unexpected error');
+        assert.equal(total, 1, 'Wrong total');
+        openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should remove old file associated to tag if replaced', function(done) {
+      var expectedFilenameToRemove = 'fileName';
+      expectedMedias = [
+        {
+          id: '42',
+          tags: [
+            {
+              id: '43',
+              value: 42000,
+              name: 'Name',
+              description: 'Description',
+              file: {
+                originalname: 'originalName',
+                mimetype: 'mimetype',
+                filename: expectedFilenameToRemove,
+                size: 43
+              }
+            }
+          ]
+        }
+      ];
+      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
+      var expectedTag = {
+        id: expectedMedias[0].tags[0].id,
+        value: 42000,
+        name: 'Name',
+        description: 'Description'
+      };
+      var expectedFile = {
+        originalname: 'newOriginalName',
+        mimetype: 'mimetype',
+        filename: 'newOfileName',
+        size: 44
+      };
+
+      openVeoApi.fileSystem.rm = chai.spy(function(filePath, callback) {
+        assert.equal(
+          filePath,
+          process.rootPublish + '/assets/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFilenameToRemove
+        );
+        callback();
+      });
+
+      provider.updateOneTag(expectedFilter, expectedTag, expectedFile, function(error, total) {
         assert.isNull(error, 'Unexpected error');
         assert.equal(total, 1, 'Wrong total');
         openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
