@@ -295,7 +295,7 @@ describe('VideoController', function() {
   describe('getPlatformsAction', function() {
 
     it('should send response with the list of available platforms', function(done) {
-      var expectedPlatforms = ['local', 'vimeo'];
+      var expectedPlatforms = [TYPES.LOCAL, TYPES.VIMEO];
       for (var platform in videoPlatformConf) videoPlatformConf[platform] = expectedPlatforms.indexOf(platform) >= 0;
 
       response.send = function(data) {
@@ -1231,7 +1231,7 @@ describe('VideoController', function() {
       expectedMedias = [
         {
           id: '42',
-          type: 'local'
+          type: TYPES.LOCAL
         }
       ];
       expectedInfo = {
@@ -1519,7 +1519,7 @@ describe('VideoController', function() {
       expectedMedias = [
         {
           id: '42',
-          type: 'local',
+          type: TYPES.LOCAL,
           mediaId: ['42']
         }
       ];
@@ -1612,7 +1612,7 @@ describe('VideoController', function() {
       expectedMedias = [
         {
           id: '42',
-          type: 'local',
+          type: TYPES.LOCAL,
           mediaId: ['42']
         }
       ];
