@@ -182,7 +182,7 @@ describe('ConfigurationController', function() {
       });
 
       response.send = function(configurations) {
-        assert.isNull(configurations['publishTls'], 'Unexpected settings');
+        assert.isEmpty(configurations['publishTls'], 'Unexpected settings');
         coreApi.settingProvider.getOne.should.have.been.called.exactly(2);
         done();
       };

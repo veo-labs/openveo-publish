@@ -59,28 +59,30 @@
     };
 
     // TLS settings
-    $scope.tlsSettings = {
-      model: {
-        properties: (publishTls && publishTls.properties) || []
-      },
-      fields: [
-        {
-          key: 'properties',
-          type: 'editableTags',
-          wrapper: ['editableWrapper', 'bootstrapLabel', 'bootstrapHasError'],
-          templateOptions: {
-            label: $filter('translate')('PUBLISH.CONFIGURATION.TLS_PROPERTIES'),
-            availableOptions: utilService.buildSelectOptions(properties.data.entities)
+    if (publishTls) {
+      $scope.tlsSettings = {
+        model: {
+          properties: publishTls.properties || []
+        },
+        fields: [
+          {
+            key: 'properties',
+            type: 'editableTags',
+            wrapper: ['editableWrapper', 'bootstrapLabel', 'bootstrapHasError'],
+            templateOptions: {
+              label: $filter('translate')('PUBLISH.CONFIGURATION.TLS_PROPERTIES'),
+              availableOptions: utilService.buildSelectOptions(properties.data.entities)
+            }
           }
-        }
-      ],
-      options: {
-        formState: {
-          showForm: $scope.rights.edit
-        }
-      },
-      isFormSaving: false
-    };
+        ],
+        options: {
+          formState: {
+            showForm: $scope.rights.edit
+          }
+        },
+        isFormSaving: false
+      };
+    }
 
     /**
      * Saves medias settings.

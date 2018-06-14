@@ -100,7 +100,7 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
         function(error, tlsSettings) {
           if (error) return callback(error);
 
-          configurations['publishTls'] = tlsSettings && tlsSettings.value;
+          configurations['publishTls'] = (tlsSettings && tlsSettings.value) ? tlsSettings.value : {};
           callback();
         }
       );

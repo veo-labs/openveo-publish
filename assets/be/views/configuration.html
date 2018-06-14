@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="col-sd-12 col-md-4">
+    <div ng-if="tlsSettings" class="col-sd-12 col-md-4">
       <div class="panel panel-default">
         <div uib-popover="{{'PUBLISH.CONFIGURATION.TLS_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.TLS_TITLE' | translate"></div>
         <div class="panel-body">
