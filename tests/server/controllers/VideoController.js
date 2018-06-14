@@ -299,7 +299,7 @@ describe('VideoController', function() {
       for (var platform in videoPlatformConf) videoPlatformConf[platform] = expectedPlatforms.indexOf(platform) >= 0;
 
       response.send = function(data) {
-        assert.deepEqual(data.platforms, expectedPlatforms, 'Wront platforms');
+        assert.deepEqual(data.platforms, expectedPlatforms, 'Wrong platforms');
         done();
       };
       videoController.getPlatformsAction(request, response);
