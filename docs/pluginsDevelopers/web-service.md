@@ -15,7 +15,7 @@ Name | Type | Required | Default | Details
 query | String | No | - | To search on both videos title and description
 states | String/Array | No | - | To filter videos by state
 dateStart | String/Number | No | - | To get videos after or equal to a date (in any format supported by JavaScript Date object)
-dateEnd | String/Number | No | - | To get videos before a date (in any format supported by JavaScript Date object)
+dateEnd | String/Number | No | - | To get videos before or equal to a date (in any format supported by JavaScript Date object)
 categories | String/Array | No | - | To filter videos by category
 groups | String/Array | No | - | To filter videos by group
 user | String/Array | No | - | To filter videos by user
