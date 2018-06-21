@@ -344,6 +344,11 @@ PublishManager.prototype.publish = function(mediaPackage) {
           // Retry media
           self.retry(media.id, true);
 
+        } else {
+          self.emit(
+            'error',
+            new PublishError('Duplicate file "' + mediaPackage.originalPackagePath, ERRORS.DUPLICATE_MEDIA)
+          );
         }
       }
     );
