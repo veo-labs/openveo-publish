@@ -1,3 +1,7 @@
+# 7.0.1 / YYYY-MM-DD
+
+- Fix medias blocked in *pending* state when uploading more than 3 medias at a time
+
 # 7.0.0 / 2018-06-15
 
 ## BREAKING CHANGES

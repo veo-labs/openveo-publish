@@ -14,10 +14,8 @@ var packageFactory = process.requirePublish('app/server/packages/packageFactory.
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishError = process.requirePublish('app/server/PublishError.js');
-var fileSystem = openVeoApi.fileSystem;
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
-var acceptedPackagesExtensions = [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4];
 var publishManager;
 
 /**
@@ -310,55 +308,45 @@ PublishManager.prototype.publish = function(mediaPackage) {
 
   if (mediaPackage && (typeof mediaPackage === 'object')) {
 
-    openVeoApi.util.validateFiles({
-      file: mediaPackage.originalPackagePath
-    }, {
-      file: {
-        in: acceptedPackagesExtensions,
-        validateExtension: true
-      }
-    }, function(error, files) {
-      if (error || (files.file && !files.file.isValid))
-        return self.emit('error', new PublishError('Media package type is not valid (' +
-                                                   mediaPackage.originalPackagePath +
-                                                   ')', ERRORS.INVALID_PACKAGE_TYPE));
+    // Media package can be in queue and already have an id
+    if (!mediaPackage.id) {
+      var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
+      mediaPackage.id = shortid.generate();
+      mediaPackage.title = mediaPackage.title || pathDescriptor.name;
+    }
 
-      // Media package can be in queue and already have an id
-      if (!mediaPackage.id) {
-        var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
-        mediaPackage.packageType = files.file.type;
-        mediaPackage.id = shortid.generate();
-        mediaPackage.title = mediaPackage.title || pathDescriptor.name;
-      }
+    self.videoProvider.getOne(
+      new ResourceFilter().equal('originalPackagePath', mediaPackage.originalPackagePath),
+      {
+        include: ['id']
+      },
+      function(error, media) {
+        if (error) {
+          self.emit('error', new PublishError('Getting media with original package path "' +
+                                              mediaPackage.originalPackagePath + '" failed with message : ' +
+                                              error.message, ERRORS.UNKNOWN));
+        } else if (!media) {
 
-      self.videoProvider.getOne(
-        new ResourceFilter().equal('originalPackagePath', mediaPackage.originalPackagePath),
-        {
-          include: ['id']
-        },
-        function(error, media) {
-          if (error) {
-            self.emit('error', new PublishError('Getting media with original package path "' +
-                                                mediaPackage.originalPackagePath + '" failed with message : ' +
-                                                error.message, ERRORS.UNKNOWN));
-          } else if (!media) {
+          // Package can be added to pending packages as a new one
+          if (addPackage.call(self, mediaPackage)) {
 
-            // Package can be added to pending packages
-            if (addPackage.call(self, mediaPackage)) {
-
-              // Media package does not exist
-              // Publish it
-              var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
-              mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
-              mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
-
-            }
+            // Media package does not exist
+            // Publish it
+            var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+            mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
+            mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
 
           }
 
+        } else if (media.id === mediaPackage.id) {
+
+          // Media already exists
+          // Retry media
+          self.retry(media.id, true);
+
         }
-      );
-    });
+      }
+    );
   } else
     this.emit('error', new PublishError('mediaPackage argument must be an Object', ERRORS.UNKNOWN));
 };
