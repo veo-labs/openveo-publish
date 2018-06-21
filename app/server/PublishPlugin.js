@@ -11,6 +11,8 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 var PublishPluginApi = process.requirePublish('app/server/PublishPluginApi.js');
 var listener = process.requirePublish('app/server/listener.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var fileSystem = openVeoApi.fileSystem;
 
 var configDir = openVeoApi.fileSystem.getConfDir();
 var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
@@ -174,7 +176,23 @@ PublishPlugin.prototype.start = function(callback) {
       packageInfo['originalPackagePath'] = resourcePath;
       packageInfo['originalFileName'] = pathDescriptor.name;
 
-      publishManager.publish(packageInfo);
+      openVeoApi.util.validateFiles({
+        file: packageInfo.originalPackagePath
+      }, {
+        file: {
+          in: [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4],
+          validateExtension: true
+        }
+      }, function(error, files) {
+        if (error || (files.file && !files.file.isValid)) {
+          var errorMessage = (error && error.message) ||
+              'Media package type is not valid (' + packageInfo.originalPackagePath + ')';
+          process.logger.error(errorMessage, {code: ERRORS.INVALID_PACKAGE_TYPE});
+        } else {
+          packageInfo.packageType = files.file.type;
+          publishManager.publish(packageInfo);
+        }
+      });
     });
 
     // Listen publish manager's errors

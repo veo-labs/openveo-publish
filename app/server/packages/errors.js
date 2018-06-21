@@ -243,7 +243,18 @@ var ERRORS = {
    * @default 22
    * @final
    */
-  REPLACE_FRAGMENTED: 22
+  REPLACE_FRAGMENTED: 22,
+
+  /**
+   * A media with the same file name as already been published.
+   *
+   * @property
+   * @type Number
+   * @default 23
+   * @final
+   */
+  DUPLICATE_MEDIA: 23
+
 };
 
 Object.freeze(ERRORS);

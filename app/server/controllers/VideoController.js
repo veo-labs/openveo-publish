@@ -435,6 +435,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
   var groupsIds;
   var customProperties;
   var params;
+  var mediaPackageType;
   var provider = this.getProvider();
   var parser = new MultipartParser(request, [
     {
@@ -519,7 +520,8 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
 
         openVeoApi.util.validateFiles({
-          file: request.files.file[0].path
+          file: request.files.file[0].path,
+          validateExtension: true
         }, {
           file: {in: [fileSystemApi.FILE_TYPES.MP4, fileSystemApi.FILE_TYPES.TAR]}
         }, function(validateError, files) {
@@ -528,8 +530,10 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
               process.logger.error(validateError.message, {error: validateError, method: 'addEntityAction'});
 
             callback(HTTP_ERRORS.ADD_MEDIA_WRONG_FILE_PARAMETER);
-          } else
+          } else {
+            mediaPackageType = files.file.type;
             callback();
+          }
         });
       },
 
@@ -648,7 +652,8 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           category: params.category,
           groups: params.groups,
           user: request.user.id,
-          properties: request.body.info.properties
+          properties: request.body.info.properties,
+          packageType: mediaPackageType
         });
       }
 
