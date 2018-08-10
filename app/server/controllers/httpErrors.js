@@ -27,6 +27,7 @@ var HTTP_ERRORS = {
    * @property UNKNOWN_ERROR
    * @type Object
    * @final
+   * @default 0
    */
   UNKNOWN_ERROR: {
     code: 0x000,
@@ -40,6 +41,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_ERROR
    * @type Object
    * @final
+   * @default 1
    */
   GET_VIDEO_READY_ERROR: {
     code: 0x001,
@@ -53,6 +55,7 @@ var HTTP_ERRORS = {
    * @property PUBLISH_VIDEOS_ERROR
    * @type Object
    * @final
+   * @default 2
    */
   PUBLISH_VIDEOS_ERROR: {
     code: 0x002,
@@ -66,6 +69,7 @@ var HTTP_ERRORS = {
    * @property UNPUBLISH_VIDEOS_ERROR
    * @type Object
    * @final
+   * @default 3
    */
   UNPUBLISH_VIDEOS_ERROR: {
     code: 0x003,
@@ -79,6 +83,7 @@ var HTTP_ERRORS = {
    * @property GET_CONFIGURATION_ERROR
    * @type Object
    * @final
+   * @default 4
    */
   GET_CONFIGURATION_ERROR: {
     code: 0x004,
@@ -92,6 +97,7 @@ var HTTP_ERRORS = {
    * @property GET_PROPERTIES_ERROR
    * @type Object
    * @final
+   * @default 5
    */
   GET_PROPERTIES_ERROR: {
     code: 0x005,
@@ -105,6 +111,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEOS_ERROR
    * @type Object
    * @final
+   * @default 6
    */
   GET_VIDEOS_ERROR: {
     code: 0x006,
@@ -118,6 +125,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_UPDATE_ERROR
    * @type Object
    * @final
+   * @default 7
    */
   STATISTICS_UPDATE_ERROR: {
     code: 0x007,
@@ -132,6 +140,7 @@ var HTTP_ERRORS = {
    * @property SAVE_MEDIAS_SETTINGS_ERROR
    * @type Object
    * @final
+   * @default 8
    */
   SAVE_MEDIAS_SETTINGS_ERROR: {
     code: 0x008,
@@ -145,6 +154,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_UPLOAD_ERROR
    * @type Object
    * @final
+   * @default 9
    */
   UPDATE_TAG_UPLOAD_ERROR: {
     code: 0x009,
@@ -158,6 +168,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_GROUPS_ERROR
    * @type Object
    * @final
+   * @default 10
    */
   ADD_MEDIA_GROUPS_ERROR: {
     code: 0x00a,
@@ -171,6 +182,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_CUSTOM_PROPERTIES_ERROR
    * @type Object
    * @final
+   * @default 11
    */
   ADD_MEDIA_CUSTOM_PROPERTIES_ERROR: {
     code: 0x00b,
@@ -183,6 +195,7 @@ var HTTP_ERRORS = {
    *
    * @property ADD_MEDIA_PARSE_ERROR
    * @type Object
+   * @default 12
    * @final
    */
   ADD_MEDIA_PARSE_ERROR: {
@@ -197,6 +210,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_CHECK_DUPLICATE_ERROR
    * @type Object
    * @final
+   * @default 13
    */
   ADD_MEDIA_CHECK_DUPLICATE_ERROR: {
     code: 0x00d,
@@ -210,6 +224,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_REMOVE_FILE_ERROR
    * @type Object
    * @final
+   * @default 14
    */
   ADD_MEDIA_REMOVE_FILE_ERROR: {
     code: 0x00e,
@@ -223,6 +238,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_NOT_READY_ERROR
    * @type Object
    * @final
+   * @default 15
    */
   GET_VIDEO_READY_NOT_READY_ERROR: {
     code: 0x00f,
@@ -236,6 +252,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_GET_INFO_ERROR
    * @type Object
    * @final
+   * @default 16
    */
   GET_VIDEO_READY_GET_INFO_ERROR: {
     code: 0x010,
@@ -249,6 +266,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 17
    */
   UPDATE_MEDIA_GET_ONE_ERROR: {
     code: 0x011,
@@ -262,6 +280,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEOS_GET_PROPERTIES_ERROR
    * @type Object
    * @final
+   * @default 18
    */
   GET_VIDEOS_GET_PROPERTIES_ERROR: {
     code: 0x012,
@@ -275,6 +294,7 @@ var HTTP_ERRORS = {
    * @property PUBLISH_VIDEOS_GET_VIDEOS_ERROR
    * @type Object
    * @final
+   * @default 19
    */
   PUBLISH_VIDEOS_GET_VIDEOS_ERROR: {
     code: 0x013,
@@ -288,6 +308,7 @@ var HTTP_ERRORS = {
    * @property UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR
    * @type Object
    * @final
+   * @default 20
    */
   UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR: {
     code: 0x014,
@@ -301,6 +322,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 21
    */
   UPDATE_TAG_GET_ONE_ERROR: {
     code: 0x015,
@@ -314,6 +336,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_CHAPTER_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 22
    */
   UPDATE_CHAPTER_GET_ONE_ERROR: {
     code: 0x016,
@@ -327,6 +350,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_ERROR
    * @type Object
    * @final
+   * @default 23
    */
   UPDATE_TAG_ERROR: {
     code: 0x017,
@@ -340,6 +364,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_CHAPTER_ERROR
    * @type Object
    * @final
+   * @default 24
    */
   UPDATE_CHAPTER_ERROR: {
     code: 0x018,
@@ -353,6 +378,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_TAGS_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 25
    */
   REMOVE_TAGS_GET_ONE_ERROR: {
     code: 0x019,
@@ -366,6 +392,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_TAGS_ERROR
    * @type Object
    * @final
+   * @default 26
    */
   REMOVE_TAGS_ERROR: {
     code: 0x01a,
@@ -379,6 +406,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_CHAPTERS_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 27
    */
   REMOVE_CHAPTERS_GET_ONE_ERROR: {
     code: 0x01b,
@@ -392,6 +420,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_CHAPTERS_ERROR
    * @type Object
    * @final
+   * @default 28
    */
   REMOVE_CHAPTERS_ERROR: {
     code: 0x01c,
@@ -405,6 +434,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 29
    */
   CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR: {
     code: 0x01d,
@@ -418,6 +448,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR
    * @type Object
    * @final
+   * @default 30
    */
   CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR: {
     code: 0x01e,
@@ -431,6 +462,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_GET_ONE_ERROR
    * @type Object
    * @final
+   * @default 31
    */
   STATISTICS_GET_ONE_ERROR: {
     code: 0x01f,
@@ -444,6 +476,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_VIDEO_POI_ERROR
    * @type Object
    * @final
+   * @default 32
    */
   CONVERT_VIDEO_POI_ERROR: {
     code: 0x020,
@@ -457,6 +490,7 @@ var HTTP_ERRORS = {
    * @property INVALID_VIDEO_THUMBNAIL
    * @type Object
    * @final
+   * @default 33
    */
   INVALID_VIDEO_THUMBNAIL: {
     code: 0x021,
@@ -470,6 +504,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_PARSE_ERROR
    * @type Object
    * @final
+   * @default 34
    */
   UPDATE_MEDIA_PARSE_ERROR: {
     code: 0x022,
@@ -483,6 +518,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_ERROR
    * @type Object
    * @final
+   * @default 35
    */
   UPDATE_MEDIA_ERROR: {
     code: 0x023,
@@ -496,6 +532,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_ERROR
    * @type Object
    * @final
+   * @default 36
    */
   GET_MEDIA_ERROR: {
     code: 0x024,
@@ -509,6 +546,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_GET_INFO_ERROR
    * @type Object
    * @final
+   * @default 37
    */
   GET_MEDIA_GET_INFO_ERROR: {
     code: 0x025,
@@ -522,6 +560,7 @@ var HTTP_ERRORS = {
    * @property SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR
    * @type Object
    * @final
+   * @default 38
    */
   SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR: {
     code: 0x026,
@@ -535,6 +574,7 @@ var HTTP_ERRORS = {
    * @property SAVE_TLS_SETTINGS_ERROR
    * @type Object
    * @final
+   * @default 39
    */
   SAVE_TLS_SETTINGS_ERROR: {
     code: 0x027,
@@ -548,6 +588,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_SYNCHRONIZE_ERROR
    * @type Object
    * @final
+   * @default 40
    */
   UPDATE_MEDIA_SYNCHRONIZE_ERROR: {
     code: 0x028,
@@ -563,6 +604,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_FORBIDDEN
    * @type Object
    * @final
+   * @default 256
    */
   GET_VIDEO_READY_FORBIDDEN: {
     code: 0x100,
@@ -576,6 +618,7 @@ var HTTP_ERRORS = {
    * @property PUBLISH_VIDEOS_FORBIDDEN
    * @type Object
    * @final
+   * @default 257
    */
   PUBLISH_VIDEOS_FORBIDDEN: {
     code: 0x101,
@@ -589,6 +632,7 @@ var HTTP_ERRORS = {
    * @property UNPUBLISH_VIDEOS_FORBIDDEN
    * @type Object
    * @final
+   * @default 258
    */
   UNPUBLISH_VIDEOS_FORBIDDEN: {
     code: 0x102,
@@ -602,6 +646,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_FORBIDDEN
    * @type Object
    * @final
+   * @default 259
    */
   UPDATE_TAG_FORBIDDEN: {
     code: 0x103,
@@ -615,6 +660,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_FORBIDDEN
    * @type Object
    * @final
+   * @default 260
    */
   UPDATE_MEDIA_FORBIDDEN: {
     code: 0x104,
@@ -628,6 +674,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_CHAPTER_FORBIDDEN
    * @type Object
    * @final
+   * @default 261
    */
   UPDATE_CHAPTER_FORBIDDEN: {
     code: 0x105,
@@ -641,6 +688,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_TAGS_FORBIDDEN
    * @type Object
    * @final
+   * @default 262
    */
   REMOVE_TAGS_FORBIDDEN: {
     code: 0x106,
@@ -654,6 +702,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_CHAPTERS_FORBIDDEN
    * @type Object
    * @final
+   * @default 263
    */
   REMOVE_CHAPTERS_FORBIDDEN: {
     code: 0x107,
@@ -667,6 +716,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_POINTS_OF_INTEREST_FORBIDDEN
    * @type Object
    * @final
+   * @default 264
    */
   CONVERT_POINTS_OF_INTEREST_FORBIDDEN: {
     code: 0x108,
@@ -680,6 +730,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_FORBIDDEN
    * @type Object
    * @final
+   * @default 265
    */
   GET_MEDIA_FORBIDDEN: {
     code: 0x109,
@@ -695,6 +746,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 512
    */
   GET_VIDEO_READY_MISSING_PARAMETERS: {
     code: 0x200,
@@ -708,6 +760,7 @@ var HTTP_ERRORS = {
    * @property PUBLISH_VIDEOS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 513
    */
   PUBLISH_VIDEOS_MISSING_PARAMETERS: {
     code: 0x201,
@@ -721,6 +774,7 @@ var HTTP_ERRORS = {
    * @property UNPUBLISH_VIDEOS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 514
    */
   UNPUBLISH_VIDEOS_MISSING_PARAMETERS: {
     code: 0x202,
@@ -734,6 +788,7 @@ var HTTP_ERRORS = {
    * @property RETRY_VIDEOS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 515
    */
   RETRY_VIDEOS_MISSING_PARAMETERS: {
     code: 0x203,
@@ -747,6 +802,7 @@ var HTTP_ERRORS = {
    * @property START_UPLOAD_VIDEOS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 516
    */
   START_UPLOAD_VIDEOS_MISSING_PARAMETERS: {
     code: 0x204,
@@ -760,6 +816,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_MISSING_ID_PARAMETERS
    * @type Object
    * @final
+   * @default 517
    */
   STATISTICS_MISSING_ID_PARAMETERS: {
     code: 0x205,
@@ -774,6 +831,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_PROPERTY_UNKNOWN
    * @type Object
    * @final
+   * @default 518
    */
   STATISTICS_PROPERTY_UNKNOWN: {
     code: 0x206,
@@ -788,6 +846,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_ENTITY_UNKNOWN
    * @type Object
    * @final
+   * @default 519
    */
   STATISTICS_ENTITY_UNKNOWN: {
     code: 0x207,
@@ -802,6 +861,7 @@ var HTTP_ERRORS = {
    * @property STATISTICS_MISSING_COUNT_PARAMETERS
    * @type Object
    * @final
+   * @default 520
    */
   STATISTICS_MISSING_COUNT_PARAMETERS: {
     code: 0x208,
@@ -816,6 +876,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEOS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 521
    */
   GET_VIDEOS_WRONG_PARAMETERS: {
     code: 0x209,
@@ -829,6 +890,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 522
    */
   UPDATE_TAG_MISSING_PARAMETERS: {
     code: 0x20a,
@@ -842,6 +904,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_TAGS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 523
    */
   REMOVE_TAGS_MISSING_PARAMETERS: {
     code: 0x20b,
@@ -855,6 +918,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 524
    */
   ADD_MEDIA_MISSING_PARAMETERS: {
     code: 0x20c,
@@ -868,6 +932,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_MISSING_INFO_PARAMETERS
    * @type Object
    * @final
+   * @default 525
    */
   ADD_MEDIA_MISSING_INFO_PARAMETERS: {
     code: 0x20d,
@@ -881,6 +946,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_WRONG_FILE_PARAMETER
    * @type Object
    * @final
+   * @default 526
    */
   ADD_MEDIA_WRONG_FILE_PARAMETER: {
     code: 0x20e,
@@ -895,6 +961,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 527
    */
   ADD_MEDIA_WRONG_PARAMETERS: {
     code: 0x20f,
@@ -908,6 +975,7 @@ var HTTP_ERRORS = {
    * @property ADD_MEDIA_WRONG_PROPERTIES_PARAMETER
    * @type Object
    * @final
+   * @default 528
    */
   ADD_MEDIA_WRONG_PROPERTIES_PARAMETER: {
     code: 0x210,
@@ -921,6 +989,7 @@ var HTTP_ERRORS = {
    * @property SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 529
    */
   SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS: {
     code: 0x211,
@@ -934,6 +1003,7 @@ var HTTP_ERRORS = {
    * @property SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 530
    */
   SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS: {
     code: 0x212,
@@ -947,6 +1017,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 531
    */
   GET_VIDEO_READY_WRONG_PARAMETERS: {
     code: 0x213,
@@ -960,6 +1031,7 @@ var HTTP_ERRORS = {
    * @property PUBLISH_VIDEOS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 532
    */
   PUBLISH_VIDEOS_WRONG_PARAMETERS: {
     code: 0x214,
@@ -973,6 +1045,7 @@ var HTTP_ERRORS = {
    * @property UNPUBLISH_VIDEOS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 533
    */
   UNPUBLISH_VIDEOS_WRONG_PARAMETERS: {
     code: 0x215,
@@ -986,6 +1059,7 @@ var HTTP_ERRORS = {
    * @property START_UPLOAD_VIDEOS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 534
    */
   START_UPLOAD_VIDEOS_WRONG_PARAMETERS: {
     code: 0x216,
@@ -999,6 +1073,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_TAG_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 535
    */
   UPDATE_TAG_WRONG_PARAMETERS: {
     code: 0x217,
@@ -1012,6 +1087,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_CHAPTER_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 536
    */
   UPDATE_CHAPTER_MISSING_PARAMETERS: {
     code: 0x218,
@@ -1025,6 +1101,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_CHAPTER_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 537
    */
   UPDATE_CHAPTER_WRONG_PARAMETERS: {
     code: 0x219,
@@ -1038,6 +1115,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_TAGS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 538
    */
   REMOVE_TAGS_WRONG_PARAMETERS: {
     code: 0x21a,
@@ -1051,6 +1129,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_CHAPTERS_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 539
    */
   REMOVE_CHAPTERS_MISSING_PARAMETERS: {
     code: 0x21b,
@@ -1064,6 +1143,7 @@ var HTTP_ERRORS = {
    * @property REMOVE_CHAPTERS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 540
    */
   REMOVE_CHAPTERS_WRONG_PARAMETERS: {
     code: 0x21c,
@@ -1077,6 +1157,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 541
    */
   CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS: {
     code: 0x21d,
@@ -1090,6 +1171,7 @@ var HTTP_ERRORS = {
    * @property CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 542
    */
   CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS: {
     code: 0x21e,
@@ -1103,6 +1185,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 543
    */
   GET_MEDIA_WRONG_PARAMETERS: {
     code: 0x21f,
@@ -1116,6 +1199,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_MISSING_PARAMETERS
    * @type Object
    * @final
+   * @default 544
    */
   GET_MEDIA_MISSING_PARAMETERS: {
     code: 0x220,
@@ -1129,6 +1213,7 @@ var HTTP_ERRORS = {
    * @property RETRY_VIDEOS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 545
    */
   RETRY_VIDEOS_WRONG_PARAMETERS: {
     code: 0x221,
@@ -1142,6 +1227,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 546
    */
   GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS: {
     code: 0x222,
@@ -1155,6 +1241,7 @@ var HTTP_ERRORS = {
    * @property SAVE_TLS_SETTINGS_WRONG_PARAMETERS
    * @type Object
    * @final
+   * @default 547
    */
   SAVE_TLS_SETTINGS_WRONG_PARAMETERS: {
     code: 0x223,
@@ -1168,6 +1255,7 @@ var HTTP_ERRORS = {
    * @property SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER
    * @type Object
    * @final
+   * @default 548
    */
   SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER: {
     code: 0x224,
@@ -1183,6 +1271,7 @@ var HTTP_ERRORS = {
    * @property GET_VIDEO_READY_NOT_FOUND
    * @type Object
    * @final
+   * @default 768
    */
   GET_VIDEO_READY_NOT_FOUND: {
     code: 0x300,
@@ -1196,6 +1285,7 @@ var HTTP_ERRORS = {
    * @property GET_MEDIA_NOT_FOUND
    * @type Object
    * @final
+   * @default 769
    */
   GET_MEDIA_NOT_FOUND: {
     code: 0x301,
@@ -1209,6 +1299,7 @@ var HTTP_ERRORS = {
    * @property UPDATE_MEDIA_NOT_FOUND_ERROR
    * @type Object
    * @final
+   * @default 770
    */
   UPDATE_MEDIA_NOT_FOUND_ERROR: {
     code: 0x302,
