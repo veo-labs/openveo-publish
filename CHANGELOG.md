@@ -1,3 +1,9 @@
+# 7.0.2 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix the owner and group of new medias added from the catalogue. Owner was set to the user specified in configuration instead of the user who added the media. Group was set to the group specified in configuration instead of the group specified when adding the media.
+
 # 7.0.1 / 2018-06-21
 
 ## BUG FIXES

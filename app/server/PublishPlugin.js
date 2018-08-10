@@ -13,6 +13,7 @@ var PublishPluginApi = process.requirePublish('app/server/PublishPluginApi.js');
 var listener = process.requirePublish('app/server/listener.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var fileSystem = openVeoApi.fileSystem;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 var configDir = openVeoApi.fileSystem.getConfDir();
 var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
@@ -129,6 +130,8 @@ PublishPlugin.prototype.init = function(callback) {
  *
  * This is automatically called by core application after plugin is initialized.
  *
+ * TODO: When a cache mechanism will be implemented, Publish settings will have to be pulled from cache.
+ *
  * @method start
  * @async
  * @param {Function} callback Function to call when it's done with :
@@ -176,23 +179,63 @@ PublishPlugin.prototype.start = function(callback) {
       packageInfo['originalPackagePath'] = resourcePath;
       packageInfo['originalFileName'] = pathDescriptor.name;
 
-      openVeoApi.util.validateFiles({
-        file: packageInfo.originalPackagePath
-      }, {
-        file: {
-          in: [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4],
-          validateExtension: true
+      async.series([
+
+        // Validate file
+        function(callback) {
+          openVeoApi.util.validateFiles({
+            file: packageInfo.originalPackagePath
+          }, {
+            file: {
+              in: [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4],
+              validateExtension: true
+            }
+          }, function(error, files) {
+            if (error || (files.file && !files.file.isValid)) {
+              var errorMessage = (error && error.message) ||
+                  'Media package type is not valid (' + packageInfo.originalPackagePath + ')';
+              process.logger.error(errorMessage, {code: ERRORS.INVALID_PACKAGE_TYPE});
+              callback(new Error(errorMessage));
+            } else {
+              callback(null, files.file.type);
+            }
+          });
+        },
+
+        // Get Publish medias settings
+        function(callback) {
+          var settingProvider = process.api.getCoreApi().settingProvider;
+
+          settingProvider.getOne(
+            new ResourceFilter()
+            .equal('id', 'publish-medias'),
+            null,
+            function(error, setting) {
+              if (error) {
+                process.logger.error(
+                  'Failed getting media settings with message: "' + (error && error.message) + '"'
+                );
+              }
+
+              callback(error, setting && setting.value);
+            }
+          );
         }
-      }, function(error, files) {
-        if (error || (files.file && !files.file.isValid)) {
-          var errorMessage = (error && error.message) ||
-              'Media package type is not valid (' + packageInfo.originalPackagePath + ')';
-          process.logger.error(errorMessage, {code: ERRORS.INVALID_PACKAGE_TYPE});
-        } else {
-          packageInfo.packageType = files.file.type;
-          publishManager.publish(packageInfo);
+
+      ], function(error, results) {
+        if (error) return;
+
+        var packageType = results[0];
+        var mediasSettings = results[1];
+
+        packageInfo.packageType = packageType;
+        if (mediasSettings) {
+          if (mediasSettings.owner) packageInfo.user = mediasSettings.owner;
+          if (mediasSettings.group) packageInfo.groups = [mediasSettings.group];
         }
+        publishManager.publish(packageInfo);
       });
+
     });
 
     // Listen publish manager's errors

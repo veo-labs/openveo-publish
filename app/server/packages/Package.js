@@ -321,79 +321,49 @@ Package.prototype.initPackage = function() {
   process.logger.debug('Init package ' + this.mediaPackage.id);
 
   var self = this;
+  var filter = new ResourceFilter().equal('originalFileName', this.mediaPackage.originalFileName);
+  if (this.mediaPackage.type) filter.equal('type', this.mediaPackage.type);
 
-  async.series([
-    function(callback) {
-      var settingProvider = process.api.getCoreApi().settingProvider;
+  self.videoProvider.getOne(
+    filter,
+    null,
+    function(getOneError, media) {
+      if (getOneError) return self.emit('error', new PackageError(getOneError.message, ERRORS.SAVE_PACKAGE_DATA));
 
-      settingProvider.getOne(
-        new ResourceFilter()
-        .equal('id', 'publish-medias'),
-        null,
-        function(error, setting) {
-          if (error) return callback(error);
-          var mediasSettings = setting && setting.value;
-
-          if (mediasSettings) {
-            if (mediasSettings.owner)
-              self.mediaPackage.user = mediasSettings.owner;
-
-            if (mediasSettings.group)
-              self.mediaPackage.groups = [mediasSettings.group];
-          }
-          callback();
+      if (media) {
+        if (media.errorCode === ERRORS.NO_ERROR) {
+          var originalPackagePath = self.mediaPackage.originalPackagePath;
+          var originalPackageType = self.mediaPackage.packageType;
+          self.mediaPackage = media;
+          self.mediaPackage.errorCode = ERRORS.NO_ERROR;
+          self.mediaPackage.state = STATES.PENDING;
+          self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
+          self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
+          self.mediaPackage.originalPackagePath = originalPackagePath;
+          self.mediaPackage.packageType = originalPackageType;
+          if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
         }
-      );
-    },
-    function(callback) {
-      var filter = new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName);
-      if (self.mediaPackage.type) filter.equal('type', self.mediaPackage.type);
 
-      self.videoProvider.getOne(
-        filter,
-        null,
-        function(getOneError, media) {
-          if (getOneError) return callback(getOneError);
-
-          if (media) {
-            if (media.errorCode != ERRORS.NO_ERROR)
-              callback();
-            else {
-              var originalPackagePath = self.mediaPackage.originalPackagePath;
-              var originalPackageType = self.mediaPackage.packageType;
-              self.mediaPackage = media;
-              self.mediaPackage.errorCode = ERRORS.NO_ERROR;
-              self.mediaPackage.state = STATES.PENDING;
-              self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
-              self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
-              self.mediaPackage.originalPackagePath = originalPackagePath;
-              self.mediaPackage.packageType = originalPackageType;
-              if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
-              callback();
-            }
-          } else {
-            self.mediaPackage.state = STATES.PENDING;
-            self.mediaPackage.link = null;
-            self.mediaPackage.mediaId = null;
-            self.mediaPackage.errorCode = ERRORS.NO_ERROR;
-            self.mediaPackage.properties = self.mediaPackage.properties || {};
-            self.mediaPackage.metadata = self.mediaPackage.metadata || {};
-            self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
-            self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
-            if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
-            self.videoProvider.add([self.mediaPackage], callback);
-          }
-        }
-      );
-    }],
-    function(error) {
-      if (error)
-        self.emit('error', new PackageError(error.message, ERRORS.SAVE_PACKAGE_DATA));
-      else {
         self.emit('stateChanged', self.mediaPackage);
         self.fsm.transition();
+      } else {
+        self.mediaPackage.state = STATES.PENDING;
+        self.mediaPackage.link = null;
+        self.mediaPackage.mediaId = null;
+        self.mediaPackage.errorCode = ERRORS.NO_ERROR;
+        self.mediaPackage.properties = self.mediaPackage.properties || {};
+        self.mediaPackage.metadata = self.mediaPackage.metadata || {};
+        self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
+        self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
+        if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
+        self.videoProvider.add([self.mediaPackage], function(addError) {
+          if (addError) return self.emit('error', new PackageError(addError.message, ERRORS.SAVE_PACKAGE_DATA));
+          self.emit('stateChanged', self.mediaPackage);
+          self.fsm.transition();
+        });
       }
-    });
+    }
+  );
 };
 
 /**
