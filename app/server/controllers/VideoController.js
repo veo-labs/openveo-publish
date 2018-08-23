@@ -492,27 +492,26 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
         customProperties = properties;
         callback();
       });
-    },
-
-    // Parse multipart body
-    function(callback) {
-      parser.parse(function(error) {
-        if (error) {
-          process.logger.error(error.message, {error: error, method: 'addEntityAction'});
-          return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
-        }
-
-        if (!request.body.info) return callback(HTTP_ERRORS.ADD_MEDIA_MISSING_INFO_PARAMETERS);
-
-        request.body.info = JSON.parse(request.body.info);
-        callback();
-      });
     }
 
   ], function(error) {
     if (error) return next(error);
 
     async.series([
+
+      // Parse multipart body
+      function(callback) {
+        parser.parse(function(error) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
+          }
+          if (!request.body.info) return callback(HTTP_ERRORS.ADD_MEDIA_MISSING_INFO_PARAMETERS);
+
+          request.body.info = JSON.parse(request.body.info);
+          callback();
+        });
+      },
 
       // Validate file
       function(callback) {
