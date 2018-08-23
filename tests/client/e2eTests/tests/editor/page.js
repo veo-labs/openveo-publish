@@ -18,7 +18,7 @@ chai.use(chaiAsPromised);
 describe('Editor page', function() {
   var page;
   var mediaId = 'test-editor-page';
-  var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
+  var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages');
   var mediaFileName = 'blank.mp4';
   var mediaFileDuration = 610000;
   var medias;

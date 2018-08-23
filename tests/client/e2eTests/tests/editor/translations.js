@@ -19,7 +19,7 @@ describe('Editor page translations', function() {
   var page;
   var medias;
   var mediaId = 'test-editor-page-translations';
-  var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/packages');
+  var mediaFilePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages');
   var mediaFileName = 'blank.mp4';
   var mediaHelper;
 
