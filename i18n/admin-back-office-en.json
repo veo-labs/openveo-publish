@@ -21,7 +21,9 @@
     "DELETE_PROPERTIES_NAME" : "Delete properties",
     "DELETE_PROPERTIES_DESCRIPTION" : "Delete one or several custom properties",
     "INCREASE_VIEW_NAME" : "Increase video views",
-    "INCREASE_VIEW_DESCRIPTION" : "Increase views count on video"
+    "INCREASE_VIEW_DESCRIPTION" : "Increase views count on video",
+    "ADD_VIDEO_NAME" : "Add video",
+    "ADD_VIDEO_DESCRIPTION" : "Add a new video"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Add properties",

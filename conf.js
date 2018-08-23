@@ -37,7 +37,8 @@ module.exports = {
         'get /videos/:id': 'app/server/controllers/VideoController.getEntityAction',
         'post /videos/:id/poi/convert': 'app/server/controllers/VideoController.convertPoiAction',
         'get /videos*': 'app/server/controllers/VideoController.getEntitiesAction',
-        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction'
+        'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction',
+        'post /videos': 'app/server/controllers/VideoController.addEntityAction'
       }
     }
   },
@@ -68,6 +69,14 @@ module.exports = {
       description: 'PUBLISH.WS_SCOPES.DELETE_VIDEOS_DESCRIPTION',
       paths: [
         'delete /publish/videos*'
+      ]
+    },
+    {
+      id: 'publish-add-video',
+      name: 'PUBLISH.WS_SCOPES.ADD_VIDEO_NAME',
+      description: 'PUBLISH.WS_SCOPES.ADD_VIDEO_DESCRIPTION',
+      paths: [
+        'post /publish/videos'
       ]
     }
   ],

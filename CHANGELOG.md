@@ -1,4 +1,8 @@
-# 7.0.2 / YYYY-MM-DD
+# 7.1.0 / YYYY-MM-DD
+
+## NEW FEATURES
+
+- Web service endpoint POST /videos have been added to be able to add a new video. Note that if you are using a web server as a frontal of OpenVeo application server, you may have to increase the upload size limit
 
 ## BUG FIXES
 

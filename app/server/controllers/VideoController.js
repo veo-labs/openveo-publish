@@ -431,6 +431,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
   if (!request.body) return next(HTTP_ERRORS.ADD_MEDIA_MISSING_PARAMETERS);
 
   var self = this;
+  var mediaId;
   var categoriesIds;
   var groupsIds;
   var customProperties;
@@ -593,8 +594,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
             groups: {type: 'array<string>', in: groupsIds}
           };
 
-          // Avoid getting a category with value "null" (string)
-          if (request.body.info.category !== null)
+          if (request.body.info.category)
             validationDescriptor.category = {type: 'string', in: categoriesIds};
 
           params = openVeoApi.util.shallowValidateObject(request.body.info, validationDescriptor);
@@ -632,6 +632,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 
         var listener = function(mediaPackage) {
           if (mediaPackage.originalPackagePath === request.files.file[0].path) {
+            mediaId = mediaPackage.id;
             publishManager.removeListener('stateChanged', listener);
             callback();
           }
@@ -650,7 +651,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           description: params.description,
           category: params.category,
           groups: params.groups,
-          user: request.user.id,
+          user: request.user.type === 'oAuthClient' ? coreApi.getSuperAdminId() : request.user.id,
           properties: request.body.info.properties,
           packageType: mediaPackageType
         });
@@ -671,7 +672,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 
         } else
           next(error);
-      } else response.send();
+      } else response.send({id: mediaId});
     });
   });
 };

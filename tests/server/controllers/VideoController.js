@@ -192,6 +192,9 @@ describe('VideoController', function() {
         getAll: function(filter, fields, sort, callback) {
           callback(null, expectedGroups);
         }
+      },
+      getSuperAdminId: function() {
+        return '1';
       }
     };
 
@@ -878,9 +881,11 @@ describe('VideoController', function() {
   });
 
   describe('addEntityAction', function() {
+    var expectedMediaId = '42';
+    var publishManagerListener;
 
     beforeEach(function() {
-      var publishManagerListener;
+
       MultipartParser.prototype.parse = function(callback) {
         request.files = {
           file: [
@@ -905,6 +910,7 @@ describe('VideoController', function() {
       };
 
       PublishManager.publish = function(media) {
+        media.id = expectedMediaId;
         publishManagerListener(media);
       };
 
@@ -957,6 +963,7 @@ describe('VideoController', function() {
       };
 
       response.send = function(data) {
+        assert.equal(data.id, expectedMediaId, 'Wrong media id');
         done();
       };
 
@@ -1219,6 +1226,25 @@ describe('VideoController', function() {
         assert.equal(error, HTTP_ERRORS.ADD_MEDIA_REMOVE_FILE_ERROR, 'Wrong error');
         fs.unlink.should.have.been.called.exactly(1);
         done();
+      });
+    });
+
+    it('should set owner to super administrator if request comes from the web service', function(done) {
+      request.user.type = 'oAuthClient';
+
+      response.send = function(data) {
+        PublishManager.publish.should.have.been.called.exactly(1);
+        done();
+      };
+
+      PublishManager.publish = chai.spy(function(videoPackage) {
+        assert.equal(videoPackage.user, process.api.getCoreApi().getSuperAdminId(), 'Wrong user');
+        videoPackage.id = expectedMediaId;
+        publishManagerListener(videoPackage);
+      });
+
+      videoController.addEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
       });
     });
 

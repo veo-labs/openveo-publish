@@ -138,13 +138,13 @@ PublishPlugin.prototype.init = function(callback) {
  *  - **Error** An error if something went wrong, null otherwise
  */
 PublishPlugin.prototype.start = function(callback) {
+  var coreApi = process.api.getCoreApi();
+  var database = coreApi.getDatabase();
+  var videoProvider = new VideoProvider(database);
+  var publishManager = PublishManager.get(videoProvider, publishConf.maxConcurrentPackage);
 
   // Do not start the watcher if the process is the web service
   if (!process.isWebService) {
-    var coreApi = process.api.getCoreApi();
-    var database = coreApi.getDatabase();
-    var videoProvider = new VideoProvider(database);
-    var publishManager = PublishManager.get(videoProvider, publishConf.maxConcurrentPackage);
     var watcher = new Watcher();
     var hotFoldersPaths = [];
 

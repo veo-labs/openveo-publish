@@ -251,6 +251,41 @@ HTTP Status Code | Details
 }
 ```
 
+---
+
+Add video.
+
+    POST WEB_SERVICE_URL/publish/videos
+
+Expects a multipart/form-data body containing:
+
+Name | Type | Required | Default | Details
+---- | ---- | ---- | ---- | ----
+file | File | Yes | - | The video file
+thumbnail | File | No | - | The video thumbnail
+info | Object | Yes | - | The video metadata
+info.title | String | Yes | - | The video title
+info.properties | Object | No | - | The custom properties of the video with the keys as custom property ids and values as custom property values
+info.category | String | No | - | The id of the category the video belongs to
+info.date | String | No | - | The date of the video (in any format supported by JavaScript Date object)
+info.leadParagraph | String | No | - | The video lead paragraph
+info.description | String | No | - | The video description
+info.groups | Array | No | - | The list of content groups (ids) the video belongs to
+
+HTTP Status Code | Details
+---- | ----
+200 | The video has been added
+500 | An error occured on the server side
+400 | Missing body
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "id": 42
+}
+```
+
 ## Properties
 
 Get custom properties.

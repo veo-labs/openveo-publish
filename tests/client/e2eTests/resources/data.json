@@ -237,7 +237,7 @@
   "applications": {
     "publishApplicationsVideos": {
       "name": "publish-applications-videos",
-      "scopes": [ "publish-get-videos", "publish-add-videos", "publish-update-videos", "publish-delete-videos" ]
+      "scopes": [ "publish-get-videos", "publish-add-video", "publish-update-videos", "publish-delete-videos" ]
     },
     "publishApplicationsProperties": {
       "name": "publish-applications-properties",
