@@ -517,7 +517,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
       // Validate file
       function(callback) {
         if (!request.files || !request.files.file || !request.files.file.length)
-          return callback(HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR);
+          return callback(HTTP_ERRORS.ADD_MEDIA_MISSING_FILE_PARAMETER);
 
         openVeoApi.util.validateFiles({
           file: request.files.file[0].path,

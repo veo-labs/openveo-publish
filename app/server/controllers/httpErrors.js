@@ -1263,6 +1263,20 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Adding media failed, missing the media file.
+   *
+   * @property ADD_MEDIA_MISSING_FILE_PARAMETER
+   * @type Object
+   * @final
+   * @default 549
+   */
+  ADD_MEDIA_MISSING_FILE_PARAMETER: {
+    code: 0x225,
+    httpCode: 400,
+    module: 'publish'
+  },
+
   // Not found errors
 
   /**

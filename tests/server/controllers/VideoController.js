@@ -1050,7 +1050,7 @@ describe('VideoController', function() {
       };
 
       videoController.addEntityAction(request, response, function(error) {
-        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_PARSE_ERROR, 'Wrong error');
+        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_MISSING_FILE_PARAMETER, 'Wrong error');
         done();
       });
     });
