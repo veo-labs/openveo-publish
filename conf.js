@@ -60,7 +60,7 @@ module.exports = {
       description: 'PUBLISH.WS_SCOPES.GET_VIDEOS_DESCRIPTION',
       paths: [
         'get /publish/videos*',
-        'post /publish/videos/*'
+        'post /publish/videos/:id/poi/convert'
       ]
     },
     {

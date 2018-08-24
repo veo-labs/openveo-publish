@@ -1,4 +1,8 @@
-# 7.1.0 / YYYY-MM-DD
+# 8.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core >=5.2.0
 
 ## NEW FEATURES
 
