@@ -413,6 +413,34 @@ describe('Videos web service', function() {
       });
     });
 
+    it('should not be able to get videos without permission', function(done) {
+      var application = process.protractorConf.getWebServiceApplication(
+        datas.applications.publishApplicationsNoPermission.name
+      );
+      var client = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.READY,
+          title: 'Video title 1'
+        }
+      ];
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        page.refresh();
+
+        client.get('publish/videos').then(function(results) {
+          check(function() {
+            assert.ok(false, 'Unexpected response');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.equal(error.httpCode, 403, 'Wrong HTTP code');
+          }, done);
+        });
+      });
+    });
+
   });
 
   describe('post /publish/videos', function() {
