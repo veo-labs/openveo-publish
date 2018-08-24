@@ -830,6 +830,34 @@ describe('Videos web service', function() {
       });
     });
 
+    it('should not be able to add video without permission', function(done) {
+      var application = process.protractorConf.getWebServiceApplication(
+        datas.applications.publishApplicationsNoPermission.name
+      );
+      var client = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
+      var filePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages/blank.mp4');
+      client.post(
+        '/publish/videos',
+        {
+          info: JSON.stringify({
+            title: 'Title'
+          }),
+          file: fs.createReadStream(filePath)
+        },
+        null,
+        Infinity,
+        true
+      ).then(function(data) {
+        check(function() {
+          assert.ok(false, 'Unexpected response');
+        }, done);
+      }).catch(function(error) {
+        check(function() {
+          assert.equal(error.httpCode, 403, 'Wrong HTTP code');
+        }, done);
+      });
+    });
+
   });
 
 });
