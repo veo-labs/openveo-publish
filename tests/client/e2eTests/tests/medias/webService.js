@@ -753,6 +753,55 @@ describe('Videos web service', function() {
       });
     });
 
+    it('should fail if a video with the same original path already exists', function(done) {
+      var filePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages/blank.mp4');
+      webServiceClient.post(
+        '/publish/videos',
+        {
+          info: JSON.stringify({
+            title: 'Title',
+            platform: TYPES.LOCAL
+          }),
+          file: fs.createReadStream(filePath)
+        },
+        null,
+        Infinity,
+        true
+      ).then(function(data) {
+        waitForState(data.id, STATES.READY, function(error, media) {
+          webServiceClient.post(
+            '/publish/videos',
+            {
+              info: JSON.stringify({
+                title: 'Title'
+              }),
+              file: fs.createReadStream(filePath)
+            },
+            null,
+            Infinity,
+            true
+          ).then(function() {
+            check(function() {
+              assert.ok(false, 'Unexpected response');
+            }, done);
+          }).catch(function(error) {
+            check(function() {
+              assert.include(
+                error.message,
+                HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.code,
+                'Expected a message with error code ' + HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.code
+              );
+              assert.equal(error.httpCode, HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.httpCode, 'Wrong HTTP code');
+            }, done);
+          });
+        });
+      }).catch(function(error) {
+        check(function() {
+          assert.ok(false, 'Unexpected error');
+        }, done);
+      });
+    });
+
   });
 
 });
