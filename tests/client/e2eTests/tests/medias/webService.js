@@ -11,6 +11,7 @@ var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.j
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
@@ -514,6 +515,37 @@ describe('Videos web service', function() {
         true
       ).then(function(data) {
         waitForState(data.id, STATES.WAITING_FOR_UPLOAD, function(error, media) {
+          check(function() {
+            assert.equal(media.title, expectedVideoTitle, 'Wrong title');
+          }, done);
+        });
+      }).catch(function(error) {
+        check(function() {
+          assert.ok(false, 'Unexpected error: ' + error.message);
+        }, done);
+      });
+    });
+
+    it('should be able to automatically upload the video on a configured platform', function(done) {
+      var expectedVideoTitle = 'Video title';
+      var filePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages/blank.mp4');
+
+      webServiceClient.post(
+        '/publish/videos',
+        {
+          info: JSON.stringify(
+            {
+              title: expectedVideoTitle,
+              platform: TYPES.LOCAL
+            }
+          ),
+          file: fs.createReadStream(filePath)
+        },
+        null,
+        Infinity,
+        true
+      ).then(function(data) {
+        waitForState(data.id, STATES.READY, function(error, media) {
           check(function() {
             assert.equal(media.title, expectedVideoTitle, 'Wrong title');
           }, done);

@@ -424,6 +424,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
  * @param {String} [request.body.info.leadParagraph] The media lead paragraph
  * @param {String} [request.body.info.description] The media description
  * @param {Array} [request.body.info.groups] The media content groups it belongs to
+ * @param {String} [request.body.info.platform] The platform to upload the file to
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
@@ -597,6 +598,9 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           if (request.body.info.category)
             validationDescriptor.category = {type: 'string', in: categoriesIds};
 
+          if (request.body.info.platform)
+            validationDescriptor.platform = {type: 'string', in: Object.keys(platforms)};
+
           params = openVeoApi.util.shallowValidateObject(request.body.info, validationDescriptor);
 
         } catch (validationError) {
@@ -653,7 +657,8 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           groups: params.groups,
           user: request.user.type === 'oAuthClient' ? coreApi.getSuperAdminId() : request.user.id,
           properties: request.body.info.properties,
-          packageType: mediaPackageType
+          packageType: mediaPackageType,
+          type: params.platform
         });
       }
 

@@ -271,6 +271,7 @@ info.date | String | No | - | The date of the video (in any format supported by 
 info.leadParagraph | String | No | - | The video lead paragraph
 info.description | String | No | - | The video description
 info.groups | Array | No | - | The list of content groups (ids) the video belongs to
+info.platform | String | No | - | The platform to upload the file to. If no platform is specified the video will be in "*Waiting for upload*" state. Platform could be one of the platforms defined in *videoPlatformConf.json* configuration file (either **vimeo**, **wowza**, **youtube** or **local**)
 
 HTTP Status Code | Details
 ---- | ----

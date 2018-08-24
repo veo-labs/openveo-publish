@@ -921,7 +921,8 @@ describe('VideoController', function() {
         leadParagraph: 'Lead paragraph',
         description: 'Description',
         groups: [],
-        category: null
+        category: null,
+        platform: TYPES.LOCAL
       });
     });
 
@@ -1153,6 +1154,22 @@ describe('VideoController', function() {
         description: 'Description',
         groups: [],
         category: ['Wrong category id']
+      });
+
+      videoController.addEntityAction(request, response, function(error) {
+        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_WRONG_PARAMETERS, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should execute next function with an error if platform is not part of existing platforms', function(done) {
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      request.body.info = JSON.stringify({
+        title: 'Title',
+        platform: 'Wrong platform'
       });
 
       videoController.addEntityAction(request, response, function(error) {
