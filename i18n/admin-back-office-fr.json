@@ -23,7 +23,9 @@
     "INCREASE_VIEW_NAME" : "Ajouter des vues à une vidéo",
     "INCREASE_VIEW_DESCRIPTION" : "Ajouter un nombre de vue sur une vidéo",
     "ADD_VIDEO_NAME" : "Ajouter une vidéo",
-    "ADD_VIDEO_DESCRIPTION" : "Ajouter une nouvelle vidéo"
+    "ADD_VIDEO_DESCRIPTION" : "Ajouter une nouvelle vidéo",
+    "PUBLISH_VIDEOS_NAME" : "Publier des vidéos",
+    "PUBLISH_VIDEOS_DESCRIPTION" : "Publier / Dépublier des vidéos"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Ajouter des propriétés",

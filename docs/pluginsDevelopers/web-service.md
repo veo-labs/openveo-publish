@@ -287,6 +287,50 @@ HTTP Status Code | Details
 }
 ```
 
+---
+
+Publish videos.
+
+    POST WEB_SERVICE_URL/publish/videos/{video_id}/publish
+
+With **{video_id}** a comma separated list of video ids to publish.
+
+HTTP Status Code | Details
+---- | ----
+200 | The videos have been published
+500 | An error occured on the server side
+400 | Missing the video ids
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "total": 42
+}
+```
+
+---
+
+Unpublish videos.
+
+    POST WEB_SERVICE_URL/publish/videos/{video_id}/unpublish
+
+With **{video_id}** a comma separated list of video ids to unpublish.
+
+HTTP Status Code | Details
+---- | ----
+200 | The videos have been unpublished
+500 | An error occured on the server side
+400 | Missing the video ids
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "total": 42
+}
+```
+
 ## Properties
 
 Get custom properties.

@@ -860,4 +860,136 @@ describe('Videos web service', function() {
 
   });
 
+  describe('post /publish/videos/:id/publish', function() {
+
+    it('should publish videos', function(done) {
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.READY,
+          title: 'Video title 1'
+        },
+        {
+          id: '1',
+          state: STATES.READY,
+          title: 'Video title 2'
+        }
+      ];
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        webServiceClient.post(
+          '/publish/videos/' + linesToAdd[0].id + ',' + linesToAdd[1].id + '/publish'
+        ).then(function(data) {
+          check(function() {
+            assert.equal(data.total, linesToAdd.length, 'Wrong total of published videos');
+          }, done, true);
+          return webServiceClient.get('/publish/videos');
+        }).then(function(data) {
+          check(function() {
+            assert.equal(data.entities[0].state, STATES.PUBLISHED, 'Wrong state for the first video');
+            assert.equal(data.entities[1].state, STATES.PUBLISHED, 'Wrong state for the second video');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, 'Unexpected error');
+          }, done);
+        });
+      });
+    });
+
+    it('should not be able to publish videos without permission', function(done) {
+      var application = process.protractorConf.getWebServiceApplication(
+        datas.applications.publishApplicationsNoPermission.name
+      );
+      var client = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.READY,
+          title: 'Video title'
+        }
+      ];
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        client.post(
+          '/publish/videos/' + linesToAdd[0].id + '/publish'
+        ).then(function(data) {
+          check(function() {
+            assert.ok(false, 'Unexpected response');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.equal(error.httpCode, 403, 'Wrong HTTP code');
+          }, done);
+        });
+      });
+    });
+
+  });
+
+  describe('post /publish/videos/:id/unpublish', function() {
+
+    it('should unpublish videos', function(done) {
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Video title 1'
+        },
+        {
+          id: '1',
+          state: STATES.PUBLISHED,
+          title: 'Video title 2'
+        }
+      ];
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        webServiceClient.post(
+          '/publish/videos/' + linesToAdd[0].id + ',' + linesToAdd[1].id + '/unpublish'
+        ).then(function(data) {
+          check(function() {
+            assert.equal(data.total, linesToAdd.length, 'Wrong total of unpublished videos');
+          }, done, true);
+          return webServiceClient.get('/publish/videos');
+        }).then(function(data) {
+          check(function() {
+            assert.equal(data.entities[0].state, STATES.READY, 'Wrong state for the first video');
+            assert.equal(data.entities[1].state, STATES.READY, 'Wrong state for the second video');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, 'Unexpected error');
+          }, done);
+        });
+      });
+    });
+
+    it('should not be able to unpublish videos without permission', function(done) {
+      var application = process.protractorConf.getWebServiceApplication(
+        datas.applications.publishApplicationsNoPermission.name
+      );
+      var client = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Video title'
+        }
+      ];
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        client.post(
+          '/publish/videos/' + linesToAdd[0].id + '/unpublish'
+        ).then(function(data) {
+          check(function() {
+            assert.ok(false, 'Unexpected response');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.equal(error.httpCode, 403, 'Wrong HTTP code');
+          }, done);
+        });
+      });
+    });
+
+  });
+
 });
