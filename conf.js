@@ -40,7 +40,8 @@ module.exports = {
         'delete /videos/:id': 'app/server/controllers/VideoController.removeEntitiesAction',
         'post /videos': 'app/server/controllers/VideoController.addEntityAction',
         'post /videos/:ids/publish': 'app/server/controllers/VideoController.publishVideosAction',
-        'post /videos/:ids/unpublish': 'app/server/controllers/VideoController.unpublishVideosAction'
+        'post /videos/:ids/unpublish': 'app/server/controllers/VideoController.unpublishVideosAction',
+        'get /platforms': 'app/server/controllers/VideoController.getPlatformsAction'
       }
     }
   },
@@ -88,6 +89,14 @@ module.exports = {
       paths: [
         'post /publish/videos/:id/publish',
         'post /publish/videos/:id/unpublish'
+      ]
+    },
+    {
+      id: 'publish-get-platforms',
+      name: 'PUBLISH.WS_SCOPES.GET_PLATFORMS_NAME',
+      description: 'PUBLISH.WS_SCOPES.GET_PLATFORMS_DESCRIPTION',
+      paths: [
+        'get /publish/platforms'
       ]
     }
   ],

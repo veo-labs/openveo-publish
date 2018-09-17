@@ -9,6 +9,7 @@
 - Web service endpoint POST /videos has been added to be able to add a new video. Note that if you are using a web server as a frontal of OpenVeo application server, you may have to increase the upload size limit
 - Web service endpont POST /videos/:id/publish has been added to be able to publish a video in ready state
 - Web service endpont POST /videos/:id/unpublish has been added to be able to unpublish a video in publish state
+- Web service endpont POST /videos/platforms has been added to get the list of configured video platforms
 
 ## BUG FIXES
 

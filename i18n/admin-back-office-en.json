@@ -25,7 +25,9 @@
     "ADD_VIDEO_NAME" : "Add video",
     "ADD_VIDEO_DESCRIPTION" : "Add a new video",
     "PUBLISH_VIDEOS_NAME" : "Publish videos",
-    "PUBLISH_VIDEOS_DESCRIPTION" : "Publish / Unpublish videos"
+    "PUBLISH_VIDEOS_DESCRIPTION" : "Publish / Unpublish videos",
+    "GET_PLATFORMS_NAME" : "Get video platforms",
+    "GET_PLATFORMS_DESCRIPTION" : "Get the list of configured video platforms"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Add properties",

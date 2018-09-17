@@ -523,3 +523,28 @@ HTTP Status Code | Details
   "total": 42
 }
 ```
+
+## Platforms
+
+Get configured video platforms.
+
+    GET WEB_SERVICE_URL/publish/platforms
+
+HTTP Status Code | Details
+---- | ----
+200 | Got the platforms
+500 | An error occured on the server side
+401 | Authentication to the web service failed
+403 | Authorization forbidden for this end point
+
+```json
+{
+  "platforms": [
+    "vimeo",
+    "youtube",
+    "local",
+    "tls",
+    "wowza"
+  ]
+}
+```
