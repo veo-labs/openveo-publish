@@ -596,6 +596,48 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Removing medias failed, a media is not in a stable state.
+   *
+   * @property REMOVE_MEDIAS_STATE_ERROR
+   * @type Object
+   * @final
+   * @default 41
+   */
+  REMOVE_MEDIAS_STATE_ERROR: {
+    code: 0x029,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Removing medias failed.
+   *
+   * @property REMOVE_MEDIAS_ERROR
+   * @type Object
+   * @final
+   * @default 42
+   */
+  REMOVE_MEDIAS_ERROR: {
+    code: 0x02a,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Removing medias failed when getting the list of medias.
+   *
+   * @property REMOVE_MEDIAS_GET_MEDIAS_ERROR
+   * @type Object
+   * @final
+   * @default 43
+   */
+  REMOVE_MEDIAS_GET_MEDIAS_ERROR: {
+    code: 0x02b,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -734,6 +776,20 @@ var HTTP_ERRORS = {
    */
   GET_MEDIA_FORBIDDEN: {
     code: 0x109,
+    httpCode: 403,
+    module: 'publish'
+  },
+
+  /**
+   * Removing medias failed, user doesn't have enough privilege.
+   *
+   * @property REMOVE_MEDIAS_FORBIDDEN
+   * @type Object
+   * @final
+   * @default 266
+   */
+  REMOVE_MEDIAS_FORBIDDEN: {
+    code: 0x10a,
     httpCode: 403,
     module: 'publish'
   },
@@ -1273,6 +1329,20 @@ var HTTP_ERRORS = {
    */
   ADD_MEDIA_MISSING_FILE_PARAMETER: {
     code: 0x225,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Removing medias failed, missing the media ids.
+   *
+   * @property REMOVE_MEDIAS_MISSING_PARAMETERS
+   * @type Object
+   * @final
+   * @default 550
+   */
+  REMOVE_MEDIAS_MISSING_PARAMETERS: {
+    code: 0x226,
     httpCode: 400,
     module: 'publish'
   },

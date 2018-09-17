@@ -992,4 +992,113 @@ describe('Videos web service', function() {
 
   });
 
+  describe('delete /publish/videos/:id', function() {
+
+    it('should remove videos', function(done) {
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Video title 1'
+        },
+        {
+          id: '1',
+          state: STATES.PUBLISHED,
+          title: 'Video title 2'
+        }
+      ];
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        webServiceClient.delete(
+          '/publish/videos/' + linesToAdd[0].id + ',' + linesToAdd[1].id
+        ).then(function(data) {
+          check(function() {
+            assert.equal(data.total, linesToAdd.length, 'Wrong total of removed videos');
+          }, done, true);
+          return webServiceClient.get('/publish/videos');
+        }).then(function(data) {
+          check(function() {
+            assert.equal(data.entities.length, 0, 'Unexpected videos');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, 'Unexpected error');
+          }, done);
+        });
+      });
+    });
+
+    it('should send response with an error if no video corresponds to the specified id', function(done) {
+      webServiceClient.delete('/publish/videos/wrongId').then(function(data) {
+        check(function() {
+          assert.ok(false, 'Unexpected response');
+        }, done);
+      }).catch(function(error) {
+        check(function() {
+          assert.include(
+            error.message,
+            HTTP_ERRORS.REMOVE_MEDIAS_ERROR.code,
+            'Expected a message with error code ' + HTTP_ERRORS.REMOVE_MEDIAS_ERROR.code
+          );
+          assert.equal(error.httpCode, HTTP_ERRORS.REMOVE_MEDIAS_ERROR.httpCode, 'Wrong HTTP code');
+        }, done);
+      });
+    });
+
+    it('should send response with an error if video is not in a stable state', function(done) {
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PENDING,
+          title: 'Video title 1'
+        }
+      ];
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        webServiceClient.delete('/publish/videos/' + linesToAdd[0].id).then(function(data) {
+          check(function() {
+            assert.ok(false, 'Unexpected response');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.include(
+              error.message,
+              HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR.code,
+              'Expected a message with error code ' + HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR.code
+            );
+            assert.equal(error.httpCode, HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR.httpCode, 'Wrong HTTP code');
+          }, done);
+        });
+      });
+    });
+
+    it('should not be able to remove videos without permission on the end point', function(done) {
+      var application = process.protractorConf.getWebServiceApplication(
+        datas.applications.publishApplicationsNoPermission.name
+      );
+      var client = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
+      var linesToAdd = [
+        {
+          id: '0',
+          state: STATES.PUBLISHED,
+          title: 'Video title'
+        }
+      ];
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        client.delete(
+          '/publish/videos/' + linesToAdd[0].id
+        ).then(function(data) {
+          check(function() {
+            assert.ok(false, 'Unexpected response');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.equal(error.httpCode, 403, 'Wrong HTTP code');
+          }, done);
+        });
+      });
+    });
+
+  });
+
 });

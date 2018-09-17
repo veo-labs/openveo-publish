@@ -14,6 +14,7 @@
 ## BUG FIXES
 
 - Fix the owner and group of new medias added from the catalogue. Owner was set to the user specified in configuration instead of the user who added the media. Group was set to the group specified in configuration instead of the group specified when adding the media.
+- Fix server crash when removing an unstable video through DELETE /videos/:id. It is no longer possible to remove a video in a unstable state (different from "ready", "published", "Waiting for upload" and "Error")
 
 # 7.0.1 / 2018-06-21
 

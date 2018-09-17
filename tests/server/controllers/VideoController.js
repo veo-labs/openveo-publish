@@ -40,6 +40,26 @@ describe('VideoController', function() {
   var fs;
   var superAdminId = '0';
   var anonymousId = '1';
+  var unstableStates = [
+    STATES.PENDING,
+    STATES.COPYING,
+    STATES.EXTRACTING,
+    STATES.VALIDATING,
+    STATES.PREPARING,
+    STATES.UPLOADING,
+    STATES.SYNCHRONIZING,
+    STATES.SAVING_TIMECODES,
+    STATES.COPYING_IMAGES,
+    STATES.GENERATE_THUMB,
+    STATES.GET_METADATA,
+    STATES.DEFRAGMENT_MP4
+  ];
+  var stableStates = [
+    STATES.ERROR,
+    STATES.WAITING_FOR_UPLOAD,
+    STATES.READY,
+    STATES.PUBLISHED
+  ];
 
   // Mocks
   beforeEach(function() {
@@ -61,9 +81,9 @@ describe('VideoController', function() {
     VideoProvider.prototype.get = chai.spy(function(filter, fields, page, limit, sort, callback) {
       callback(null, expectedMedias, expectedPagination);
     });
-    VideoProvider.prototype.remove = function(filter, callback) {
+    VideoProvider.prototype.remove = chai.spy(function(filter, callback) {
       callback(null, expectedMedias.length);
-    };
+    });
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
     });
@@ -3174,4 +3194,245 @@ describe('VideoController', function() {
     });
 
   });
+
+  describe('removeEntitiesAction', function() {
+
+    it('should remove medias and send operation result', function(done) {
+      var expectedIds = ['41', '42'];
+      expectedIds.forEach(function(expectedId) {
+        expectedMedias.push({
+          id: expectedId,
+          metadata: {
+            user: request.user.id
+          },
+          state: STATES.PUBLISHED
+        });
+      });
+
+      response.send = function(result) {
+        VideoProvider.prototype.remove.should.have.been.called.exactly(1);
+        assert.equal(result.total, expectedIds.length, 'Wrong total');
+        done();
+      };
+
+      VideoProvider.prototype.remove = chai.spy(function(filter, callback) {
+        assert.equal(filter.operations[0].type, ResourceFilter.OPERATORS.IN, 'Wrong operation type');
+        assert.equal(filter.operations[0].field, 'id', 'Wrong operation field');
+        assert.deepEqual(filter.operations[0].value, expectedIds, 'Wrong operation value');
+        callback(null, expectedIds.length);
+      });
+
+      request.params.id = expectedIds.join(',');
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected error');
+      });
+    });
+
+    it('should send an HTTP missing parameters error if id is not specified', function(done) {
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected error');
+      };
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_MISSING_PARAMETERS, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should send an HTTP server error if getting medias failed', function(done) {
+      var expectedId = '42';
+      expectedMedias.push({
+        id: expectedId,
+        metadata: {
+          user: request.user.id
+        },
+        state: STATES.PUBLISHED
+      });
+
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected error');
+      };
+
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, page, limit, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      request.params.id = expectedId;
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
+        VideoProvider.prototype.remove.should.have.been.called.exactly(0);
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_GET_MEDIAS_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should send an HTTP server error if removing medias failed', function(done) {
+      var expectedId = '42';
+      expectedMedias.push({
+        id: expectedId,
+        metadata: {
+          user: request.user.id
+        },
+        state: STATES.PUBLISHED
+      });
+
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected error');
+      };
+
+      VideoProvider.prototype.remove = chai.spy(function(filter, callback) {
+        callback(new Error('Error'));
+      });
+
+      request.params.id = expectedId;
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        VideoProvider.prototype.remove.should.have.been.called.exactly(1);
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should send an HTTP server error if removing medias partially failed', function(done) {
+      var expectedIds = ['41', '42'];
+      expectedIds.forEach(function(expectedId) {
+        expectedMedias.push({
+          id: expectedId,
+          metadata: {
+            user: request.user.id
+          },
+          state: STATES.PUBLISHED
+        });
+      });
+
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected error');
+      };
+
+      VideoProvider.prototype.remove = chai.spy(function(filter, callback) {
+        callback(null, expectedIds.length - 1);
+      });
+
+      request.params.id = expectedIds.join(',');
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        VideoProvider.prototype.remove.should.have.been.called.exactly(1);
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should send an HTTP forbidden if user has not enough privilege to delete medias', function(done) {
+      var expectedId = '42';
+      expectedMedias.push({
+        id: expectedId,
+        metadata: {
+          user: 'Something else'
+        },
+        state: STATES.PUBLISHED
+      });
+
+      videoController.isUserAuthorized = chai.spy(function(user, media, operation) {
+        return false;
+      });
+
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      request.params.id = expectedId;
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        videoController.isUserAuthorized.should.have.been.called.exactly(1);
+        VideoProvider.prototype.remove.should.have.been.called.exactly(0);
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_FORBIDDEN, 'Wrong error');
+        done();
+      });
+    });
+
+    it('should send an HTTP server error if some medias could not be removed', function(done) {
+      var expectedId = '42';
+      expectedMedias.push({
+        id: expectedId,
+        metadata: {
+          user: request.user.id
+        },
+        state: STATES.PUBLISHED
+      });
+
+      response.send = function(result) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      VideoProvider.prototype.remove = chai.spy(function(filter, callback) {
+        callback(null, 0);
+      });
+
+      request.params.id = expectedId;
+
+      videoController.removeEntitiesAction(request, response, function(error) {
+        VideoProvider.prototype.remove.should.have.been.called.exactly(1);
+        assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+    stableStates.forEach(function(stableState) {
+
+      it('should remove media and send operation result if media state is "' + stableState + '"',
+      function(done) {
+        var expectedId = '42';
+        expectedMedias.push({
+          id: expectedId,
+          metadata: {
+            user: request.user.id
+          },
+          state: stableState
+        });
+
+        response.send = function(result) {
+          VideoProvider.prototype.remove.should.have.been.called.exactly(1);
+          done();
+        };
+
+        request.params.id = expectedId;
+
+        videoController.removeEntitiesAction(request, response, function(error) {
+          assert.ok(false, 'Unexpected error');
+        });
+      });
+
+    });
+
+    unstableStates.forEach(function(unstableState) {
+
+      it('should send an HTTP server error if at least one media is in state "' + unstableState + '"', function(done) {
+        var expectedId = '42';
+        expectedMedias.push({
+          id: expectedId,
+          metadata: {
+            user: request.user.id
+          },
+          state: unstableState
+        });
+
+        response.send = function(result) {
+          assert.ok(false, 'Unexpected response');
+        };
+
+        request.params.id = expectedId;
+
+        videoController.removeEntitiesAction(request, response, function(error) {
+          VideoProvider.prototype.remove.should.have.been.called.exactly(0);
+          assert.strictEqual(error, HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR, 'Wrong error');
+          done();
+        });
+      });
+
+    });
+
+  });
+
 });

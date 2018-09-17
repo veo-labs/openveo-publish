@@ -1849,3 +1849,97 @@ VideoController.prototype.isUserManager = function(user) {
 VideoController.prototype.addEntitiesAction = function(request, response, next) {
   throw new Error('addEntitiesAction method not available for medias');
 };
+
+/**
+ * Removes medias.
+ *
+ * User must have permission to remove the medias. If user doesn't have permission to remove a particular media an
+ * HTTP forbidden error will be sent as response.
+ * Only medias in a stable state can be removed.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "total": 42
+ *     }
+ *
+ * @method removeEntitiesAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.params Request parameters
+ * @param {String} request.params.id A comma separated list of media ids to remove
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+VideoController.prototype.removeEntitiesAction = function(request, response, next) {
+  if (request.params.id) {
+    var self = this;
+    var mediaIds = request.params.id.split(',');
+    var stableStates = [
+      STATES.ERROR,
+      STATES.WAITING_FOR_UPLOAD,
+      STATES.READY,
+      STATES.PUBLISHED
+    ];
+    var mediaIdsToRemove = [];
+    var provider = this.getProvider();
+
+    // Get information on medias which are about to be removed to validate that the user has enough permissions
+    // to do it and that the media is on a stable state
+    provider.get(
+      new ResourceFilter().in('id', mediaIds),
+      {
+        include: ['id', 'metadata', 'state']
+      },
+      mediaIds.length,
+      null,
+      null,
+      function(error, medias, pagination) {
+        if (error) return next(HTTP_ERRORS.REMOVE_MEDIAS_GET_MEDIAS_ERROR);
+
+        medias.forEach(function(media) {
+
+          // Make sure user is authorized to modify the media
+          if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.DELETE)) {
+            process.logger.error(
+              'User doesn\'t have enough privilege to remove the media',
+              {method: 'removeEntitiesAction', media: media.id, user: request.user}
+            );
+            return next(HTTP_ERRORS.REMOVE_MEDIAS_FORBIDDEN);
+          }
+
+          // Make sure media is in a stable state
+          if (stableStates.indexOf(media.state) < 0) {
+            process.logger.error(
+              'Media can\'t be removed, it is not in a stable state',
+              {method: 'removeEntitiesAction', media: media.id, state: media.state}
+            );
+            return next(HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR);
+          }
+          mediaIdsToRemove.push(media.id);
+        });
+
+        provider.remove(new ResourceFilter().in('id', mediaIdsToRemove), function(error, total) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'removeEntitiesAction'});
+            next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
+          } else if (total != mediaIdsToRemove.length) {
+            process.logger.error(total + '/' + mediaIds.length + ' removed',
+                                 {method: 'removeEntitiesAction', medias: mediaIdsToRemove});
+            next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
+          } else {
+            response.send({total: total});
+          }
+        });
+
+      }
+    );
+
+  } else {
+
+    // Missing media ids
+    next(HTTP_ERRORS.REMOVE_MEDIAS_MISSING_PARAMETERS);
+
+  }
+};
