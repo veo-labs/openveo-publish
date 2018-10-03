@@ -11,6 +11,7 @@
 - Web service endpont POST /videos/:id/unpublish has been added to be able to unpublish a video in publish state
 - Web service endpont POST /videos/platforms has been added to get the list of configured video platforms
 - Uploading several videos with the same name is now possible
+- The names of videos uploaded through FTP, in tar format, now respect the name of the "name" property of the .session file
 
 ## BUG FIXES
 

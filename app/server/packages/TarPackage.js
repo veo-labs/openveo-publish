@@ -459,6 +459,12 @@ TarPackage.prototype.validatePackage = function() {
             if (self.mediaPackage.metadata.date)
               self.videoProvider.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000, callback);
             else callback();
+          },
+          function(callback) {
+            var pathDescriptor = path.parse(self.mediaPackage.originalPackagePath);
+            if (self.mediaPackage.metadata.name && self.mediaPackage.title === pathDescriptor.name)
+              self.videoProvider.updateTitle(self.mediaPackage.id, self.mediaPackage.metadata.name, callback);
+            else callback();
           }
         ], function() {
           self.fsm.transition();
