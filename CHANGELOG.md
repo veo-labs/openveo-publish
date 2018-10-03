@@ -10,6 +10,7 @@
 - Web service endpont POST /videos/:id/publish has been added to be able to publish a video in ready state
 - Web service endpont POST /videos/:id/unpublish has been added to be able to unpublish a video in publish state
 - Web service endpont POST /videos/platforms has been added to get the list of configured video platforms
+- Uploading several videos with the same name is now possible
 
 ## BUG FIXES
 

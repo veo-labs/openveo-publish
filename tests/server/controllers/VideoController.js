@@ -951,7 +951,8 @@ describe('VideoController', function() {
         assert.deepInclude(expectedFiles, {
           name: 'file',
           destinationPath: publishConf.videoTmpDir,
-          maxCount: 1
+          maxCount: 1,
+          unique: true
         }, 'Wrong file');
         assert.deepInclude(expectedFiles, {
           name: 'thumbnail',
@@ -1194,22 +1195,6 @@ describe('VideoController', function() {
 
       videoController.addEntityAction(request, response, function(error) {
         assert.equal(error, HTTP_ERRORS.ADD_MEDIA_WRONG_PARAMETERS, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next function with an error if a media with the same name already exists', function(done) {
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-      response.send = function(data) {
-        assert.ok(false, 'Unexpected response');
-      };
-
-      videoController.addEntityAction(request, response, function(error) {
-        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR, 'Wrong error');
         done();
       });
     });

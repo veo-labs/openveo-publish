@@ -438,12 +438,12 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
   var customProperties;
   var params;
   var mediaPackageType;
-  var provider = this.getProvider();
   var parser = new MultipartParser(request, [
     {
       name: 'file',
       destinationPath: publishConf.videoTmpDir,
-      maxCount: 1
+      maxCount: 1,
+      unique: true
     },
     {
       name: 'thumbnail',
@@ -609,24 +609,6 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
         }
 
         callback();
-      },
-
-      // Make sure media does not already exist in database
-      function(callback) {
-        provider.getOne(
-          new ResourceFilter()
-          .equal('originalPackagePath', request.files.file[0].path),
-          {
-            include: ['id']
-          },
-          function(getOneError, media) {
-            if (getOneError)
-              process.logger.error(getOneError.message, {error: getOneError, method: 'addEntityAction'});
-
-            if (media) callback(HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR);
-            else callback();
-          }
-        );
       },
 
       // Add new media

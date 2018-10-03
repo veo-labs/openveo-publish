@@ -553,6 +553,21 @@ VideoProvider.prototype.updateThumbnail = function(id, path, callback) {
 };
 
 /**
+ * Updates video title.
+ *
+ * @method updateTitle
+ * @async
+ * @param {Number} id The id of the video to update
+ * @param {String} title The video title
+ * @param {Function} callback The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of updated items
+ */
+VideoProvider.prototype.updateTitle = function(id, title, callback) {
+  updateMedia.call(this, id, {title: title}, callback);
+};
+
+/**
  * Removes medias.
  *
  * All datas associated to the deleted medias will also be deleted.

@@ -764,6 +764,44 @@ describe('VideoProvider', function() {
 
   });
 
+  describe('updateTitle', function() {
+
+    it('should update the media title', function(done) {
+      var expectedId = '42';
+      var expectedTitle = 'Title';
+
+      provider.updateOne = function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedId,
+          'Wrong id'
+        );
+        assert.strictEqual(data.title, expectedTitle, 'Wrong title');
+        callback(null, 1);
+      };
+
+      provider.updateTitle(expectedId, expectedTitle, function(error, total) {
+        assert.isNull(error, 'Unexpected error');
+        assert.equal(total, 1);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if update failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+
+      provider.updateOne = function(filter, data, callback) {
+        callback(expectedError);
+      };
+
+      provider.updateTitle('42', 'Title', function(error, total) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        done();
+      });
+    });
+
+  });
+
   describe('remove', function() {
 
     it('should remove medias', function(done) {

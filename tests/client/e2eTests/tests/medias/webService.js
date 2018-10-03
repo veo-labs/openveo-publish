@@ -466,7 +466,12 @@ describe('Videos web service', function() {
 
     it('should add a video', function(done) {
       var expectedVideoTitle = 'Video title';
-      var filePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages/blank.mp4');
+      var expectedFileName = 'blank';
+      var expectedFileExtension = '.mp4';
+      var filePath = path.join(
+        process.rootPublish,
+        'tests/client/e2eTests/resources/packages/' + expectedFileName + expectedFileExtension
+      );
       var thumbnailPath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/images/blank.png');
       var expectedDate = new Date().getTime();
       var expectedLeadParagraph = '<h1>Lead paragraph</h1>';
@@ -508,6 +513,7 @@ describe('Videos web service', function() {
             );
             assert.equal(media.metadata['profile-settings']['video-height'], 1080, 'Wrong video height');
             assert.deepEqual(media.metadata.groups, expectedGroups, 'Wrong groups');
+            assert.match(media.originalFileName, new RegExp(expectedFileName + '-.*'), 'Wrong file name');
             assert.equal(media.title, expectedVideoTitle, 'Wrong title');
             assert.equal(media.category, expectedCategory, 'Wrong category');
             assert.equal(
@@ -777,55 +783,6 @@ describe('Videos web service', function() {
             'Expected a message with error code ' + HTTP_ERRORS.ADD_MEDIA_WRONG_PARAMETERS.code
           );
           assert.equal(error.httpCode, HTTP_ERRORS.ADD_MEDIA_WRONG_PARAMETERS.httpCode, 'Wrong HTTP code');
-        }, done);
-      });
-    });
-
-    it('should fail if a video with the same original path already exists', function(done) {
-      var filePath = path.join(process.rootPublish, 'tests/client/e2eTests/resources/packages/blank.mp4');
-      webServiceClient.post(
-        '/publish/videos',
-        {
-          info: JSON.stringify({
-            title: 'Title',
-            platform: TYPES.LOCAL
-          }),
-          file: fs.createReadStream(filePath)
-        },
-        null,
-        Infinity,
-        true
-      ).then(function(data) {
-        waitForState(data.id, STATES.READY, function(error, media) {
-          webServiceClient.post(
-            '/publish/videos',
-            {
-              info: JSON.stringify({
-                title: 'Title'
-              }),
-              file: fs.createReadStream(filePath)
-            },
-            null,
-            Infinity,
-            true
-          ).then(function() {
-            check(function() {
-              assert.ok(false, 'Unexpected response');
-            }, done);
-          }).catch(function(error) {
-            check(function() {
-              assert.include(
-                error.message,
-                HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.code,
-                'Expected a message with error code ' + HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.code
-              );
-              assert.equal(error.httpCode, HTTP_ERRORS.ADD_MEDIA_CHECK_DUPLICATE_ERROR.httpCode, 'Wrong HTTP code');
-            }, done);
-          });
-        });
-      }).catch(function(error) {
-        check(function() {
-          assert.ok(false, 'Unexpected error');
         }, done);
       });
     });
