@@ -26,8 +26,8 @@
     "ADD_VIDEO_DESCRIPTION" : "Ajouter une nouvelle vidéo",
     "PUBLISH_VIDEOS_NAME" : "Publier des vidéos",
     "PUBLISH_VIDEOS_DESCRIPTION" : "Publier / Dépublier des vidéos",
-    "GET_PLATFORMS_NAME" : "Récupérer les platformes vidéos",
-    "GET_PLATFORMS_DESCRIPTION" : "Récupérer la liste des platformes vidéos configurées"
+    "GET_PLATFORMS_NAME" : "Récupérer les plateformes vidéos",
+    "GET_PLATFORMS_DESCRIPTION" : "Récupérer la liste des plateformes vidéos configurées"
   },
   "PERMISSIONS" : {
     "ADD_PROPERTIES_NAME" : "Ajouter des propriétés",
