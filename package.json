@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "7.0.1",
+  "version": "8.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -34,7 +34,7 @@
     "xml2js": "0.4.17"
   },
   "devDependencies": {
-    "@openveo/rest-nodejs-client": "3.*",
+    "@openveo/rest-nodejs-client": "3.* >=3.1.0",
     "chai": "4.0.2",
     "chai-as-promised": "7.1.1",
     "chai-spies": "0.7.1",
