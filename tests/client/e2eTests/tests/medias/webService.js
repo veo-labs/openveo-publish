@@ -82,7 +82,23 @@ describe('Videos web service', function() {
     categoryHelper.addEntities([
       {
         title: 'Category 1',
-        id: 'category1'
+        id: 'category1',
+        items: [
+          {
+            title: 'Sub category 1',
+            id: 'category11',
+            items: [
+              {
+                title: 'Sub sub category 1',
+                id: 'category111'
+              }
+            ]
+          },
+          {
+            title: 'Sub category 2',
+            id: 'category12'
+          }
+        ]
       }
     ]).then(function(addedLines) {
       addedCategories = addedLines.tree;
@@ -286,36 +302,63 @@ describe('Videos web service', function() {
         {
           id: '0',
           state: STATES.READY,
-          title: 'Video title 1',
-          category: '1'
+          title: 'Video in root category',
+          category: addedCategories[0].id
         },
         {
           id: '1',
           state: STATES.PUBLISHED,
-          title: 'Video title 2',
-          category: '2'
+          title: 'Video in category 1',
+          category: addedCategories[0].items[0].id
         },
         {
           id: '2',
           state: STATES.ERROR,
-          title: 'Video title 3',
-          category: '3'
+          title: 'Video in sub category 1 of category 1',
+          category: addedCategories[0].items[0].items[0].id
+        },
+        {
+          id: '3',
+          state: STATES.ERROR,
+          title: 'Video in category 2',
+          category: addedCategories[0].items[1].id
         }
       ];
 
       mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
         page.refresh();
 
-        webServiceClient.get('publish/videos?categories=1').then(function(results) {
+        webServiceClient.get('publish/videos?categories=' + addedCategories[0].id).then(function(results) {
           var videos = results.entities;
           check(function() {
-            assert.equal(videos.length, 1, 'Wrong number of results');
+            assert.equal(videos.length, 4, 'Wrong number of results');
+            assert.sameMembers(
+              [videos[0].id, videos[1].id, videos[2].id, videos[3].id],
+              [linesToAdd[0].id, linesToAdd[1].id, linesToAdd[2].id, linesToAdd[3].id],
+              'Wrong videos'
+            );
           }, done, true);
-          return webServiceClient.get('publish/videos?categories[]=2&categories[]=3');
+          return webServiceClient.get('publish/videos?categories=' + addedCategories[0].items[0].id);
         }).then(function(results) {
           var videos = results.entities;
           check(function() {
             assert.equal(videos.length, 2, 'Wrong number of results');
+            assert.sameMembers([videos[0].id, videos[1].id], [linesToAdd[1].id, linesToAdd[2].id], 'Wrong videos');
+          }, done, true);
+          return webServiceClient.get('publish/videos?categories=' + addedCategories[0].items[0].items[0].id);
+        }).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.equal(videos.length, 1, 'Wrong number of results');
+            assert.sameMembers([videos[0].id], [linesToAdd[2].id], 'Wrong videos');
+          }, done, true);
+          return webServiceClient.get('publish/videos?categories[]=' + addedCategories[0].items[0].items[0].id +
+                                      '&categories[]=' + addedCategories[0].items[1].id);
+        }).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.equal(videos.length, 2, 'Wrong number of results');
+            assert.sameMembers([videos[0].id, videos[1].id], [linesToAdd[2].id, linesToAdd[3].id], 'Wrong videos');
           }, done);
         }).catch(function(error) {
           check(function() {

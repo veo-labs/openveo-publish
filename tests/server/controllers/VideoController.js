@@ -1906,14 +1906,25 @@ describe('VideoController', function() {
       });
     });
 
-    it('should be able to filter results by categories', function(done) {
-      expectedMedias = [{id: 42}];
-      request.query = {categories: ['42']};
+    it('should be able to filter results by category', function(done) {
+      var expectedCategoryIds = ['42', '43'];
+      request.query = {categories: expectedCategoryIds[0]};
+      expectedMedias = [{id: '44'}];
+      expectedCategories = [
+        {
+          id: expectedCategoryIds[0],
+          items: [
+            {
+              id: expectedCategoryIds[1]
+            }
+          ]
+        }
+      ];
 
       VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
-        assert.deepEqual(
+        assert.sameMembers(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'category').value,
-          request.query.categories,
+          expectedCategoryIds,
           'Unexpected filters'
         );
         callback(null, expectedMedias, expectedPagination);
@@ -2158,6 +2169,25 @@ describe('VideoController', function() {
 
       videoController.getEntitiesAction(request, response, function(error) {
         assert.strictEqual(error, HTTP_ERRORS.GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS, 'Wrong error');
+        VideoProvider.prototype.get.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute next with an error if getting categories failed', function(done) {
+      request.query = {categories: ['42']};
+      expectedMedias = [{id: 43}];
+
+      coreApi.taxonomyProvider.getTaxonomyTerms = function(name, callback) {
+        callback(new Error('Something went wrong'));
+      };
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected call to send');
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEOS_GET_CATEGORIES_ERROR, 'Wrong error');
         VideoProvider.prototype.get.should.have.been.called.exactly(0);
         done();
       });

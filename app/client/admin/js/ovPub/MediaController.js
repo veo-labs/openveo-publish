@@ -593,37 +593,30 @@
         value: '',
         label: $filter('translate')('PUBLISH.MEDIAS.QUERY_FILTER')
       }, {
-        key: 'startDate',
+        key: 'dateStart',
         type: 'date',
-        param: 'dateStart',
         value: '',
-        label: $filter('translate')('PUBLISH.MEDIAS.START_DATE_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.START_DATE_FILTER'),
+        getValue: function(value) {
+          return value.getTime();
+        }
       }, {
-        key: 'endDate',
+        key: 'dateEnd',
         type: 'date',
-        param: 'dateEnd',
         value: '',
-        label: $filter('translate')('PUBLISH.MEDIAS.END_DATE_FILTER')
+        label: $filter('translate')('PUBLISH.MEDIAS.END_DATE_FILTER'),
+        getValue: function(value) {
+          value.setDate(value.getDate() + 1);
+          value.setMilliseconds(value.getMilliseconds() - 1);
+          return value.getTime();
+        }
       }, {
-        key: 'category',
+        key: 'categories',
         type: 'select',
         param: 'categories',
         value: null,
         label: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_FILTER'),
-
-        /*
-         * [{
-         "value": 'id',
-         "name": 'title',
-         "children" : 'id1,id2,id3'
-         },
-         ...
-         ];
-         */
-        options: getSelectableCategories('CORE.UI.ALL'),
-
-        // if enable filter will filter with the selectId AND additionnal id set in the "children" key of each options
-        filterWithChildren: true
+        options: getSelectableCategories('CORE.UI.ALL')
       }
     ];
     scopeDataTable.header = [

@@ -638,6 +638,20 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Getting medias failed when getting the list of categories.
+   *
+   * @property GET_VIDEOS_GET_CATEGORIES_ERROR
+   * @type Object
+   * @final
+   * @default 44
+   */
+  GET_VIDEOS_GET_CATEGORIES_ERROR: {
+    code: 0x02c,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**

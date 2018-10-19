@@ -931,9 +931,6 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   // Add states
   if (params.states && params.states.length) filter.in('state', params.states);
 
-  // Add categories
-  if (params.categories && params.categories.length) filter.in('category', params.categories);
-
   // Add groups
   if (params.groups && params.groups.length) filter.in('metadata.groups', params.groups);
 
@@ -1022,6 +1019,29 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       }
 
       callback();
+    },
+
+    // Validate categories
+    function(callback) {
+      if (!params.categories || !params.categories.length) return callback();
+
+      coreApi.taxonomyProvider.getTaxonomyTerms('categories', function(error, terms) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
+          return callback(HTTP_ERRORS.GET_VIDEOS_GET_CATEGORIES_ERROR);
+        }
+
+        var categories = [];
+        params.categories.forEach(function(category) {
+          categories = categories.concat(
+            openVeoApi.util.getPropertyFromArray('id', terms, 'items', category),
+            [category]
+          );
+        });
+
+        filter.in('category', categories);
+        callback();
+      });
     },
 
     // Get the list of medias

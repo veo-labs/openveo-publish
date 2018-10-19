@@ -1,3 +1,9 @@
+# 9.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core >=7.0.0
+
 # 8.0.0 / 2018-10-16
 
 ## BREAKING CHANGES

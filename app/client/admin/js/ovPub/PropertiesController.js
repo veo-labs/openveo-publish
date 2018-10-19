@@ -104,9 +104,8 @@
         label: $filter('translate')('PUBLISH.PROPERTIES.QUERY_FILTER')
       },
       {
-        key: 'type',
+        key: 'types',
         type: 'select',
-        param: 'types',
         value: '',
         label: $filter('translate')('PUBLISH.PROPERTIES.TYPE_FILTER'),
         options: filterTypeOptions
