@@ -8,7 +8,7 @@
 
 ## BREAKING CHANGES
 
-- OpenVeo Publish now requires OpenVeo Core >=5.2.0
+- OpenVeo Publish now requires OpenVeo Core >=6.0.0
 
 ## NEW FEATURES
 
