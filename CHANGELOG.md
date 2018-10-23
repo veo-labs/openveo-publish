@@ -4,6 +4,10 @@
 
 - OpenVeo Publish now requires OpenVeo Core >=7.0.0
 
+## NEW FEATURES
+
+- Web service endpoints GET /properties and GET /videos now accept a "useSmartSearch" parameter which modifies the way search is made. If "useSmartSearch" is activated (this is the default), search will be made using the search mechanism of the storage. If "useSmartSearch" is deactivated it will search using a simple regular expression
+
 # 8.0.0 / 2018-10-16
 
 ## BREAKING CHANGES

@@ -121,6 +121,61 @@ describe('Videos web service', function() {
 
   describe('get /publish/videos', function() {
 
+    it('should be able to search videos without smart search', function(done) {
+      var textSearchPropertyPrefix = 'TestSearch';
+      var textSearchPropertySuffix = 'Smart';
+      var linesToAdd = [mediaHelper.getAddExample()];
+
+      /**
+       * Tests search with and without the smart search.
+       *
+       * @param {String} searchProperty The search property of the entity
+       * @return {Promise} Promise resolving when test is done
+       */
+      function testSmartSearch(searchProperty) {
+        var searchQuery = encodeURIComponent(
+          textSearchPropertyPrefix + searchProperty + textSearchPropertySuffix.slice(0, 2)
+        );
+        return webServiceClient.get('publish/videos?useSmartSearch=0&query=' + searchQuery).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.equal(videos.length, 1, 'Unexpected number of videos');
+            assert.equal(videos[0].id, linesToAdd[0].id, 'Wrong video');
+          }, done, true);
+          return webServiceClient.get('publish/videos?query=' + searchQuery);
+        }).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.equal(videos.length, 0, 'Unexpected videos');
+          }, done, true);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, error.message);
+          }, done);
+        });
+      }
+
+      mediaHelper.textSearchProperties.forEach(function(searchProperty) {
+        linesToAdd[0][searchProperty] = textSearchPropertyPrefix + searchProperty + textSearchPropertySuffix;
+      });
+
+      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
+        var promises = [];
+
+        mediaHelper.textSearchProperties.forEach(function(searchProperty) {
+          promises.push(testSmartSearch(searchProperty));
+        });
+
+        Promise.all(promises).then(function(results) {
+          done();
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, 'Unexpected error: ' + error.message);
+          }, done);
+        });
+      });
+    });
+
     it('should be able to filter videos by custom properties', function(done) {
       var properties = {};
       var propertiesQuery = '';

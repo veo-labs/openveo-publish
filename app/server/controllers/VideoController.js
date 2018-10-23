@@ -868,6 +868,8 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.query Request's query parameters
  * @param {String} [request.query.query] To search on both medias title and description
+ * @param {Number} [request.query.useSmartSearch=1] 1 to use a more advanced search mechanism, 0 to use a simple search
+ * based on a regular expression
  * @param {String|Array} [request.query.include] The list of fields to include from returned medias
  * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned medias. Ignored if
  * include is also specified.
@@ -900,6 +902,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   try {
     params = openVeoApi.util.shallowValidateObject(request.query, {
       query: {type: 'string'},
+      useSmartSearch: {type: 'number', in: [0, 1], default: 1},
       include: {type: 'array<string>'},
       exclude: {type: 'array<string>'},
       states: {type: 'array<number>'},
@@ -926,7 +929,17 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   var filter = new ResourceFilter();
 
   // Add search query
-  if (params.query) filter.search('"' + params.query + '"');
+  if (params.query) {
+    if (params.useSmartSearch)
+      filter.search('"' + params.query + '"');
+    else {
+      var queryRegExp = new RegExp(openVeoApi.util.escapeTextForRegExp(params.query), 'i');
+      filter.or([
+        new ResourceFilter().regex('title', queryRegExp),
+        new ResourceFilter().regex('description', queryRegExp)
+      ]);
+    }
+  }
 
   // Add states
   if (params.states && params.states.length) filter.in('state', params.states);

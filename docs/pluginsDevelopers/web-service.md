@@ -13,6 +13,7 @@ Get videos.
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
 query | String | No | - | To search on both videos title and description
+useSmartSearch | Number | No | 1 | **1** to use a more advanced search mechanism, **0** to use a simple search based on a regular expression
 states | String/Array | No | - | To filter videos by state
 dateStart | String/Number | No | - | To get videos after or equal to a date (in any format supported by JavaScript Date object)
 dateEnd | String/Number | No | - | To get videos before or equal to a date (in any format supported by JavaScript Date object)
@@ -340,6 +341,7 @@ Get custom properties.
 Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
 query | String | No | - | To search on both properties name and description
+useSmartSearch | Number | No | 1 | **1** to use a more advanced search mechanism, **0** to use a simple search based on a regular expression
 types | String/Array | No | - | To filter properties by type
 sortBy | String | No | name | To sort properties by either **name** or **description**
 sortOrder | String | No | desc | Sort order (either **asc** or **desc**)

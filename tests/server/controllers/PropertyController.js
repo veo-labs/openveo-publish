@@ -184,6 +184,33 @@ describe('PropertyController', function() {
       });
     });
 
+    it('should be able to deactivate the smart search', function(done) {
+      var expectedQuery = '42';
+      request.query = {query: expectedQuery, useSmartSearch: 0};
+
+      PropertyProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'name').value,
+          '/' + expectedQuery + '/i',
+          'Wrong operation on "name"'
+        );
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'description').value,
+          '/' + expectedQuery + '/i',
+          'Wrong operation on "description"'
+        );
+        callback();
+      };
+
+      response.send = function(data) {
+        done();
+      };
+
+      propertyController.getEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next middleware');
+      });
+    });
+
     it('should be able to sort results by either name or description', function(done) {
       var asyncActions = [];
       var orderedProperties = ['name', 'description'];

@@ -172,7 +172,8 @@ describe('VideoController', function() {
           callback(null, {});
         },
         shallowValidateObject: api.util.shallowValidateObject,
-        getPropertyFromArray: api.util.getPropertyFromArray
+        getPropertyFromArray: api.util.getPropertyFromArray,
+        escapeTextForRegExp: api.util.escapeTextForRegExp
       }
     };
 
@@ -1758,6 +1759,34 @@ describe('VideoController', function() {
 
       videoController.getEntitiesAction(request, response, function() {
         assert.equal(false, 'Unexpected error');
+      });
+    });
+
+    it('should be able to deactivate the smart search', function(done) {
+      var expectedQuery = '42';
+      expectedMedias = [{id: 42}];
+      request.query = {query: expectedQuery, useSmartSearch: 0};
+
+      VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'title').value,
+          '/' + expectedQuery + '/i',
+          'Wrong operation on "title"'
+        );
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'description').value,
+          '/' + expectedQuery + '/i',
+          'Wrong operation on "description"'
+        );
+        callback(null, expectedMedias, expectedPagination);
+      };
+
+      response.send = function(data) {
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected error');
       });
     });
 

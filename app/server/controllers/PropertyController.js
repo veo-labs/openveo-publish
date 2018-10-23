@@ -63,6 +63,8 @@ PropertyController.prototype.getPropertyTypesAction = function(request, response
  * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned properties. Ignored if
  * include is also specified.
  * @param {String} [request.query.query] Search query to search on both name and description
+ * @param {Number} [request.query.useSmartSearch=1] 1 to use a more advanced search mechanism, 0 to use a simple search
+ * based on a regular expression
  * @param {Array} [request.query.types] To filter properties by type
  * @param {String} [request.query.page=0] The expected page
  * @param {String} [request.query.limit=10] The expected limit
@@ -80,6 +82,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
       include: {type: 'array<string>'},
       exclude: {type: 'array<string>'},
       query: {type: 'string'},
+      useSmartSearch: {type: 'number', in: [0, 1], default: 1},
       types: {type: 'array<string>'},
       limit: {type: 'number', gt: 0},
       page: {type: 'number', gte: 0, default: 0},
@@ -98,7 +101,17 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
   var filter = new ResourceFilter();
 
   // Add search query
-  if (params.query) filter.search('"' + params.query + '"');
+  if (params.query) {
+    if (params.useSmartSearch)
+      filter.search('"' + params.query + '"');
+    else {
+      var queryRegExp = new RegExp(openVeoApi.util.escapeTextForRegExp(params.query), 'i');
+      filter.or([
+        new ResourceFilter().regex('name', queryRegExp),
+        new ResourceFilter().regex('description', queryRegExp)
+      ]);
+    }
+  }
 
   // Add property types
   if (params.types && params.types.length) filter.in('type', params.types);
