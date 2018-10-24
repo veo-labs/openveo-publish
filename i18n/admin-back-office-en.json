@@ -90,6 +90,7 @@
     "ATTR_GROUPS" : "Groups of contents",
     "ATTR_MEDIA" : "Video",
     "ATTR_THUMBNAIL": "Thumbnail",
+    "ATTR_OWNER": "Owner",
     "FORM_ADD_TITLE_DESC" : "Title of the video",
     "FORM_ADD_DATE_DESC" : "Date of the video",
     "FORM_ADD_LEAD_PARAGRAPH_DESC" : "Lead paragraph of the description",

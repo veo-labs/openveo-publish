@@ -793,7 +793,7 @@
           key: 'user',
           type: 'horizontalEditableSelect',
           templateOptions: {
-            label: $filter('translate')('CORE.UI.OWNER'),
+            label: $filter('translate')('PUBLISH.MEDIAS.ATTR_OWNER'),
             options: opt
           }
         });

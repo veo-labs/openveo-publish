@@ -90,6 +90,7 @@
     "ATTR_GROUPS" : "Groupes de contenus",
     "ATTR_MEDIA" : "Vidéo",
     "ATTR_THUMBNAIL" : "Vignette",
+    "ATTR_OWNER": "Propriétaire",
     "FORM_ADD_TITLE_DESC" : "Titre de la vidéo",
     "FORM_ADD_DATE_DESC" : "Date de la vidéo",
     "FORM_ADD_LEAD_PARAGRAPH_DESC" : "Chapeau de la description",
