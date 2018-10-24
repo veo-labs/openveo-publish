@@ -613,7 +613,6 @@
       }, {
         key: 'categories',
         type: 'select',
-        param: 'categories',
         value: null,
         label: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_FILTER'),
         options: getSelectableCategories('CORE.UI.ALL')
