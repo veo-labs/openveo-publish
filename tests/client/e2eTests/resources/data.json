@@ -221,6 +221,18 @@
       "password": "publish-medias-manager",
       "roles": [ "publishMediasManager", "publishMedias" ]
     },
+    "publishMediasSearchByOwner1": {
+      "name": "publish-medias-search-by-owner-1",
+      "email": "publish-medias-search-by-owner-1@veo-labs.com",
+      "password": "publish-medias-search-by-owner-1",
+      "roles": []
+    },
+    "publishMediasSearchByOwner2": {
+      "name": "publish-medias-search-by-owner-2",
+      "email": "publish-medias-search-by-owner-2@veo-labs.com",
+      "password": "publish-medias-search-by-owner-2",
+      "roles": []
+    },
     "publishEditorEdit": {
       "name": "publish-editor-edit",
       "email": "publish-editor-edit@veo-labs.com",

@@ -79,6 +79,13 @@ MediaPage.prototype.getSearchFields = function(form) {
     baseElement: form
   });
 
+  // Owner field
+  fields.owner = Field.get({
+    type: 'autoComplete',
+    name: this.translations.PUBLISH.MEDIAS.OWNER_FILTER,
+    baseElement: form
+  });
+
   return fields;
 };
 
@@ -115,6 +122,13 @@ MediaPage.prototype.getEditFormFields = function(form) {
   fields.category = Field.get({
     type: 'select',
     name: this.translations.PUBLISH.MEDIAS.ATTR_CATEGORY,
+    baseElement: form
+  });
+
+  // Owner field
+  fields.owner = Field.get({
+    type: 'select',
+    name: this.translations.PUBLISH.MEDIAS.ATTR_OWNER,
     baseElement: form
   });
 

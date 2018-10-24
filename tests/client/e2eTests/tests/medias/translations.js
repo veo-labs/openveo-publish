@@ -47,10 +47,12 @@ describe('Media page translations', function() {
         var searchFromField = searchFields.from;
         var searchToField = searchFields.to;
         var searchCategoryField = searchFields.category;
+        var searchOwnerField = searchFields.owner;
         assert.eventually.equal(searchQueryField.getLabel(), publishTranslations.MEDIAS.QUERY_FILTER);
         assert.eventually.equal(searchFromField.getLabel(), publishTranslations.MEDIAS.START_DATE_FILTER);
         assert.eventually.equal(searchToField.getLabel(), publishTranslations.MEDIAS.END_DATE_FILTER);
         assert.eventually.equal(searchCategoryField.getLabel(), publishTranslations.MEDIAS.CATEGORY_FILTER);
+        assert.eventually.equal(searchOwnerField.getLabel(), publishTranslations.MEDIAS.OWNER_FILTER);
         page.closeSearchEngine();
 
         // All actions translations

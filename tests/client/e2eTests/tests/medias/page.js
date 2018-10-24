@@ -11,6 +11,7 @@ var STATES = process.requirePublish('app/server/packages/states.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
+var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
 var TableAssert = e2e.asserts.TableAssert;
 
 // Load assertion library
@@ -714,6 +715,85 @@ describe('Media page', function() {
 
       }).then(function() {
         return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
+      });
+    });
+
+    it('should be able to search by owner', function() {
+      var expectedUser = process.protractorConf.getUser(
+        datas.users.publishMediasSearchByOwner1.name
+      );
+      var expectedValues = [];
+      var linesToAdd = [
+        {
+          id: '42',
+          state: STATES.PUBLISHED,
+          user: expectedUser.id
+        },
+        {
+          id: '43',
+          state: STATES.PUBLISHED,
+          user: expectedUser.id
+        }
+      ];
+
+      // Add lines
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
+
+      var search = {owner: expectedUser.name};
+
+      // Get all line values before search
+      return page.getAllLineDetails().then(function(datas) {
+        var regexp = new RegExp(search.query, 'i');
+
+        // Predict values
+        var filteredDatas = datas.filter(function(data) {
+          return regexp.test(data.fields.owner);
+        });
+
+        for (var i = 0; i < filteredDatas.length; i++)
+          expectedValues.push(filteredDatas[i].cells[1]);
+
+      }).then(function() {
+        return tableAssert.checkSearch(search, expectedValues, page.translations.PUBLISH.MEDIAS.NAME_COLUMN);
+      });
+    });
+
+    it('should be able to search by owner using suggestions', function() {
+      var expectedUsers = [
+        process.protractorConf.getUser(
+          datas.users.publishMediasSearchByOwner1.name
+        ),
+        process.protractorConf.getUser(
+          datas.users.publishMediasSearchByOwner2.name
+        )
+      ];
+      var linesToAdd = [
+        {
+          id: '42',
+          state: STATES.PUBLISHED,
+          user: expectedUsers[0].id
+        }
+      ];
+
+      // Add lines
+      mediaHelper.addEntities(linesToAdd);
+      page.refresh();
+
+      var search = {owner: expectedUsers[0].name.slice(0, expectedUsers[0].name.length - 1)};
+
+      return page.search(search).then(function() {
+        var fields = page.getSearchFields(page.searchFormElement);
+        assert.eventually.sameMembers(
+          fields.owner.getSuggestions(),
+          [expectedUsers[0].name, expectedUsers[1].name],
+          'Wrong suggestions'
+        );
+        fields.owner.validateSuggestion(expectedUsers[0].name);
+        return page.getAllLineDetails();
+      }).then(function(datas) {
+        assert.equal(datas.length, 1, 'Wrong number of medias');
+        assert.equal(datas[0].fields.owner, expectedUsers[0].name, 'Wrong media');
       });
     });
 

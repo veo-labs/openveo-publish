@@ -26,6 +26,7 @@
     var entityType = 'videos';
     var isUserManager = $scope.hasPermission('publish-manage-videos');
     var addMediaPromise = null;
+    var userFilterCanceller;
 
     $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
@@ -616,6 +617,43 @@
         value: null,
         label: $filter('translate')('PUBLISH.MEDIAS.CATEGORY_FILTER'),
         options: getSelectableCategories('CORE.UI.ALL')
+      }, {
+        key: 'user',
+        type: 'autoComplete',
+        value: null,
+        label: $filter('translate')('PUBLISH.MEDIAS.OWNER_FILTER'),
+        getValue: function(suggestion) {
+          return (suggestion && suggestion.value) || null;
+        },
+        getSuggestions: function(query) {
+          if (userFilterCanceller) {
+
+            // Hack to differentiate cancel from unavailable server and then avoid a notification
+            userFilterCanceller.promise.status = true;
+            userFilterCanceller.resolve();
+
+          }
+          userFilterCanceller = $q.defer();
+
+          return entityService.getAllEntities('users', null, {
+            include: ['id', 'name'],
+            sortBy: 'name',
+            sortOrder: 'asc',
+            query: query,
+            useSmartSearch: 0
+          }, userFilterCanceller.promise).then(function(results) {
+            var suggestions = [];
+            results.data.entities.forEach(function(user) {
+              suggestions.push(
+                {
+                  value: user.id,
+                  name: user.name
+                }
+              );
+            });
+            return $q.when(suggestions);
+          });
+        }
       }
     ];
     scopeDataTable.header = [
