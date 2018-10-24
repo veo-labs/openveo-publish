@@ -9,6 +9,10 @@
 - Web service endpoints GET /properties and GET /videos now accept a "useSmartSearch" parameter which modifies the way search is made. If "useSmartSearch" is activated (this is the default), search will be made using the search mechanism of the storage. If "useSmartSearch" is deactivated it will search using a simple regular expression
 - Add a "Owner" search field to the catalog search engine to be able to filter videos by their owner
 
+## BUG FIXES
+
+- Fix texts in configuration page for the "MEDIAS" block (which has been renamed into "WATCHER") as this block does not concern all medias but only medias coming from the watcher
+
 # 8.0.0 / 2018-10-16
 
 ## BREAKING CHANGES

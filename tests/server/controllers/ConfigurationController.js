@@ -115,8 +115,8 @@ describe('ConfigurationController', function() {
       videoPlatformConf.youtube = false;
       expectedSettings = [
         {
-          id: 'publish-medias',
-          value: 'Medias settings'
+          id: 'publish-watcher',
+          value: 'Watcher settings'
         },
         {
           id: 'publish-tls',
@@ -151,7 +151,7 @@ describe('ConfigurationController', function() {
       videoPlatformConf.tls = false;
       expectedSettings = [
         {
-          id: 'publish-medias',
+          id: 'publish-watcher',
           value: 'Medias settings'
         }
       ];
@@ -172,7 +172,7 @@ describe('ConfigurationController', function() {
       videoPlatformConf.youtube = false;
       expectedSettings = [
         {
-          id: 'publish-medias',
+          id: 'publish-watcher',
           value: 'Medias settings'
         }
       ];
@@ -198,7 +198,7 @@ describe('ConfigurationController', function() {
       videoPlatformConf.youtube = false;
       expectedSettings = [
         {
-          id: 'publish-medias',
+          id: 'publish-watcher',
           value: 'Medias settings'
         }
       ];

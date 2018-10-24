@@ -15,7 +15,7 @@
   users,
   properties
   ) {
-    var publishMedias = publishConf.data.publishMedias;
+    var publishWatcher = publishConf.data.publishWatcher;
     var publishTls = publishConf.data.publishTls;
 
     $scope.rights = {};
@@ -24,11 +24,11 @@
     // Youtube settings
     $scope.youtubeConf = publishConf.data.youtube;
 
-    // Medias settings
-    $scope.mediasSettings = {
+    // Watcher settings
+    $scope.watcherSettings = {
       model: {
-        owner: (publishMedias && publishMedias.owner) || null,
-        group: (publishMedias && publishMedias.group) || null
+        owner: (publishWatcher && publishWatcher.owner) || null,
+        group: (publishWatcher && publishWatcher.group) || null
       },
       fields: [
         {
@@ -36,7 +36,7 @@
           type: 'editableSelect',
           wrapper: 'editableWrapper',
           templateOptions: {
-            label: $filter('translate')('PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER'),
+            label: $filter('translate')('PUBLISH.CONFIGURATION.WATCHER_DEFAULT_OWNER'),
             options: utilService.buildSelectOptions(users.data.entities)
           }
         },
@@ -45,7 +45,7 @@
           type: 'editableSelect',
           wrapper: 'editableWrapper',
           templateOptions: {
-            label: $filter('translate')('PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP'),
+            label: $filter('translate')('PUBLISH.CONFIGURATION.WATCHER_DEFAULT_GROUP'),
             options: utilService.buildSelectOptions(groups.data.entities)
           }
         }
@@ -87,17 +87,17 @@
     /**
      * Saves medias settings.
      */
-    $scope.saveMediasSettings = function() {
-      $scope.mediasSettings.isFormSaving = true;
+    $scope.saveWatcherSettings = function() {
+      $scope.watcherSettings.isFormSaving = true;
 
-      return publishService.saveMediasSettings({
-        owner: $scope.mediasSettings.model.owner || undefined,
-        group: $scope.mediasSettings.model.group || undefined
+      return publishService.saveWatcherSettings({
+        owner: $scope.watcherSettings.model.owner || undefined,
+        group: $scope.watcherSettings.model.group || undefined
       }).then(function() {
-        $scope.mediasSettings.isFormSaving = false;
+        $scope.watcherSettings.isFormSaving = false;
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
       }).catch(function() {
-        $scope.mediasSettings.isFormSaving = false;
+        $scope.watcherSettings.isFormSaving = false;
       });
     };
 

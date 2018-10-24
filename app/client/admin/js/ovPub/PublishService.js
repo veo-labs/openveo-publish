@@ -221,14 +221,14 @@
     }
 
     /**
-     * Saves medias settings.
+     * Saves watcher settings.
      *
-     * @method saveMediasSettings
-     * @param {Object} data The medias settings
+     * @method saveWatcherSettings
+     * @param {Object} data The watcher settings
      * @return {HttpPromise} The HTTP promise
      */
-    function saveMediasSettings(data) {
-      return $http.post(basePath + 'publish/configuration/medias/', data);
+    function saveWatcherSettings(data) {
+      return $http.post(basePath + 'publish/configuration/watcher/', data);
     }
 
     /**
@@ -397,7 +397,7 @@
       getPlatforms: getPlatforms,
       loadMedia: loadMedia,
       getConfiguration: getConfiguration,
-      saveMediasSettings: saveMediasSettings,
+      saveWatcherSettings: saveWatcherSettings,
       saveTlsSettings: saveTlsSettings,
       updateTag: updateTag,
       updateChapter: updateChapter,

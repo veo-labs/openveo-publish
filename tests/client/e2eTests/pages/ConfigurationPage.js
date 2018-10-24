@@ -112,21 +112,21 @@ ConfigurationPage.prototype.getYoutubePeerLink = function(name) {
 };
 
 /**
- * Gets fields of the medias settings form.
+ * Gets fields of the watcher settings form.
  *
  * @param {Object} panelElement The panel element finder
  * @return {Object} The list of fields
  */
-ConfigurationPage.prototype.getMediasSettingsFields = function(panelElement) {
+ConfigurationPage.prototype.getWatcherSettingsFields = function(panelElement) {
   return {
     owner: Field.get({
       type: 'select',
-      name: this.translations.PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_OWNER,
+      name: this.translations.PUBLISH.CONFIGURATION.WATCHER_DEFAULT_OWNER,
       baseElement: panelElement
     }),
     group: Field.get({
       type: 'select',
-      name: this.translations.PUBLISH.CONFIGURATION.MEDIAS_DEFAULT_GROUP,
+      name: this.translations.PUBLISH.CONFIGURATION.WATCHER_DEFAULT_GROUP,
       baseElement: panelElement
     })
   };
@@ -151,51 +151,51 @@ ConfigurationPage.prototype.getTlsSettingsFields = function(panelElement, proper
 };
 
 /**
- * Gets medias default owner.
+ * Gets watcher default owner.
  *
  * @param {Boolean} literal true to get the literal instead, false to get field value
- * @return {Promise} Promise resolving with medias default owner
+ * @return {Promise} Promise resolving with watcher default owner
  */
-ConfigurationPage.prototype.getMediasDefaultOwner = function(literal) {
+ConfigurationPage.prototype.getWatcherDefaultOwner = function(literal) {
   var self = this;
 
-  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE).then(function(panelElement) {
     if (literal)
-      return self.getMediasSettingsFields(panelElement).owner.getText();
+      return self.getWatcherSettingsFields(panelElement).owner.getText();
     else
-      return self.getMediasSettingsFields(panelElement).owner.getValue();
+      return self.getWatcherSettingsFields(panelElement).owner.getValue();
   });
 };
 
 /**
- * Gets medias default group.
+ * Gets watcher default group.
  *
  * @param {Boolean} literal true to get the literal instead, false to get field value
- * @return {Promise} Promise resolving with medias default group
+ * @return {Promise} Promise resolving with watcher default group
  */
-ConfigurationPage.prototype.getMediasDefaultGroup = function(literal) {
+ConfigurationPage.prototype.getWatcherDefaultGroup = function(literal) {
   var self = this;
 
-  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE).then(function(panelElement) {
     if (literal)
-      return self.getMediasSettingsFields(panelElement).group.getText();
+      return self.getWatcherSettingsFields(panelElement).group.getText();
     else
-      return self.getMediasSettingsFields(panelElement).group.getValue();
+      return self.getWatcherSettingsFields(panelElement).group.getValue();
   });
 };
 
 /**
- * Sets medias settings.
+ * Sets watcher settings.
  *
  * @param {String} ownerName The name of the default owner
  * @param {String} group The name of the default group
- * @return {Promise} Promise resolving when medias settings have been saved
+ * @return {Promise} Promise resolving when watcher settings have been saved
  */
-ConfigurationPage.prototype.editMediasSettings = function(owner, group) {
+ConfigurationPage.prototype.editWatcherSettings = function(owner, group) {
   var self = this;
 
-  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
-    var fields = self.getMediasSettingsFields(panelElement);
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE).then(function(panelElement) {
+    var fields = self.getWatcherSettingsFields(panelElement);
     fields.owner.setValue(owner);
     fields.group.setValue(group);
     return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));

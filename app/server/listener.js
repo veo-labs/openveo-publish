@@ -70,7 +70,7 @@ module.exports.onUsersDeleted = function(ids, callback) {
 
       // Get watcher configuration
       settingProvider.getOne(
-        new ResourceFilter().equal('id', 'publish-medias'),
+        new ResourceFilter().equal('id', 'publish-watcher'),
         null,
         function(error, mediasSettings) {
           if (error) return callback(error);
@@ -80,7 +80,7 @@ module.exports.onUsersDeleted = function(ids, callback) {
               ids.indexOf(mediasSettings.value.owner) >= 0) {
             mediasSettings.value.owner = null;
             settingProvider.updateOne(
-              new ResourceFilter().equal('id', 'publish-medias'),
+              new ResourceFilter().equal('id', 'publish-watcher'),
               {
                 value: mediasSettings.value
               },
@@ -137,7 +137,7 @@ module.exports.onGroupsDeleted = function(ids, callback) {
   var settingProvider = process.api.getCoreApi().settingProvider;
 
   settingProvider.getOne(
-    new ResourceFilter().equal('id', 'publish-medias'),
+    new ResourceFilter().equal('id', 'publish-watcher'),
     null,
     function(error, mediasSettings) {
       if (error) return callback(error);
@@ -147,7 +147,7 @@ module.exports.onGroupsDeleted = function(ids, callback) {
           ids.indexOf(mediasSettings.value.group) >= 0) {
         mediasSettings.value.group = null;
         settingProvider.updateOne(
-          new ResourceFilter().equal('id', 'publish-medias'),
+          new ResourceFilter().equal('id', 'publish-watcher'),
           {
             value: mediasSettings.value
           },

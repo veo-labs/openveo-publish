@@ -135,14 +135,14 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Saving medias settings failed.
+   * Saving watcher settings failed.
    *
-   * @property SAVE_MEDIAS_SETTINGS_ERROR
+   * @property SAVE_WATCHER_SETTINGS_ERROR
    * @type Object
    * @final
    * @default 8
    */
-  SAVE_MEDIAS_SETTINGS_ERROR: {
+  SAVE_WATCHER_SETTINGS_ERROR: {
     code: 0x008,
     httpCode: 500,
     module: 'publish'
@@ -1054,28 +1054,28 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Saving medias settings failed, missing parameters.
+   * Saving watcher settings failed, missing parameters.
    *
-   * @property SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS
+   * @property SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS
    * @type Object
    * @final
    * @default 529
    */
-  SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS: {
+  SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS: {
     code: 0x211,
     httpCode: 400,
     module: 'publish'
   },
 
   /**
-   * Saving medias settings failed, wrong parameters.
+   * Saving watcher settings failed, wrong parameters.
    *
-   * @property SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS
+   * @property SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS
    * @type Object
    * @final
    * @default 530
    */
-  SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS: {
+  SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS: {
     code: 0x212,
     httpCode: 400,
     module: 'publish'

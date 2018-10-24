@@ -52,23 +52,23 @@ describe('Configuration page translations', function() {
   }
 
   /**
-   * Validates medias settings translations.
+   * Validates watcher settings translations.
    */
-  function checkMediasSettings() {
+  function checkWatcherSettings() {
 
-    // Medias panel title
-    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE));
+    // Watcher panel title
+    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE));
     assert.eventually.equal(
-      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE),
-      page.translations.PUBLISH.CONFIGURATION.MEDIAS_INFO
+      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.WATCHER_INFO
     );
 
-    // Medias without owner nor group
-    assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
-    assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+    // Watcher without owner nor group
+    assert.eventually.equal(page.getWatcherDefaultOwner(), page.translations.CORE.UI.NONE);
+    assert.eventually.equal(page.getWatcherDefaultGroup(), page.translations.CORE.UI.NONE);
 
-    // Medias formular button
-    page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE).then(function(panelElement) {
+    // Watcher formular button
+    page.getPanel(page.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE).then(function(panelElement) {
       assert.eventually.ok(panelElement.element(by.binding('CORE.UI.FORM_SAVE')).isPresent());
     });
 
@@ -112,7 +112,7 @@ describe('Configuration page translations', function() {
         assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CONFIGURATION.INFO);
 
         checkYoutubeSettings();
-        checkMediasSettings();
+        checkWatcherSettings();
         checkTlsSettings();
 
         configurationHelper.removeAllEntities(defaultSettings);

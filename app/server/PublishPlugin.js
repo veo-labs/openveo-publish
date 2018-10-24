@@ -208,7 +208,7 @@ PublishPlugin.prototype.start = function(callback) {
 
           settingProvider.getOne(
             new ResourceFilter()
-            .equal('id', 'publish-medias'),
+            .equal('id', 'publish-watcher'),
             null,
             function(error, setting) {
               if (error) {

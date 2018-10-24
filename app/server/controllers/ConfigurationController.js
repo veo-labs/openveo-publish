@@ -71,17 +71,19 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
       } else
         callback();
     },
+
+    // Get Watcher configuration
     function(callback) {
-      configurations['publishMedias'] = {};
+      configurations['publishWatcher'] = {};
       var settingProvider = process.api.getCoreApi().settingProvider;
 
       settingProvider.getOne(
-        new ResourceFilter().equal('id', 'publish-medias'),
+        new ResourceFilter().equal('id', 'publish-watcher'),
         null,
-        function(error, mediasSettings) {
+        function(error, watcherSettings) {
           if (error) return callback(error);
 
-          configurations['publishMedias'] = mediasSettings && mediasSettings.value;
+          configurations['publishWatcher'] = watcherSettings && watcherSettings.value;
           callback();
         }
       );
@@ -141,7 +143,7 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
 };
 
 /**
- * Saves medias settings.
+ * Saves watcher settings.
  *
  * @example
  *
@@ -154,7 +156,7 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
  *       "total": 1
  *     }
  *
- * @method saveMediasSettings
+ * @method saveWatcherSettings
  * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body Request's body
@@ -163,7 +165,7 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
-ConfigurationController.prototype.saveMediasSettings = function(request, response, next) {
+ConfigurationController.prototype.saveWatcherSettings = function(request, response, next) {
   if (request.body) {
     var settingProvider = process.api.getCoreApi().settingProvider;
     var parsedBody;
@@ -175,20 +177,20 @@ ConfigurationController.prototype.saveMediasSettings = function(request, respons
       });
 
     } catch (error) {
-      return next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_WRONG_PARAMETERS);
+      return next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS);
     }
 
     settingProvider.add(
       [
         {
-          id: 'publish-medias',
+          id: 'publish-watcher',
           value: parsedBody
         }
       ],
       function(error, total, settings) {
         if (error) {
-          process.logger.error(error.message, {error: error, method: 'saveMediasSettings'});
-          next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_ERROR);
+          process.logger.error(error.message, {error: error, method: 'saveWatcherSettings'});
+          next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_ERROR);
         } else {
           response.send({settings: settings[0].value, total: total});
         }
@@ -197,7 +199,7 @@ ConfigurationController.prototype.saveMediasSettings = function(request, respons
   } else {
 
     // Missing body
-    next(HTTP_ERRORS.SAVE_MEDIAS_SETTINGS_MISSING_PARAMETERS);
+    next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS);
 
   }
 };

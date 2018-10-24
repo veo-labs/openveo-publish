@@ -72,20 +72,20 @@ describe('Configuration page', function() {
       assert.isRejected(page.getYoutubePeerLink());
     });
 
-    describe('Medias', function() {
+    describe('Watcher', function() {
 
       it('should not be able to edit settings', function() {
         var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
         var expectedGroup = datas.groups.publishGroup1;
 
-        assert.isRejected(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+        assert.isRejected(page.editWatcherSettings(expectedOwner.name, expectedGroup.name));
       });
 
       it('should display settings as literals', function() {
         var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
         var expectedGroup = datas.groups.publishGroup1;
         configurationHelper.addEntities([{
-          id: 'publish-medias',
+          id: 'publish-watcher',
           value: {
             owner: expectedOwner.id,
             group: 'publishGroup1'
@@ -94,13 +94,13 @@ describe('Configuration page', function() {
 
         page.refresh();
 
-        assert.eventually.equal(page.getMediasDefaultOwner(true), expectedOwner.name);
-        assert.eventually.equal(page.getMediasDefaultGroup(true), expectedGroup.name);
+        assert.eventually.equal(page.getWatcherDefaultOwner(true), expectedOwner.name);
+        assert.eventually.equal(page.getWatcherDefaultGroup(true), expectedGroup.name);
       });
 
       it('should display a generic text if no values', function() {
-        assert.eventually.equal(page.getMediasDefaultOwner(true), page.translations.CORE.UI.NONE);
-        assert.eventually.equal(page.getMediasDefaultGroup(true), page.translations.CORE.UI.NONE);
+        assert.eventually.equal(page.getWatcherDefaultOwner(true), page.translations.CORE.UI.NONE);
+        assert.eventually.equal(page.getWatcherDefaultGroup(true), page.translations.CORE.UI.NONE);
       });
 
     });
@@ -120,7 +120,7 @@ describe('Configuration page', function() {
 
         page.refresh();
 
-        assert.isRejected(page.editMediasSettings([customPropertiesToAdd[0].name]));
+        assert.isRejected(page.editWatcherSettings([customPropertiesToAdd[0].name]));
       });
 
       it('should display settings as literals', function() {

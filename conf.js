@@ -28,7 +28,7 @@ module.exports = {
         'get /configuration/all': 'app/server/controllers/ConfigurationController.getConfigurationAllAction',
         'get /configuration/googleOAuthAssociation':
         'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
-        'post /configuration/medias': 'app/server/controllers/ConfigurationController.saveMediasSettings',
+        'post /configuration/watcher': 'app/server/controllers/ConfigurationController.saveWatcherSettings',
         'post /configuration/tls': 'app/server/controllers/ConfigurationController.saveTlsSettingsAction'
       },
       ws: {

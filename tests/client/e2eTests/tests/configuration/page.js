@@ -89,22 +89,22 @@ describe('Configuration page', function() {
 
   });
 
-  describe('Medias', function() {
+  describe('Watcher', function() {
 
     it('should display configuration panel', function() {
-      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.MEDIAS_TITLE));
+      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.WATCHER_TITLE));
     });
 
     it('should not display an owner nor a group by default', function() {
-      assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
-      assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getWatcherDefaultOwner(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getWatcherDefaultGroup(), page.translations.CORE.UI.NONE);
     });
 
     it('should display actual default owner and group if specified', function() {
       var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
       var expectedGroup = datas.groups.publishGroup1;
       configurationHelper.addEntities([{
-        id: 'publish-medias',
+        id: 'publish-watcher',
         value: {
           owner: expectedOwner.id,
           group: 'publishGroup1'
@@ -113,30 +113,30 @@ describe('Configuration page', function() {
 
       page.refresh();
 
-      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
-      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
+      assert.eventually.equal(page.getWatcherDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getWatcherDefaultGroup(), expectedGroup.name);
     });
 
     it('should be able to change the default owner and group', function() {
       var expectedOwner = process.protractorConf.getUser(datas.users.publishGuest.name);
       var expectedGroup = datas.groups.publishGroup1;
 
-      assert.isFulfilled(page.editMediasSettings(expectedOwner.name, expectedGroup.name));
+      assert.isFulfilled(page.editWatcherSettings(expectedOwner.name, expectedGroup.name));
 
-      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
-      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
+      assert.eventually.equal(page.getWatcherDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getWatcherDefaultGroup(), expectedGroup.name);
 
       page.refresh();
 
-      assert.eventually.equal(page.getMediasDefaultOwner(), expectedOwner.name);
-      assert.eventually.equal(page.getMediasDefaultGroup(), expectedGroup.name);
+      assert.eventually.equal(page.getWatcherDefaultOwner(), expectedOwner.name);
+      assert.eventually.equal(page.getWatcherDefaultGroup(), expectedGroup.name);
     });
 
     it('should be able to set no default owner nor group', function() {
-      page.editMediasSettings(page.translations.CORE.UI.NONE, page.translations.CORE.UI.NONE);
+      page.editWatcherSettings(page.translations.CORE.UI.NONE, page.translations.CORE.UI.NONE);
       page.refresh();
-      assert.eventually.equal(page.getMediasDefaultOwner(), page.translations.CORE.UI.NONE);
-      assert.eventually.equal(page.getMediasDefaultGroup(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getWatcherDefaultOwner(), page.translations.CORE.UI.NONE);
+      assert.eventually.equal(page.getWatcherDefaultGroup(), page.translations.CORE.UI.NONE);
     });
 
   });

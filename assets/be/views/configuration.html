@@ -22,15 +22,15 @@
 
     <div class="col-sd-12 col-md-4">
       <div class="panel panel-default">
-        <div uib-popover="{{'PUBLISH.CONFIGURATION.MEDIAS_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.MEDIAS_TITLE' | translate"></div>
+        <div uib-popover="{{'PUBLISH.CONFIGURATION.WATCHER_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.WATCHER_TITLE' | translate"></div>
         <div class="panel-body">
-          <form novalidate ng-submit="saveMediasSettings();" name="mediasSettings.form">
-            <formly-form model="mediasSettings.model" fields="mediasSettings.fields" options="mediasSettings.options">
-              <div class="text-right" ng-if="mediasSettings.options.formState.showForm">
+          <form novalidate ng-submit="saveWatcherSettings();" name="watcherSettings.form">
+            <formly-form model="watcherSettings.model" fields="watcherSettings.fields" options="watcherSettings.options">
+              <div class="text-right" ng-if="watcherSettings.options.formState.showForm">
                 <button
                         class="btn btn-primary"
                         type="submit"
-                        ng-disabled="mediasSettings.form.$invalid || mediasSettings.isFormSaving"
+                        ng-disabled="watcherSettings.form.$invalid || watcherSettings.isFormSaving"
                         ng-bind="'CORE.UI.FORM_SAVE' | translate"
                 ></button>
               </div>
