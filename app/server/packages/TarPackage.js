@@ -576,6 +576,5 @@ TarPackage.prototype.saveTimecodes = function() {
  * @return {String} System path of the media file
  */
 TarPackage.prototype.getMediaFilePath = function() {
-  return path.join(this.publishConf.videoTmpDir,
-     String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
+  return path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
 };

@@ -1235,7 +1235,7 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
- /**
+  /**
    * Converting points of interest failed, missing parameters.
    *
    * @property CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS
@@ -1249,7 +1249,7 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
- /**
+  /**
    * Converting points of interest failed, wrong parameters.
    *
    * @property CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS

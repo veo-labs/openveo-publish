@@ -14,6 +14,26 @@
 
 - Fix texts in configuration page for the "MEDIAS" block (which has been renamed into "WATCHER") as this block does not concern all medias but only medias coming from the watcher
 
+## DEPENDENCIES
+
+- **chai** has been upgraded from 4.0.2 to **4.2.0**
+- **chai-spies** has been upgraded from 0.7.1 to **1.0.0**
+- **flightplan** has been upgraded from 0.6.17 to **0.6.19**
+- **grunt** has been upgraded from 1.0.1 to **1.0.3**
+- **grunt-cli** has been upgraded from 1.2.0 to **1.3.0**
+- **grunt-contrib-uglify** has been upgraded from 2.0.0 to **4.0.0**
+- **grunt-contrib-watch** has been upgraded from 1.0.0 to **1.1.0**
+- **grunt-eslint** has been upgraded from 19.0.0 to **21.0.0**
+- **grunt-gh-pages** has been upgraded from 2.0.0 to **3.1.0**
+- **grunt-karma** has been upgraded from 2.0.0 to **3.0.0**
+- **grunt-mkdocs** has been upgraded from 0.2.0 to **1.0.0**
+- **grunt-mocha-test** has been upgraded from 0.13.2 to **0.13.3**
+- **karma** has been upgraded from 1.3.0 to **3.1.1**
+- **karma-chrome-launcher** has been upgraded from 2.0.0 to **2.2.0**
+- **karma-firefox-launcher** has been upgraded from 1.0.0 to **1.1.0**
+- **mocha** has been upgraded from 3.2.0 to **5.2.0**
+- **mock-require** has been upgraded from 3.0.1 to **3.0.2**
+
 # 8.0.0 / 2018-10-16
 
 ## BREAKING CHANGES

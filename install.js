@@ -188,15 +188,15 @@ function createVideoPlatformConf(callback) {
     function(callback) {
       if (!youtubeConf) return callback();
       secureQuestion('Enter Youtube API client secret (available in your Google Developper Console):\n',
-      function(answer) {
-        youtubeConf.googleOAuth.clientSecret = answer;
-        callback();
-      });
+        function(answer) {
+          youtubeConf.googleOAuth.clientSecret = answer;
+          callback();
+        }
+      );
     },
     function(callback) {
       if (!youtubeConf) return callback();
-      rl.question('Enter Youtube redirect URL (available in your Google Developper Console):\n',
-      function(answer) {
+      rl.question('Enter Youtube redirect URL (available in your Google Developper Console):\n', function(answer) {
         youtubeConf.googleOAuth.redirectUrl = answer;
         callback();
       });
@@ -247,8 +247,7 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!wowzaConf) return callback();
-      rl.question('Enter Wowza file transfer port (let empty to set port acccording to protocol):\n',
-      function(answer) {
+      rl.question('Enter Wowza file transfer port (let empty to set port acccording to protocol):\n', function(answer) {
         if (answer) wowzaConf.port = parseInt(answer);
         else if (wowzaConf.protocol == 'ftp') wowzaConf.port = 21;
         callback();
@@ -256,16 +255,14 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!wowzaConf) return callback();
-      rl.question('Enter FTP/SFTP user login:\n',
-      function(answer) {
+      rl.question('Enter FTP/SFTP user login:\n', function(answer) {
         wowzaConf.user = answer;
         callback();
       });
     },
     function(callback) {
       if (!wowzaConf) return callback();
-      secureQuestion('Enter FTP/SFTP user password:\n',
-      function(answer) {
+      secureQuestion('Enter FTP/SFTP user password:\n', function(answer) {
         wowzaConf.pwd = answer;
         callback();
       });
@@ -301,19 +298,23 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!localConf) return callback();
-      rl.question('Enter file system path where to store medias (default: "' + localConf.vodFilePath + '"):\n',
-      function(answer) {
-        if (answer !== '') localConf.vodFilePath = answer;
-        callback();
-      });
+      rl.question(
+        'Enter file system path where to store medias (default: "' + localConf.vodFilePath + '"):\n',
+        function(answer) {
+          if (answer !== '') localConf.vodFilePath = answer;
+          callback();
+        }
+      );
     },
     function(callback) {
       if (!localConf) return callback();
-      rl.question('Enter streaming URI relative to OpenVeo base URL (default: "' + localConf.streamPath + '"):\n',
-      function(answer) {
-        if (answer !== '') localConf.streamPath = answer;
-        callback();
-      });
+      rl.question(
+        'Enter streaming URI relative to OpenVeo base URL (default: "' + localConf.streamPath + '"):\n',
+        function(answer) {
+          if (answer !== '') localConf.streamPath = answer;
+          callback();
+        }
+      );
     },
 
     // TLS
@@ -328,11 +329,13 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!tlsConf) return callback();
-      rl.question('Enter system path of the NFS root directory (default: "' + tlsConf.nfsPath + '"):\n',
-      function(answer) {
-        if (answer !== '') tlsConf.nfsPath = answer;
-        callback();
-      });
+      rl.question(
+        'Enter system path of the NFS root directory (default: "' + tlsConf.nfsPath + '"):\n',
+        function(answer) {
+          if (answer !== '') tlsConf.nfsPath = answer;
+          callback();
+        }
+      );
     },
     function(callback) {
       if (!tlsConf) return callback();
@@ -345,24 +348,21 @@ function createVideoPlatformConf(callback) {
     },
     function(callback) {
       if (!tlsConf) return callback();
-      secureQuestion('Enter TLS access token:\n',
-      function(answer) {
+      secureQuestion('Enter TLS access token:\n', function(answer) {
         if (answer !== '') tlsConf.accessToken = answer;
         callback();
       });
     },
     function(callback) {
       if (!tlsConf) return callback();
-      rl.question('Enter TLS web service URL:\n',
-      function(answer) {
+      rl.question('Enter TLS web service URL:\n', function(answer) {
         if (answer !== '') tlsConf.url = answer;
         callback();
       });
     },
     function(callback) {
       if (!tlsConf) return callback();
-      rl.question('Enter the system path of the TLS web service full chain certificate:\n',
-      function(answer) {
+      rl.question('Enter the system path of the TLS web service full chain certificate:\n', function(answer) {
         if (answer !== '') tlsConf.certificate = answer;
         callback();
       });

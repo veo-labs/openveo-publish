@@ -50,7 +50,7 @@ ConfigurationPage.prototype.getPanel = function(name) {
 
       // Panel title corresponds to the searched title
       // Return parent element
-      if (text.replace(/ ?[\*:]?$/, '') === name.toUpperCase())
+      if (text.replace(/ ?[*:]?$/, '') === name.toUpperCase())
         panelElement = panelHeading.element(by.xpath('..'));
 
     });

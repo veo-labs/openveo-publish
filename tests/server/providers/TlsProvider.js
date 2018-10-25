@@ -153,7 +153,7 @@ describe('TlsProvider', function() {
         assert.equal(resourcePath, expectedMediaFilePath, 'Wrong resource path');
         assert.match(
           destinationPath,
-          new RegExp(provider.mediaDirectoryPath + '[^\/]+\/video.mp4'),
+          new RegExp(provider.mediaDirectoryPath + '[^/]+/video.mp4'),
           'Wrong destination path'
         );
         callback();
@@ -169,10 +169,10 @@ describe('TlsProvider', function() {
 
     it('should send media information to TLS', function(done) {
       TlsClient.prototype.put = chai.spy(function(endPoint, body) {
-        assert.match(endPoint, /videos\/[^\/]+/, 'Wrong end point');
+        assert.match(endPoint, /videos\/[^/]+/, 'Wrong end point');
         assert.match(
           body.path,
-          new RegExp(provider.conf.mediaDirectoryPath + '[^\/]+\/video.mp4'),
+          new RegExp(provider.conf.mediaDirectoryPath + '[^/]+/video.mp4'),
           'Wrong media file path'
         );
         return Promise.resolve();
@@ -220,7 +220,7 @@ describe('TlsProvider', function() {
       var expectedError = new Error('Something went wrong');
 
       openVeoApi.fileSystem.rm = chai.spy(function(resourcePath, callback) {
-        assert.match(resourcePath, new RegExp(provider.mediaDirectoryPath + '[^\/]+'), 'Wrong resource path');
+        assert.match(resourcePath, new RegExp(provider.mediaDirectoryPath + '[^/]+'), 'Wrong resource path');
         callback();
       });
 

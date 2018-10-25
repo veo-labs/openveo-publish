@@ -6,16 +6,17 @@
    * Defines the categories controller for the categories page.
    */
   function EditorController(
-          $window,
-          $scope,
-          $http,
-          $filter,
-          $timeout,
-          i18nService,
-          ovMultirangeViews,
-          media,
-          publishName,
-          publishService) {
+    $window,
+    $scope,
+    $http,
+    $filter,
+    $timeout,
+    i18nService,
+    ovMultirangeViews,
+    media,
+    publishName,
+    publishService
+  ) {
 
     var orderBy = $filter('orderBy');
     var uploadAborted = false;
@@ -392,23 +393,23 @@
       style_formats: [{ // eslint-disable-line
         title: 'Headers',
         items: [
-        {title: 'Header 1', format: 'h1'},
-        {title: 'Header 2', format: 'h2'},
-        {title: 'Header 3', format: 'h3'},
-        {title: 'Header 4', format: 'h4'}
+          {title: 'Header 1', format: 'h1'},
+          {title: 'Header 2', format: 'h2'},
+          {title: 'Header 3', format: 'h3'},
+          {title: 'Header 4', format: 'h4'}
         ]
       }, {
         title: 'Inline', items: [
-        {title: 'Bold', icon: 'bold', format: 'bold'},
-        {title: 'Italic', icon: 'italic', format: 'italic'},
-        {title: 'Underline', icon: 'underline', format: 'underline'},
-        {title: 'Code', icon: 'code', format: 'code'}
+          {title: 'Bold', icon: 'bold', format: 'bold'},
+          {title: 'Italic', icon: 'italic', format: 'italic'},
+          {title: 'Underline', icon: 'underline', format: 'underline'},
+          {title: 'Code', icon: 'code', format: 'code'}
         ]
       }, {
         title: 'Blocks',
         items: [
-        {title: 'Paragraph', format: 'p'},
-        {title: 'Blockquote', format: 'blockquote'}
+          {title: 'Paragraph', format: 'p'},
+          {title: 'Blockquote', format: 'blockquote'}
         ]
       }],
       content_css: '/be/css/tinymce.css?' + new Date().getTime() // eslint-disable-line

@@ -6,14 +6,14 @@
    * Defines the configuration controller for the configuration page.
    */
   function ConfigurationController(
-  $scope,
-  publishConf,
-  publishService,
-  utilService,
-  $filter,
-  groups,
-  users,
-  properties
+    $scope,
+    publishConf,
+    publishService,
+    utilService,
+    $filter,
+    groups,
+    users,
+    properties
   ) {
     var publishWatcher = publishConf.data.publishWatcher;
     var publishTls = publishConf.data.publishTls;

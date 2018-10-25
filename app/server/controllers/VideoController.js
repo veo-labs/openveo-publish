@@ -237,8 +237,8 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
 
       // User without enough privilege to read the media in ready state
       if (media.state === STATES.READY &&
-          !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
-         ) {
+        !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
+      ) {
         return next(HTTP_ERRORS.GET_VIDEO_READY_FORBIDDEN);
       }
 
@@ -1173,9 +1173,7 @@ VideoController.prototype.publishVideosAction = function(request, response, next
         if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE)) return;
         asyncFunctions.push(function(callback) {
           provider.updateOne(
-            new ResourceFilter()
-            .equal('id', media.id)
-            .equal('state', STATES.READY),
+            new ResourceFilter().equal('id', media.id).equal('state', STATES.READY),
             {
               state: STATES.PUBLISHED
             },
@@ -1260,9 +1258,7 @@ VideoController.prototype.unpublishVideosAction = function(request, response, ne
         if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE)) return;
         asyncFunctions.push(function(callback) {
           provider.updateOne(
-            new ResourceFilter()
-            .equal('id', media.id)
-            .equal('state', STATES.PUBLISHED),
+            new ResourceFilter().equal('id', media.id).equal('state', STATES.PUBLISHED),
             {
               state: STATES.READY
             },
@@ -1759,8 +1755,8 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
 
       // User without enough privilege to read the media in ready state
       if (media.state === STATES.READY &&
-          !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
-         ) {
+        !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
+      ) {
         return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_FORBIDDEN);
       }
 
@@ -1940,8 +1936,10 @@ VideoController.prototype.removeEntitiesAction = function(request, response, nex
             process.logger.error(error.message, {error: error, method: 'removeEntitiesAction'});
             next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
           } else if (total != mediaIdsToRemove.length) {
-            process.logger.error(total + '/' + mediaIds.length + ' removed',
-                                 {method: 'removeEntitiesAction', medias: mediaIdsToRemove});
+            process.logger.error(
+              total + '/' + mediaIds.length + ' removed',
+              {method: 'removeEntitiesAction', medias: mediaIdsToRemove}
+            );
             next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
           } else {
             response.send({total: total});

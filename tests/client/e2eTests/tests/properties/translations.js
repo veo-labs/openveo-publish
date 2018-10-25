@@ -59,8 +59,10 @@ describe('Property page translations', function() {
         assert.eventually.equal(nameField.getLabel(), publishTranslations.PROPERTIES.ATTR_NAME);
         assert.eventually.equal(nameField.getDescription(), publishTranslations.PROPERTIES.FORM_ADD_NAME_DESC);
         assert.eventually.equal(descriptionField.getLabel(), publishTranslations.PROPERTIES.ATTR_DESCRIPTION);
-        assert.eventually.equal(descriptionField.getDescription(),
-                                publishTranslations.PROPERTIES.FORM_ADD_DESCRIPTION_DESC);
+        assert.eventually.equal(
+          descriptionField.getDescription(),
+          publishTranslations.PROPERTIES.FORM_ADD_DESCRIPTION_DESC
+        );
         assert.eventually.equal(typeField.getLabel(), publishTranslations.PROPERTIES.ATTR_TYPE);
         assert.eventually.equal(typeField.getDescription(), publishTranslations.PROPERTIES.FORM_ADD_TYPE_DESC);
         assert.eventually.equal(page.addButtonElement.getText(), coreTranslations.UI.FORM_ADD);
@@ -70,8 +72,10 @@ describe('Property page translations', function() {
         descriptionField.setValue('Description');
         typeField.setValue(publishTranslations.PROPERTIES.FORM_ADD_LIST_TYPE);
         assert.eventually.equal(listValuesField.getLabel(), publishTranslations.PROPERTIES.ATTR_LIST_VALUES);
-        assert.eventually.equal(listValuesField.getDescription(),
-                                publishTranslations.PROPERTIES.FORM_ADD_LIST_VALUES_DESC);
+        assert.eventually.equal(
+          listValuesField.getDescription(),
+          publishTranslations.PROPERTIES.FORM_ADD_LIST_VALUES_DESC
+        );
         page.closeAddForm();
 
         // Search engine translations

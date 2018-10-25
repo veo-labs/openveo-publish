@@ -207,8 +207,7 @@ PublishPlugin.prototype.start = function(callback) {
           var settingProvider = process.api.getCoreApi().settingProvider;
 
           settingProvider.getOne(
-            new ResourceFilter()
-            .equal('id', 'publish-watcher'),
+            new ResourceFilter().equal('id', 'publish-watcher'),
             null,
             function(error, setting) {
               if (error) {

@@ -289,7 +289,7 @@
       });
     }
 
-     /**
+    /**
      * Remove tags from media.
      *
      * @method removeTags
@@ -301,7 +301,7 @@
       return $http.delete(basePath + 'publish/videos/' + id + '/tags/' + tagIds.join(','));
     }
 
-     /**
+    /**
      * Removes chapters from media.
      *
      * @method removeChapters

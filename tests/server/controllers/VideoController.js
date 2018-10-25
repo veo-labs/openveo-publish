@@ -3425,8 +3425,7 @@ describe('VideoController', function() {
 
     stableStates.forEach(function(stableState) {
 
-      it('should remove media and send operation result if media state is "' + stableState + '"',
-      function(done) {
+      it('should remove media and send operation result if media state is "' + stableState + '"', function(done) {
         var expectedId = '42';
         expectedMedias.push({
           id: expectedId,

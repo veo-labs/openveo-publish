@@ -211,8 +211,9 @@ CategoryPage.prototype.openCategory = function(category) {
 
   return browser.waitForAngular().then(function() {
     var promises = [];
-    promises.push((typeof category === 'string') ? self.getCategoryElement(category) :
-                  protractor.promise.fulfilled(category));
+    promises.push(
+      (typeof category === 'string') ? self.getCategoryElement(category) : protractor.promise.fulfilled(category)
+    );
 
     // Get category element
     return protractor.promise.all(promises);
@@ -244,8 +245,9 @@ CategoryPage.prototype.closeCategory = function(category) {
 
   return browser.waitForAngular().then(function() {
     var promises = [];
-    promises.push((typeof category === 'string') ? self.getCategoryElement(category) :
-                  protractor.promise.fulfilled(category));
+    promises.push(
+      (typeof category === 'string') ? self.getCategoryElement(category) : protractor.promise.fulfilled(category)
+    );
 
     // Get category element
     return protractor.promise.all(promises);

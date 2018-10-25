@@ -83,13 +83,14 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
 
     // Checks user quota
     function(callback) {
-      self.ftps.put(mediaFilePath, path.join(self.conf.vodFilePath, mediaId + path.extname(mediaFilePath)))
-              .exec(function(error, response) {
-                if (response && response.error)
-                  return callback(new Error(response.error));
+      self.ftps.put(mediaFilePath, path.join(self.conf.vodFilePath, mediaId + path.extname(mediaFilePath))).exec(
+        function(error, response) {
+          if (response && response.error)
+            return callback(new Error(response.error));
 
-                callback();
-              });
+          callback();
+        }
+      );
     }
   ], function(error) {
     callback(error, mediaId);

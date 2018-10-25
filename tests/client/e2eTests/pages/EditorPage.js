@@ -99,8 +99,10 @@ function getLineByIndex(lines, name, index) {
  * @return {Promise} Promise resolving with the list of elements in the time bar
  */
 function getTimeBarElements() {
-  return browser.executeScript('var scope = angular.element(arguments[0]).scope(); return scope.ranges;',
-                               this.timeBarElement.getWebElement());
+  return browser.executeScript(
+    'var scope = angular.element(arguments[0]).scope(); return scope.ranges;',
+    this.timeBarElement.getWebElement()
+  );
 }
 
 /**
@@ -111,12 +113,14 @@ function getTimeBarElements() {
  * @return {Promise} Promise resolving with the list of elements in the time bar
  */
 function moveTimeBarElement(index, position) {
-  return browser.executeScript('var scope = angular.element(arguments[0]).scope(); ' +
-                               'scope.ranges[arguments[1]].value = arguments[2]; ' +
-                               'scope.updateTime(); ' +
-                               'scope.releaseRange(scope.ranges[arguments[1]]); ' +
-                               'scope.$apply();',
-                               this.timeBarElement.getWebElement(), index, position);
+  return browser.executeScript(
+    'var scope = angular.element(arguments[0]).scope(); ' +
+    'scope.ranges[arguments[1]].value = arguments[2]; ' +
+    'scope.updateTime(); ' +
+    'scope.releaseRange(scope.ranges[arguments[1]]); ' +
+    'scope.$apply();',
+    this.timeBarElement.getWebElement(), index, position
+  );
 }
 
 /**

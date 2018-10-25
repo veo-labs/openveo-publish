@@ -29,8 +29,10 @@ describe('Category page translations', function() {
         assert.eventually.equal(page.getTitle(), page.translations.PUBLISH.CATEGORIES.PAGE_TITLE);
         assert.eventually.equal(page.pageTitleElement.getText(), page.translations.PUBLISH.CATEGORIES.TITLE);
         assert.eventually.equal(page.pageDescriptionElement.getText(), page.translations.PUBLISH.CATEGORIES.INFO);
-        assert.eventually.equal(page.addFieldElement.getAttribute('placeholder'),
-                                page.translations.PUBLISH.CATEGORIES.NEW_ITEM);
+        assert.eventually.equal(
+          page.addFieldElement.getAttribute('placeholder'),
+          page.translations.PUBLISH.CATEGORIES.NEW_ITEM
+        );
 
         // Add form
         page.setAddFieldMouseOver();

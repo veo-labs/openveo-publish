@@ -27,10 +27,11 @@ describe('Configuration page translations', function() {
     );
 
     // Youtube with no associated account
-    assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
-                          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
-                          page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
-                         );
+    assert.eventually.equal(
+      page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_NOT_ASSOCIATED_STATUS + '\n' +
+      page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER
+    );
 
     // Youtube with an associated account
     // Associate a fake Google account
@@ -45,10 +46,11 @@ describe('Configuration page translations', function() {
     }]);
     page.refresh();
     assert.eventually.equal(page.getYoutubePeerLink(), page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER);
-    assert.eventually.equal(page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
-                            page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
-                            page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
-                           );
+    assert.eventually.equal(
+      page.getPanelText(page.translations.PUBLISH.CONFIGURATION.YOUTUBE_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.YOUTUBE_PEER_ASSOCIATED_STATUS + '\n' +
+      page.translations.PUBLISH.CONFIGURATION.YOUTUBE_MODIFY_PEER
+    );
   }
 
   /**

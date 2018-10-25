@@ -383,8 +383,10 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
         } else if (!mediaPackage) {
 
           // Package does not exist
-          self.emit('error', new PublishError('Cannot retry package ' + packageId + ' (not found)',
-                                              ERRORS.PACKAGE_NOT_FOUND));
+          self.emit(
+            'error',
+            new PublishError('Cannot retry package ' + packageId + ' (not found)', ERRORS.PACKAGE_NOT_FOUND)
+          );
 
         } else if (mediaPackage.state === STATES.ERROR || forceRetry) {
 
@@ -428,22 +430,28 @@ PublishManager.prototype.retryAll = function() {
 
   // Retrieve all packages in a non stable state
   this.videoProvider.getAll(
-    new ResourceFilter()
-    .notIn('state', [
-      STATES.ERROR,
-      STATES.WAITING_FOR_UPLOAD,
-      STATES.READY,
-      STATES.PUBLISHED
-    ]),
+    new ResourceFilter().notIn(
+      'state', [
+        STATES.ERROR,
+        STATES.WAITING_FOR_UPLOAD,
+        STATES.READY,
+        STATES.PUBLISHED
+      ]
+    ),
     null,
     {
       id: 'desc'
     },
     function(error, mediaPackages) {
-      if (error)
-        return self.emit('error', new PublishError('Getting packages in non stable state failed with message : ' +
-                                                   error.message,
-                                              ERRORS.UNKNOWN));
+      if (error) {
+        return self.emit(
+          'error',
+          new PublishError(
+            'Getting packages in non stable state failed with message : ' + error.message,
+            ERRORS.UNKNOWN
+          )
+        );
+      }
 
       mediaPackages.forEach(function(mediaPackage) {
         self.retry(mediaPackage.id, true);
@@ -481,8 +489,10 @@ PublishManager.prototype.upload = function(packageId, platform) {
         } else if (!mediaPackage) {
 
           // Package does not exist
-          self.emit('error', new PublishError('Cannot upload package ' + packageId + ' (not found)',
-                                              ERRORS.PACKAGE_NOT_FOUND));
+          self.emit(
+            'error',
+            new PublishError('Cannot upload package ' + packageId + ' (not found)', ERRORS.PACKAGE_NOT_FOUND)
+          );
 
         } else if (mediaPackage.state === STATES.WAITING_FOR_UPLOAD) {
 

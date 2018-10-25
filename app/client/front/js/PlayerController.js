@@ -9,7 +9,7 @@
     $scope.ready = false;
     $scope.autoPlay = false;
 
-    var urlChunks = /.*\/([^\/]*)\/?/.exec($location.path());
+    var urlChunks = /.*\/([^/]*)\/?/.exec($location.path());
     var player = document.getElementById('ov-player');
 
     angular.element(player).on('needPoiConversion', function(event, duration) {
