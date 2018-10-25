@@ -94,6 +94,28 @@ describe('Configuration page translations', function() {
   }
 
   /**
+   * Validates catalog settings translations.
+   */
+  function checkCatalogSettings() {
+
+    // Catalog panel title
+    assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE));
+    assert.eventually.equal(
+      page.getPanelInformation(page.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE),
+      page.translations.PUBLISH.CONFIGURATION.CATALOG_INFO
+    );
+
+    // Catalog without refresh interval
+    assert.eventually.isEmpty(page.getCatalogRefreshInterval());
+
+    // Catalog formular button
+    page.getPanel(page.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE).then(function(panelElement) {
+      assert.eventually.ok(panelElement.element(by.binding('CORE.UI.FORM_SAVE')).isPresent());
+    });
+
+  }
+
+  /**
    * Checks translations.
    *
    * @param {Number} [index] Index of the language to test in the list of languages
@@ -114,6 +136,7 @@ describe('Configuration page translations', function() {
         checkYoutubeSettings();
         checkWatcherSettings();
         checkTlsSettings();
+        checkCatalogSettings();
 
         configurationHelper.removeAllEntities(defaultSettings);
         page.refresh();

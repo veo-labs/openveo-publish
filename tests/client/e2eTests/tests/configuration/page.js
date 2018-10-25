@@ -260,4 +260,52 @@ describe('Configuration page', function() {
 
   });
 
+  describe('Catalog', function() {
+
+    it('should display configuration panel', function() {
+      assert.isFulfilled(page.getPanel(page.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE));
+    });
+
+    it('should not display a refresh interval by default', function() {
+      assert.eventually.isEmpty(page.getCatalogRefreshInterval());
+    });
+
+    it('should display actual refresh interval if specified', function() {
+      var expectedRefreshInterval = 42;
+      configurationHelper.addEntities([{
+        id: 'publish-catalog',
+        value: {
+          refreshInterval: expectedRefreshInterval
+        }
+      }]);
+
+      page.refresh();
+
+      assert.eventually.equal(page.getCatalogRefreshInterval(), expectedRefreshInterval);
+    });
+
+    it('should be able to change the refresh interval', function() {
+      var expectedRefreshInterval = 42;
+
+      assert.isFulfilled(page.editCatalogSettings(expectedRefreshInterval));
+
+      assert.eventually.equal(page.getCatalogRefreshInterval(), expectedRefreshInterval);
+
+      page.refresh();
+
+      assert.eventually.equal(page.getCatalogRefreshInterval(), expectedRefreshInterval);
+    });
+
+    it('should be able to leave refresh interval field empty', function() {
+      page.editCatalogSettings();
+      page.refresh();
+      assert.eventually.isEmpty(page.getCatalogRefreshInterval());
+    });
+
+    it('should not be able to set a refresh interval if it contains non-digit characters', function() {
+      assert.isRejected(page.editCatalogSettings('Wrong refresh interval'));
+    });
+
+  });
+
 });

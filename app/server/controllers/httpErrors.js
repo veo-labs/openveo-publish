@@ -652,6 +652,20 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Saving catalog settings failed.
+   *
+   * @property SAVE_CATALOG_SETTINGS_ERROR
+   * @type Object
+   * @final
+   * @default 45
+   */
+  SAVE_CATALOG_SETTINGS_ERROR: {
+    code: 0x02d,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -1357,6 +1371,34 @@ var HTTP_ERRORS = {
    */
   REMOVE_MEDIAS_MISSING_PARAMETERS: {
     code: 0x226,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Saving catalog settings failed, wrong parameters.
+   *
+   * @property SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS
+   * @type Object
+   * @final
+   * @default 551
+   */
+  SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS: {
+    code: 0x227,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Saving catalog settings failed, missing parameters.
+   *
+   * @property SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS
+   * @type Object
+   * @final
+   * @default 552
+   */
+  SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS: {
+    code: 0x228,
     httpCode: 400,
     module: 'publish'
   },

@@ -113,6 +113,9 @@ window.ovPlayerDirectory = '/publish/lib/openveo-player/';
         }],
         users: ['entityService', function(entityService) {
           return entityService.getAllEntities('users');
+        }],
+        settings: ['entityService', function(entityService) {
+          return entityService.getEntity('settings', null, 'publish-catalog');
         }]
       }
     });

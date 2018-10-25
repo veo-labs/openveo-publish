@@ -19,6 +19,7 @@
   platforms,
   groups,
   users,
+  settings,
   tableReloadEventService,
   i18nService,
   publishName,
@@ -27,11 +28,13 @@
     var isUserManager = $scope.hasPermission('publish-manage-videos');
     var addMediaPromise = null;
     var userFilterCanceller;
+    var pollMediasPromise;
 
     $scope.properties = properties.data.entities;
     $scope.platforms = platforms.data.platforms;
     $scope.groups = groups.data.entities;
     $scope.users = users.data.entities;
+    $scope.settings = settings.data.entity && settings.data.entity.value;
     $scope.isCollapsed = true;
     $scope.fileToUpload = null;
     $scope.thumbToAdd = null;
@@ -135,17 +138,19 @@
       ].join(''), 0);
     }
 
-    // Iterate through the list of medias, if at least one media
-    // is pending, poll each 30 seconds to be informed of
-    // its status
-    var pollMediasPromise = $interval(function() {
-      if (!scopeEditForm.pendingEdition) {
-        entityService.deleteCache(entityType, publishName);
-        tableReloadEventService.broadcast(function() {
-          $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.MEDIAS.RELOAD'), 4000);
-        });
-      }
-    }, 30000);
+    // Automatically update the list of medias
+    if ($scope.settings && $scope.settings.refreshInterval) {
+      pollMediasPromise = $interval(function() {
+        if (!scopeEditForm.pendingEdition) {
+          entityService.deleteCache(entityType, publishName);
+          tableReloadEventService.broadcast(function() {
+            $scope.$emit('setAlert', 'info', $filter('translate')('PUBLISH.MEDIAS.RELOAD', null, {
+              interval: $scope.settings.refreshInterval
+            }), 4000);
+          });
+        }
+      }, $scope.settings.refreshInterval * 1000);
+    }
 
     /**
      * Retries a media which is on error.
@@ -889,6 +894,7 @@
     'platforms',
     'groups',
     'users',
+    'settings',
     'tableReloadEventService',
     'i18nService',
     'publishName',

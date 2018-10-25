@@ -151,6 +151,22 @@ ConfigurationPage.prototype.getTlsSettingsFields = function(panelElement, proper
 };
 
 /**
+ * Gets fields of the catalog settings form.
+ *
+ * @param {Object} panelElement The panel element finder
+ * @return {Object} The list of fields
+ */
+ConfigurationPage.prototype.getCatalogSettingsFields = function(panelElement) {
+  return {
+    refreshInterval: Field.get({
+      type: 'text',
+      name: this.translations.PUBLISH.CONFIGURATION.CATALOG_REFRESH_INTERVAL,
+      baseElement: panelElement
+    })
+  };
+};
+
+/**
  * Gets watcher default owner.
  *
  * @param {Boolean} literal true to get the literal instead, false to get field value
@@ -220,6 +236,23 @@ ConfigurationPage.prototype.getTlsProperties = function(literal) {
 };
 
 /**
+ * Gets catalog refresh interval.
+ *
+ * @param {Boolean} literal true to get the literal instead, false to get field value
+ * @return {Promise} Promise resolving to the refresh interval
+ */
+ConfigurationPage.prototype.getCatalogRefreshInterval = function(literal) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE).then(function(panelElement) {
+    if (literal)
+      return self.getCatalogSettingsFields(panelElement).refreshInterval.getText();
+    else
+      return self.getCatalogSettingsFields(panelElement).refreshInterval.getValue();
+  });
+};
+
+/**
  * Sets TLS settings.
  *
  * @param {Array} properties The list of property names
@@ -237,6 +270,24 @@ ConfigurationPage.prototype.editTlsSettings = function(properties, useAutoComple
       fields.properties.setValueUsingAutoCompletion(properties);
     else
       fields.properties.setValue(properties);
+
+    return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));
+  });
+};
+
+/**
+ * Sets catalog settings.
+ *
+ * @param {Number} refreshInterval The refresh interval
+ * @return {Promise} Promise resolving when catalog settings have been saved
+ */
+ConfigurationPage.prototype.editCatalogSettings = function(refreshInterval) {
+  var self = this;
+
+  return this.getPanel(self.translations.PUBLISH.CONFIGURATION.CATALOG_TITLE).then(function(panelElement) {
+    var fields = self.getCatalogSettingsFields(panelElement);
+
+    fields.refreshInterval.setValue(refreshInterval);
 
     return browserExt.click(panelElement.element(by.binding('CORE.UI.FORM_SAVE')));
   });

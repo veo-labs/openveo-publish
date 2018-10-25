@@ -26,6 +26,11 @@
       return $http.get(basePath + pluginPath + entityType);
     };
 
+    var getEntity = function(entityType, pluginName, id) {
+      var pluginPath = (!pluginName) ? '' : pluginName + '/';
+      return $http.get(basePath + pluginPath + entityType + '/' + id);
+    };
+
     var deleteCache = function(entityType, pluginName) {
       if (!pluginName) pluginName = 'core';
       if (entityCache[pluginName]) delete entityCache[pluginName][entityType];
@@ -36,6 +41,7 @@
       updateEntity: updateEntity,
       removeEntities: removeEntities,
       getAllEntities: getAllEntities,
+      getEntity: getEntity,
       deleteCache: deleteCache
     };
 

@@ -2,6 +2,27 @@
   <h2 ng-bind="'PUBLISH.CONFIGURATION.TITLE' | translate"></h2>
   <div class="well well-lg" ng-bind="'PUBLISH.CONFIGURATION.INFO' | translate"></div>
   <div class="row">
+
+    <div class="col-sd-12 col-md-4">
+      <div class="panel panel-default">
+        <div uib-popover="{{'PUBLISH.CONFIGURATION.CATALOG_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.CATALOG_TITLE' | translate"></div>
+        <div class="panel-body">
+          <form novalidate ng-submit="saveCatalogSettings();" name="catalogSettings.form">
+            <formly-form model="catalogSettings.model" fields="catalogSettings.fields" options="catalogSettings.options">
+              <div class="text-right" ng-if="catalogSettings.options.formState.showForm">
+                <button
+                        class="btn btn-primary"
+                        type="submit"
+                        ng-disabled="catalogSettings.form.$invalid || catalogSettings.isFormSaving"
+                        ng-bind="'CORE.UI.FORM_SAVE' | translate"
+                ></button>
+              </div>
+            </formly-form>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div ng-if="youtubeConf" class="col-sd-12 col-md-4">
       <div class="panel panel-default">
         <div uib-popover="{{'PUBLISH.CONFIGURATION.YOUTUBE_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.YOUTUBE_TITLE' | translate"></div>
@@ -20,26 +41,6 @@
       </div>
     </div>
 
-    <div class="col-sd-12 col-md-4">
-      <div class="panel panel-default">
-        <div uib-popover="{{'PUBLISH.CONFIGURATION.WATCHER_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.WATCHER_TITLE' | translate"></div>
-        <div class="panel-body">
-          <form novalidate ng-submit="saveWatcherSettings();" name="watcherSettings.form">
-            <formly-form model="watcherSettings.model" fields="watcherSettings.fields" options="watcherSettings.options">
-              <div class="text-right" ng-if="watcherSettings.options.formState.showForm">
-                <button
-                        class="btn btn-primary"
-                        type="submit"
-                        ng-disabled="watcherSettings.form.$invalid || watcherSettings.isFormSaving"
-                        ng-bind="'CORE.UI.FORM_SAVE' | translate"
-                ></button>
-              </div>
-            </formly-form>
-          </form>
-        </div>
-      </div>
-    </div>
-
     <div ng-if="tlsSettings" class="col-sd-12 col-md-4">
       <div class="panel panel-default">
         <div uib-popover="{{'PUBLISH.CONFIGURATION.TLS_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.TLS_TITLE' | translate"></div>
@@ -51,6 +52,26 @@
                         class="btn btn-primary"
                         type="submit"
                         ng-disabled="tlsSettings.form.$invalid || tlsSettings.isFormSaving"
+                        ng-bind="'CORE.UI.FORM_SAVE' | translate"
+                ></button>
+              </div>
+            </formly-form>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sd-12 col-md-4">
+      <div class="panel panel-default">
+        <div uib-popover="{{'PUBLISH.CONFIGURATION.WATCHER_INFO' | translate}}" popover-trigger="'mouseenter'" popover-placement="bottom" class="panel-heading text-uppercase" ng-bind="'PUBLISH.CONFIGURATION.WATCHER_TITLE' | translate"></div>
+        <div class="panel-body">
+          <form novalidate ng-submit="saveWatcherSettings();" name="watcherSettings.form">
+            <formly-form model="watcherSettings.model" fields="watcherSettings.fields" options="watcherSettings.options">
+              <div class="text-right" ng-if="watcherSettings.options.formState.showForm">
+                <button
+                        class="btn btn-primary"
+                        type="submit"
+                        ng-disabled="watcherSettings.form.$invalid || watcherSettings.isFormSaving"
                         ng-bind="'CORE.UI.FORM_SAVE' | translate"
                 ></button>
               </div>

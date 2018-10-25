@@ -81,6 +81,16 @@ describe('MediaController', function() {
             name: 'user 10'
           }]
         }
+      },
+      settings: {
+        data: {
+          entity: {
+            id: 'publish-catalog',
+            value: {
+              refreshInterval: 42
+            }
+          }
+        }
       }
 
     });

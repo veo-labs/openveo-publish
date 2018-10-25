@@ -72,6 +72,22 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
         callback();
     },
 
+    // Get catalog configuration
+    function(callback) {
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-catalog'),
+        null,
+        function(error, catalogSettings) {
+          if (error) return callback(error);
+
+          configurations['publishCatalog'] = catalogSettings && catalogSettings.value;
+          callback();
+        }
+      );
+    },
+
     // Get Watcher configuration
     function(callback) {
       configurations['publishWatcher'] = {};
@@ -307,6 +323,68 @@ ConfigurationController.prototype.saveTlsSettingsAction = function(request, resp
 
     // Missing body
     next(HTTP_ERRORS.SAVE_TLS_SETTINGS_MISSING_PARAMETERS);
+
+  }
+};
+
+/**
+ * Saves catalog settings.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "settings" : {
+ *         "refreshInterval": 50 // The refresh interval in seconds
+ *       },
+ *       "total": 1
+ *     }
+ *
+ * @method saveCatalogSettingsAction
+ * @async
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {Number} request.body.refreshInterval The refresh interval in seconds
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.saveCatalogSettingsAction = function(request, response, next) {
+  if (request.body) {
+    var coreApi = process.api.getCoreApi();
+    var settingProvider = coreApi.settingProvider;
+    var parsedBody;
+
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        refreshInterval: {type: 'number'}
+      });
+    } catch (error) {
+      return next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS);
+    }
+
+    settingProvider.add(
+      [
+        {
+          id: 'publish-catalog',
+          value: parsedBody
+        }
+      ],
+      function(error, total, settings) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'saveCatalogSettingsAction'});
+          next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_ERROR);
+        } else {
+          response.send({
+            settings: settings[0].value,
+            total: total
+          });
+        }
+      }
+    );
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS);
 
   }
 };

@@ -126,7 +126,7 @@
     "END_DATE_FILTER": "Au",
     "CATEGORY_FILTER" : "Rubrique",
     "OWNER_FILTER" : "Propriétaire",
-    "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans 30s.",
+    "RELOAD": "Toutes les vidéos ont été rechargées avec succès.<br><br>Rechargement automatique dans {{interval}}s.",
     "NOT_READY": "Cette vidéo nécessite un réencodage pour etre visionné. Cette tâche est en cours.<br><br>Merci de réessayer dans quelques instant.",
     "UPLOAD_CANCELED": "L'upload a été interrompu. Le fichier n'a pas été uploadé."
   },
@@ -210,6 +210,9 @@
     "WATCHER_DEFAULT_GROUP": "Groupe des médias par défaut",
     "TLS_TITLE": "TLS",
     "TLS_INFO": "Configurez les intéractions entre OpenVeo et la plateforme TLS.",
-    "TLS_PROPERTIES": "Propriétés personnalisées à envoyer à TLS"
+    "TLS_PROPERTIES": "Propriétés personnalisées à envoyer à TLS",
+    "CATALOG_TITLE": "Catalogue",
+    "CATALOG_INFO": "Configurez le catalogue de vidéos.",
+    "CATALOG_REFRESH_INTERVAL": "Intervalle de rafraîchissement (en secondes)"
   }
 }

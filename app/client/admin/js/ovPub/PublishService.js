@@ -243,6 +243,17 @@
     }
 
     /**
+     * Saves catalog settings.
+     *
+     * @method saveCatalogSettings
+     * @param {Object} data The catalog settings
+     * @return {HttpPromise} The HTTP promise
+     */
+    function saveCatalogSettings(data) {
+      return $http.post(basePath + 'publish/configuration/catalog/', data);
+    }
+
+    /**
      * Updates a chapter associated to the specified media.
      *
      * @method updateChapter
@@ -399,6 +410,7 @@
       getConfiguration: getConfiguration,
       saveWatcherSettings: saveWatcherSettings,
       saveTlsSettings: saveTlsSettings,
+      saveCatalogSettings: saveCatalogSettings,
       updateTag: updateTag,
       updateChapter: updateChapter,
       removeTags: removeTags,

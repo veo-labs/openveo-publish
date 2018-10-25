@@ -29,7 +29,8 @@ module.exports = {
         'get /configuration/googleOAuthAssociation':
         'app/server/controllers/ConfigurationController.handleGoogleOAuthCodeAction',
         'post /configuration/watcher': 'app/server/controllers/ConfigurationController.saveWatcherSettings',
-        'post /configuration/tls': 'app/server/controllers/ConfigurationController.saveTlsSettingsAction'
+        'post /configuration/tls': 'app/server/controllers/ConfigurationController.saveTlsSettingsAction',
+        'post /configuration/catalog': 'app/server/controllers/ConfigurationController.saveCatalogSettingsAction'
       },
       ws: {
         'get /propertiesTypes': 'app/server/controllers/PropertyController.getPropertyTypesAction',

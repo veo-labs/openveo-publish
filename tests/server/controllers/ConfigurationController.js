@@ -23,6 +23,7 @@ describe('ConfigurationController', function() {
   var request;
   var response;
   var coreApi;
+  var GoogleOAuthHelper;
 
   // Mocks
   beforeEach(function() {
@@ -87,12 +88,24 @@ describe('ConfigurationController', function() {
       locals: {}
     };
 
+    GoogleOAuthHelper = function() {};
+    GoogleOAuthHelper.prototype.hasToken = chai.spy(function(callback) {
+      callback(null, 'token');
+    });
+    GoogleOAuthHelper.prototype.getAuthUrl = chai.spy(function(data) {
+      return 'URL';
+    });
+
     originalCoreApi = process.api;
     process.api = coreApi;
 
     mock('publish/videoPlatformConf.json', videoPlatformConf);
     mock('@openveo/api', openVeoApi);
     mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
+    mock(
+      path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/youtube/GoogleOAuthHelper.js'),
+      GoogleOAuthHelper
+    );
   });
 
   // Initialize tests
@@ -110,10 +123,19 @@ describe('ConfigurationController', function() {
 
   describe('getConfigurationAllAction', function() {
 
-    it('should send response with TLS configuration', function(done) {
-      var count = 0;
-      videoPlatformConf.youtube = false;
+    it('should send response with catalog, Youtube, Watcher and TLS configurations', function(done) {
       expectedSettings = [
+        {
+          id: 'publish-youtube',
+          value: {
+            hasToken: true,
+            authUrl: 'Auth URL'
+          }
+        },
+        {
+          id: 'publish-catalog',
+          value: 'Catalog settings'
+        },
         {
           id: 'publish-watcher',
           value: 'Watcher settings'
@@ -124,98 +146,119 @@ describe('ConfigurationController', function() {
         }
       ];
 
+      GoogleOAuthHelper.prototype.hasToken = chai.spy(function(callback) {
+        callback(null, expectedSettings[0].value.hasToken);
+      });
+      GoogleOAuthHelper.prototype.getAuthUrl = chai.spy(function(data) {
+        return expectedSettings[0].value.authUrl;
+      });
+
       coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
-        if (count === 1) {
-          assert.equal(
+        var id = filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value;
+        if (id === 'publish-catalog') callback(null, expectedSettings[1]);
+        else if (id === 'publish-watcher') callback(null, expectedSettings[2]);
+        else if (id === 'publish-tls') callback(null, expectedSettings[3]);
+        else callback();
+      });
+
+      response.send = function(configurations) {
+        assert.deepEqual(configurations['youtube'], expectedSettings[0].value, 'Wrong Youtube settings');
+        assert.strictEqual(configurations['publishCatalog'], expectedSettings[1].value, 'Wrong catalog settings');
+        assert.strictEqual(configurations['publishWatcher'], expectedSettings[2].value, 'Wrong watcher settings');
+        assert.strictEqual(configurations['publishTls'], expectedSettings[3].value, 'Wrong TLS settings');
+        coreApi.settingProvider.getOne.should.have.been.called.exactly(3);
+        GoogleOAuthHelper.prototype.hasToken.should.have.been.called.exactly(1);
+        GoogleOAuthHelper.prototype.getAuthUrl.should.have.been.called.exactly(1);
+        done();
+      };
+
+      controller.getConfigurationAllAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected error');
+      });
+    });
+
+    describe('TLS', function() {
+
+      it('should send response without TLS configuration if TLS is not activated', function(done) {
+        videoPlatformConf.tls = false;
+
+        coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+          assert.notEqual(
             filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
             'publish-tls',
-            'Wrong setting id'
+            'Unexpected call to get TLS settings'
           );
-        }
-        callback(null, expectedSettings[count++]);
+          callback();
+        });
+
+        response.send = function(configurations) {
+          assert.notProperty(configurations, 'publishTls', 'Unexpected settings');
+          done();
+        };
+
+        controller.getConfigurationAllAction(request, response, function(error) {
+          assert.ok(false, 'Unexpected error');
+        });
       });
 
-      response.send = function(configurations) {
-        assert.equal(configurations['publishTls'], expectedSettings[1].value, 'Wrong TLS settings');
-        coreApi.settingProvider.getOne.should.have.been.called.exactly(2);
-        done();
-      };
+      it('should send response with empty TLS configuration if TLS configuration does not exist', function(done) {
+        coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+          callback();
+        });
 
-      controller.getConfigurationAllAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
+        response.send = function(configurations) {
+          assert.isEmpty(configurations['publishTls'], 'Unexpected settings');
+          coreApi.settingProvider.getOne.should.have.been.called.at.least(1);
+          done();
+        };
+
+        controller.getConfigurationAllAction(request, response, function(error) {
+          assert.ok(false, 'Unexpected error');
+        });
       });
+
+      it('should execute next with an error if getting TLS configuration failed', function(done) {
+        coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+          if (filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value === 'publish-tls')
+            callback(new Error('Something went wrong'));
+          else
+            callback();
+        });
+
+        response.send = function(configurations) {
+          assert.ok(false, 'Unexpected response');
+        };
+
+        controller.getConfigurationAllAction(request, response, function(error) {
+          assert.strictEqual(error, HTTP_ERRORS.GET_CONFIGURATION_ERROR, 'Wrong error');
+          coreApi.settingProvider.getOne.should.have.been.called.at.least(1);
+          done();
+        });
+      });
+
     });
 
-    it('should send response without TLS configuration if TLS is not activated', function(done) {
-      videoPlatformConf.youtube = false;
-      videoPlatformConf.tls = false;
-      expectedSettings = [
-        {
-          id: 'publish-watcher',
-          value: 'Medias settings'
-        }
-      ];
+    describe('catalog', function() {
 
-      response.send = function(configurations) {
-        assert.notProperty(configurations, 'publishTls', 'Unexpected settings');
-        coreApi.settingProvider.getOne.should.have.been.called.exactly(1);
-        done();
-      };
+      it('should execute next with an error if getting catalog configuration failed', function(done) {
+        coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
+          if (filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value === 'publish-catalog')
+            callback(new Error('Something went wrong'));
+          else
+            callback();
+        });
 
-      controller.getConfigurationAllAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
+        response.send = function(configurations) {
+          assert.ok(false, 'Unexpected response');
+        };
 
-    it('should send response with empty TLS configuration if TLS configuration does not exist', function(done) {
-      var count = 0;
-      videoPlatformConf.youtube = false;
-      expectedSettings = [
-        {
-          id: 'publish-watcher',
-          value: 'Medias settings'
-        }
-      ];
-
-      coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
-        callback(null, (count === 0) ? expectedSettings[count++] : null);
+        controller.getConfigurationAllAction(request, response, function(error) {
+          assert.strictEqual(error, HTTP_ERRORS.GET_CONFIGURATION_ERROR, 'Wrong error');
+          coreApi.settingProvider.getOne.should.have.been.called.at.least(1);
+          done();
+        });
       });
 
-      response.send = function(configurations) {
-        assert.isEmpty(configurations['publishTls'], 'Unexpected settings');
-        coreApi.settingProvider.getOne.should.have.been.called.exactly(2);
-        done();
-      };
-
-      controller.getConfigurationAllAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should execute next with an error if getting TLS configuration failed', function(done) {
-      var count = 0;
-      var expectedError = new Error('Something went wrong');
-      videoPlatformConf.youtube = false;
-      expectedSettings = [
-        {
-          id: 'publish-watcher',
-          value: 'Medias settings'
-        }
-      ];
-
-      coreApi.settingProvider.getOne = chai.spy(function(filter, fields, callback) {
-        callback((count === 1) ? expectedError : null, (count === 0) ? expectedSettings[count++] : null);
-      });
-
-      response.send = function(configurations) {
-        assert.ok(false, 'Unexpected response');
-      };
-
-      controller.getConfigurationAllAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.GET_CONFIGURATION_ERROR, 'Wrong error');
-        coreApi.settingProvider.getOne.should.have.been.called.exactly(2);
-        done();
-      });
     });
 
   });
@@ -336,6 +379,64 @@ describe('ConfigurationController', function() {
       controller.saveTlsSettingsAction(request, response, function(error) {
         coreApi.settingProvider.add.should.have.been.called.exactly(0);
         assert.strictEqual(error, HTTP_ERRORS.SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR, 'Wrong error');
+        done();
+      });
+    });
+
+  });
+
+  describe('saveCatalogSettingsAction', function() {
+
+    it('should save catalog settings', function(done) {
+      var expectedRefreshInterval = 42;
+      request.body.refreshInterval = expectedRefreshInterval;
+
+      coreApi.settingProvider.add = chai.spy(function(settings, callback) {
+        assert.equal(settings[0].id, 'publish-catalog', 'Wrong setting id');
+        assert.deepEqual(settings[0].value.refreshInterval, expectedRefreshInterval, 'Wrong setting value');
+        callback(null, 1, settings);
+      });
+
+      response.send = function(data) {
+        assert.equal(data.total, 1, 'Wrong total');
+        assert.deepEqual(data.settings.refreshInterval, expectedRefreshInterval, 'Wrong setting value');
+        coreApi.settingProvider.add.should.have.been.called.exactly(1);
+        done();
+      };
+
+      controller.saveCatalogSettingsAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected error');
+      });
+    });
+
+    it('should execute next with an error if body is missing', function(done) {
+      request.body = null;
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      controller.saveCatalogSettingsAction(request, response, function(error) {
+        assert.equal(error, HTTP_ERRORS.SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS, 'Wrong error');
+        coreApi.settingProvider.add.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute next with an error if saving catalog settings failed', function(done) {
+      request.body.refreshInterval = 42;
+
+      coreApi.settingProvider.add = chai.spy(function(settings, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      controller.saveCatalogSettingsAction(request, response, function(error) {
+        assert.equal(error, HTTP_ERRORS.SAVE_CATALOG_SETTINGS_ERROR, 'Wrong error');
+        coreApi.settingProvider.add.should.have.been.called.exactly(1);
         done();
       });
     });

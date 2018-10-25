@@ -17,6 +17,7 @@
   ) {
     var publishWatcher = publishConf.data.publishWatcher;
     var publishTls = publishConf.data.publishTls;
+    var publishCatalog = publishConf.data.publishCatalog;
 
     $scope.rights = {};
     $scope.rights.edit = $scope.checkAccess('publish-manage-publish-config');
@@ -84,6 +85,36 @@
       };
     }
 
+    // Catalog settings
+    $scope.catalogSettings = {
+      model: {
+        refreshInterval: (publishCatalog && publishCatalog.refreshInterval) || null
+      },
+      fields: [
+        {
+          key: 'refreshInterval',
+          type: 'editableInput',
+          wrapper: ['editableWrapper', 'bootstrapHasError'],
+          validators: {
+            number: {
+              expression: function(viewValue, modelValue) {
+                return !viewValue || /^[0-9]*$/.test(viewValue);
+              }
+            }
+          },
+          templateOptions: {
+            label: $filter('translate')('PUBLISH.CONFIGURATION.CATALOG_REFRESH_INTERVAL')
+          }
+        }
+      ],
+      options: {
+        formState: {
+          showForm: $scope.rights.edit
+        }
+      },
+      isFormSaving: false
+    };
+
     /**
      * Saves medias settings.
      */
@@ -114,6 +145,22 @@
         $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
       }).catch(function() {
         $scope.tlsSettings.isFormSaving = false;
+      });
+    };
+
+    /**
+     * Saves catalog settings.
+     */
+    $scope.saveCatalogSettings = function() {
+      $scope.catalogSettings.isFormSaving = true;
+
+      return publishService.saveCatalogSettings({
+        refreshInterval: $scope.catalogSettings.model.refreshInterval
+      }).then(function() {
+        $scope.catalogSettings.isFormSaving = false;
+        $scope.$emit('setAlert', 'success', $filter('translate')('CORE.UI.SAVE_SUCCESS'), 4000);
+      }).catch(function() {
+        $scope.catalogSettings.isFormSaving = false;
       });
     };
 

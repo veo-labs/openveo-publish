@@ -160,6 +160,32 @@ describe('Configuration page', function() {
 
     });
 
+    describe('Catalog', function() {
+
+      it('should not be able to edit settings', function() {
+        assert.isRejected(page.editCatalogSettings(42));
+      });
+
+      it('should display settings as literals', function() {
+        var expectedRefreshInterval = 42;
+        configurationHelper.addEntities([{
+          id: 'publish-catalog',
+          value: {
+            refreshInterval: expectedRefreshInterval
+          }
+        }]);
+
+        page.refresh();
+
+        assert.eventually.equal(page.getCatalogRefreshInterval(true), expectedRefreshInterval);
+      });
+
+      it('should display a generic text if no values', function() {
+        assert.eventually.equal(page.getCatalogRefreshInterval(true), page.translations.CORE.UI.EMPTY);
+      });
+
+    });
+
   });
 
 });
