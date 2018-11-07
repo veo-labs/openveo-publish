@@ -11,7 +11,6 @@ describe('PropertiesController', function() {
 
   // Load module publish and entity
   beforeEach(function() {
-    module('ngJSONPath');
     module('ov.publish');
     module('ov.entity');
   });

@@ -8,9 +8,8 @@ describe('MediaController', function() {
     $httpBackend,
     scope;
 
-  // Load module publish, entity and ngJSONPath
+  // Load modules
   beforeEach(function() {
-    module('ngJSONPath');
     module('ngFileUpload');
     module('ov.publish');
     module('ov.entity');

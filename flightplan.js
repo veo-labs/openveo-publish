@@ -111,7 +111,6 @@ plan.local(['e2e', 'unit'], function(local) {
     // Install openveo-core dependencies and compile sources
     local.with('cd ' + workingDirectory, function() {
       local.exec('npm install --ignore-scripts');
-      local.exec('bower install');
       local.exec('grunt prod');
     });
 
@@ -156,7 +155,6 @@ plan.local(['e2e', 'unit'], function(local) {
     // Install openveo-publish dependencies and compile sources
     local.with('cd ' + projectDirectory, function() {
       local.exec('npm install --ignore-scripts');
-      local.exec('bower install');
       local.exec('grunt prod');
     });
 

@@ -126,11 +126,30 @@ VideoController.prototype.displayVideoAction = function(request, response, next)
     if (publishPlugin.custom) {
       var customScripts = publishPlugin.custom.scriptFiles;
       var playerScripts = customScripts.publishPlayer;
-      response.locals.scripts = response.locals.scripts.concat(
-        (customScripts.base || []),
-        ((playerScripts && playerScripts[env]) ? playerScripts[env] : [])
-      );
-      response.locals.css = response.locals.css.concat(publishPlugin.custom.cssFiles || []);
+
+      // Custom scripts
+      if (customScripts && customScripts.base) {
+        response.locals.scripts = response.locals.scripts.concat(customScripts.base.map(function(customScript) {
+          return path.join(publishPlugin.mountPath, customScript);
+        }));
+      }
+
+      // Custom player scripts
+      if (playerScripts && playerScripts[env]) {
+        response.locals.scripts = response.locals.scripts.concat(playerScripts[env].map(function(playerScript) {
+          return path.join(publishPlugin.mountPath, playerScript);
+        }));
+      }
+
+      // Custom CSS
+      if (publishPlugin.custom.cssFiles) {
+        response.locals.css = response.locals.css.concat(
+          publishPlugin.custom.cssFiles.map(function(cssFile) {
+            return path.join(publishPlugin.mountPath, cssFile);
+          })
+        );
+      }
+
     }
     response.render('player', response.locals);
   } else

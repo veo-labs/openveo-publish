@@ -9,7 +9,6 @@ describe('PublishService', function() {
 
   // Load module publish
   beforeEach(function() {
-    module('ngJSONPath');
     module('ov.publish');
   });
 

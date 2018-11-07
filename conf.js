@@ -232,72 +232,61 @@ module.exports = {
       }
     ],
     scriptLibFiles: {
-      base: [
-      ],
       dev: [
-        '/publish/multirange/multirange.js'
+        'multirange/multirange.js'
       ],
       prod: [
-        '/publish/be/js/libOpenveoPublish.js'
+        'be/js/libOpenveoPublish.js'
       ]
     },
     scriptFiles: {
-      base: [
-        '/publish/lib/video.js/dist/video.min.js',
-        '/publish/lib/dashjs/dist/dash.all.min.js',
-        '/publish/lib/videojs-contrib-dash/index.js',
-        '/publish/lib/videojs-contrib-hls/index.js',
-        '/publish/lib/openveo-player/dist/openveo-player.min.js'
-      ],
       dev: [
-        '/publish/ovPub/PublishApp.js',
-        '/publish/ovPub/MediaController.js',
-        '/publish/ovPub/PropertiesController.js',
-        '/publish/ovPub/CategoriesController.js',
-        '/publish/ovPub/EditorController.js',
-        '/publish/ovPub/ConfigurationController.js',
-        '/publish/ovPub/PublishService.js',
-        '/publish/ovPub/TimeDirective.js',
-        '/publish/ovPub/MillisecondsToTimeFilter.js',
-        '/publish/ovPub/TimeToMillisecondsFilter.js'
+        'ovPub/PublishApp.js',
+        'ovPub/MediaController.js',
+        'ovPub/PropertiesController.js',
+        'ovPub/CategoriesController.js',
+        'ovPub/EditorController.js',
+        'ovPub/ConfigurationController.js',
+        'ovPub/PublishService.js',
+        'ovPub/TimeDirective.js',
+        'ovPub/MillisecondsToTimeFilter.js',
+        'ovPub/TimeToMillisecondsFilter.js'
       ],
       prod: [
-        '/publish/be/js/openveoPublish.js'
+        'be/js/openveoPublish.js'
       ]
     },
     cssFiles: [
-      '/publish/be/css/publish.css',
-      '/publish/lib/openveo-player/dist/openveo-player.css',
-      '/publish/lib/video.js/dist/video-js.min.css'
+      'be/css/publish.css'
     ]
   },
   custom: {
     scriptFiles: {
       base: [
-        '/publish/lib/angular/angular.min.js',
-        '/publish/lib/angular-animate/angular-animate.min.js',
-        '/publish/lib/angular-cookies/angular-cookies.min.js',
-        '/publish/lib/openveo-player/dist/openveo-player.min.js',
-        '/publish/lib/video.js/dist/video.min.js',
-        '/publish/lib/dashjs/dist/dash.all.min.js',
-        '/publish/lib/videojs-contrib-dash/index.js',
-        '/publish/lib/videojs-contrib-hls/index.js'
+        'angular/angular.min.js',
+        'angular-animate/angular-animate.min.js',
+        'angular-cookies/angular-cookies.min.js',
+        'openveo-player/dist/openveo-player.min.js',
+        'video.js/dist/video.min.js',
+        'dashjs/dist/dash.all.min.js',
+        'videojs-contrib-dash/dist/videojs-dash.min.js',
+        'videojs-contrib-hls/dist/videojs-contrib-hls.min.js'
       ],
       publishPlayer: {
         dev: [
-          '/publish/PublishPlayerApp.js',
-          '/publish/MediaService.js',
-          '/publish/PlayerController.js'
+          'PublishPlayerApp.js',
+          'MediaService.js',
+          'PlayerController.js'
         ],
         prod: [
-          '/publish/player/js/openveoPublishPlayer.js'
+          'player/js/openveoPublishPlayer.js'
         ]
       }
     },
     cssFiles: [
-      '/publish/be/css/player_page.css',
-      '/publish/lib/openveo-player/dist/openveo-player.css',
-      '/publish/lib/video.js/dist/video-js.min.css'
+      'be/css/player_page.css',
+      'openveo-player/dist/openveo-player.css',
+      'video.js/dist/video-js.min.css'
     ]
   },
   viewsFolders: [
@@ -337,5 +326,52 @@ module.exports = {
         crop: true
       }
     ]
-  }
+  },
+  libraries: [
+    {
+      name: 'angular',
+      mountPath: 'angular',
+      files: []
+    },
+    {
+      name: 'angular-animate',
+      mountPath: 'angular-animate',
+      files: []
+    },
+    {
+      name: 'angular-cookies',
+      mountPath: 'angular-cookies',
+      files: []
+    },
+    {
+      name: 'html5shiv',
+      mountPath: 'html5shiv',
+      files: []
+    },
+    {
+      name: '@openveo/player',
+      mountPath: 'openveo-player',
+      files: ['dist/openveo-player.min.js', 'dist/openveo-player.css']
+    },
+    {
+      name: 'video.js',
+      mountPath: 'video.js',
+      files: ['dist/video.min.js', 'dist/video-js.min.css']
+    },
+    {
+      name: 'dashjs',
+      mountPath: 'dashjs',
+      files: ['dist/dash.all.min.js']
+    },
+    {
+      name: 'videojs-contrib-dash',
+      mountPath: 'videojs-contrib-dash',
+      files: ['dist/videojs-dash.min.js']
+    },
+    {
+      name: 'videojs-contrib-hls',
+      mountPath: 'videojs-contrib-hls',
+      files: ['dist/videojs-contrib-hls.min.js']
+    }
+  ]
 };

@@ -1,6 +1,5 @@
 'use strict';
 
-window.ovPlayerDirectory = '/publish/lib/openveo-player/';
 (function(angular) {
 
   var app = angular.module('ov.publish', [

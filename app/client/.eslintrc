@@ -11,8 +11,6 @@
     // Add angular to environment globals but do not authorize to overwrite it
     angular: false,
 
-    ovPlayerDirectory: true,
-
     // Add openVeoSettings environment global but do not authorize to overwrite it
     openVeoSettings: true
 

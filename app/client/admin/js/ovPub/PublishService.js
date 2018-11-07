@@ -8,7 +8,7 @@
    * @module ov.publish
    * @class publishService
    */
-  function PublishService($http, $q, entityService, jsonPath, publishName, Upload) {
+  function PublishService($http, $q, entityService, publishName, Upload) {
     var basePath = '/be/';
     var properties;
     var taxonomyCategory;
@@ -139,25 +139,36 @@
     function loadTaxonomyCategory() {
       if (!taxonomyCategory) {
 
+        categoriesByKey = {};
+        categoriesOptions = [];
+
+        var loadCategory = function(category) {
+          if (!category) return;
+
+          var term = {
+            value: category.id,
+            name: category.title
+          };
+          categoriesByKey[category.id] = term;
+          categoriesOptions.push(term);
+
+          if (category.items && category.items.length) {
+            category.items.forEach(function(subCategory) {
+              loadCategory(subCategory);
+            });
+          }
+        };
+
         // Get taxonomy "categories" from server
         return $http.get(basePath + 'taxonomies?query=categories').then(function(results) {
           taxonomyCategory = results.data.entities && results.data.entities[0];
-          categoriesByKey = {};
-          categoriesOptions = [];
-          var categoriestmp = jsonPath(taxonomyCategory, '$..*[?(@.id)]');
-          if (categoriestmp) {
-            categoriestmp.map(function(obj) {
-              var children = jsonPath(obj, '$..*[?(@.id)].id');
-              var rubric = {
-                value: obj.id,
-                name: obj.title,
-                children: children ? children.join(',') : ''
-              };
-              categoriesByKey[obj.id] = rubric;
-              categoriesOptions.push(rubric);
-              return obj;
+
+          if (taxonomyCategory && taxonomyCategory.tree) {
+            taxonomyCategory.tree.forEach(function(category) {
+              loadCategory(category);
             });
           }
+
           return $q.when({
             data: taxonomyCategory
           });
@@ -421,6 +432,6 @@
   }
 
   app.factory('publishService', PublishService);
-  PublishService.$inject = ['$http', '$q', 'entityService', 'jsonPath', 'publishName', 'Upload'];
+  PublishService.$inject = ['$http', '$q', 'entityService', 'publishName', 'Upload'];
 
 })(angular.module('ov.publish'));

@@ -22,9 +22,6 @@ ehthumbs.db
 # Published video packages
 /assets/player/videos
 
-# Bower dependencies
-/assets/lib
-
 # Compiled files
 .sass-cache
 /build

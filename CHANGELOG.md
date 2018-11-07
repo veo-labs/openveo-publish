@@ -1,3 +1,13 @@
+# 10.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core >=8.0.0
+
+## NEW FEATURES
+
+- OpenVeo Publish does not use Bower anymore, it now uses NPM for both client and server dependencies
+
 # 9.0.0 / 2018-10-26
 
 ## BREAKING CHANGES

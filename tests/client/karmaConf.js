@@ -11,14 +11,13 @@ module.exports = function(config) {
 
     // List of files / patterns to load in the browser
     files: [
-      'assets/lib/angular/angular.js',
-      'assets/lib/angular-route/angular-route.js',
-      'assets/lib/angular-animate/angular-animate.js',
-      'assets/lib/angular-cookies/angular-cookies.js',
-      'assets/lib/angular-mocks/angular-mocks.js',
-      'assets/lib/ng-jsonpath/dist/ng-jsonpath.js',
-      'assets/lib/tinymce/tinymce.min.js',
-      'assets/lib/angular-ui-tinymce/dist/tinymce.min.js',
+      'node_modules/angular/angular.js',
+      'node_modules/angular-route/angular-route.js',
+      'node_modules/angular-animate/angular-animate.js',
+      'node_modules/angular-cookies/angular-cookies.js',
+      'node_modules/angular-mocks/angular-mocks.js',
+      'node_modules/tinymce/tinymce.min.js',
+      'node_modules/angular-ui-tinymce/dist/tinymce.min.js',
       'tests/client/unitTests/front/player/playerApp.js',
       'tests/client/unitTests/admin/tableForm/tableForm.js',
       'tests/client/unitTests/admin/util/UtilApp.js',
