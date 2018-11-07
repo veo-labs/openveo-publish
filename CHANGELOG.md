@@ -8,6 +8,10 @@
 
 - OpenVeo Publish does not use Bower anymore, it now uses NPM for both client and server dependencies
 
+## BUG FIXES
+
+- Fix "grunt remove:doc" which hasn't worked since version 3.0.0
+
 # 9.0.0 / 2018-10-26
 
 ## BREAKING CHANGES
