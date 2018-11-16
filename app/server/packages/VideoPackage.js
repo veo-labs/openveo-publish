@@ -150,7 +150,7 @@ VideoPackage.prototype.defragmentMp4 = function() {
   this.updateState(this.mediaPackage.id, STATES.DEFRAGMENT_MP4, function() {
     // Detect if file need defragmentation (unknown "nb_frames")
     ffmpeg.ffprobe(filePath, function(error, metadata) {
-      if (Array.isArray(metadata.streams)) {
+      if (metadata && Array.isArray(metadata.streams)) {
         var fragmentedStreams = metadata.streams.filter(function(stream) {
           if (stream.codec_type !== 'video')
             return false;

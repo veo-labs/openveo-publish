@@ -12,6 +12,12 @@
 
 - Fix "grunt remove:doc" which hasn't worked since version 3.0.0
 
+# 9.0.1 / 2018-11-16
+
+## BUG FIXES
+
+- Fix server crash when uploading an invalid video
+
 # 9.0.0 / 2018-10-26
 
 ## BREAKING CHANGES
