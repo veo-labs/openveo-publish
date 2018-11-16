@@ -1,3 +1,9 @@
+# 9.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix server crash when uploading an invalid video
+
 # 9.0.0 / 2018-10-26
 
 ## BREAKING CHANGES
