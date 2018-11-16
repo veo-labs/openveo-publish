@@ -1,0 +1,4130 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>HTTP_ERRORS - OpenVeo Publish server</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish server</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 9.0.1
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/ConfigurationController.html">ConfigurationController</a></li>
+                                <li><a href="../classes/DirectoryFsWatcher.html">DirectoryFsWatcher</a></li>
+                                <li><a href="../classes/DirectoryWatcher.html">DirectoryWatcher</a></li>
+                                <li><a href="../classes/ERRORS.html">ERRORS</a></li>
+                                <li><a href="../classes/factory.html">factory</a></li>
+                                <li><a href="../classes/GoogleOAuthHelper.html">GoogleOAuthHelper</a></li>
+                                <li><a href="../classes/HTTP_ERRORS.html">HTTP_ERRORS</a></li>
+                                <li><a href="../classes/listener.html">listener</a></li>
+                                <li><a href="../classes/LocalProvider.html">LocalProvider</a></li>
+                                <li><a href="../classes/mediaPlatformFactory.html">mediaPlatformFactory</a></li>
+                                <li><a href="../classes/MediaPlatformProvider.html">MediaPlatformProvider</a></li>
+                                <li><a href="../classes/Package.html">Package</a></li>
+                                <li><a href="../classes/PackageError.html">PackageError</a></li>
+                                <li><a href="../classes/PropertyController.html">PropertyController</a></li>
+                                <li><a href="../classes/PropertyProvider.html">PropertyProvider</a></li>
+                                <li><a href="../classes/PUBLISH_HOOKS.html">PUBLISH_HOOKS</a></li>
+                                <li><a href="../classes/PublishError.html">PublishError</a></li>
+                                <li><a href="../classes/PublishManager.html">PublishManager</a></li>
+                                <li><a href="../classes/PublishPlugin.html">PublishPlugin</a></li>
+                                <li><a href="../classes/PublishPluginApi.html">PublishPluginApi</a></li>
+                                <li><a href="../classes/ResumableUpload.html">ResumableUpload</a></li>
+                                <li><a href="../classes/STATES.html">STATES</a></li>
+                                <li><a href="../classes/StatisticsController.html">StatisticsController</a></li>
+                                <li><a href="../classes/TarPackage.html">TarPackage</a></li>
+                                <li><a href="../classes/TarPackageError.html">TarPackageError</a></li>
+                                <li><a href="../classes/TlsClient.html">TlsClient</a></li>
+                                <li><a href="../classes/TlsProvider.html">TlsProvider</a></li>
+                                <li><a href="../classes/TYPES.html">TYPES</a></li>
+                                <li><a href="../classes/VideoController.html">VideoController</a></li>
+                                <li><a href="../classes/VideoPackage.html">VideoPackage</a></li>
+                                <li><a href="../classes/VideoPackageError.html">VideoPackageError</a></li>
+                                <li><a href="../classes/VideoProvider.html">VideoProvider</a></li>
+                                <li><a href="../classes/VimeoProvider.html">VimeoProvider</a></li>
+                                <li><a href="../classes/Watcher.html">Watcher</a></li>
+                                <li><a href="../classes/WatcherError.html">WatcherError</a></li>
+                                <li><a href="../classes/WowzaProvider.html">WowzaProvider</a></li>
+                                <li><a href="../classes/YoutubeProvider.html">YoutubeProvider</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/controllers.html">controllers</a></li>
+                                <li><a href="../modules/packages.html">packages</a></li>
+                                <li><a href="../modules/providers.html">providers</a></li>
+                                <li><a href="../modules/publish.html">publish</a></li>
+                                <li><a href="../modules/watcher.html">watcher</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>HTTP_ERRORS</h1>
+<div class="meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/app_server_controllers_httpErrors.js.html#l7"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:7</code></a>
+        </div>
+
+            Module: <a href="../modules/controllers.html">controllers</a>
+
+        <p><span class="flag static">static</span></p>
+</div>
+
+
+<h3>Summary</h3>
+<div class="intro">
+    <p>The list of HTTP errors with, for each error, its associated
+hexadecimal code and HTTP return code.
+HTTP errors are sent by controllers.</p>
+
+</div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_CHECK_DUPLICATE_ERROR">ADD_MEDIA_CHECK_DUPLICATE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_CUSTOM_PROPERTIES_ERROR">ADD_MEDIA_CUSTOM_PROPERTIES_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_GROUPS_ERROR">ADD_MEDIA_GROUPS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_MISSING_FILE_PARAMETER">ADD_MEDIA_MISSING_FILE_PARAMETER</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_MISSING_INFO_PARAMETERS">ADD_MEDIA_MISSING_INFO_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_MISSING_PARAMETERS">ADD_MEDIA_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_PARSE_ERROR">ADD_MEDIA_PARSE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_REMOVE_FILE_ERROR">ADD_MEDIA_REMOVE_FILE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_WRONG_FILE_PARAMETER">ADD_MEDIA_WRONG_FILE_PARAMETER</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_WRONG_PARAMETERS">ADD_MEDIA_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_ADD_MEDIA_WRONG_PROPERTIES_PARAMETER">ADD_MEDIA_WRONG_PROPERTIES_PARAMETER</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_POINTS_OF_INTEREST_FORBIDDEN">CONVERT_POINTS_OF_INTEREST_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR">CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS">CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR">CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS">CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_CONVERT_VIDEO_POI_ERROR">CONVERT_VIDEO_POI_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_CONFIGURATION_ERROR">GET_CONFIGURATION_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_ERROR">GET_MEDIA_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_FORBIDDEN">GET_MEDIA_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_GET_INFO_ERROR">GET_MEDIA_GET_INFO_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_MISSING_PARAMETERS">GET_MEDIA_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_NOT_FOUND">GET_MEDIA_NOT_FOUND</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_MEDIA_WRONG_PARAMETERS">GET_MEDIA_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_PROPERTIES_ERROR">GET_PROPERTIES_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_ERROR">GET_VIDEO_READY_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_FORBIDDEN">GET_VIDEO_READY_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_GET_INFO_ERROR">GET_VIDEO_READY_GET_INFO_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_MISSING_PARAMETERS">GET_VIDEO_READY_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_NOT_FOUND">GET_VIDEO_READY_NOT_FOUND</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_NOT_READY_ERROR">GET_VIDEO_READY_NOT_READY_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEO_READY_WRONG_PARAMETERS">GET_VIDEO_READY_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS">GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEOS_ERROR">GET_VIDEOS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEOS_GET_CATEGORIES_ERROR">GET_VIDEOS_GET_CATEGORIES_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEOS_GET_PROPERTIES_ERROR">GET_VIDEOS_GET_PROPERTIES_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_GET_VIDEOS_WRONG_PARAMETERS">GET_VIDEOS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_INVALID_VIDEO_THUMBNAIL">INVALID_VIDEO_THUMBNAIL</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_PUBLISH_VIDEOS_ERROR">PUBLISH_VIDEOS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_PUBLISH_VIDEOS_FORBIDDEN">PUBLISH_VIDEOS_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_PUBLISH_VIDEOS_GET_VIDEOS_ERROR">PUBLISH_VIDEOS_GET_VIDEOS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_PUBLISH_VIDEOS_MISSING_PARAMETERS">PUBLISH_VIDEOS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_PUBLISH_VIDEOS_WRONG_PARAMETERS">PUBLISH_VIDEOS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_CHAPTERS_ERROR">REMOVE_CHAPTERS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_CHAPTERS_FORBIDDEN">REMOVE_CHAPTERS_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_CHAPTERS_GET_ONE_ERROR">REMOVE_CHAPTERS_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_CHAPTERS_MISSING_PARAMETERS">REMOVE_CHAPTERS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_CHAPTERS_WRONG_PARAMETERS">REMOVE_CHAPTERS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_MEDIAS_ERROR">REMOVE_MEDIAS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_MEDIAS_FORBIDDEN">REMOVE_MEDIAS_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_MEDIAS_GET_MEDIAS_ERROR">REMOVE_MEDIAS_GET_MEDIAS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_MEDIAS_MISSING_PARAMETERS">REMOVE_MEDIAS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_MEDIAS_STATE_ERROR">REMOVE_MEDIAS_STATE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_TAGS_ERROR">REMOVE_TAGS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_TAGS_FORBIDDEN">REMOVE_TAGS_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_TAGS_GET_ONE_ERROR">REMOVE_TAGS_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_TAGS_MISSING_PARAMETERS">REMOVE_TAGS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_REMOVE_TAGS_WRONG_PARAMETERS">REMOVE_TAGS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_RETRY_VIDEOS_MISSING_PARAMETERS">RETRY_VIDEOS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_RETRY_VIDEOS_WRONG_PARAMETERS">RETRY_VIDEOS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_CATALOG_SETTINGS_ERROR">SAVE_CATALOG_SETTINGS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS">SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS">SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR">SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_TLS_SETTINGS_ERROR">SAVE_TLS_SETTINGS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_TLS_SETTINGS_WRONG_PARAMETERS">SAVE_TLS_SETTINGS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER">SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_WATCHER_SETTINGS_ERROR">SAVE_WATCHER_SETTINGS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS">SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS">SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_START_UPLOAD_VIDEOS_MISSING_PARAMETERS">START_UPLOAD_VIDEOS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_START_UPLOAD_VIDEOS_WRONG_PARAMETERS">START_UPLOAD_VIDEOS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_ENTITY_UNKNOWN">STATISTICS_ENTITY_UNKNOWN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_GET_ONE_ERROR">STATISTICS_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_MISSING_COUNT_PARAMETERS">STATISTICS_MISSING_COUNT_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_MISSING_ID_PARAMETERS">STATISTICS_MISSING_ID_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_PROPERTY_UNKNOWN">STATISTICS_PROPERTY_UNKNOWN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_STATISTICS_UPDATE_ERROR">STATISTICS_UPDATE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNKNOWN_ERROR">UNKNOWN_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNPUBLISH_VIDEOS_ERROR">UNPUBLISH_VIDEOS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNPUBLISH_VIDEOS_FORBIDDEN">UNPUBLISH_VIDEOS_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR">UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNPUBLISH_VIDEOS_MISSING_PARAMETERS">UNPUBLISH_VIDEOS_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UNPUBLISH_VIDEOS_WRONG_PARAMETERS">UNPUBLISH_VIDEOS_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_CHAPTER_ERROR">UPDATE_CHAPTER_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_CHAPTER_FORBIDDEN">UPDATE_CHAPTER_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_CHAPTER_GET_ONE_ERROR">UPDATE_CHAPTER_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_CHAPTER_MISSING_PARAMETERS">UPDATE_CHAPTER_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_CHAPTER_WRONG_PARAMETERS">UPDATE_CHAPTER_WRONG_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_ERROR">UPDATE_MEDIA_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_FORBIDDEN">UPDATE_MEDIA_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_GET_ONE_ERROR">UPDATE_MEDIA_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_NOT_FOUND_ERROR">UPDATE_MEDIA_NOT_FOUND_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_PARSE_ERROR">UPDATE_MEDIA_PARSE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_MEDIA_SYNCHRONIZE_ERROR">UPDATE_MEDIA_SYNCHRONIZE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_ERROR">UPDATE_TAG_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_FORBIDDEN">UPDATE_TAG_FORBIDDEN</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_GET_ONE_ERROR">UPDATE_TAG_GET_ONE_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_MISSING_PARAMETERS">UPDATE_TAG_MISSING_PARAMETERS</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_UPLOAD_ERROR">UPDATE_TAG_UPLOAD_ERROR</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_UPDATE_TAG_WRONG_PARAMETERS">UPDATE_TAG_WRONG_PARAMETERS</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+        </div>
+
+
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                    <div id="property_ADD_MEDIA_CHECK_DUPLICATE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_CHECK_DUPLICATE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l207"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:207</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_CHECK_DUPLICATE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Checking that media does not already exists in database, when adding a media, failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 13</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_CUSTOM_PROPERTIES_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_CUSTOM_PROPERTIES_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l179"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:179</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_CUSTOM_PROPERTIES_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of custom properties, when adding a media, failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 11</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_GROUPS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_GROUPS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l165"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:165</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_GROUPS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of groups, when adding a media, failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 10</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_MISSING_FILE_PARAMETER" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_MISSING_FILE_PARAMETER</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1350"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1350</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_MISSING_FILE_PARAMETER</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding media failed, missing the media file.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 549</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_MISSING_INFO_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_MISSING_INFO_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1013"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1013</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_MISSING_INFO_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding media failed, missing the body.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 525</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l999"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:999</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding a media failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 524</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_PARSE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_PARSE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l193"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:193</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_PARSE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Parsing multipart body, when adding a media, failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 12</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_REMOVE_FILE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_REMOVE_FILE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l221"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:221</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_REMOVE_FILE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing temporary media file, when adding a media, failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 14</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_WRONG_FILE_PARAMETER" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_WRONG_FILE_PARAMETER</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1027"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1027</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_WRONG_FILE_PARAMETER</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding media failed, wrong file parameter.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 526</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1042"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1042</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding media failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 527</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_ADD_MEDIA_WRONG_PROPERTIES_PARAMETER" class="property item">
+                    
+                      <h3 class="blue-method-name">ADD_MEDIA_WRONG_PROPERTIES_PARAMETER</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1056"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1056</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>ADD_MEDIA_WRONG_PROPERTIES_PARAMETER</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Adding media failed, wrong properties parameter.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 528</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_POINTS_OF_INTEREST_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_POINTS_OF_INTEREST_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l783"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:783</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_POINTS_OF_INTEREST_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Converting points of interest failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 264</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l431"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:431</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Converting points of interest failed when getting media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 29</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1238"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1238</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Converting points of interest failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 541</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l445"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:445</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Converting points of interest failed, media is not ready.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 30</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1252"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1252</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Converting points of interest failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 542</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_CONVERT_VIDEO_POI_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">CONVERT_VIDEO_POI_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l473"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:473</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>CONVERT_VIDEO_POI_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Convert points of interest error.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 32</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_CONFIGURATION_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_CONFIGURATION_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l80"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:80</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_CONFIGURATION_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting Publish plugin configuration failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 4</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l529"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:529</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting media failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 36</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l797"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:797</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting media failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 265</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_GET_INFO_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_GET_INFO_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l543"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:543</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_GET_INFO_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting media failed when getting video platform information.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 37</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1280"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1280</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting media failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 544</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_NOT_FOUND" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_NOT_FOUND</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1422"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1422</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_NOT_FOUND</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Media was not found.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 769</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_MEDIA_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_MEDIA_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1266"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1266</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_MEDIA_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting media failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 543</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_PROPERTIES_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_PROPERTIES_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l94"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:94</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_PROPERTIES_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of custom properties failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 5</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l38"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:38</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting a ready video failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 1</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l671"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:671</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting a ready video failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 256</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_GET_INFO_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_GET_INFO_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l249"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:249</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_GET_INFO_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting a ready media failed when getting video platform information.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 16</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l827"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:827</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting a ready video failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 512</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_NOT_FOUND" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_NOT_FOUND</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1408"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1408</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_NOT_FOUND</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Ready video was not found.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 768</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_NOT_READY_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_NOT_READY_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l235"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:235</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_NOT_READY_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting a ready media failed, media is not ready.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 15</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEO_READY_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEO_READY_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1098"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1098</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEO_READY_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting video ready failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 531</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1308"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1308</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of videos failed, wrong custom properties values.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 546</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEOS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEOS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l108"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:108</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEOS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of videos failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 6</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEOS_GET_CATEGORIES_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEOS_GET_CATEGORIES_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l641"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:641</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEOS_GET_CATEGORIES_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting medias failed when getting the list of categories.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 44</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEOS_GET_PROPERTIES_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEOS_GET_PROPERTIES_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l277"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:277</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEOS_GET_PROPERTIES_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting medias failed when getting custom properties.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 18</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_GET_VIDEOS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">GET_VIDEOS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l957"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:957</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>GET_VIDEOS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting the list of videos failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 521</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_INVALID_VIDEO_THUMBNAIL" class="property item">
+                    
+                      <h3 class="blue-method-name">INVALID_VIDEO_THUMBNAIL</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l487"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:487</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>INVALID_VIDEO_THUMBNAIL</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Invalid video thumbnail.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 33</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_PUBLISH_VIDEOS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">PUBLISH_VIDEOS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l52"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:52</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>PUBLISH_VIDEOS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Publishing a video failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 2</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_PUBLISH_VIDEOS_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">PUBLISH_VIDEOS_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l685"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:685</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>PUBLISH_VIDEOS_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Publishing a video failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 257</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_PUBLISH_VIDEOS_GET_VIDEOS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">PUBLISH_VIDEOS_GET_VIDEOS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l291"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:291</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>PUBLISH_VIDEOS_GET_VIDEOS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Publishing medias failed when getting medias.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 19</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_PUBLISH_VIDEOS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">PUBLISH_VIDEOS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l841"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:841</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>PUBLISH_VIDEOS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Publishing a video failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 513</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_PUBLISH_VIDEOS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">PUBLISH_VIDEOS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1112"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1112</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>PUBLISH_VIDEOS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Publishing videos failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 532</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_CHAPTERS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_CHAPTERS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l417"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:417</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_CHAPTERS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing chapters failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 28</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_CHAPTERS_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_CHAPTERS_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l769"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:769</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_CHAPTERS_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media chapters failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 263</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_CHAPTERS_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_CHAPTERS_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l403"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:403</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_CHAPTERS_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media chapters failed when getting the media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 27</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_CHAPTERS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_CHAPTERS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1210"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1210</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_CHAPTERS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media chapters failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 539</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_CHAPTERS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_CHAPTERS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1224"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1224</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_CHAPTERS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media chapters failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 540</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_MEDIAS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_MEDIAS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l613"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:613</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_MEDIAS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing medias failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 42</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_MEDIAS_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_MEDIAS_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l811"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:811</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_MEDIAS_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing medias failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 266</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_MEDIAS_GET_MEDIAS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_MEDIAS_GET_MEDIAS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l627"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:627</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_MEDIAS_GET_MEDIAS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing medias failed when getting the list of medias.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 43</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_MEDIAS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_MEDIAS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1364"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1364</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_MEDIAS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing medias failed, missing the media ids.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 550</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_MEDIAS_STATE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_MEDIAS_STATE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l599"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:599</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_MEDIAS_STATE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing medias failed, a media is not in a stable state.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 41</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_TAGS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_TAGS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l389"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:389</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_TAGS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing tags failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 26</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_TAGS_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_TAGS_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l755"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:755</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_TAGS_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media tags failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 262</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_TAGS_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_TAGS_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l375"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:375</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_TAGS_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media tags failed when getting the media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 25</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_TAGS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_TAGS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l985"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:985</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_TAGS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media tags failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 523</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_REMOVE_TAGS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">REMOVE_TAGS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1196"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1196</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>REMOVE_TAGS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Removing media tags failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 538</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_RETRY_VIDEOS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">RETRY_VIDEOS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l869"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:869</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>RETRY_VIDEOS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Retrying video processing failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 515</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_RETRY_VIDEOS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">RETRY_VIDEOS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1294"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1294</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>RETRY_VIDEOS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Retrying video processing failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 545</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_CATALOG_SETTINGS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_CATALOG_SETTINGS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l655"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:655</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_CATALOG_SETTINGS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving catalog settings failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 45</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1392"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1392</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving catalog settings failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 552</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1378"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1378</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving catalog settings failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 551</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l557"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:557</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Getting custom properties failed while saving TLS settings.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 38</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_TLS_SETTINGS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_TLS_SETTINGS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l571"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:571</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_TLS_SETTINGS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving TLS settings failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 39</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_TLS_SETTINGS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_TLS_SETTINGS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1322"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1322</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_TLS_SETTINGS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving TLS settings failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 547</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1336"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1336</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving TLS settings failed, one or more custom properties do not exist.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 548</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_WATCHER_SETTINGS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_WATCHER_SETTINGS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l137"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:137</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_WATCHER_SETTINGS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving watcher settings failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 8</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1070"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1070</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving watcher settings failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 529</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1084"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1084</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Saving watcher settings failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 530</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_START_UPLOAD_VIDEOS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">START_UPLOAD_VIDEOS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l883"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:883</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>START_UPLOAD_VIDEOS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Starting a video upload failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 516</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_START_UPLOAD_VIDEOS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">START_UPLOAD_VIDEOS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1140"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1140</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>START_UPLOAD_VIDEOS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Starting videos upload failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 534</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_ENTITY_UNKNOWN" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_ENTITY_UNKNOWN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l927"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:927</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_ENTITY_UNKNOWN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Setting statistics about an entity failed, unknown entity.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 519</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l459"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:459</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating media statistics failed when getting media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 31</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_MISSING_COUNT_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_MISSING_COUNT_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l942"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:942</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_MISSING_COUNT_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Setting statistics about an entity failed, missing the count parameter.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 520</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_MISSING_ID_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_MISSING_ID_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l897"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:897</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_MISSING_ID_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Setting statistics about an entity failed, missing the id parameter.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 517</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_PROPERTY_UNKNOWN" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_PROPERTY_UNKNOWN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l912"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:912</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_PROPERTY_UNKNOWN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Setting statistics about an entity failed, unknown statistic property.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 518</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_STATISTICS_UPDATE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">STATISTICS_UPDATE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l122"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:122</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>STATISTICS_UPDATE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating an entity statistics failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 7</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNKNOWN_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UNKNOWN_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l24"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:24</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNKNOWN_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unidentified error.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 0</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNPUBLISH_VIDEOS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UNPUBLISH_VIDEOS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l66"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:66</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNPUBLISH_VIDEOS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unpublishing a video failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 3</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNPUBLISH_VIDEOS_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">UNPUBLISH_VIDEOS_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l699"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:699</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNPUBLISH_VIDEOS_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unpublishing a video failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 258</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l305"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:305</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unpublishing medias failed when getting medias.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 20</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNPUBLISH_VIDEOS_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UNPUBLISH_VIDEOS_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l855"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:855</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNPUBLISH_VIDEOS_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unpublishing a video failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 514</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UNPUBLISH_VIDEOS_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UNPUBLISH_VIDEOS_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1126"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1126</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UNPUBLISH_VIDEOS_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Unpublishing videos failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 533</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_CHAPTER_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_CHAPTER_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l361"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:361</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_CHAPTER_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating chapter failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 24</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_CHAPTER_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_CHAPTER_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l741"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:741</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_CHAPTER_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media chapter failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 261</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_CHAPTER_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_CHAPTER_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l333"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:333</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_CHAPTER_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating chapter failed when getting the media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 22</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_CHAPTER_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_CHAPTER_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1168"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1168</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_CHAPTER_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media chapter failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 536</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_CHAPTER_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_CHAPTER_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1182"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1182</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_CHAPTER_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media chapter failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 537</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l515"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:515</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 35</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l727"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:727</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 260</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l263"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:263</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media failed when getting the media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 17</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_NOT_FOUND_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_NOT_FOUND_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1436"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1436</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_NOT_FOUND_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Media was not found when trying to update it.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 770</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_PARSE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_PARSE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l501"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:501</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_PARSE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media failed when parsing body.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 34</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_MEDIA_SYNCHRONIZE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_MEDIA_SYNCHRONIZE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l585"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:585</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_MEDIA_SYNCHRONIZE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Synchronizing media with media platform failed while updating media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 40</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l347"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:347</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating tag failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 23</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_FORBIDDEN" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_FORBIDDEN</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l713"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:713</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_FORBIDDEN</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media tag failed, user doesn't have enough privilege.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 259</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_GET_ONE_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_GET_ONE_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l319"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:319</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_GET_ONE_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating tag failed when getting the media.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 21</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_MISSING_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_MISSING_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l971"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:971</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_MISSING_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media tag failed, missing parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 522</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_UPLOAD_ERROR" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_UPLOAD_ERROR</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l151"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:151</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_UPLOAD_ERROR</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Attaching a file to a tag failed.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 9</p>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_UPDATE_TAG_WRONG_PARAMETERS" class="property item">
+                    
+                      <h3 class="blue-method-name">UPDATE_TAG_WRONG_PARAMETERS</h3>
+                      <div class="meta method-meta">
+                          <p>
+                              Defined in
+                          <a href="../files/app_server_controllers_httpErrors.js.html#l1154"><code>app&#x2F;server&#x2F;controllers&#x2F;httpErrors.js:1154</code></a>
+                      </p>
+                    
+                    
+                      </div>
+                    
+                      <h3>Syntax</h3>
+                      <div class="blue-method-syntax">
+                        <h3 class="name"><code>UPDATE_TAG_WRONG_PARAMETERS</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                            <span class="flag final">final</span>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                          <h3>Summary</h3>
+                            <p>Updating a media tag failed, wrong parameters.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 535</p>
+                    
+                    
+                    
+                    </div>
+            </div>
+
+
+    </div>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
