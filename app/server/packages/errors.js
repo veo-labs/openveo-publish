@@ -146,7 +146,7 @@ var ERRORS = {
   /**
    * Cleaning package temporary directory failed.
    *
-   * @property SCAN_FOR_IMAGES
+   * @property CLEAN_DIRECTORY
    * @type Number
    * @default 13
    * @final
