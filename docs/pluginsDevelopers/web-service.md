@@ -100,7 +100,11 @@ HTTP Status Code | Details
         {
           "image" : {
             "large" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg", // Large image
-            "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?style=publish-thumb-200" // Small image
+            "small" : {
+              "url" : "http://openveo-cdn.local/1440175380631/points-of-interest-images.jpg", // Sprite containing the small image
+              "x" : 0, // x coordinate of the small image inside the sprite
+              "y" : 0 // y coordinate of the small image inside the sprite
+            }
           },
           "timecode" : 0 // Timecode when to display the image (in ms)
         },
@@ -220,7 +224,11 @@ HTTP Status Code | Details
       {
         "image" : {
           "large" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg", // Large image
-          "small" : "http://openveo-cdn.local/1440175380631/slide_00000.jpeg?style=publish-thumb-200" // Small image
+          "small" : {
+            "url" : "http://openveo-cdn.local/1440175380631/points-of-interest-images.jpg", // Sprite containing the small image
+            "x" : 0, // x coordinate of the small image inside the sprite
+            "y" : 0 // y coordinate of the small image inside the sprite
+          }
         },
         "timecode" : 0 // Timecode when to display the image (in ms)
       },

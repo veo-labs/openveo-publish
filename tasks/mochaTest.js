@@ -13,6 +13,7 @@ module.exports = {
       'tests/server/providers/*.js',
       'tests/server/watcher/*.js',
       'tests/server/migrations/*.js',
+      'tests/server/packages/*.js',
       'tests/server/listener.js'
     ]
   }

@@ -476,7 +476,32 @@ TarPackage.prototype.validatePackage = function() {
 };
 
 /**
- * Saves package timecodes into a JSON file.
+ * Saves package points of interests.
+ *
+ * It expects package metadata to have a property "indexes" containing a list of points of interest with for each one:
+ *  - **String** type The type of the point of interest, either "image" or "tag"
+ *  - **Number** timecode The time of the point of interest in the video (in milliseconds)
+ *  - **Object** data Information about the point of interest depending on its type, see below
+ *
+ * "data" property of a point of interest of type "image":
+ *  - **String** filename The name of the image file in the package
+ *
+ * "data" property of a point of interest of type "tag":
+ *  - **String** tagname The name of the tag
+ *
+ * Instead of defining the points of interest in package metadata, it is possible to define them in a "synchro.xml"
+ * file at the root of the package with the following content:
+ * <pre>
+ *   <?xml version="1.0"?>
+ *   <player>
+ *     <synchro id="slide_00000.jpeg" timecode="0"/>
+ *     <synchro id="slide_00001.jpeg" timecode="1400"/>
+ *     ...
+ *   </player>
+ * </pre>
+ *
+ * However using "synchro.xml" is deprecated and should not be used anymore. Also note that it is not possible to
+ * define points of interest of type "tag" using this method.
  *
  * This is a transition.
  *
@@ -485,84 +510,133 @@ TarPackage.prototype.validatePackage = function() {
 TarPackage.prototype.saveTimecodes = function() {
   var self = this;
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
-  process.logger.debug('Save timecodes to ' + videoFinalDir);
+  process.logger.debug('Save points of interests');
 
-  var timecodes;
-  async.series([
+  async.waterfall([
 
     // Update state
     function(callback) {
-      self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, callback);
-    },
-
-    // save timecode in metadata from XML if they are not in metadata
-    function(callback) {
-      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
-        timecodes = self.mediaPackage.metadata.indexes;
-        callback();
-      } else saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
-        if (error && self.mediaPackage.metadata['rich-media'])
-          callback(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
-        else {
-          timecodes = formatedTimecodes;
-          callback();
-        }
+      self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, function(error) {
+        callback(error);
       });
     },
 
-    // parse meatadata to save timecodes and tags
+    // Retrieve points of interest either from metadata or "synchro.xml" file
     function(callback) {
+      var pointsOfInterest;
+
+      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
+        pointsOfInterest = self.mediaPackage.metadata.indexes;
+        callback(null, pointsOfInterest);
+      } else {
+        saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
+          if (error && self.mediaPackage.metadata['rich-media'])
+            callback(error);
+          else {
+            pointsOfInterest = formatedTimecodes;
+            callback(null, pointsOfInterest);
+          }
+        });
+      }
+    },
+
+    // Generate sprites for the points of interest of type "image"
+    function(pointsOfInterest, callback) {
+      if (!pointsOfInterest) return callback(null, null, pointsOfInterest);
+
+      // Gets points of interest of type "image"
+      var poiImagesPaths = pointsOfInterest.reduce(function(filtered, pointOfInterest) {
+        if (pointOfInterest.type === 'image' && pointOfInterest.data)
+          filtered.push(path.join(extractDirectory, pointOfInterest.data.filename));
+        return filtered;
+      }, []);
+
+      if (!poiImagesPaths.length) return callback(null, pointsOfInterest, pointsOfInterest);
+
+      // Generate one or more sprite of 740x400 containing all video images
+      openVeoApi.imageProcessor.generateSprites(
+        poiImagesPaths,
+        path.join(extractDirectory, 'points-of-interest-images.jpg'),
+        148,
+        80,
+        5,
+        5,
+        90,
+        extractDirectory,
+        function(error, spriteReferences) {
+          callback(error, pointsOfInterest, spriteReferences);
+        }
+      );
+    },
+
+    // Save points of interest
+    function(pointsOfInterest, spriteReferences, callback) {
       var videoInfo = {};
 
-      // Got timecodes for this video
-      if (timecodes) {
-        videoInfo.timecodes = [];
-        videoInfo.tags = [];
+      if (!pointsOfInterest) return callback();
 
-        for (var i = 0; i < timecodes.length; i++) {
-          var currentTc = timecodes[i];
-          var timecodeType = currentTc.type;
+      // Got points of interest for this video
+      // Dissociate points of interest regarding types
 
-          switch (timecodeType) {
-            case 'image':
-              var style = 'publish-thumb-200';
-              videoInfo.timecodes.push({
-                id: shortid.generate(),
-                timecode: currentTc.timecode,
-                image: {
-                  small: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename + '?style=' + style,
-                  large: '/publish/' + self.mediaPackage.id + '/' + currentTc.data.filename
-                }
-              });
-              break;
+      videoInfo.timecodes = [];
+      videoInfo.tags = [];
 
-            case 'tag':
-              videoInfo.tags.push({
-                id: shortid.generate(),
-                value: currentTc.timecode,
-                name: currentTc.data && currentTc.data.tagname ?
-                  currentTc.data.tagname : 'Tag' + (videoInfo.tags.length + 1)
-              });
-              break;
-            default:
-          }
+      for (var i = 0; i < pointsOfInterest.length; i++) {
+        var pointOfInterest = pointsOfInterest[i];
+
+        switch (pointOfInterest.type) {
+          case 'image':
+            if (!pointOfInterest.data || !pointOfInterest.data.filename) break;
+
+            // Find image in sprite
+            var imageReference;
+            for (var j = 0; j < spriteReferences.length; j++) {
+              if (path.join(extractDirectory, pointOfInterest.data.filename) === spriteReferences[j].image) {
+                imageReference = spriteReferences[j];
+                break;
+              }
+            }
+
+            // Get the name of the sprite file
+            var spriteFileName = imageReference.sprite.match(/\/([^/]*)$/)[1];
+
+            videoInfo.timecodes.push({
+              id: shortid.generate(),
+              timecode: pointOfInterest.timecode,
+              image: {
+                small: {
+                  url: '/publish/' + self.mediaPackage.id + '/' + spriteFileName,
+                  x: imageReference.x,
+                  y: imageReference.y
+                },
+                large: '/publish/' + self.mediaPackage.id + '/' + pointOfInterest.data.filename
+              }
+            });
+            break;
+
+          case 'tag':
+            videoInfo.tags.push({
+              id: shortid.generate(),
+              value: pointOfInterest.timecode,
+              name: pointOfInterest.data && pointOfInterest.data.tagname ?
+                pointOfInterest.data.tagname : 'Tag' + (videoInfo.tags.length + 1)
+            });
+            break;
+          default:
         }
-        self.videoProvider.updateOne(
-          new ResourceFilter().equal('id', self.mediaPackage.id),
-          videoInfo,
-          function(error) {
-            return callback(error);
-          }
-        );
-      } else {
-        callback();
       }
+      self.videoProvider.updateOne(
+        new ResourceFilter().equal('id', self.mediaPackage.id),
+        videoInfo,
+        function(error) {
+          return callback(error);
+        }
+      );
     }
   ], function(error) {
     if (error)
-      self.setError(error);
+      self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
     else
       self.fsm.transition();
   });
