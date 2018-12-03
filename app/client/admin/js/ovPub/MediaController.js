@@ -134,7 +134,7 @@
         '&lt;iframe width="768" height="500" ',
         'src="' + $location.protocol() + '://' + $location.host() + ':' + $location.port() + media.link,
         '?fullscreen&lang=' + i18nService.getLanguage() + '"',
-        ' frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;',
+        ' frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;',
         '</div>'
       ].join(''), 0);
     }

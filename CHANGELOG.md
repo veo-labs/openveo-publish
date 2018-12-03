@@ -9,6 +9,7 @@
 ## NEW FEATURES
 
 - Translate the HTML version of the OpenVeo Player
+- Add browser vendors attributes for fullscreen to the shared iframe code
 
 ## DEPENDENCIES
 
