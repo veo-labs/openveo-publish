@@ -270,7 +270,7 @@ module.exports = {
         'video.js/dist/video.min.js',
         'dashjs/dist/dash.all.min.js',
         'videojs-contrib-dash/dist/videojs-dash.min.js',
-        'videojs-contrib-hls/dist/videojs-contrib-hls.min.js'
+        'videojs-flash/dist/videojs-flash.min.js'
       ],
       publishPlayer: {
         dev: [
@@ -369,9 +369,9 @@ module.exports = {
       files: ['dist/videojs-dash.min.js']
     },
     {
-      name: 'videojs-contrib-hls',
-      mountPath: 'videojs-contrib-hls',
-      files: ['dist/videojs-contrib-hls.min.js']
+      name: 'videojs-flash',
+      mountPath: 'videojs-flash',
+      files: ['dist/videojs-flash.min.js']
     }
   ]
 };
