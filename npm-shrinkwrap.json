@@ -7333,32 +7333,6 @@
         }
       }
     },
-    "videojs-flash": {
-      "version": "2.1.2",
-      "resolved": "https://registry.npmjs.org/videojs-flash/-/videojs-flash-2.1.2.tgz",
-      "integrity": "sha512-7fUrJTEYAY1rPeCUt4Zx8t4d5feZJXfJIJLFYZEMI+Kh12dkqew06m3EFyATZ3ScnjoCpAyOXPPsv8KALulAzw==",
-      "requires": {
-        "global": "^4.3.2",
-        "video.js": "^6 || ^7",
-        "videojs-swf": "5.4.2"
-      },
-      "dependencies": {
-        "global": {
-          "version": "4.3.2",
-          "resolved": "https://registry.npmjs.org/global/-/global-4.3.2.tgz",
-          "integrity": "sha1-52mJJopsdMOJCLEwWxD8DjlOnQ8=",
-          "requires": {
-            "min-document": "^2.19.0",
-            "process": "~0.5.1"
-          }
-        },
-        "videojs-swf": {
-          "version": "5.4.2",
-          "resolved": "https://registry.npmjs.org/videojs-swf/-/videojs-swf-5.4.2.tgz",
-          "integrity": "sha512-FGg+Csioa8/A/EacvFefBdb9Z0rSiMlheHDunZnN3xXfUF43jvjawcWFQnZvrv1Cs1nE1LBrHyUZjF7j2mKOLw=="
-        }
-      }
-    },
     "videojs-font": {
       "version": "3.1.0",
       "resolved": "https://registry.npmjs.org/videojs-font/-/videojs-font-3.1.0.tgz",

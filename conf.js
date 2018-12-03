@@ -269,8 +269,7 @@ module.exports = {
         'openveo-player/dist/openveo-player.min.js',
         'video.js/dist/video.min.js',
         'dashjs/dist/dash.all.min.js',
-        'videojs-contrib-dash/dist/videojs-dash.min.js',
-        'videojs-flash/dist/videojs-flash.min.js'
+        'videojs-contrib-dash/dist/videojs-dash.min.js'
       ],
       publishPlayer: {
         dev: [
@@ -367,11 +366,6 @@ module.exports = {
       name: 'videojs-contrib-dash',
       mountPath: 'videojs-contrib-dash',
       files: ['dist/videojs-dash.min.js']
-    },
-    {
-      name: 'videojs-flash',
-      mountPath: 'videojs-flash',
-      files: ['dist/videojs-flash.min.js']
     }
   ]
 };

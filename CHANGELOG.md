@@ -4,6 +4,7 @@
 
 - Web service endpoints GET /videos and /videos/:id now express timecodes small images using a sprite object instead of an URL
 - OpenVeo Publish now requires OpenVeo Core >=8.1.0
+- Drop support of flash technology for the HTML version of the OpenVeo Player
 
 ## NEW FEATURES
 
