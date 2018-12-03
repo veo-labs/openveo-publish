@@ -116,6 +116,7 @@ VideoController.prototype.displayVideoAction = function(request, response, next)
   var plugins = process.api.getPlugins();
   response.locals.scripts = [];
   response.locals.css = [];
+  response.locals.languages = ['"en"', '"fr"'];
 
   plugins.forEach(function(subPlugin) {
     if (subPlugin.name === 'publish')
