@@ -18,6 +18,7 @@
 - **videojs-contrib-dash** has been upgraded from 2.9.1 to **2.10.0**
 - **videojs-contrib-hls** has been removed. It is replaced by videojs-http-streaming which is a sub dependency of video.js since version 7.0.0
 - **videojs-flash** has been added to replace video.js built-in flash player which has been removed in version 6.0.0 of video.js
+- **angular** has been upgraded from 1.5.5 to **1.5.11**
 
 # 10.0.0 / YYYY-MM-DD
 

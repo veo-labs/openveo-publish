@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@openveo/player": "4.*",
-    "angular": "1.5.5",
-    "angular-animate": "1.5.5",
-    "angular-cookies": "1.5.5",
+    "angular": "1.5.11",
+    "angular-animate": "1.5.11",
+    "angular-cookies": "1.5.11",
     "async": "2.1.4",
     "dashjs": "2.9.2",
     "express": "4.14.0",
@@ -44,8 +44,8 @@
   },
   "devDependencies": {
     "@openveo/rest-nodejs-client": "3.* >=3.1.0",
-    "angular-mocks": "1.5.5",
-    "angular-route": "1.5.5",
+    "angular-mocks": "1.5.11",
+    "angular-route": "1.5.11",
     "angular-ui-tinymce": "0.0.19",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",

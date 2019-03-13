@@ -205,30 +205,30 @@
       }
     },
     "angular": {
-      "version": "1.5.5",
-      "resolved": "http://registry.npmjs.org/angular/-/angular-1.5.5.tgz",
-      "integrity": "sha1-Z4/f0cnEc2jdICx/yLs71NuhfBg="
+      "version": "1.5.11",
+      "resolved": "https://registry.npmjs.org/angular/-/angular-1.5.11.tgz",
+      "integrity": "sha1-jFunOG8VllyazzQp9ogVU6raMNY="
     },
     "angular-animate": {
-      "version": "1.5.5",
-      "resolved": "http://registry.npmjs.org/angular-animate/-/angular-animate-1.5.5.tgz",
-      "integrity": "sha1-ZkG6UX03uBWFeNmReOHppr7Rm3U="
+      "version": "1.5.11",
+      "resolved": "https://registry.npmjs.org/angular-animate/-/angular-animate-1.5.11.tgz",
+      "integrity": "sha1-G6pDwwPRuTxOaqiUU7ORFLehxmk="
     },
     "angular-cookies": {
-      "version": "1.5.5",
-      "resolved": "http://registry.npmjs.org/angular-cookies/-/angular-cookies-1.5.5.tgz",
-      "integrity": "sha1-1swY7FD0FczZPBl88Gp6GlxPHvU="
+      "version": "1.5.11",
+      "resolved": "https://registry.npmjs.org/angular-cookies/-/angular-cookies-1.5.11.tgz",
+      "integrity": "sha1-iFWN58UETcw6vreWFNfvgQe6ScA="
     },
     "angular-mocks": {
-      "version": "1.5.5",
-      "resolved": "http://registry.npmjs.org/angular-mocks/-/angular-mocks-1.5.5.tgz",
-      "integrity": "sha1-QNl214oHkEJsxFN786c5YPhP6qE=",
+      "version": "1.5.11",
+      "resolved": "https://registry.npmjs.org/angular-mocks/-/angular-mocks-1.5.11.tgz",
+      "integrity": "sha1-oOHdDqVf137np1fXVTbF6WTIb4E=",
       "dev": true
     },
     "angular-route": {
-      "version": "1.5.5",
-      "resolved": "http://registry.npmjs.org/angular-route/-/angular-route-1.5.5.tgz",
-      "integrity": "sha1-aTSTaSCbHzRySlgUXcfsakmHoec=",
+      "version": "1.5.11",
+      "resolved": "https://registry.npmjs.org/angular-route/-/angular-route-1.5.11.tgz",
+      "integrity": "sha1-SWFPOhZ/VCkeRJ/ougXTnFiSS4M=",
       "dev": true
     },
     "angular-ui-tinymce": {
