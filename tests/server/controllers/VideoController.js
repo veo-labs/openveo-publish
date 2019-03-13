@@ -561,7 +561,11 @@ describe('VideoController', function() {
             {
               value: 42000,
               image: {
-                small: expectedSmallImageUri,
+                small: {
+                  url: expectedSmallImageUri,
+                  x: 0,
+                  y: 0
+                },
                 large: expectedLargeImageUri
               }
             }
@@ -596,7 +600,7 @@ describe('VideoController', function() {
           'Wrong thumbnail'
         );
         assert.strictEqual(
-          data.entity.timecodes[0].image.small,
+          data.entity.timecodes[0].image.small.url,
           coreApi.getCdnUrl() + expectedSmallImageUri,
           'Wrong small timecode'
         );
@@ -804,7 +808,11 @@ describe('VideoController', function() {
             {
               value: 42000,
               image: {
-                small: expectedSmallImageUri,
+                small: {
+                  url: expectedSmallImageUri,
+                  x: 0,
+                  y: 0
+                },
                 large: expectedLargeImageUri
               }
             }
@@ -839,7 +847,7 @@ describe('VideoController', function() {
           'Wrong thumbnail'
         );
         assert.strictEqual(
-          data.entity.timecodes[0].image.small,
+          data.entity.timecodes[0].image.small.url,
           coreApi.getCdnUrl() + expectedSmallImageUri,
           'Wrong small timecode'
         );
@@ -2280,7 +2288,11 @@ describe('VideoController', function() {
             {
               value: 42000,
               image: {
-                small: expectedSmallImageUri,
+                small: {
+                  url: expectedSmallImageUri,
+                  x: 0,
+                  y: 0
+                },
                 large: expectedLargeImageUri
               }
             }
@@ -2313,7 +2325,7 @@ describe('VideoController', function() {
           'Wrong thumbnail'
         );
         assert.strictEqual(
-          data.entities[0].timecodes[0].image.small,
+          data.entities[0].timecodes[0].image.small.url,
           coreApi.getCdnUrl() + expectedSmallImageUri,
           'Wrong small timecode'
         );

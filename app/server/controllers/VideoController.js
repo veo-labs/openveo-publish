@@ -61,9 +61,8 @@ function resolveResourcesUrls(medias) {
       if (media.timecodes) {
         media.timecodes.forEach(function(timecode) {
           if (timecode.image) {
-
             if (timecode.image.small)
-              timecode.image.small = cdnUrl + timecode.image.small.replace(removeFirstSlashRegExp, '');
+              timecode.image.small.url = cdnUrl + timecode.image.small.url.replace(removeFirstSlashRegExp, '');
 
             if (timecode.image.large)
               timecode.image.large = cdnUrl + timecode.image.large.replace(removeFirstSlashRegExp, '');
