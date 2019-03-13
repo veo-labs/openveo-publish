@@ -53,7 +53,7 @@ module.exports.update = function(callback) {
                 openVeoApi.imageProcessor.generateSprites(
                   timecodesImages,
                   path.join(mediaPublicDirectory, 'points-of-interest-images.jpg'),
-                  148,
+                  142,
                   80,
                   5,
                   5,

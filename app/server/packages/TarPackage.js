@@ -558,7 +558,7 @@ TarPackage.prototype.saveTimecodes = function() {
       openVeoApi.imageProcessor.generateSprites(
         poiImagesPaths,
         path.join(extractDirectory, 'points-of-interest-images.jpg'),
-        148,
+        142,
         80,
         5,
         5,

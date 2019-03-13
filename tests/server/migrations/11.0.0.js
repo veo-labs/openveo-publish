@@ -130,7 +130,7 @@ describe('Migration 11.0.0', function() {
         'Wrong sprite path'
       );
 
-      assert.equal(width, 148, 'Wrong width');
+      assert.equal(width, 142, 'Wrong width');
       assert.equal(height, 80, 'Wrong height');
       assert.equal(totalColumns, 5, 'Wrong number of columns');
       assert.equal(maxRows, 5, 'Wrong number of rows');
