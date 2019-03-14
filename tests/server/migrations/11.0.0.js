@@ -255,7 +255,7 @@ describe('Migration 11.0.0', function() {
     });
 
     migration.update(function(error) {
-      assert.strictEqual(error, expectedError, 'Unexpected error');
+      assert.strictEqual(error, expectedError, 'Wrong error');
       openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
       VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
       done();
@@ -298,8 +298,157 @@ describe('Migration 11.0.0', function() {
     });
 
     migration.update(function(error) {
-      assert.strictEqual(error, expectedError, 'Unexpected error');
+      assert.strictEqual(error, expectedError, 'Wrong error');
       openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should rename tag files properties "filename", "mimetype", "originalname" and "basePath" into "fileName", ' +
+     '"mimeType", "originalName" and "url"', function(done) {
+    var medias = [
+      {
+        id: '42',
+        tags: [
+          {
+            id: '1',
+            value: 42000,
+            name: 'Tag1',
+            file: {
+              originalname: 'Original name 1',
+              mimetype: 'image/png',
+              filename: 'file-1.png',
+              size: 42000000,
+              basePath: '/file-1.png'
+            },
+            description: 'Description 1'
+          },
+          {
+            id: '2',
+            value: 43000,
+            name: 'Tag2',
+            file: {
+              originalname: 'Original name 2',
+              mimetype: 'image/png',
+              filename: 'file-2.png',
+              size: 43000000,
+              basePath: '/file-2.png'
+            },
+            description: 'Description 2'
+          },
+          {
+            id: '3',
+            value: 44000,
+            name: 'Tag3',
+            description: 'Description 3'
+          }
+        ]
+      }
+    ];
+
+    expectedMedias = JSON.parse(JSON.stringify(medias));
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      for (var i = 0; i < modifications.tags.length; i++) {
+        var tag = modifications.tags[i];
+        var expectedTag = medias[0].tags[i];
+        assert.equal(tag.id, expectedTag.id, 'Wrong id');
+        assert.equal(tag.name, expectedTag.name, 'Wrong name');
+        assert.equal(tag.description, expectedTag.description, 'Wrong description');
+
+        if (tag.file) {
+          assert.equal(tag.file.originalName, expectedTag.file.originalname, 'Wrong original name');
+          assert.equal(tag.file.mimeType, expectedTag.file.mimetype, 'Wrong MIME type');
+          assert.equal(tag.file.fileName, expectedTag.file.filename, 'Wrong file name');
+          assert.equal(tag.file.size, expectedTag.file.size, 'Wrong size');
+          assert.equal(tag.file.url, expectedTag.file.basePath, 'Wrong URL');
+
+          assert.isUndefined(tag.file.originalname, 'Unexpected "originalname" property');
+          assert.isUndefined(tag.file.mimetype, 'Unexpected "mimetype" property');
+          assert.isUndefined(tag.file.filename, 'Unexpected "filename" property');
+          assert.isUndefined(tag.file.basePath, 'Unexpected "basePath" property');
+        }
+      }
+      callback(null, 1);
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should not update storage if no medias when renaming', function(done) {
+    expectedMedias = [];
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should not update storage if no tags on medias when renaming', function(done) {
+    expectedMedias = [
+      {
+        id: '42'
+      }
+    ];
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting medias failed when renaming', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    VideoProvider.prototype.getAll = function(filter, fields, sort, callback) {
+      if (fields.include) callback(expectedError);
+      else callback(null, expectedMedias);
+    };
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if renaming failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    expectedMedias = [
+      {
+        id: '42',
+        tags: [
+          {
+            id: '1',
+            value: 42000,
+            name: 'Tag',
+            file: {
+              originalname: 'Original name',
+              mimetype: 'image/png',
+              filename: 'file.png',
+              size: 42000000,
+              basePath: '/file.png'
+            },
+            description: 'Description'
+          }
+        ]
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
       VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
       done();
     });

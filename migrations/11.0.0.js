@@ -102,8 +102,62 @@ module.exports.update = function(callback) {
 
         async.parallel(asyncActions, callback);
       });
-    }
+    },
 
+    /**
+     * Renames tag file properties "mimetype", "filename", "basePath" and "originalname".
+     *
+     * Tag file property "mimetype" is renamed into "mimeType".
+     * Tag file property "filename" is renamed into "fileName".
+     * Tag file property "basePath" is renamed into "url".
+     * Tag file property "originalname" is renamed into "originalName".
+     */
+    function(callback) {
+      videoProvider.getAll(null, {include: ['tags']}, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
+
+        // No medias
+        // No need to change anything
+        if (!medias || !medias.length) return callback();
+
+        var asyncActions = [];
+
+        medias.forEach(function(media) {
+
+          // No tags
+          // Nothing to do
+          if (!media.tags) return;
+
+          var newTags = [];
+          media.tags.forEach(function(tag) {
+            if (tag.file) {
+              tag.file.originalName = tag.file.originalname;
+              tag.file.url = tag.file.basePath;
+              tag.file.mimeType = tag.file.mimetype;
+              tag.file.fileName = tag.file.filename;
+              delete tag.file.originalname;
+              delete tag.file.basePath;
+              delete tag.file.mimetype;
+              delete tag.file.filename;
+            }
+
+            newTags.push(tag);
+          });
+
+          asyncActions.push(function(callback) {
+            videoProvider.updateOne(
+              new ResourceFilter().equal('id', media.id),
+              {
+                tags: newTags
+              },
+              callback
+            );
+          });
+        });
+
+        async.parallel(asyncActions, callback);
+      });
+    }
   ], function(error, results) {
     if (error) return callback(error);
     process.logger.info('Publish 11.0.0 migration done.');

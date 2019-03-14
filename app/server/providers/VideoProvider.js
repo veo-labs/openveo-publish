@@ -230,15 +230,15 @@ function updateMedia(id, modifier, callback) {
  * @private
  * @param {String} mediaId The media id
  * @param {Object} file The file information
- * @param {String} file.mimetype The file MIME type
- * @param {String} file.filename The file name to resolve
+ * @param {String} file.mimeType The file MIME type
+ * @param {String} file.fileName The file name to resolve
  * @return {String} The resolved file path
  */
 function getTagFilePath(mediaId, file) {
-  if (file.mimetype.substr(0, 'image'.length) != 'image')
-    return '/publish/player/videos/' + mediaId + '/uploads/' + file.filename;
+  if (file.mimeType.substr(0, 'image'.length) != 'image')
+    return '/publish/player/videos/' + mediaId + '/uploads/' + file.fileName;
   else
-    return '/publish/' + mediaId + '/uploads/' + file.filename;
+    return '/publish/' + mediaId + '/uploads/' + file.fileName;
 }
 
 /**
@@ -724,11 +724,11 @@ VideoProvider.prototype.createIndexes = function(callback) {
  * @param {String} [tag.name] The tag name
  * @param {String} [tag.description] The tag description
  * @param {String} [tag.file] The tag file description object
- * @param {String} tag.file.originalname The tag file original name
- * @param {String} tag.file.mimetype The tag file MIME type
- * @param {String} tag.file.filename The tag file name
+ * @param {String} tag.file.originalName The tag file original name
+ * @param {String} tag.file.mimeType The tag file MIME type
+ * @param {String} tag.file.fileName The tag file name
  * @param {Number} tag.file.size The tag file size
- * @param {String} tag.file.basePath The tag file URI
+ * @param {String} tag.file.url The tag file URI
  * @param {Object} [file] The new file to associate to the tag
  * @param {String} file.originalname The tag file original name
  * @param {String} file.mimetype The tag file MIME type
@@ -746,6 +746,12 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
   var found = false;
   var asyncFunctions = [];
   var tagToAdd;
+
+  if (file) {
+    file.originalName = file.originalname;
+    file.mimeType = file.mimetype;
+    file.fileName = file.filename;
+  }
 
   // Get media
   this.getOne(
@@ -776,7 +782,7 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
             // No more file associated to the tag
             // Mark old file as "to be deleted"
             if (!tag.file && mediaTag.file)
-              fileNameToRemove = mediaTag.file.filename;
+              fileNameToRemove = mediaTag.file.fileName;
 
             if (file) {
 
@@ -785,14 +791,14 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
               // Old file should be deleted
               // Mark old file as "to be deleted"
               if (mediaTag.file)
-                fileNameToRemove = mediaTag.file.filename;
+                fileNameToRemove = mediaTag.file.fileName;
 
               mediaTag.file = {
-                originalname: file.originalname,
-                mimetype: file.mimetype,
-                filename: file.filename,
+                originalName: file.originalName,
+                mimeType: file.mimeType,
+                fileName: file.fileName,
                 size: file.size,
-                basePath: getTagFilePath(media.id, file)
+                url: getTagFilePath(media.id, file)
               };
 
             } else if (!tag.file) {
@@ -833,11 +839,11 @@ VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
 
         if (file) {
           newTag.file = {
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            filename: file.filename,
+            originalName: file.originalName,
+            mimeType: file.mimeType,
+            fileName: file.fileName,
             size: file.size,
-            basePath: getTagFilePath(media.id, file)
+            url: getTagFilePath(media.id, file)
           };
         }
 
@@ -1008,7 +1014,7 @@ VideoProvider.prototype.removeTags = function(filter, tagsIds, callback) {
           if (tagsIds.indexOf(mediaTag.id) >= 0) {
 
             // Found a tag to remove
-            if (mediaTag.file) oldFilesNames.push(mediaTag.file.filename);
+            if (mediaTag.file) oldFilesNames.push(mediaTag.file.fileName);
             return false;
 
           } else

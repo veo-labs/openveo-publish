@@ -530,13 +530,13 @@
       }
     };
 
-    // Get simple mimetype
+    // Get simple mimeType
     $scope.getFileMimeType = function() {
       if (!$scope.modelToEdit || !$scope.modelToEdit.file) return null;
-      else if ($scope.modelToEdit.file.mimetype.substr(0, 'image'.length) == 'image') return 'image';
-      else if ($scope.modelToEdit.file.mimetype.substr(0, 'video'.length) == 'video') return 'video';
-      else if ($scope.modelToEdit.file.mimetype.substr(0, 'audio'.length) == 'audio') return 'audio';
-      else return $scope.modelToEdit.file.mimetype;
+      else if ($scope.modelToEdit.file.mimeType.substr(0, 'image'.length) == 'image') return 'image';
+      else if ($scope.modelToEdit.file.mimeType.substr(0, 'video'.length) == 'video') return 'video';
+      else if ($scope.modelToEdit.file.mimeType.substr(0, 'audio'.length) == 'audio') return 'audio';
+      else return $scope.modelToEdit.file.mimeType;
     };
 
     /*

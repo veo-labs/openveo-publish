@@ -77,10 +77,10 @@ HTTP Status Code | Details
           "description" : "Tag 1 description", // Tag description
           "value" : 0.3, // Tag timecode in percent (percentage of the video)
           "file" : { // Tag associated file
-            "mimetype" : "video/mp4",
-            "basePath" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
-            "originalname" : "original-name.mp4",
-            "filename" : "name.mp4",
+            "mimeType" : "video/mp4",
+            "url" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
+            "originalName" : "original-name.mp4",
+            "fileName" : "name.mp4",
             "size" : 102458
           }
         },
@@ -201,10 +201,10 @@ HTTP Status Code | Details
         "description" : "Tag 1 description", // Tag description
         "value" : 0.3, // Tag timecode in percent (percentage of the video)
         "file" : { // Tag associated file
-          "mimetype" : "video/mp4",
-          "basePath" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
-          "originalname" : "original-name.mp4",
-          "filename" : "name.mp4",
+          "mimeType" : "video/mp4",
+          "url" : "http://openveo-cdn.local/path/to/ressource/video.mp4",
+          "originalName" : "original-name.mp4",
+          "fileName" : "name.mp4",
           "size" : 102458
         }
       },

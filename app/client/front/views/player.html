@@ -18,21 +18,19 @@
 
   <body>
     <div class="container" ng-class="{'full':isFullViewport}" ng-cloak>
-      <ov-player
-        id="ov-player"
-        ov-mode="{{defaultMode}}"
-        ov-player-type="{{playerType}}"
-        ov-full-viewport="isFullViewport"
-        ov-data="data"
-        ov-language="{{language}}"
-        ov-auto-play="{{autoPlay}}"
-        ov-media-sources-icon="true"
-        ov-remember-position="true"
+      <opl-player
+        id="opl-player"
+        opl-template="{{defaultTemplate}}"
+        opl-player-type="{{playerType}}"
+        opl-full-viewport="{{isFullViewport}}"
+        opl-data="data"
+        opl-language="{{language}}"
+        opl-auto-play="{{autoPlay}}"
+        opl-remember-position="true"
         ng-show="ready"
-      ></ov-player>
+      ></opl-player>
       <div class="disclaimer" ng-if="!ready && data">
-        <span ng-bind-html="availabilityMessage">
-        </span>
+        <span ng-bind-html="availabilityMessage"></span>
       </div>
     </div>
 

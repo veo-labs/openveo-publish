@@ -20,20 +20,21 @@
         });
     });
 
-    // Got a media id from url
+    // Got a media id from URL
     if (urlChunks.length) {
       var mediaId = urlChunks[1];
 
       mediaService.getMedia(mediaId, function(media) {
         if (media) {
 
-          // Retrieve url parameters
+          // Retrieve URL parameters
           var urlParams = $location.search();
-          $scope.defaultMode = 'both';
+
+          $scope.defaultTemplate = 'split_50_50';
           if (media.metadata) {
             var template = media.metadata.template || '';
             if (template.match(/^mix-/))
-              $scope.defaultMode = 'media';
+              $scope.defaultTemplate = 'split_1';
           }
           $scope.data = media;
           $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;

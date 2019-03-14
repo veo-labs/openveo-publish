@@ -284,7 +284,7 @@ module.exports = {
     },
     cssFiles: [
       'be/css/player_page.css',
-      'openveo-player/dist/openveo-player.css',
+      'openveo-player/dist/openveo-player.min.css',
       'video.js/dist/video-js.min.css'
     ]
   },
@@ -350,7 +350,7 @@ module.exports = {
     {
       name: '@openveo/player',
       mountPath: 'openveo-player',
-      files: ['dist/openveo-player.min.js', 'dist/openveo-player.css']
+      files: ['dist/openveo-player.min.js', 'dist/openveo-player.min.css']
     },
     {
       name: 'video.js',

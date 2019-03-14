@@ -1165,13 +1165,13 @@ describe('VideoProvider', function() {
         assert.equal(modifications.tags[0].name, expectedTag.name, 'Wrong name');
         assert.equal(modifications.tags[0].value, expectedTag.value, 'Wrong value');
         assert.equal(modifications.tags[0].description, expectedTag.description, 'Wrong description');
-        assert.equal(modifications.tags[0].file.originalname, expectedFile.originalname, 'Wrong original name');
-        assert.equal(modifications.tags[0].file.mimetype, expectedFile.mimetype, 'Wrong type MIME');
-        assert.equal(modifications.tags[0].file.filename, expectedFile.filename, 'Wrong file name');
+        assert.equal(modifications.tags[0].file.originalName, expectedFile.originalname, 'Wrong original name');
+        assert.equal(modifications.tags[0].file.mimeType, expectedFile.mimetype, 'Wrong type MIME');
+        assert.equal(modifications.tags[0].file.fileName, expectedFile.filename, 'Wrong file name');
         assert.equal(modifications.tags[0].file.size, expectedFile.size, 'Wrong file size');
         assert.notProperty(modifications.tags[0], 'unexpectedProperty', 'Unexpected property');
         assert.equal(
-          modifications.tags[0].file.basePath,
+          modifications.tags[0].file.url,
           '/publish/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFile.filename,
           'Wrong file size'
         );
@@ -1216,13 +1216,13 @@ describe('VideoProvider', function() {
         assert.equal(modifications.tags[0].name, expectedTag.name, 'Wrong name');
         assert.equal(modifications.tags[0].value, expectedTag.value, 'Wrong value');
         assert.equal(modifications.tags[0].description, expectedTag.description, 'Wrong description');
-        assert.equal(modifications.tags[0].file.originalname, expectedFile.originalname, 'Wrong original name');
-        assert.equal(modifications.tags[0].file.mimetype, expectedFile.mimetype, 'Wrong type MIME');
-        assert.equal(modifications.tags[0].file.filename, expectedFile.filename, 'Wrong file name');
+        assert.equal(modifications.tags[0].file.originalName, expectedFile.originalname, 'Wrong original name');
+        assert.equal(modifications.tags[0].file.mimeType, expectedFile.mimetype, 'Wrong type MIME');
+        assert.equal(modifications.tags[0].file.fileName, expectedFile.filename, 'Wrong file name');
         assert.equal(modifications.tags[0].file.size, expectedFile.size, 'Wrong file size');
         assert.notProperty(modifications.tags[0], 'unexpectedProperty', 'Unexpected property');
         assert.equal(
-          modifications.tags[0].file.basePath,
+          modifications.tags[0].file.url,
           '/publish/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFile.filename,
           'Wrong file size'
         );
@@ -1248,9 +1248,9 @@ describe('VideoProvider', function() {
               name: 'Name',
               description: 'Description',
               file: {
-                originalname: 'originalName',
-                mimetype: 'mimetype',
-                filename: expectedFilenameToRemove,
+                originalName: 'originalName',
+                mimeType: 'mimetype',
+                fileName: expectedFilenameToRemove,
                 size: 43
               }
             }
@@ -1293,9 +1293,9 @@ describe('VideoProvider', function() {
               name: 'Name',
               description: 'Description',
               file: {
-                originalname: 'originalName',
-                mimetype: 'mimetype',
-                filename: expectedFilenameToRemove,
+                originalName: 'originalName',
+                mimeType: 'mimetype',
+                fileName: expectedFilenameToRemove,
                 size: 43
               }
             }
@@ -1632,9 +1632,9 @@ describe('VideoProvider', function() {
               description: 'Description',
               value: 43000,
               file: {
-                originalname: 'originalName',
-                mimetype: 'mimetype',
-                filename: 'fileName',
+                originalName: 'originalName',
+                mimeType: 'mimetype',
+                fileName: 'fileName',
                 size: 43
               }
             }
@@ -1646,7 +1646,7 @@ describe('VideoProvider', function() {
       openVeoApi.fileSystem.rm = chai.spy(function(filePath, callback) {
         var mediasDirectoryPath = process.rootPublish + '/assets/player/videos/';
         var tag = expectedMedias[0].tags[0];
-        var expectedPath = mediasDirectoryPath + expectedMedias[0].id + '/uploads/' + tag.file.filename;
+        var expectedPath = mediasDirectoryPath + expectedMedias[0].id + '/uploads/' + tag.file.fileName;
         assert.equal(filePath, expectedPath, 'Wrong path');
         callback();
       });

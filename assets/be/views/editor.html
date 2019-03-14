@@ -7,15 +7,15 @@
   <div class="well well-lg" ng-bind="'PUBLISH.EDITOR.INFO' | translate"></div>
   <div class="row media-viewer">
     <div class='col-sm-8 col-sm-push-4'>
-       <ov-player
-         ov-player-type="{{playerType}}"
-         ov-data="mediaPlayer"
-         ov-language="{{playerLanguage}}"
-         ov-hide-chapters-tab="true"
-         ov-hide-tags-tab="true"
-         ov-disable-cut="true"
+       <opl-player
+         opl-player-type="{{playerType}}"
+         opl-data="mediaPlayer"
+         opl-language="{{playerLanguage}}"
+         opl-chapters-tab="false"
+         opl-tags-tab="false"
+         opl-cuts="false"
          id="editorPlayer"
-         ></ov-player>
+         ></opl-player>
     </div>
     <div class='col-sm-4 col-sm-pull-8' >
     <uib-tabset justified="true">
@@ -76,16 +76,16 @@
           </div>
           <div class="form-group" ng-if="modelToEdit.file && !modelToEdit.type && !file">
 
-            <img style="width:100%" ng-if="simpleMimeType == 'image'" ng-src="{{modelToEdit.file.basePath}}">
+            <img style="width:100%" ng-if="simpleMimeType == 'image'" ng-src="{{modelToEdit.file.url}}">
             <video width="100%" controls ng-if="simpleMimeType == 'video'"
-              ng-src="{{modelToEdit.file.basePath}}">
+              ng-src="{{modelToEdit.file.url}}">
             </video>
-            <audio style="width:100%" ng-if="simpleMimeType == 'audio'" ng-src="{{modelToEdit.file.basePath}}" audioplayer controls></audio>
-            <div ng-if="simpleMimeType && ['image','video','audio'].indexOf(simpleMimeType) == -1">{{modelToEdit.file.originalname}}</div>
+            <audio style="width:100%" ng-if="simpleMimeType == 'audio'" ng-src="{{modelToEdit.file.url}}" audioplayer controls></audio>
+            <div ng-if="simpleMimeType && ['image','video','audio'].indexOf(simpleMimeType) == -1">{{modelToEdit.file.originalName}}</div>
 
-            <a ng-if="simpleMimeType" href="{{modelToEdit.file.basePath}}?filename={{modelToEdit.file.originalname}}"
+            <a ng-if="simpleMimeType" href="{{modelToEdit.file.url}}?filename={{modelToEdit.file.originalName}}"
               class="btn btn-default" role="button"
-              download="{{modelToEdit.file.originalname}}"
+              download="{{modelToEdit.file.originalName}}"
               ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <span> {{ 'PUBLISH.EDITOR.FILE_DOWNLOAD' | translate}}</span>
             </a>
             <button type="button" class="btn btn-danger" ng-click="modelToEdit.file = null" ng-show="modelToEdit.file">{{ 'CORE.UI.REMOVE' | translate}}</button>

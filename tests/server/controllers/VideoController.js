@@ -574,7 +574,7 @@ describe('VideoController', function() {
             {
               id: 'tagId',
               file: {
-                basePath: expectedTagFileUri
+                url: expectedTagFileUri
               }
             }
           ],
@@ -610,7 +610,7 @@ describe('VideoController', function() {
           'Wrong large timecode'
         );
         assert.strictEqual(
-          data.entity.tags[0].file.basePath,
+          data.entity.tags[0].file.url,
           coreApi.getCdnUrl() + expectedTagFileUri,
           'Wrong tag file'
         );
@@ -821,7 +821,7 @@ describe('VideoController', function() {
             {
               id: 'tagId',
               file: {
-                basePath: expectedTagFileUri
+                url: expectedTagFileUri
               }
             }
           ],
@@ -857,7 +857,7 @@ describe('VideoController', function() {
           'Wrong large timecode'
         );
         assert.strictEqual(
-          data.entity.tags[0].file.basePath,
+          data.entity.tags[0].file.url,
           coreApi.getCdnUrl() + expectedTagFileUri,
           'Wrong tag file'
         );
@@ -2301,7 +2301,7 @@ describe('VideoController', function() {
             {
               id: 'tagId',
               file: {
-                basePath: expectedTagFileUri
+                url: expectedTagFileUri
               }
             }
           ],
@@ -2335,7 +2335,7 @@ describe('VideoController', function() {
           'Wrong large timecode'
         );
         assert.strictEqual(
-          data.entities[0].tags[0].file.basePath,
+          data.entities[0].tags[0].file.url,
           coreApi.getCdnUrl() + expectedTagFileUri,
           'Wrong tag file'
         );

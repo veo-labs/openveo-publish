@@ -73,8 +73,8 @@ function resolveResourcesUrls(medias) {
       // Tags
       if (media.tags) {
         media.tags.forEach(function(tag) {
-          if (tag.file && tag.file.basePath)
-            tag.file.basePath = cdnUrl + tag.file.basePath.replace(removeFirstSlashRegExp, '');
+          if (tag.file && tag.file.url)
+            tag.file.url = cdnUrl + tag.file.url.replace(removeFirstSlashRegExp, '');
         });
       }
 

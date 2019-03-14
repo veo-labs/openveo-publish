@@ -3,6 +3,7 @@
 ## BREAKING CHANGES
 
 - Web service endpoints GET /videos and /videos/:id now express timecodes small images using a sprite object instead of an URL
+- Web service endpoints GET /videos and /videos/:id tag file properties have been renamed: "mimetype" has been renamed into "mimeType", "basePath" has been renamed into "url", "originalname" has been renamed into "originalName" and "filename" has been renamed into "fileName"
 - OpenVeo Publish now requires OpenVeo Core >=8.1.0
 - Drop support of flash technology for the HTML version of the OpenVeo Player
 
@@ -19,6 +20,7 @@
 - **videojs-contrib-hls** has been removed. It is replaced by videojs-http-streaming which is a sub dependency of video.js since version 7.0.0
 - **videojs-flash** has been added to replace video.js built-in flash player which has been removed in version 6.0.0 of video.js
 - **angular** has been upgraded from 1.5.5 to **1.5.11**
+- **@openveo/player** has been upgraded from 4.0.0 to **5.0.0**
 
 # 10.0.0 / YYYY-MM-DD
 
