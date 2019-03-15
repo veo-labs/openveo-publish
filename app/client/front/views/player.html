@@ -26,7 +26,16 @@
         opl-data="data"
         opl-language="{{language}}"
         opl-auto-play="{{autoPlay}}"
-        opl-remember-position="true"
+        opl-remember-position="{{rememberPosition}}"
+        opl-fullscreen-icon="{{fullScreenIconDisplayed}}"
+        opl-volume-icon="{{volumeIconDisplayed}}"
+        opl-template-icon="{{templateIconDisplayed}}"
+        opl-settings-icon="{{settingsIconDisplayed}}"
+        opl-veo-labs-icon="{{veoLabsIconDisplayed}}"
+        opl-time="{{timeDisplayed}}"
+        opl-chapters-tab="{{chaptersDisplayed}}"
+        opl-tags-tab="{{tagsDisplayed}}"
+        opl-cuts="{{cutsEnabled}}"
         ng-show="ready"
       ></opl-player>
       <div class="disclaimer" ng-if="!ready && data">

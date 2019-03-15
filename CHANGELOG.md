@@ -11,6 +11,22 @@
 
 - Translate the HTML version of the OpenVeo Player
 - Add browser vendors attributes for fullscreen to the shared iframe code
+- Add new parameters to the player public page to have more control on the player:
+  - Parameter "remember-position" to force the player to start playing the video at the time the user was last time or not (Default is "remember-position=true")
+  - Parameter "fullscreen-icon" to show / hide the fullscreen control (Default is "fullscreen-icon=true")
+  - Parameter "volume-icon" to show / hide the volume control (Default is "volume-icon=true")
+  - Parameter "template-icon" to show / hide the template selector (Default is "template-icon=true")
+  - Parameter "settings-icon" to show / hide the settings control (Default is "settings-icon=true")
+  - Parameter "veo-labs-icon" to show / hide the veo-labs logotype (Default is "veo-labs-icon=true")
+  - Parameter "time" to show / hide the time and duration (Default is "time=true")
+  - Parameter "chapters" to show / hide chapters (Default is "chapters=true")
+  - Parameter "tags" to show / hide tags (Default is "tags=true")
+  - Parameter "cuts" to enable / disable cuts (Default is "cuts=true")
+  - Parameter "template" to set the default template to use from "split_1", "split_2", "split_50_50" and "split_25_75" (Default is "template=split_50_50")
+
+## BUG FIXES
+
+- Fix "auto-play", "type" and "fullscreen" parameter on the player public page which weren't always working
 
 ## DEPENDENCIES
 
