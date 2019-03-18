@@ -38,7 +38,6 @@
     "shortid": "2.2.6",
     "video.js": "7.3.0",
     "videojs-contrib-dash": "2.10.0",
-    "videojs-contrib-hls": "5.15.0",
     "vimeo": "1.2.0",
     "xml2js": "0.4.17"
   },
