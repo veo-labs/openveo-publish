@@ -36,7 +36,7 @@
         opl-chapters-tab="{{chaptersDisplayed}}"
         opl-tags-tab="{{tagsDisplayed}}"
         opl-cuts="{{cutsEnabled}}"
-        ng-show="ready"
+        ng-style="{'visibility': (ready) ? 'visible' : 'hidden'}"
       ></opl-player>
       <div class="disclaimer" ng-if="!ready && data">
         <span ng-bind-html="availabilityMessage"></span>
