@@ -224,16 +224,29 @@ VideoPackage.prototype.generateThumb = function() {
     var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
 
     if (self.mediaPackage.originalThumbnailPath !== undefined) {
-    // Copy user's thumbnail
-      process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-      openVeoApi.fileSystem.copy(
-        self.mediaPackage.originalThumbnailPath,
-        path.join(destinationPath, 'thumbnail.jpg'),
-        function(error) {
-          if (error) {
-            self.setError(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
-          }
 
+      async.series([
+
+        // Thumbnail already exists for this package, copy the thumbnail
+        function(callback) {
+          process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
+          openVeoApi.fileSystem.copy(
+            self.mediaPackage.originalThumbnailPath,
+            path.join(destinationPath, 'thumbnail.jpg'),
+            callback
+          );
+        },
+
+        // Remove original thumbnail
+        function(callback) {
+          process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+          fs.unlink(self.mediaPackage.originalThumbnailPath, callback);
+        }
+
+      ], function(error) {
+        if (error) {
+          self.setError(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
+        } else {
           self.videoProvider.updateThumbnail(
             self.mediaPackage.id,
             '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
@@ -242,7 +255,8 @@ VideoPackage.prototype.generateThumb = function() {
             }
           );
         }
-      );
+      });
+
     } else {
     // Generate thumb
       process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);

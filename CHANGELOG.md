@@ -27,6 +27,7 @@
 ## BUG FIXES
 
 - Fix "auto-play", "type" and "fullscreen" parameter on the player public page which weren't always working
+- Fix adding a thumbnail from the catalog of videos when adding a new video which was failing without error. It now sets the package on error if adding the thumbnail failed. This bug appeared in version 6.0.0
 
 ## DEPENDENCIES
 

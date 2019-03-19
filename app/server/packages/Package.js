@@ -414,20 +414,6 @@ Package.prototype.removeOriginalPackage = function() {
         else
           callback();
       });
-    },
-    function(callback) {
-      // Remove uploaded thumbnail (if it has been uploaded)
-      if (self.mediaPackage.originalThumbnailPath) {
-        process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
-        fs.unlink(self.mediaPackage.originalThumbnailPath, function(error) {
-          if (error)
-            self.setError(new PackageError(error.message, ERRORS.UNLINK));
-          else
-            callback();
-        });
-      } else {
-        callback();
-      }
     }
   ], function() {
     self.fsm.transition();
