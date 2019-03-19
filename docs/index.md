@@ -25,7 +25,7 @@ OpenVeo Publish adds the following features:
 ![Back end catalogue](images/screenshots/back-end-catalogue.jpg)
 
 ### Back end media editor
-![Back end media editor](images/screenshots/back-end-media-editor.jpg)
+![Back end media editor](images/screenshots/back-end-media-editor.png)
 
 ### Back end categories
 ![Back end categories](images/screenshots/back-end-categories.jpg)
@@ -34,4 +34,4 @@ OpenVeo Publish adds the following features:
 ![Back end properties](images/screenshots/back-end-properties.jpg)
 
 ### Public video with images synchronization
-![Player video](images/screenshots/player.jpg)
+![Player video](images/screenshots/player.png)
