@@ -294,7 +294,7 @@ VideoProvider.prototype.getOne = function(filter, fields, callback) {
       poi.sort(ordering);
       last = poi[poi.length - 1];
 
-      media.needPointsOfInterestUnitConversion = last.value <= 1;
+      media.needPointsOfInterestUnitConversion = last.value <= 1 && last.value !== 0;
       break;
     }
 

@@ -28,6 +28,7 @@
 
 - Fix "auto-play", "type" and "fullscreen" parameter on the player public page which weren't always working
 - Fix adding a thumbnail from the catalog of videos when adding a new video which was failing without error. It now sets the package on error if adding the thumbnail failed. This bug appeared in version 6.0.0
+- Fix chapters and tags wrong times when adding only one chapter at 0 with several tags or one tag at 0 with several chapters
 
 ## DEPENDENCIES
 
