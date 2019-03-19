@@ -97,7 +97,7 @@
 
         // only gets called once
         if (!playerController || duration) {
-          playerController = angular.element(myPlayer).controller('ovPlayer');
+          playerController = angular.element(myPlayer).controller('oplPlayer');
 
           // Set Duration
           $scope.duration = duration;
