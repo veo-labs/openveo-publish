@@ -13,8 +13,9 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  *
  * @param {TaxonomyProvider} provider The entity provider that will be used by the Helper
  */
-function CategoryHelper(provider) {
+function CategoryHelper(provider, treeId) {
   CategoryHelper.super_.call(this, provider);
+  this.treeId = treeId;
 }
 
 module.exports = CategoryHelper;

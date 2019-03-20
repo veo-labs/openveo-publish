@@ -16,8 +16,8 @@ describe('Category page', function() {
   // Prepare page
   before(function() {
     var taxonomyProvider = process.api.getCoreApi().taxonomyProvider;
-    categoryHelper = new CategoryHelper(taxonomyProvider);
     page = new CategoryPage(taxonomyProvider);
+    categoryHelper = new CategoryHelper(taxonomyProvider, page.treeId);
   });
 
   // Logout after tests
@@ -106,15 +106,12 @@ describe('Category page', function() {
     });
 
     it('should not be able to edit category by requesting the server directly', function() {
-      var initialTree = {
-        tree: [
-          {
-            id: '1452701121600',
-            title: 'title',
-            items: []
-          }
-        ]
-      };
+      var initialTree = [
+        {
+          title: 'title',
+          items: []
+        }
+      ];
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
@@ -140,15 +137,12 @@ describe('Category page', function() {
     });
 
     it('should not be able to remove category by requesting the server directly', function() {
-      var initialTree = {
-        tree: [
-          {
-            id: '1452701121600',
-            title: 'title',
-            items: []
-          }
-        ]
-      };
+      var initialTree = [
+        {
+          title: 'title',
+          items: []
+        }
+      ];
       categoryHelper.addEntities(initialTree);
       page.refresh();
 
