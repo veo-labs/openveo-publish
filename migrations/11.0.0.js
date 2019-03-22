@@ -22,7 +22,7 @@ module.exports.update = function(callback) {
      * with the URL of the sprite and the coordinates of the image inside the sprite.
      */
     function(callback) {
-      videoProvider.getAll(null, {include: ['timecodes']}, {id: 'desc'}, function(error, medias) {
+      videoProvider.getAll(null, {include: ['timecodes', 'id']}, {id: 'desc'}, function(error, medias) {
         if (error) return callback(error);
 
         // No medias
@@ -37,7 +37,8 @@ module.exports.update = function(callback) {
           // Nothing to do
           if (!media.timecodes) return;
 
-          var mediaPublicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + media.id);
+          var videoDirectoryPath = path.join(process.rootPublish, 'assets/player/videos/');
+          var mediaPublicDirectoryPath = path.join(videoDirectoryPath, media.id);
 
           asyncActions.push(function(callback) {
 
@@ -46,13 +47,13 @@ module.exports.update = function(callback) {
               // Generate sprite of small images
               function(callback) {
                 var timecodesImages = media.timecodes.map(function(timecode) {
-                  return timecode.image.large;
+                  return timecode.image.large.replace('/publish/', videoDirectoryPath);
                 });
 
                 // Generate one or more sprite of 740x400 containing all video images
                 openVeoApi.imageProcessor.generateSprites(
                   timecodesImages,
-                  path.join(mediaPublicDirectory, 'points-of-interest-images.jpg'),
+                  path.join(mediaPublicDirectoryPath, 'points-of-interest-images.jpg'),
                   142,
                   80,
                   5,
@@ -72,7 +73,9 @@ module.exports.update = function(callback) {
                   // Find image in sprite
                   var imageReference;
                   for (var i = 0; i < imagesReferences.length; i++) {
-                    if (timecode.image.large === imagesReferences[i].image) {
+                    var timecodeLargeImagePath = timecode.image.large.replace('/publish/', videoDirectoryPath);
+
+                    if (timecodeLargeImagePath === imagesReferences[i].image) {
                       imageReference = imagesReferences[i];
                       break;
                     }
@@ -113,7 +116,7 @@ module.exports.update = function(callback) {
      * Tag file property "originalname" is renamed into "originalName".
      */
     function(callback) {
-      videoProvider.getAll(null, {include: ['tags']}, {id: 'desc'}, function(error, medias) {
+      videoProvider.getAll(null, {include: ['tags', 'id']}, {id: 'desc'}, function(error, medias) {
         if (error) return callback(error);
 
         // No medias
