@@ -1,14 +1,15 @@
-# 11.0.0 / YYYY-MM-DD
+# 10.0.0 / YYYY-MM-DD
 
 ## BREAKING CHANGES
 
 - Web service endpoints GET /videos and /videos/:id now express timecodes small images using a sprite object instead of an URL
 - Web service endpoints GET /videos and /videos/:id tag file properties have been renamed: "mimetype" has been renamed into "mimeType", "basePath" has been renamed into "url", "originalname" has been renamed into "originalName" and "filename" has been renamed into "fileName"
-- OpenVeo Publish now requires OpenVeo Core >=8.1.0
+- OpenVeo Publish now requires OpenVeo Core >=8.0.0
 - Drop support of flash technology for the HTML version of the OpenVeo Player
 
 ## NEW FEATURES
 
+- OpenVeo Publish does not use Bower anymore, it now uses NPM for both client and server dependencies
 - Translate the HTML version of the OpenVeo Player
 - Add browser vendors attributes for fullscreen to the shared iframe code
 - Add new parameters to the player public page to have more control on the player:
@@ -26,6 +27,7 @@
 
 ## BUG FIXES
 
+- Fix "grunt remove:doc" which hasn't worked since version 3.0.0
 - Fix "auto-play", "type" and "fullscreen" parameter on the player public page which weren't always working
 - Fix adding a thumbnail from the catalog of videos when adding a new video which was failing without error. It now sets the package on error if adding the thumbnail failed. This bug appeared in version 6.0.0
 - Fix chapters and tags wrong times when adding only one chapter at 0 with several tags or one tag at 0 with several chapters
@@ -38,20 +40,6 @@
 - **videojs-contrib-hls** has been removed. It is replaced by videojs-http-streaming which is a sub dependency of video.js since version 7.0.0
 - **angular** has been upgraded from 1.5.5 to **1.5.11**
 - **@openveo/player** has been upgraded from 4.0.0 to **5.0.0**
-
-# 10.0.0 / YYYY-MM-DD
-
-## BREAKING CHANGES
-
-- OpenVeo Publish now requires OpenVeo Core >=8.0.0
-
-## NEW FEATURES
-
-- OpenVeo Publish does not use Bower anymore, it now uses NPM for both client and server dependencies
-
-## BUG FIXES
-
-- Fix "grunt remove:doc" which hasn't worked since version 3.0.0
 
 # 9.0.1 / 2018-11-16
 

@@ -9,7 +9,7 @@ var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
-  process.logger.info('Publish 11.0.0 migration launched.');
+  process.logger.info('Publish 10.0.0 migration launched.');
   var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
 
   async.series([
@@ -163,7 +163,7 @@ module.exports.update = function(callback) {
     }
   ], function(error, results) {
     if (error) return callback(error);
-    process.logger.info('Publish 11.0.0 migration done.');
+    process.logger.info('Publish 10.0.0 migration done.');
     callback();
   });
 };

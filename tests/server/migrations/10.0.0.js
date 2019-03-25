@@ -11,7 +11,7 @@ var assert = chai.assert;
 chai.should();
 chai.use(spies);
 
-describe('Migration 11.0.0', function() {
+describe('Migration 10.0.0', function() {
   var migration;
   var database;
   var VideoProvider;
@@ -70,7 +70,7 @@ describe('Migration 11.0.0', function() {
 
   // Initialize tests
   beforeEach(function() {
-    migration = mock.reRequire(path.join(process.rootPublish, 'migrations/11.0.0.js'));
+    migration = mock.reRequire(path.join(process.rootPublish, 'migrations/10.0.0.js'));
   });
 
   // Stop mocks
