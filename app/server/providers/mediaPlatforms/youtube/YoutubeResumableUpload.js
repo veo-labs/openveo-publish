@@ -109,15 +109,25 @@ ResumableUpload.prototype.upload = function() {
 
   // Send request and start upload if success
   request.post(options, function(err, res, body) {
+    if (body) {
+      body = JSON.parse(body);
+
+      if (body.error) {
+        self.retry = 0;
+        self.emit('error', new Error(body.error.message));
+        return;
+      }
+    }
+
     if (err || !res.headers.location) {
-      self.emit('error', new Error(err));
+      self.emit('error', err);
       if ((self.retry > 0) || (self.retry <= -1)) {
         self.emit('progress', 'Retrying ...');
         self.retry--;
         self.upload();// retry
       } else {
         if (err)
-          self.emit('error', new Error(err));
+          self.emit('error', err);
         else
           self.emit('error', new Error('max try reached'));
         return;

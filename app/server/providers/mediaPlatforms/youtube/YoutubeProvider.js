@@ -241,7 +241,7 @@ YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams
         process.logger.debug('Upload progress', progress);
       });
       resumableUpload.on('error', function(error) {
-        process.logger.debug('Upload error', error);
+        process.logger.error('Upload error', error && error.message);
         if (resumableUpload.retry === 0) {
           callback(error);
         }
