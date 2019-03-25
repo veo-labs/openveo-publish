@@ -1,3 +1,9 @@
+# 9.0.2 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix server crash when uploading on Youtube failed
+
 # 9.0.1 / 2018-11-16
 
 ## BUG FIXES
