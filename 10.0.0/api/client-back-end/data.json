@@ -1,0 +1,1400 @@
+{
+    "project": {
+        "name": "OpenVeo Publish AngularJS back end",
+        "description": "AngularJS OpenVeo Publish plugin back end documentation",
+        "version": "10.0.0"
+    },
+    "files": {
+        "app/client/admin/js/multirange/multirange.js": {
+            "name": "app/client/admin/js/multirange/multirange.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/CategoriesController.js": {
+            "name": "app/client/admin/js/ovPub/CategoriesController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/ConfigurationController.js": {
+            "name": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/EditorController.js": {
+            "name": "app/client/admin/js/ovPub/EditorController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/MediaController.js": {
+            "name": "app/client/admin/js/ovPub/MediaController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/MillisecondsToTimeFilter.js": {
+            "name": "app/client/admin/js/ovPub/MillisecondsToTimeFilter.js",
+            "modules": {
+                "ov.publish": 1
+            },
+            "classes": {
+                "millisecondsToTime": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PropertiesController.js": {
+            "name": "app/client/admin/js/ovPub/PropertiesController.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PublishApp.js": {
+            "name": "app/client/admin/js/ovPub/PublishApp.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/PublishService.js": {
+            "name": "app/client/admin/js/ovPub/PublishService.js",
+            "modules": {},
+            "classes": {
+                "publishService": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/TimeDirective.js": {
+            "name": "app/client/admin/js/ovPub/TimeDirective.js",
+            "modules": {},
+            "classes": {
+                "ovpTime": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/client/admin/js/ovPub/TimeToMillisecondsFilter.js": {
+            "name": "app/client/admin/js/ovPub/TimeToMillisecondsFilter.js",
+            "modules": {},
+            "classes": {
+                "timeToMilliseconds": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "ov.publish": {
+            "name": "ov.publish",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "millisecondsToTime": 1,
+                "publishService": 1,
+                "ovpTime": 1,
+                "timeToMilliseconds": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "app/client/admin/js/ovPub/TimeToMillisecondsFilter.js",
+            "line": 5,
+            "description": "Convert time in milliseconds into time string (hh:mm:ss)"
+        }
+    },
+    "classes": {
+        "millisecondsToTime": {
+            "name": "millisecondsToTime",
+            "shortname": "millisecondsToTime",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ov.publish",
+            "namespace": "",
+            "file": "app/client/admin/js/ovPub/MillisecondsToTimeFilter.js",
+            "line": 5,
+            "description": "Convert time in milliseconds into time string (hh:mm:ss)"
+        },
+        "publishService": {
+            "name": "publishService",
+            "shortname": "publishService",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ov.publish",
+            "namespace": "",
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 5,
+            "description": "Defines a publish service to manage medias, categories and properties."
+        },
+        "ovpTime": {
+            "name": "ovpTime",
+            "shortname": "ovpTime",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ov.publish",
+            "namespace": "",
+            "file": "app/client/admin/js/ovPub/TimeDirective.js",
+            "line": 5,
+            "description": "Time directive\n\nProvide a new HTML element ovp-time. This element will create three input (hours, minutes and\nseconds) for selecting time. Theese inputs will be joined in a single string (hh:mm:ss) to set\nthe viewValue and will be converted in milliseconds for the modelValue.\n\nThe attribute milliseconds-max must be set to validate the value range."
+        },
+        "timeToMilliseconds": {
+            "name": "timeToMilliseconds",
+            "shortname": "timeToMilliseconds",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ov.publish",
+            "namespace": "",
+            "file": "app/client/admin/js/ovPub/TimeToMillisecondsFilter.js",
+            "line": 5,
+            "description": "Convert time string (hh:mm:ss) into milliseconds"
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "app/client/admin/js/multirange/multirange.js",
+            "line": 28,
+            "description": "Update ranges if the duration is setted",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 5,
+            "description": "Defines the categories controller for the categories page.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 12,
+            "description": "Handles success when a category is added or updated.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 23,
+            "description": "Handles error when a category is added or updated.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/CategoriesController.js",
+            "line": 30,
+            "description": "Checks that category name field is not empty.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "line": 5,
+            "description": "Defines the configuration controller for the configuration page.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "line": 118,
+            "description": "Saves medias settings.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "line": 135,
+            "description": "Saves TLS settings.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/ConfigurationController.js",
+            "line": 151,
+            "description": "Saves catalog settings.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 5,
+            "description": "Defines the categories controller for the categories page.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 24,
+            "description": "Reconstructs ranges with chapters and cut array.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 36,
+            "description": "Initializes chapters and start / end cuts.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 69,
+            "description": "Executes, safely, the given function in AngularJS process.",
+            "params": [
+                {
+                    "name": "functionToExecute",
+                    "description": "The function to execute as part of\nthe angular digest process.",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 90,
+            "description": "Gathers some parameters before calling init.",
+            "params": [
+                {
+                    "name": "duration",
+                    "description": "Media duration",
+                    "type": "Number"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 118,
+            "description": "TAG",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 122,
+            "description": "Abort upload and delete file",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 134,
+            "description": "Clean object to save deleting all unecessary data",
+            "params": [
+                {
+                    "name": "collectionName",
+                    "description": "object key of the properties to clean",
+                    "type": "String"
+                },
+                {
+                    "name": "cleanAll",
+                    "description": "condition if all Object has to be cleaned",
+                    "type": "Bool"
+                }
+            ],
+            "return": {
+                "description": "clean Object",
+                "type": "Object"
+            },
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 166,
+            "description": "Retreive element position in array by its id",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The element id to search",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The position of this element, -1 otherwise",
+                "type": "Number"
+            },
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 179,
+            "description": "Save chapter error callback",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 202,
+            "description": "Save chapter success callback",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 226,
+            "description": "Save chapter",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 251,
+            "description": "Selects and unselect a provided cut.",
+            "params": [
+                {
+                    "name": "cut",
+                    "description": "The cut to toggle",
+                    "type": "Object"
+                },
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 270,
+            "description": "Selects or unselect the begin cut.",
+            "params": [
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 279,
+            "description": "Selects or unselect the ending cut.",
+            "params": [
+                {
+                    "name": "addOrRemove",
+                    "description": "Forces the addition or removal of the cut",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 288,
+            "description": "Save chapter and cut",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/EditorController.js",
+            "line": 323,
+            "description": "Calling preinit with a duration chnage on the player, it sometimes fail so...",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 5,
+            "description": "Defines the media controller for the medias page.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 103,
+            "description": "Gets all categories and add a value for \"none\".",
+            "params": [
+                {
+                    "name": "label",
+                    "description": "The label for \"no categories\"",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The list of categories",
+                "type": "Array"
+            },
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 116,
+            "description": "Opens a link in a new tab.",
+            "params": [
+                {
+                    "name": "link",
+                    "description": "Destination url",
+                    "type": "String"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 125,
+            "description": "Opens an alert to display HTML code to share the media.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "The media to share",
+                    "type": "Object"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 156,
+            "description": "Retries a media which is on error.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of medias to work on",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 170,
+            "description": "Asks server to start uploading the media to the chosen platform.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of medias to work on",
+                    "type": "Array"
+                },
+                {
+                    "name": "platformName",
+                    "description": "The name of platform to upload to",
+                    "type": "String"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 185,
+            "description": "Publishes a list of medias.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of media ids to publish",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 199,
+            "description": "Unpublishes a list of medias.",
+            "params": [
+                {
+                    "name": "medias",
+                    "description": "The list of media ids to unpublish",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 213,
+            "description": "Removes a list of medias.",
+            "params": [
+                {
+                    "name": "selected",
+                    "description": "The list of media ids to remove",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "Function to reload the datatable",
+                    "type": "Function"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 227,
+            "description": "Saves media information.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "Media data",
+                    "type": "Object"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 255,
+            "description": "Routes to media editor.",
+            "params": [
+                {
+                    "name": "media",
+                    "description": "The media to edit",
+                    "type": "Object"
+                }
+            ],
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 264,
+            "description": "Builds custom properties fields descriptors for formly.",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "Model where to find default values",
+                    "type": "Object",
+                    "optional": true
+                },
+                {
+                    "name": "inlineEditable",
+                    "description": "true to generate an inline editable field instead of a simple editable field",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The list of formly fields descriptors",
+                "type": "Array"
+            },
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/MediaController.js",
+            "line": 444,
+            "description": "Collapses / extends the add form.",
+            "class": "millisecondsToTime"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 5,
+            "description": "Defines the properties controller for the properties page.",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 33,
+            "description": "Removes a list of properties.",
+            "params": [
+                {
+                    "name": "selected",
+                    "description": "The list of property ids to remove",
+                    "type": "Array"
+                },
+                {
+                    "name": "reload",
+                    "description": "The reload Function to force reloading the table",
+                    "type": "Function"
+                }
+            ],
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 48,
+            "description": "Adds a property.",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "Property data",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PropertiesController.js",
+            "line": 60,
+            "description": "Saves property.",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "Property data",
+                    "type": "Object"
+                }
+            ],
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishApp.js",
+            "line": 14,
+            "description": "Defines a filter to print status in cells.\n\nThis filter has one optional Number parameter which must be specified\nif the input is equal to 8 (error status), to precise the error code.",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishApp.js",
+            "line": 45,
+            "description": "Filter to print Category in cells.",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishApp.js",
+            "line": 58,
+            "description": "Filter to print Multi Sources Media icon",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 20,
+            "description": "Retries a media.\n\nIf a media is on error, the upload / publication process has stopped and can be retried.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to retry",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "retryMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 34,
+            "description": "Publishes the given media.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to publish",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "publishMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 46,
+            "description": "Unpublishes the given media.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to unpublish",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "unpublishMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 58,
+            "description": "Loads all properties from server.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadProperties",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 79,
+            "description": "Gets list of properties.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getProperties",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 89,
+            "description": "Loads the list of available media platforms from server.",
+            "return": {
+                "description": "The promise used to retrieve platforms from server",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadPlatforms",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 110,
+            "description": "Gets the list of available platforms.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getPlatforms",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 120,
+            "description": "Asks server to start uploading a media waiting for manual upload.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the media to start uploading",
+                    "type": "String"
+                },
+                {
+                    "name": "platform",
+                    "description": "The media platform to upload to",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "startMediaUpload",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 133,
+            "description": "Loads taxonomy \"categories\".",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadTaxonomyCategory",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 183,
+            "description": "Gets the taxonomy \"categories\".",
+            "return": {
+                "description": "The taxonomy",
+                "type": "Object"
+            },
+            "itemtype": "method",
+            "name": "getTaxonomyCategory",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 193,
+            "description": "Gets the list of categories formatted for an HTMLSelect element.",
+            "return": {
+                "description": "The list of categories",
+                "type": "Array"
+            },
+            "itemtype": "method",
+            "name": "getCategoriesOptions",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 203,
+            "description": "Gets list of categories indexed by keys.",
+            "return": {
+                "description": "The list of categories",
+                "type": "Object"
+            },
+            "itemtype": "method",
+            "name": "getCategoriesByKey",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 213,
+            "description": "Loads a media by its id.",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "loadMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 234,
+            "description": "Saves watcher settings.",
+            "itemtype": "method",
+            "name": "saveWatcherSettings",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The watcher settings",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "HttpPromise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 245,
+            "description": "Saves TLS settings.",
+            "itemtype": "method",
+            "name": "saveTlsSettings",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The TLS settings",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "HttpPromise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 256,
+            "description": "Saves catalog settings.",
+            "itemtype": "method",
+            "name": "saveCatalogSettings",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The catalog settings",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "HttpPromise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 267,
+            "description": "Updates a chapter associated to the specified media.",
+            "itemtype": "method",
+            "name": "updateChapter",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                },
+                {
+                    "name": "chapter",
+                    "description": "Information about the chapter",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "id",
+                            "description": "The chapter id",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "value",
+                            "description": "The chapter time in milliseconds",
+                            "type": "Number",
+                            "optional": true
+                        },
+                        {
+                            "name": "name",
+                            "description": "The chapter name",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "description",
+                            "description": "The chapter description",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "HttpPromise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 283,
+            "description": "Updates a tag associated to the specified media.",
+            "itemtype": "method",
+            "name": "updateTag",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                },
+                {
+                    "name": "file",
+                    "description": "The file to upload",
+                    "type": "Object"
+                },
+                {
+                    "name": "tag",
+                    "description": "Information about the tag",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "id",
+                            "description": "The tag id",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "value",
+                            "description": "The tag time in milliseconds",
+                            "type": "Number",
+                            "optional": true
+                        },
+                        {
+                            "name": "name",
+                            "description": "The tag name",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "description",
+                            "description": "The tag description",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 303,
+            "description": "Remove tags from media.",
+            "itemtype": "method",
+            "name": "removeTags",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                },
+                {
+                    "name": "tagIds",
+                    "description": "The list of tag ids to remove",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 315,
+            "description": "Removes chapters from media.",
+            "itemtype": "method",
+            "name": "removeChapters",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The media id",
+                    "type": "String"
+                },
+                {
+                    "name": "chapterIds",
+                    "description": "The list of chapter ids to remove",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "The HTTP promise",
+                "type": "HttpPromise"
+            },
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 327,
+            "description": "Clears a publish service cache.",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The cache element to clear (**properties**, **categories** or **editor**), null to\nclear all caches",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "itemtype": "method",
+            "name": "cacheClear",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 356,
+            "description": "Retrieves publish plugin configuration.",
+            "return": {
+                "description": "The HTTP promise",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "getConfiguration",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 366,
+            "description": "Adds a media.",
+            "params": [
+                {
+                    "name": "Information",
+                    "description": "about the media",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "An HTTP promise resolving when media has been added",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "addMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/PublishService.js",
+            "line": 385,
+            "description": "Update a media",
+            "params": [
+                {
+                    "name": "Information",
+                    "description": "about the media",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "An HTTP promise resolving when media has been updated",
+                "type": "Promise"
+            },
+            "itemtype": "method",
+            "name": "updateMedia",
+            "class": "publishService",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/TimeDirective.js",
+            "line": 55,
+            "description": "notEmpty Constraints\n\nIf the parser can't convert the viewValue, the modelValue be undefined.",
+            "class": "ovpTime",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/TimeDirective.js",
+            "line": 64,
+            "description": "range Constraints\n\nThe model value must be greater or equals to zero and can't exceed\nthe max value setted in the attributes.",
+            "class": "ovpTime",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/TimeDirective.js",
+            "line": 74,
+            "description": "Set the viewValue on change events",
+            "class": "ovpTime",
+            "module": "ov.publish"
+        },
+        {
+            "file": "app/client/admin/js/ovPub/TimeDirective.js",
+            "line": 83,
+            "description": "Add zero below the input's value to match the two digits string pattern\non blur event.",
+            "class": "ovpTime",
+            "module": "ov.publish"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nUpdate ranges if the duration is setted",
+            "line": " app/client/admin/js/multirange/multirange.js:28"
+        },
+        {
+            "message": "Missing item type\nDefines the categories controller for the categories page.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:5"
+        },
+        {
+            "message": "Missing item type\nHandles success when a category is added or updated.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:12"
+        },
+        {
+            "message": "Missing item type\nHandles error when a category is added or updated.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:23"
+        },
+        {
+            "message": "Missing item type\nChecks that category name field is not empty.",
+            "line": " app/client/admin/js/ovPub/CategoriesController.js:30"
+        },
+        {
+            "message": "Missing item type\nDefines the configuration controller for the configuration page.",
+            "line": " app/client/admin/js/ovPub/ConfigurationController.js:5"
+        },
+        {
+            "message": "Missing item type\nSaves medias settings.",
+            "line": " app/client/admin/js/ovPub/ConfigurationController.js:118"
+        },
+        {
+            "message": "Missing item type\nSaves TLS settings.",
+            "line": " app/client/admin/js/ovPub/ConfigurationController.js:135"
+        },
+        {
+            "message": "Missing item type\nSaves catalog settings.",
+            "line": " app/client/admin/js/ovPub/ConfigurationController.js:151"
+        },
+        {
+            "message": "Missing item type\nDefines the categories controller for the categories page.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:5"
+        },
+        {
+            "message": "Missing item type\nReconstructs ranges with chapters and cut array.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:24"
+        },
+        {
+            "message": "Missing item type\nInitializes chapters and start / end cuts.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:36"
+        },
+        {
+            "message": "Missing item type\nExecutes, safely, the given function in AngularJS process.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:69"
+        },
+        {
+            "message": "Missing item type\nGathers some parameters before calling init.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:90"
+        },
+        {
+            "message": "Missing item type\nTAG",
+            "line": " app/client/admin/js/ovPub/EditorController.js:118"
+        },
+        {
+            "message": "Missing item type\nAbort upload and delete file",
+            "line": " app/client/admin/js/ovPub/EditorController.js:122"
+        },
+        {
+            "message": "Missing item type\nClean object to save deleting all unecessary data",
+            "line": " app/client/admin/js/ovPub/EditorController.js:134"
+        },
+        {
+            "message": "Missing item type\nRetreive element position in array by its id",
+            "line": " app/client/admin/js/ovPub/EditorController.js:166"
+        },
+        {
+            "message": "Missing item type\nSave chapter error callback",
+            "line": " app/client/admin/js/ovPub/EditorController.js:179"
+        },
+        {
+            "message": "Missing item type\nSave chapter success callback",
+            "line": " app/client/admin/js/ovPub/EditorController.js:202"
+        },
+        {
+            "message": "Missing item type\nSave chapter",
+            "line": " app/client/admin/js/ovPub/EditorController.js:226"
+        },
+        {
+            "message": "Missing item type\nSelects and unselect a provided cut.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:251"
+        },
+        {
+            "message": "Missing item type\nSelects or unselect the begin cut.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:270"
+        },
+        {
+            "message": "Missing item type\nSelects or unselect the ending cut.",
+            "line": " app/client/admin/js/ovPub/EditorController.js:279"
+        },
+        {
+            "message": "Missing item type\nSave chapter and cut",
+            "line": " app/client/admin/js/ovPub/EditorController.js:288"
+        },
+        {
+            "message": "Missing item type\nCalling preinit with a duration chnage on the player, it sometimes fail so...",
+            "line": " app/client/admin/js/ovPub/EditorController.js:323"
+        },
+        {
+            "message": "Missing item type\nDefines the media controller for the medias page.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:5"
+        },
+        {
+            "message": "Missing item type\nGets all categories and add a value for \"none\".",
+            "line": " app/client/admin/js/ovPub/MediaController.js:103"
+        },
+        {
+            "message": "Missing item type\nOpens a link in a new tab.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:116"
+        },
+        {
+            "message": "Missing item type\nOpens an alert to display HTML code to share the media.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:125"
+        },
+        {
+            "message": "Missing item type\nRetries a media which is on error.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:156"
+        },
+        {
+            "message": "Missing item type\nAsks server to start uploading the media to the chosen platform.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:170"
+        },
+        {
+            "message": "Missing item type\nPublishes a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:185"
+        },
+        {
+            "message": "Missing item type\nUnpublishes a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:199"
+        },
+        {
+            "message": "Missing item type\nRemoves a list of medias.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:213"
+        },
+        {
+            "message": "Missing item type\nSaves media information.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:227"
+        },
+        {
+            "message": "Missing item type\nRoutes to media editor.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:255"
+        },
+        {
+            "message": "Missing item type\nBuilds custom properties fields descriptors for formly.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:264"
+        },
+        {
+            "message": "Missing item type\nCollapses / extends the add form.",
+            "line": " app/client/admin/js/ovPub/MediaController.js:444"
+        },
+        {
+            "message": "Missing item type\nDefines the properties controller for the properties page.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:5"
+        },
+        {
+            "message": "Missing item type\nRemoves a list of properties.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:33"
+        },
+        {
+            "message": "Missing item type\nAdds a property.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:48"
+        },
+        {
+            "message": "Missing item type\nSaves property.",
+            "line": " app/client/admin/js/ovPub/PropertiesController.js:60"
+        },
+        {
+            "message": "Missing item type\nDefines a filter to print status in cells.\n\nThis filter has one optional Number parameter which must be specified\nif the input is equal to 8 (error status), to precise the error code.",
+            "line": " app/client/admin/js/ovPub/PublishApp.js:14"
+        },
+        {
+            "message": "Missing item type\nFilter to print Category in cells.",
+            "line": " app/client/admin/js/ovPub/PublishApp.js:45"
+        },
+        {
+            "message": "Missing item type\nFilter to print Multi Sources Media icon",
+            "line": " app/client/admin/js/ovPub/PublishApp.js:58"
+        },
+        {
+            "message": "Missing item type\nnotEmpty Constraints\n\nIf the parser can't convert the viewValue, the modelValue be undefined.",
+            "line": " app/client/admin/js/ovPub/TimeDirective.js:55"
+        },
+        {
+            "message": "Missing item type\nrange Constraints\n\nThe model value must be greater or equals to zero and can't exceed\nthe max value setted in the attributes.",
+            "line": " app/client/admin/js/ovPub/TimeDirective.js:64"
+        },
+        {
+            "message": "Missing item type\nSet the viewValue on change events",
+            "line": " app/client/admin/js/ovPub/TimeDirective.js:74"
+        },
+        {
+            "message": "Missing item type\nAdd zero below the input's value to match the two digits string pattern\non blur event.",
+            "line": " app/client/admin/js/ovPub/TimeDirective.js:83"
+        }
+    ]
+}
