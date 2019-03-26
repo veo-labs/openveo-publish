@@ -6,6 +6,16 @@
    * Defines the player controller.
    */
   function PlayerController($scope, $window, $location, $sce, $http, mediaService, ovPublishTranslations) {
+    var urlParams = $location.search();
+
+    $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
+    $scope.publishLanguage = ovPublishTranslations[$scope.language] ? angular.copy($scope.language) : 'en';
+
+    var dictionary = ovPublishTranslations[$scope.publishLanguage];
+
+    $scope.availabilityMessage = $sce.trustAsHtml(dictionary['AVAILABILITY_MESSAGE']);
+    $scope.loadingMessage = $sce.trustAsHtml(dictionary['LOADING_MESSAGE']);
+    $scope.defaultTemplate = 'split_50_50';
     $scope.ready = false;
     $scope.autoPlay = false;
 
@@ -29,21 +39,13 @@
      * @param {Object} media The media to play
      */
     function configurePlayer(media) {
-      var urlParams = $location.search();
-
       $scope.data = media;
 
-      $scope.defaultTemplate = 'split_50_50';
       if ($scope.data.metadata) {
         var template = $scope.data.metadata.template || '';
         if (template.match(/^mix-/))
           $scope.defaultTemplate = 'split_1';
       }
-      $scope.language = urlParams['lang'] || navigator.language || navigator.browserLanguage;
-      $scope.publishLanguage = ovPublishTranslations[$scope.language] ? angular.copy($scope.language) : 'en';
-
-      var dictionary = ovPublishTranslations[$scope.publishLanguage];
-      $scope.availabilityMessage = $sce.trustAsHtml(dictionary['AVAILABILITY_MESSAGE']);
 
       if ($scope.data.available || $scope.data.type == 'youtube') {
         $scope.isFullViewport = isParameterTrue(urlParams['fullscreen'], false);

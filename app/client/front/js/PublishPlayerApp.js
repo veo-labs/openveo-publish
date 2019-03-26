@@ -14,11 +14,13 @@
   // Translations
   app.constant('ovPublishTranslations', {
     en: {
-      AVAILABILITY_MESSAGE: 'This media is not yet available on the streaming platform.<br/>Please retry later.'
+      AVAILABILITY_MESSAGE: 'This media is not yet available on the streaming platform.<br/>Please retry later.',
+      LOADING_MESSAGE: 'Video is loading.<br/>Please wait...'
     },
     fr: {
       AVAILABILITY_MESSAGE: 'Cette vidéo n\'est pas encore disponible sur la plateforme vidéo.<br/>' +
-      'Veuillez réessayer plus tard.'
+      'Veuillez réessayer plus tard.',
+      LOADING_MESSAGE: 'La vidéo est en cours de chargement.<br/>Veuillez patienter...'
     }
   });
 

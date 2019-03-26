@@ -3,6 +3,7 @@
 ## BUG FIXES
 
 - Fix 10.0.0 migration script which was failing if a video didn't have indexes
+- Fix message displayed when player is loading, it was saying that the video is not available instead of saying that the video is loading
 
 # 10.0.0 / 2019-03-26
 
