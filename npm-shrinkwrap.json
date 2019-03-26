@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "9.0.1",
+  "version": "10.0.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -64,9 +64,9 @@
       }
     },
     "@openveo/player": {
-      "version": "4.0.0",
-      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-4.0.0.tgz",
-      "integrity": "sha512-txtn7UTFObqqpOpQE2dLv9aUx5hz1K6Jh3LRukBMIgfv+vEuPCWz6/MX5bpAlc9Ph3UZtovuj2+CMfN9+AslhA=="
+      "version": "5.0.0",
+      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-5.0.0.tgz",
+      "integrity": "sha512-1wBKg2JFmJymfMRfKdlD0SN8OQZ1x4hwEmOknFZ8G5uIINutwFYHqU6+nEMrpqDdfiDGV+n+veNTz5DcsVortg=="
     },
     "@openveo/rest-nodejs-client": {
       "version": "3.1.0",

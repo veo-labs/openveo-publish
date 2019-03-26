@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "9.0.1",
+  "version": "10.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
@@ -21,7 +21,7 @@
     "url": "https://github.com/veo-labs/openveo-publish.git"
   },
   "dependencies": {
-    "@openveo/player": "4.*",
+    "@openveo/player": "5.*",
     "angular": "1.5.11",
     "angular-animate": "1.5.11",
     "angular-cookies": "1.5.11",
@@ -75,7 +75,7 @@
     "yuidoc-theme-blue": "0.1.9"
   },
   "peerDependencies": {
-    "@openveo/core": "8.*"
+    "@openveo/core": ">=8.*"
   },
   "scripts": {
     "prepack": "grunt prod",
