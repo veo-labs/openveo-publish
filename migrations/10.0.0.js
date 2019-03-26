@@ -35,7 +35,7 @@ module.exports.update = function(callback) {
 
           // No timecodes
           // Nothing to do
-          if (!media.timecodes) return;
+          if (!media.timecodes || !media.timecodes.length) return;
 
           var videoDirectoryPath = path.join(process.rootPublish, 'assets/player/videos/');
           var mediaPublicDirectoryPath = path.join(videoDirectoryPath, media.id);
@@ -129,7 +129,7 @@ module.exports.update = function(callback) {
 
           // No tags
           // Nothing to do
-          if (!media.tags) return;
+          if (!media.tags || !media.tags.length) return;
 
           var newTags = [];
           media.tags.forEach(function(tag) {

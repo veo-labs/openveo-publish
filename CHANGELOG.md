@@ -1,3 +1,9 @@
+# 10.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix 10.0.0 migration script which was failing if a video didn't have indexes
+
 # 10.0.0 / 2019-03-26
 
 ## BREAKING CHANGES
