@@ -49,6 +49,12 @@
 - **angular** has been upgraded from 1.5.5 to **1.5.11**
 - **@openveo/player** has been upgraded from 4.0.0 to **5.0.0**
 
+# 9.0.2 / 2019-04-18
+
+## BUG FIXES
+
+- Fix server crash when uploading on Youtube failed
+
 # 9.0.1 / 2018-11-16
 
 ## BUG FIXES
