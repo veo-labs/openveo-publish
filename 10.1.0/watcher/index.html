@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Watcher - Openveo Publish</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Watcher";
+    var mkdocs_page_input_path = "watcher.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Openveo Publish</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">INTRODUCTION</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">USERS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../prerequisites/">Prerequisites</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../getting-started/">Getting started</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Watcher</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#introduction">Introduction</a></li>
+    
+
+    <li class="toctree-l3"><a href="#tar-files">tar files</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#session-file">.session file</a></li>
+        
+            <li><a class="toctree-l4" href="#synchroxml-file-deprecated">synchro.xml file (DEPRECATED)</a></li>
+        
+            <li><a class="toctree-l4" href="#list-of-images">List of images</a></li>
+        
+            <li><a class="toctree-l4" href="#video-file">Video file</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l3"><a href="#mp4-files">mp4 files</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../advanced-configuration/">Advanced configuration</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">PLUGINS DEVELOPERS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../pluginsDevelopers/web-service/">Web Service</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../pluginsDevelopers/api/">API</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">PUBLISH DEVELOPERS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../developers/basics/">Basics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/installation/">Installation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/back-end/">Back end AngularJS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/compilation/">CSS / SASS / JS compilation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/unit-tests/">Unit tests</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/end-to-end-tests/">End to end tests</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../developers/api/">API</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Openveo Publish</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>USERS &raquo;</li>
+        
+      
+    
+    <li>Watcher</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/veo-labs/openveo-publish/edit/master/docs/watcher.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="introduction">Introduction</h1>
+<p>The Watcher is capable of listening to some directories specified in <a href="../advanced-configuration/">plugin's configuration</a>.</p>
+<p>Two types of files can be copied in these directories:</p>
+<ul>
+<li><a href="#tar-files">tar files</a></li>
+<li><a href="#mp4-files">mp4 files</a></li>
+</ul>
+<p>Soon after the file has been copied, it will appear in back end catalogue page where all medias are referenced.</p>
+<p><img alt="Back end catalogue video" src="../images/screenshots/back-end-catalogue-video.jpg" /></p>
+<h1 id="tar-files">tar files</h1>
+<p>tar files are used for videos with synchronized images. A valid tar file must contain a <strong>video file</strong>, a <strong>.session</strong> file and a <strong>list of images</strong>.</p>
+<h2 id="session-file">.session file</h2>
+<p><strong>.session</strong> file is used to store information about the package. It is written in JSON format and must contain at least:</p>
+<pre><code class="json">{
+  &quot;filename&quot;: &quot;video.mp4&quot;, // Name of the video file in the package
+  &quot;indexes&quot;: [ // The list of indexes in the video
+    {
+      &quot;type&quot;: &quot;image&quot;, // Index type (could be &quot;image&quot; or &quot;tag&quot;)
+      &quot;timecode&quot;: 0, // Index time (in ms) from the beginning of the video
+      &quot;data&quot;: { // Index data (only for &quot;image&quot; type)
+        &quot;filename&quot;: &quot;slide_00000.jpeg&quot; // The name of the image file in the tar
+      }
+    },
+    {
+      &quot;type&quot;: &quot;tag&quot;, // Index type (could be &quot;image&quot; or &quot;tag&quot;)
+      &quot;timecode&quot;: 3208 // Index time (in ms) from the beginning of the video
+    },
+    ...
+  ]
+}
+</code></pre>
+
+<p>It can contain some optional properties:</p>
+<pre><code class="json">{
+  &quot;date&quot;: 1425916390, // The date the video was recorded (in Unix epoch time)
+  &quot;rich-media&quot;: true, // true to indicates that video has associated images (&quot;indexes&quot; property must be present)
+  &quot;indexes&quot;: [  // An array specifying a list of timecodes, their own type and data associated.
+    {
+      &quot;timecode&quot;: 0, // timecode in ms
+      &quot;type&quot;: &quot;image&quot;, // timecode type (must be &quot;image&quot; or &quot;tag&quot;)
+      &quot;data&quot;: {  // related information to image timecode
+        &quot;filename&quot;: &quot;slide_00000.jpeg&quot; // filename of image timecode
+      }
+    },
+    {
+      &quot;timecode&quot;: 9500, // timecode in ms
+      &quot;type&quot;: &quot;tag&quot;, // timecode type (must be &quot;image&quot; or &quot;tag&quot;)
+      &quot;data&quot;: { // Optional - related information for tag timecode
+        &quot;tagname&quot;: &quot;Very important moment&quot; // tagname to display, if not defined, will be replaced by 'Tag N' where N is the number of the tag
+      }
+    },
+    ...
+  ]
+}
+</code></pre>
+
+<p>"indexes" property is used to map each video timecode to an image or a tag and must be present if <strong>rich-media</strong> property is set to "true". In this example:</p>
+<ul>
+<li>at time <strong>0ms</strong>, image <strong>slide_00000.jpeg</strong> will be displayed (<strong>slide_00000.jpeg</strong> file must be present in the package)</li>
+<li>a chapter named "<strong>Very important moment</strong>" will be created and will redirect video at time <strong>9500ms</strong>.</li>
+</ul>
+<p><strong>Nb:</strong> All extra properties are kept but won't be used directly by Publish.</p>
+<h2 id="synchroxml-file-deprecated">synchro.xml file <strong>(DEPRECATED)</strong></h2>
+<p><strong> The use of this file is deprecated.
+This file is used only if indexes information are not in .session file.</strong></p>
+<p><strong>synchro.xml</strong> file is used to map each images to a video timecode. If <strong>rich-media</strong> property is set to "true" in <strong>.session</strong> file, <strong>synchro.xml</strong> file must be present.</p>
+<p>It is written in XML format and must respect the following structure:</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;player&gt;
+
+  &lt;!-- At time 0ms, image slide_00000.jpeg must be displayed (slide_00000.jpeg must be present in the package) --&gt;
+  &lt;synchro id=&quot;slide_00000.jpeg&quot; timecode=&quot;0&quot;/&gt;
+
+  &lt;!-- At time 1400ms, image slide_00001.jpeg must be displayed (slide_00001.jpeg must be present in the package) --&gt;
+  &lt;synchro id=&quot;slide_00001.jpeg&quot; timecode=&quot;1400&quot;/&gt;
+
+  &lt;!-- At time 9500ms, image slide_00002.jpeg must be displayed (slide_00002.jpeg must be present in the package) --&gt;
+  &lt;synchro id=&quot;slide_00002.jpeg&quot; timecode=&quot;9500&quot;/&gt;
+
+&lt;/player&gt;
+</code></pre>
+
+<h2 id="list-of-images">List of images</h2>
+<p>A list of images to synchronize with the video as defined in <strong>.session</strong> file.</p>
+<h2 id="video-file">Video file</h2>
+<p>An mp4 file corresponding to the one specified by property <strong>filename</strong> in <strong>.session</strong> file.</p>
+<h1 id="mp4-files">mp4 files</h1>
+<p>If your video doesn't have associated images, a simple mp4 file will be enough.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../advanced-configuration/" class="btn btn-neutral float-right" title="Advanced configuration">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/veo-labs/openveo-publish/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../advanced-configuration/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
