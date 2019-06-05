@@ -1,4 +1,4 @@
-# 10.1.0 / YYYY-MM-DD
+# 10.1.0 / 2019-06-05
 
 ## DEPENDENCIES
 
