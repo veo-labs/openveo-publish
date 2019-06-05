@@ -1,3 +1,9 @@
+# 10.1.0 / YYYY-MM-DD
+
+## DEPENDENCIES
+
+- **@openveo/player** has been upgraded from 5.0.0 to **5.0.1**
+
 # 10.0.1 / 2019-03-26
 
 ## BUG FIXES

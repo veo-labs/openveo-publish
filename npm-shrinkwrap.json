@@ -64,9 +64,9 @@
       }
     },
     "@openveo/player": {
-      "version": "5.0.0",
-      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-5.0.0.tgz",
-      "integrity": "sha512-1wBKg2JFmJymfMRfKdlD0SN8OQZ1x4hwEmOknFZ8G5uIINutwFYHqU6+nEMrpqDdfiDGV+n+veNTz5DcsVortg=="
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-5.0.1.tgz",
+      "integrity": "sha512-6p+6kXm9o4ifAKGCw64N9BnMXo1V3kYRdxdG8oojncuUtQ74N4CsOmnvm4/QapKNAtC5AXcuuwO8y9ySVNz1mw=="
     },
     "@openveo/rest-nodejs-client": {
       "version": "3.1.0",
