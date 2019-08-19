@@ -22,6 +22,7 @@ describe('VideoController', function() {
   var expectedMedias;
   var expectedProperties;
   var expectedGroups;
+  var expectedUser;
   var expectedFiles;
   var expectedCategories;
   var expectedPagination;
@@ -65,6 +66,7 @@ describe('VideoController', function() {
   beforeEach(function() {
     plugins = [];
     expectedGroups = [];
+    expectedUser = null;
     expectedMedias = [];
     expectedProperties = [];
     expectedPagination = {};
@@ -213,6 +215,11 @@ describe('VideoController', function() {
         getAll: function(filter, fields, sort, callback) {
           callback(null, expectedGroups);
         }
+      },
+      userProvider: {
+        getOne: chai.spy(function(filter, fields, callback) {
+          callback(null, expectedUser);
+        })
       },
       getSuperAdminId: function() {
         return '1';
@@ -914,7 +921,7 @@ describe('VideoController', function() {
     var publishManagerListener;
 
     beforeEach(function() {
-
+      expectedUser = '42';
       MultipartParser.prototype.parse = function(callback) {
         request.files = {
           file: [
@@ -951,11 +958,50 @@ describe('VideoController', function() {
         description: 'Description',
         groups: [],
         category: null,
-        platform: TYPES.LOCAL
+        platform: TYPES.LOCAL,
+        user: expectedUser
       });
     });
 
     it('should add a media with an attached video', function(done) {
+      var expectedInfo;
+      var expectedGroupId = '42';
+      var expectedCategoryId = '43';
+
+      expectedGroups = [
+        {
+          id: expectedGroupId
+        }
+      ];
+      expectedCategories = [
+        {
+          id: expectedCategoryId
+        }
+      ];
+      expectedProperties = [
+        {
+          id: 'property1',
+          name: 'Property 1',
+          description: 'Property 1 description',
+          type: PropertyProvider.TYPES.TEXT
+        }
+      ];
+
+      expectedInfo = {
+        properties: {
+          property1: 'value1'
+        },
+        title: 'Title',
+        date: Date.now(),
+        leadParagraph: 'Lead paragraph',
+        description: 'Description',
+        groups: [expectedGroupId],
+        category: expectedCategoryId,
+        platform: TYPES.LOCAL,
+        user: expectedUser
+      };
+      request.body.info = JSON.stringify(expectedInfo);
+
       MultipartParser.prototype.parse = function(callback) {
         assert.deepInclude(expectedFiles, {
           name: 'file',
@@ -995,8 +1041,57 @@ describe('VideoController', function() {
 
       response.send = function(data) {
         assert.equal(data.id, expectedMediaId, 'Wrong media id');
+        PublishManager.publish.should.have.been.called.exactly(1);
         done();
       };
+
+      PublishManager.publish = chai.spy(function(videoPackage) {
+        assert.equal(videoPackage.title, expectedInfo.title, 'Wrong title');
+        assert.equal(videoPackage.date, expectedInfo.date, 'Wrong date');
+        assert.equal(videoPackage.leadParagraph, expectedInfo.leadParagraph, 'Wrong lead paragraph');
+        assert.equal(videoPackage.description, expectedInfo.description, 'Wrong description');
+        assert.deepEqual(videoPackage.groups, [expectedGroupId], 'Wrong groups');
+        assert.equal(videoPackage.category, expectedCategoryId, 'Wrong category');
+        assert.equal(videoPackage.user, expectedUser, 'Wrong owner');
+        assert.equal(videoPackage.type, expectedInfo.platform, 'Wrong platform');
+        assert.deepEqual(videoPackage.properties, expectedInfo.properties, 'Wrong properties');
+        assert.equal(videoPackage.originalPackagePath, request.files.file[0].path, 'Wrong original package path');
+        assert.equal(
+          videoPackage.originalFileName,
+          path.parse(request.files.file[0].path).name,
+          'Wrong original file name'
+        );
+        videoPackage.id = expectedMediaId;
+        publishManagerListener(videoPackage);
+      });
+
+      videoController.addEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should set video owner to the authenticated user if owner is not specified', function(done) {
+      request.body.info = JSON.stringify({
+        properties: {},
+        title: 'Title',
+        date: Date.now(),
+        leadParagraph: 'Lead paragraph',
+        description: 'Description',
+        groups: [],
+        category: null,
+        platform: TYPES.LOCAL
+      });
+
+      response.send = function(data) {
+        PublishManager.publish.should.have.been.called.exactly(1);
+        done();
+      };
+
+      PublishManager.publish = chai.spy(function(videoPackage) {
+        assert.equal(videoPackage.user, request.user.id, 'Wrong user');
+        videoPackage.id = expectedMediaId;
+        publishManagerListener(videoPackage);
+      });
 
       videoController.addEntityAction(request, response, function(error) {
         assert.ok(false, 'Unexpected call to next function');
@@ -1260,22 +1355,77 @@ describe('VideoController', function() {
       });
     });
 
-    it('should set owner to super administrator if request comes from the web service', function(done) {
-      request.user.type = 'oAuthClient';
+    it('should set owner to super administrator if request comes from the web service and no owner is specified',
+      function(done) {
+        request.user.type = 'oAuthClient';
+
+        request.body.info = JSON.stringify({
+          properties: {},
+          title: 'Title',
+          date: Date.now(),
+          leadParagraph: 'Lead paragraph',
+          description: 'Description',
+          groups: [],
+          category: null,
+          platform: TYPES.LOCAL
+        });
+
+        response.send = function(data) {
+          PublishManager.publish.should.have.been.called.exactly(1);
+          done();
+        };
+
+        PublishManager.publish = chai.spy(function(videoPackage) {
+          assert.equal(videoPackage.user, process.api.getCoreApi().getSuperAdminId(), 'Wrong user');
+          videoPackage.id = expectedMediaId;
+          publishManagerListener(videoPackage);
+        });
+
+        videoController.addEntityAction(request, response, function(error) {
+          assert.ok(false, 'Unexpected call to next function');
+        });
+      }
+    );
+
+    it('should execute next function with an error if specified user does not exist', function(done) {
+      expectedUser = null;
 
       response.send = function(data) {
-        PublishManager.publish.should.have.been.called.exactly(1);
-        done();
+        assert.ok(false, 'Unexpected response');
       };
 
-      PublishManager.publish = chai.spy(function(videoPackage) {
-        assert.equal(videoPackage.user, process.api.getCoreApi().getSuperAdminId(), 'Wrong user');
-        videoPackage.id = expectedMediaId;
-        publishManagerListener(videoPackage);
+      request.body.info = JSON.stringify({
+        title: 'Title',
+        user: '42'
       });
 
       videoController.addEntityAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected call to next function');
+        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_WRONG_USER_PARAMETER, 'Wrong error');
+        coreApi.userProvider.getOne.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should execute next function with an error if verifying owner failed', function(done) {
+      expectedUser = '42';
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected response');
+      };
+
+      request.body.info = JSON.stringify({
+        title: 'Title',
+        user: expectedUser
+      });
+
+      coreApi.userProvider.getOne = chai.spy(function(filter, fields, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      videoController.addEntityAction(request, response, function(error) {
+        assert.equal(error, HTTP_ERRORS.ADD_MEDIA_VERIFY_OWNER_ERROR, 'Wrong error');
+        coreApi.userProvider.getOne.should.have.been.called.exactly(1);
+        done();
       });
     });
 

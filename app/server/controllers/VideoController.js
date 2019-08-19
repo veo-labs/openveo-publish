@@ -444,6 +444,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
  * @param {String} [request.body.info.description] The media description
  * @param {Array} [request.body.info.groups] The media content groups it belongs to
  * @param {String} [request.body.info.platform] The platform to upload the file to
+ * @param {String} [request.body.info.user] The id of the OpenVeo user to use as the video owner
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
@@ -611,7 +612,8 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
             date: {type: 'number', default: Date.now()},
             leadParagraph: {type: 'string'},
             description: {type: 'string'},
-            groups: {type: 'array<string>', in: groupsIds}
+            groups: {type: 'array<string>', in: groupsIds},
+            user: {type: 'string'}
           };
 
           if (request.body.info.category)
@@ -628,6 +630,23 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
         }
 
         callback();
+      },
+
+      // Make sure that user exists
+      function(callback) {
+        if (!params.user) return callback();
+
+        coreApi.userProvider.getOne(new ResourceFilter().equal('id', params.user), null, function(error, fetchedUser) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_VERIFY_OWNER_ERROR);
+          } else if (!fetchedUser) {
+            process.logger.error('User "' + params.user + '" does not exist', {method: 'addEntityAction'});
+            return callback(HTTP_ERRORS.ADD_MEDIA_WRONG_USER_PARAMETER);
+          }
+
+          callback();
+        });
       },
 
       // Add new media
@@ -656,7 +675,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           description: params.description,
           category: params.category,
           groups: params.groups,
-          user: request.user.type === 'oAuthClient' ? coreApi.getSuperAdminId() : request.user.id,
+          user: params.user || (request.user.type === 'oAuthClient' ? coreApi.getSuperAdminId() : request.user.id),
           properties: request.body.info.properties,
           packageType: mediaPackageType,
           type: params.platform

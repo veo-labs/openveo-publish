@@ -1,3 +1,9 @@
+# 10.2.0 / YYYY-MM-DD
+
+## NEW FEATURES
+
+- Web service endpoint POST /videos now accepts a info.user parameter to specify the owner of the video that will be used instead of the super administrator
+
 # 10.1.0 / 2019-06-05
 
 ## DEPENDENCIES

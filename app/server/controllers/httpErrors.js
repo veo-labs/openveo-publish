@@ -666,6 +666,20 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Adding media failed when verifying the owner.
+   *
+   * @property ADD_MEDIA_VERIFY_OWNER_ERROR
+   * @type Object
+   * @final
+   * @default 46
+   */
+  ADD_MEDIA_VERIFY_OWNER_ERROR: {
+    code: 0x02e,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -1399,6 +1413,20 @@ var HTTP_ERRORS = {
    */
   SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS: {
     code: 0x228,
+    httpCode: 400,
+    module: 'publish'
+  },
+
+  /**
+   * Adding media failed, specified user does not exist.
+   *
+   * @property ADD_MEDIA_WRONG_USER_PARAMETER
+   * @type Object
+   * @final
+   * @default 553
+   */
+  ADD_MEDIA_WRONG_USER_PARAMETER: {
+    code: 0x229,
     httpCode: 400,
     module: 'publish'
   },

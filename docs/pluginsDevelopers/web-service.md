@@ -281,6 +281,7 @@ info.leadParagraph | String | No | - | The video lead paragraph
 info.description | String | No | - | The video description
 info.groups | Array | No | - | The list of content groups (ids) the video belongs to
 info.platform | String | No | - | The platform to upload the file to. If no platform is specified the video will be in "*Waiting for upload*" state. Platform could be one of the platforms defined in *videoPlatformConf.json* configuration file (either **vimeo**, **wowza**, **youtube** or **local**)
+info.user | String | No | - | The id of the OpenVeo user to use as the video owner (default is the super admin id)
 
 HTTP Status Code | Details
 ---- | ----
