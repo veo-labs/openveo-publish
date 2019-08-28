@@ -109,8 +109,6 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
  *   - **Object** Information about the media
  */
 WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
-  var self = this;
-
   if (!mediaIds) {
     callback(new Error('media id should be defined'), null);
     return;
@@ -119,19 +117,18 @@ WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
   var infos = {sources: [], available: true};
   mediaIds.forEach(function(mediaId) {
     var info = {};
-    var basePath = self.conf.streamPath + '/' + mediaId;
     info.adaptive = [
       {
         mimeType: 'application/dash+xml',
-        link: basePath + '.mp4/manifest.mpd'
+        link: mediaId + '.mp4/manifest.mpd'
       },
       {
         mimeType: 'application/x-mpegURL',
-        link: basePath + '.mp4/playlist.m3u8'
+        link: mediaId + '.mp4/playlist.m3u8'
       },
       {
         mimeType: 'application/f4m+xml',
-        link: basePath + '.mp4/manifest.f4m'
+        link: mediaId + '.mp4/manifest.f4m'
       }
     ];
     infos.sources.push(info);

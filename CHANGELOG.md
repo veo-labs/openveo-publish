@@ -1,3 +1,9 @@
+# 10.2.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix Wowza videos playing after changing property streamPath in videoPlatformConf.json file, the old base path was used instead of the new one
+
 # 10.2.0 / 2019-08-23
 
 ## NEW FEATURES

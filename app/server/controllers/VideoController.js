@@ -7,6 +7,7 @@
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
+var url = require('url');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var coreApi = process.api.getCoreApi();
@@ -52,6 +53,8 @@ util.inherits(VideoController, ContentController);
  */
 function resolveResourcesUrls(medias) {
   var cdnUrl = coreApi.getCdnUrl();
+  var wowzaStreamPath = platforms[TYPES.WOWZA] && platforms[TYPES.WOWZA].streamPath &&
+      url.format(url.parse(platforms[TYPES.WOWZA].streamPath));
   var removeFirstSlashRegExp = new RegExp(/^\//);
 
   if (medias && medias.length) {
@@ -89,6 +92,18 @@ function resolveResourcesUrls(medias) {
             source.files.forEach(function(file) {
               if (file.link)
                 file.link = cdnUrl + file.link.replace(removeFirstSlashRegExp, '');
+            });
+          }
+        });
+      }
+
+      // Wowza videos links are relative to the streamPath defined in configuration
+      if (media.type === TYPES.WOWZA && media.sources) {
+        media.sources.forEach(function(source) {
+          if (source.adaptive) {
+            source.adaptive.forEach(function(adaptiveSource) {
+              if (adaptiveSource.link)
+                adaptiveSource.link = wowzaStreamPath + adaptiveSource.link;
             });
           }
         });

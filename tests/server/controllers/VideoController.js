@@ -183,7 +183,9 @@ describe('VideoController', function() {
       local: true,
       vimeo: true,
       youtube: true,
-      wowza: true
+      wowza: {
+        streamPath: 'https://wowza.local/'
+      }
     };
 
     publishConf = {
@@ -634,6 +636,41 @@ describe('VideoController', function() {
       });
     });
 
+    it('should resolve Wowza media links', function(done) {
+      var expectedSourceUri = 'media/manifest.mpd';
+      expectedMedias = [
+        {
+          id: 42,
+          type: TYPES.WOWZA,
+          state: STATES.PUBLISHED,
+          sources: [
+            {
+              adaptive: [
+                {
+                  link: expectedSourceUri
+                }
+              ]
+            }
+          ]
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      response.send = function(data) {
+        assert.strictEqual(
+          data.entity.sources[0].adaptive[0].link,
+          videoPlatformConf.wowza.streamPath + expectedSourceUri,
+          'Wrong source link'
+        );
+        done();
+      };
+
+      videoController.getVideoReadyAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
   });
 
   describe('getEntityAction', function() {
@@ -871,6 +908,41 @@ describe('VideoController', function() {
         assert.strictEqual(
           data.entity.sources[0].files[0].link,
           coreApi.getCdnUrl() + expectedSourceUri,
+          'Wrong source link'
+        );
+        done();
+      };
+
+      videoController.getEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
+    it('should resolve Wowza media links', function(done) {
+      var expectedSourceUri = 'media-id/manifest.mpd';
+      expectedMedias = [
+        {
+          id: 42,
+          type: TYPES.WOWZA,
+          state: STATES.PUBLISHED,
+          sources: [
+            {
+              adaptive: [
+                {
+                  link: expectedSourceUri
+                }
+              ]
+            }
+          ]
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      response.send = function(data) {
+        assert.strictEqual(
+          data.entity.sources[0].adaptive[0].link,
+          videoPlatformConf.wowza.streamPath + expectedSourceUri,
           'Wrong source link'
         );
         done();
@@ -2429,6 +2501,7 @@ describe('VideoController', function() {
       var expectedLargeImageUri = 'largeImageUri';
       var expectedTagFileUri = 'tagFileUri';
       var expectedSourceUri = 'sourceUri';
+      var expectedAdaptiveSourceUri = 'media-id/manifest.mpd';
       var expectedThumbnailUri = 'thumbnailUri';
       expectedMedias = [
         {
@@ -2465,6 +2538,19 @@ describe('VideoController', function() {
             }
           ],
           thumbnail: expectedThumbnailUri
+        },
+        {
+          id: 43,
+          type: TYPES.WOWZA,
+          sources: [
+            {
+              adaptive: [
+                {
+                  link: expectedAdaptiveSourceUri
+                }
+              ]
+            }
+          ]
         }
       ];
 
@@ -2493,6 +2579,11 @@ describe('VideoController', function() {
           data.entities[0].sources[0].files[0].link,
           coreApi.getCdnUrl() + expectedSourceUri,
           'Wrong source link'
+        );
+        assert.strictEqual(
+          data.entities[1].sources[0].adaptive[0].link,
+          videoPlatformConf.wowza.streamPath + expectedAdaptiveSourceUri,
+          'Wrong adaptive source link'
         );
         done();
       };
