@@ -25,7 +25,7 @@ module.exports.update = function(callback) {
       videoProvider.getAll(
         null,
         {
-          include: ['id', 'sources']
+          include: ['id', 'sources', 'type']
         },
         {
           id: 'desc'
