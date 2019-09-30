@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js - OpenVeo Publish server</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish server</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 10.2.1
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/ConfigurationController.html">ConfigurationController</a></li>
+                                <li><a href="../classes/DirectoryFsWatcher.html">DirectoryFsWatcher</a></li>
+                                <li><a href="../classes/DirectoryWatcher.html">DirectoryWatcher</a></li>
+                                <li><a href="../classes/ERRORS.html">ERRORS</a></li>
+                                <li><a href="../classes/factory.html">factory</a></li>
+                                <li><a href="../classes/GoogleOAuthHelper.html">GoogleOAuthHelper</a></li>
+                                <li><a href="../classes/HTTP_ERRORS.html">HTTP_ERRORS</a></li>
+                                <li><a href="../classes/listener.html">listener</a></li>
+                                <li><a href="../classes/LocalProvider.html">LocalProvider</a></li>
+                                <li><a href="../classes/mediaPlatformFactory.html">mediaPlatformFactory</a></li>
+                                <li><a href="../classes/MediaPlatformProvider.html">MediaPlatformProvider</a></li>
+                                <li><a href="../classes/Package.html">Package</a></li>
+                                <li><a href="../classes/PackageError.html">PackageError</a></li>
+                                <li><a href="../classes/PropertyController.html">PropertyController</a></li>
+                                <li><a href="../classes/PropertyProvider.html">PropertyProvider</a></li>
+                                <li><a href="../classes/PUBLISH_HOOKS.html">PUBLISH_HOOKS</a></li>
+                                <li><a href="../classes/PublishError.html">PublishError</a></li>
+                                <li><a href="../classes/PublishManager.html">PublishManager</a></li>
+                                <li><a href="../classes/PublishPlugin.html">PublishPlugin</a></li>
+                                <li><a href="../classes/PublishPluginApi.html">PublishPluginApi</a></li>
+                                <li><a href="../classes/ResumableUpload.html">ResumableUpload</a></li>
+                                <li><a href="../classes/STATES.html">STATES</a></li>
+                                <li><a href="../classes/StatisticsController.html">StatisticsController</a></li>
+                                <li><a href="../classes/TarPackage.html">TarPackage</a></li>
+                                <li><a href="../classes/TarPackageError.html">TarPackageError</a></li>
+                                <li><a href="../classes/TlsClient.html">TlsClient</a></li>
+                                <li><a href="../classes/TlsProvider.html">TlsProvider</a></li>
+                                <li><a href="../classes/TYPES.html">TYPES</a></li>
+                                <li><a href="../classes/VideoController.html">VideoController</a></li>
+                                <li><a href="../classes/VideoPackage.html">VideoPackage</a></li>
+                                <li><a href="../classes/VideoPackageError.html">VideoPackageError</a></li>
+                                <li><a href="../classes/VideoProvider.html">VideoProvider</a></li>
+                                <li><a href="../classes/VimeoProvider.html">VimeoProvider</a></li>
+                                <li><a href="../classes/Watcher.html">Watcher</a></li>
+                                <li><a href="../classes/WatcherError.html">WatcherError</a></li>
+                                <li><a href="../classes/WowzaProvider.html">WowzaProvider</a></li>
+                                <li><a href="../classes/YoutubeProvider.html">YoutubeProvider</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/controllers.html">controllers</a></li>
+                                <li><a href="../modules/packages.html">packages</a></li>
+                                <li><a href="../modules/providers.html">providers</a></li>
+                                <li><a href="../modules/publish.html">publish</a></li>
+                                <li><a href="../modules/watcher.html">watcher</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: app/server/providers/mediaPlatforms/youtube/YoutubeProvider.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+/**
+ * @module providers
+ */
+
+var fs = require(&#x27;fs&#x27;);
+var util = require(&#x27;util&#x27;);
+var mime = require(&#x27;mime&#x27;);
+var async = require(&#x27;async&#x27;);
+var google = require(&#x27;googleapis&#x27;);
+var youtube = google.youtube(&#x27;v3&#x27;);
+var YoutubeResumableUpload = process.requirePublish(
+  &#x27;app/server/providers/mediaPlatforms/youtube/YoutubeResumableUpload.js&#x27;
+);
+var MediaPlatformProvider = process.requirePublish(&#x27;app/server/providers/mediaPlatforms/MediaPlatformProvider.js&#x27;);
+
+/**
+ * Available upload methods.
+ *
+ * @property UPLOAD_METHODS
+ * @type Array
+ * @private
+ * @final
+ */
+var UPLOAD_METHODS = [&#x27;uploadClassic&#x27;, &#x27;uploadResumable&#x27;];
+Object.freeze(UPLOAD_METHODS);
+
+/**
+ * Available privacy statuses.
+ *
+ * @property PRIVACY_STATUSES
+ * @type Array
+ * @private
+ * @final
+ */
+var PRIVACY_STATUSES = [&#x27;public&#x27;, &#x27;private&#x27;, &#x27;unlisted&#x27;];
+Object.freeze(PRIVACY_STATUSES);
+
+/**
+ * Defines a YoutubeProvider class to interact with [youtube platform](https://youtube.com/).
+ *
+ * @class YoutubeProvider
+ * @extends MediaPlatformProvider
+ * @constructor
+ * @param {Object} providerConf A youtube configuration object
+ * @param {String} providerConf.uploadMethod The upload method to use (see UPLOAD_METHODS)
+ * @param {String} providerConf.privacy The media privacy on Youtube (see PRIVACY_STATUSES)
+ * @param {GoogleOAuthHelper} googleOAuthHelper The Google OAuth helper
+ */
+function YoutubeProvider(providerConf, googleOAuthHelper) {
+  YoutubeProvider.super_.call(this, providerConf);
+
+  Object.defineProperties(this, {
+
+    /**
+     * Youtube upload method, uploadClassic or uploadResumable.
+     *
+     * @property uploadMethod
+     * @type String
+     */
+    uploadMethod: {
+      value: UPLOAD_METHODS.indexOf(this.conf.uploadMethod) &gt; -1 ? this.conf.uploadMethod : &#x27;uploadClassic&#x27;
+    },
+
+    /**
+     * Privacy to apply to uploaded medias either public, private or unlisted.
+     *
+     * @property privacy
+     * @type String
+     */
+    privacy: {
+      value: PRIVACY_STATUSES.indexOf(this.conf[&#x27;privacy&#x27;]) &gt; -1 ? this.conf[&#x27;privacy&#x27;] : &#x27;public&#x27;
+    },
+
+    /**
+     * The Google OAuth Helper to use to connect to Google APIs.
+     *
+     * @property googleOAuthHelper
+     * @type GoogleOAuthHelper
+     */
+    googleOAuthHelper: {value: googleOAuthHelper}
+
+  });
+}
+
+module.exports = YoutubeProvider;
+util.inherits(YoutubeProvider, MediaPlatformProvider);
+
+/**
+ * Youtube category ids.
+ *
+ * @property CATEGORIES
+ * @type Object
+ * @static
+ * @final
+ */
+YoutubeProvider.CATEGORIES = {
+  EDUCATION: 27
+};
+Object.freeze(YoutubeProvider.CATEGORIES);
+
+/**
+ * Uploads a media to the Youtube platform.
+ *
+ * @method upload
+ * @async
+ * @param {String} mediaFilePath The absolute path of the media to upload
+ * @param {Function} callback The function to call when it&#x27;s done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **String** The media id on the Youtube platform
+ */
+YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
+  var uploadParams = {
+    resource: {
+      snippet: {
+        title: &#x27;Media name&#x27;,
+        description: &#x27;Media description&#x27;,
+        categoryId: YoutubeProvider.CATEGORIES.EDUCATION
+      },
+      status: {
+        privacyStatus: this.privacy
+      }
+    }
+  };
+  uploadParams.part = ([&#x27;id&#x27;].concat(Object.keys(uploadParams.resource))).join(&#x27;,&#x27;);
+  this[this.uploadMethod](mediaFilePath, uploadParams, callback);
+};
+
+/**
+ * Uploads to Youtube in the classic way, using Youtube API.
+ *
+ * @method uploadClassic
+ * @async
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {Function} callback callback function with:
+ *  - **Error** The error if an error occurred, null otherwise
+ *  - **String** The media id on the Youtube platform
+ */
+YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, callback) {
+  var self = this;
+  var mediaId;
+  var media = fs.createReadStream(mediaFilePath);
+
+  uploadParams.media = {
+    mediaType: mime.lookup(mediaFilePath),
+    body: media
+  };
+
+  async.series([
+
+    // Check auth
+    function(callback) {
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        self.googleOAuthHelper.oauth2Client.setCredentials(token);
+        callback();
+      });
+    },
+
+    // Upload media
+    function(callback) {
+      uploadParams.auth = self.googleOAuthHelper.oauth2Client;
+      youtube.videos.insert(uploadParams, function(error, response) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        mediaId = response.id;
+        callback();
+      });
+
+    }
+  ], function(error) {
+    callback(error, mediaId);
+  });
+
+};
+
+
+/**
+ * Uploads to Youtube in a fail safe way, using resumable uploads.
+ *
+ * The upload can fail 3 times before failing globally, each times it fails it perform an upload again starting where
+ * it previously failed (ie: not re-uploading all the media)
+ *
+ * @method uploadResumable
+ * @async
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {Function} callback callback function with:
+ *  - **Error** The error if an error occurred, null otherwise
+ *  - **String** The uploaded media id
+ */
+YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams, callback) {
+  var self = this;
+  var mediaId;
+  var stats;
+
+  async.series([
+
+    // Check auth
+    function(callback) {
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        uploadParams.auth = token;
+        callback();
+      });
+    },
+
+    // Get file size
+    function(callback) {
+      fs.stat(mediaFilePath, function(error, fileStats) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        stats = fileStats;
+        callback();
+      });
+    },
+
+    // Upload media
+    function(callback) {
+      if (!uploadParams.hasOwnProperty(&#x27;auth&#x27;) || !uploadParams.auth) {
+        callback(new Error(&#x27;Auth has not been set correctly&#x27;));
+        return;
+      }
+      var resumableUpload = new YoutubeResumableUpload();
+
+      resumableUpload.tokens = uploadParams.auth;
+      resumableUpload.filepath = mediaFilePath;
+      resumableUpload.stats = stats;
+      resumableUpload.metadata = uploadParams.resource;
+      resumableUpload.retry = 3;
+
+      resumableUpload.on(&#x27;progress&#x27;, function(progress) {
+        process.logger.debug(&#x27;Upload progress&#x27;, progress);
+      });
+      resumableUpload.on(&#x27;error&#x27;, function(error) {
+        process.logger.error(&#x27;Upload error&#x27;, error &amp;&amp; error.message);
+        if (resumableUpload.retry === 0) {
+          callback(error);
+        }
+      });
+      resumableUpload.on(&#x27;success&#x27;, function(media) {
+        media = JSON.parse(media);
+        mediaId = media.id;
+        callback();
+      });
+      resumableUpload.upload();
+    }
+  ], function(error) {
+    callback(error, mediaId);
+  });
+
+};
+
+/**
+ * Gets information about a media hosted by Youtube.
+ *
+ * @method getMediaInfo
+ * @async
+ * @param {String} mediaId The Youtube id of the media
+ * @param {Function} callback The function to call when it&#x27;s done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** Information about the media
+ */
+YoutubeProvider.prototype.getMediaInfo = function(mediaId, definition, callback) {
+  if (!mediaId) {
+    callback(new Error(&#x27;media id should be defined&#x27;), null);
+    return;
+  }
+
+  // sources and pictures are not necessary: youtube player manage its own data
+  callback(null, {available: true, sources: [], pictures: [], mediaId: mediaId});
+};
+
+/**
+ * Removes a media from the Youtube platform.
+ *
+ * @method remove
+ * @async
+ * @param {Array} mediaIds Youtube media ids to remove
+ * @param {Function} callback The function to call when it&#x27;s done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+YoutubeProvider.prototype.remove = function(mediaIds, callback) {
+  var self = this;
+
+  if (!mediaIds) {
+    callback(new Error(&#x27;media id should be defined&#x27;), null);
+    return;
+  }
+  var series = [];
+
+  series.push(function(callback) {
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
+      callback();
+    });
+  });
+
+  mediaIds.forEach(function(mediaId) {
+    series.push(function(callback) {
+      var deleteParam = {
+        id: mediaId,
+        part: &#x27;id&#x27;
+      };
+      deleteParam.auth = self.googleOAuthHelper.oauth2Client;
+      youtube.videos.delete(deleteParam, function(error) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        callback();
+      });
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * Updates a media resources on the platform.
+ *
+ * If media has several resources on the platform, the same update will be performed for all resources.
+ * Actually only the media title is synchronized with Youtube.
+ *
+ * @method update
+ * @async
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The datas to update
+ * @param {String} [data.title] The media title. Be careful only the first 100 characters will be used, also
+ * &quot;less than&quot; and &quot;greater than&quot; characters will be removed
+ * @param {Boolean} force true to force the update even if title hasn&#x27;t changed, false otherwise
+ * @param {Function} callback The function to call when it&#x27;s done
+ *   - **Error** The error if an error occurred, null otherwise
+ */
+YoutubeProvider.prototype.update = function(media, data, force, callback) {
+  if (!data.title || (data.title === media.title &amp;&amp; !force)) return callback();
+
+  var self = this;
+  var series = [];
+
+  series.push(function(callback) {
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
+      callback();
+    });
+  });
+
+  media.mediaId.forEach(function(mediaId) {
+    series.push(function(callback) {
+      youtube.videos.update({
+        part: &#x27;snippet&#x27;,
+        auth: self.googleOAuthHelper.oauth2Client,
+        resource: {
+          id: mediaId,
+          snippet: {
+            title: data.title.substring(0, 100).replace(/&lt;|&gt;/g, &#x27;&#x27;),
+            categoryId: YoutubeProvider.CATEGORIES.EDUCATION
+          }
+        }
+      }, callback);
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
