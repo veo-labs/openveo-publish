@@ -129,7 +129,7 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
  * @method getMediaInfo
  * @async
  * @param {String} mediaId The Vimeo id of the media
- * @param {String} expectedDefintion The expected media definition
+ * @param {Number} expectedDefintion The expected media definition
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  *   - **Object** Information about the media
@@ -172,8 +172,8 @@ VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
                 // definitions have been transcoded
                 // Set the media as "available" as soon as the expected definition has been transcoded
                 // If media height is not standard, Vimeo eventually change its definition to something close, thus
-                // we add a factor error of 64 to deal with those cases
-                if (Math.abs(file.height - expectedDefinition) < 64)
+                // we add a factor error of 22% of the expected definition to deal with those cases
+                if (Math.abs(file.height - expectedDefinition) < (expectedDefinition * 0.22))
                   available = true;
               }
             }

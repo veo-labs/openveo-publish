@@ -3,6 +3,7 @@
 ## BUG FIXES
 
 - Fix migration script 10.0.0 which caused the ugrade to hang
+- Fix videos blocked with message "This media is not yet available on the streaming platform. Please retry later."
 
 # 10.2.2 / 2019-09-30
 
