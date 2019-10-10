@@ -103,7 +103,7 @@ module.exports.update = function(callback) {
           });
         });
 
-        async.parallel(asyncActions, callback);
+        async.series(asyncActions, callback);
       });
     },
 
