@@ -71,7 +71,7 @@
     "mocha": "5.2.0",
     "mock-require": "3.0.2",
     "pre-commit": "1.2.2",
-    "tinymce": "4.8.4",
+    "tinymce": "4.9.7",
     "yuidoc-theme-blue": "0.1.9"
   },
   "peerDependencies": {
