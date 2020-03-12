@@ -2,6 +2,7 @@
 
 ## BREAKING CHANGES
 
+- Drop support for NodeJS &lt; 12.4.0 and NPM &lt; 6.9.0
 - OpenVeo Publish now requires OpenVeo Core &gte; 9.0.0
 - HTTP error code 23 still refers to a failed point of interest update but no longer to a failed point of interest creation, use code 47 for failed point of interest creation and 48 for failed media update
 - HTTP error code 26 still refers to a failed points of interests removal but no longer to a failed media update, use code 49 for failed failed media update
