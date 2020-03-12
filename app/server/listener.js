@@ -103,7 +103,7 @@ module.exports.onUsersDeleted = function(ids, callback) {
  *
  * @method onPropertiesDeleted
  * @static
- * @param {Array} The list of deleted properties ids
+ * @param {Array} ids The list of deleted properties ids
  * @param {Function} callback Function to call when it's done
  *  - **Error** An error if something went wrong, null otherwise
  *  - **Number** The number of updated medias
