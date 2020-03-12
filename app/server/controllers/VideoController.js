@@ -16,6 +16,7 @@ var configDir = fileSystemApi.getConfDir();
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
 var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
@@ -111,6 +112,390 @@ function resolveResourcesUrls(medias) {
 
     });
   }
+}
+
+/**
+ * Updates a point of interest associated to the given media.
+ *
+ * If point of interest does not exist it is created.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "total": 1,
+ *       "poi": ...
+ *     }
+ *
+ * @method updatePoiAction
+ * @private
+ * @async
+ * @param {String} type The type of point of interest (either 'tags' or 'chapters')
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} [request.body] Request multipart body
+ * @param {Object} [request.body.info] Point of interest information
+ * @param {Number} [request.body.info.value] The point of interest time in milliseconds
+ * @param {String} [request.body.info.name] The point of interest name
+ * @param {String} [request.body.info.description] The point of interest description
+ * @param {String} [request.body.file] The multipart file associated to the point of interest
+ * @param {Object} request.params Request's parameters
+ * @param {String} request.params.id The media id the point of interest belongs to
+ * @param {String} [request.params.poiid] The point of interest id
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+function updatePoiAction(type, request, response, next) {
+  if (!request.params.id) return next(HTTP_ERRORS.UPDATE_POI_MISSING_PARAMETERS);
+
+  var self = this;
+  var params;
+
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.params, {
+      id: {type: 'string', required: true},
+      poiid: {type: 'string'}
+    });
+  } catch (error) {
+    return next(HTTP_ERRORS.UPDATE_POI_WRONG_PARAMETERS);
+  }
+
+  var media;
+  var poi;
+  var mediaId = params.id;
+  var totalUpdatedPois = 0;
+  var poiId = params.poiid;
+  var provider = this.getProvider();
+  var poiFileDestinationPath = path.join(process.rootPublish, 'assets/player/videos', mediaId, 'uploads');
+  var mediaFilter = new ResourceFilter().equal('id', mediaId);
+
+  async.series([
+
+    // Parse body multipart data
+    function(callback) {
+      var parser = new MultipartParser(request, [
+        {
+          name: 'file',
+          destinationPath: poiFileDestinationPath,
+          maxCount: 1
+        }
+      ], {
+        fileSize: 20 * 1000 * 1000
+      });
+
+      parser.parse(function(parseError) {
+        if (parseError) {
+          process.logger.error(parseError.message, {error: parseError, method: 'updatePoiAction'});
+          return callback(HTTP_ERRORS.UPDATE_POI_UPLOAD_ERROR);
+        }
+
+        if (!request.body.info) return callback(HTTP_ERRORS.UPDATE_POI_MISSING_PARAMETERS);
+
+        var file = request.files.file ? request.files.file[0] : null;
+
+        try {
+          poi = openVeoApi.util.shallowValidateObject(JSON.parse(request.body.info), {
+            value: {type: 'number'},
+            name: {type: 'string'},
+            description: {type: 'string'}
+          });
+        } catch (error) {
+          return callback(HTTP_ERRORS.UPDATE_POI_WRONG_PARAMETERS);
+        }
+
+        if (file) {
+          poi.file = {
+            originalName: file.originalname,
+            mimeType: file.mimetype,
+            fileName: file.filename,
+            size: file.size,
+            path: file.path
+          };
+          poi.file.url = provider.getPoiFilePath(mediaId, poi.file);
+        } else {
+          poi.file = null;
+        }
+
+        callback();
+      });
+    },
+
+    // Fetch media and make sure user has enough privilege to update the media
+    function(callback) {
+      provider.getOne(
+        mediaFilter,
+        {
+          include: ['id', 'metadata', type]
+        },
+        function(getOneError, fetchedMedia) {
+          media = fetchedMedia;
+          if (getOneError) {
+            process.logger.error(getOneError.message, {error: getOneError, method: 'updatePoiAction'});
+            return callback(HTTP_ERRORS.UPDATE_POI_GET_ONE_ERROR);
+          }
+          if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
+            return callback(HTTP_ERRORS.UPDATE_POI_FORBIDDEN);
+
+          callback();
+        }
+      );
+    },
+
+    // Create / update point of interest
+    function(callback) {
+      var poiProvider = new PoiProvider(coreApi.getDatabase());
+
+      if (poiId) {
+
+        // Point of interest already exists
+        // Update it
+        poiProvider.updateOne(new ResourceFilter().equal('id', poiId), poi, function(updateError, total) {
+          if (updateError) {
+            process.logger.error(updateError.message, {error: updateError, method: 'updatePoiAction'});
+            return callback(HTTP_ERRORS.UPDATE_POI_UPDATE_ERROR);
+          }
+          totalUpdatedPois = total;
+          callback();
+        });
+
+      } else {
+
+        // Point of interest does not exist
+        // Create it
+        poiProvider.add([poi], function(createError, total, pois) {
+          if (createError) {
+            process.logger.error(createError.message, {error: createError, method: 'updatePoiAction'});
+            return callback(HTTP_ERRORS.UPDATE_POI_CREATE_ERROR);
+          }
+          poiId = pois[0].id;
+          totalUpdatedPois = total;
+          callback();
+        });
+
+      }
+
+    },
+
+    // Add point of interest to the media if not already associated to it
+    function(callback) {
+      if (media[type] && media[type].indexOf(poiId) !== -1) return callback();
+
+      var data = {};
+      data[type] = media[type] || [];
+      data[type].push(poiId);
+      provider.updateOne(mediaFilter, data, function(updateMediaError, total) {
+        if (updateMediaError) {
+          process.logger.error(updateMediaError.message, {error: updateMediaError, method: 'updatePoiAction'});
+          return callback(HTTP_ERRORS.UPDATE_POI_UPDATE_MEDIA_ERROR);
+        }
+        callback();
+      });
+    }
+
+  ], function(error) {
+    if (error) return next(error);
+    poi.id = poiId;
+    response.send({total: totalUpdatedPois, poi: poi});
+  });
+}
+
+/**
+ * Removes points of interest from a media.
+ *
+ * @example
+ *
+ *     // Response example
+ *     {
+ *       "total": 1
+ *     }
+ *
+ * @method removePoisAction
+ * @async
+ * @private
+ * @param {String} type The type of points of interest (either 'tags' or 'chapters')
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.params Request parameters
+ * @param {String} request.params.id The media id
+ * @param {String} request.params.poiids A comma separated list of points of interest ids to remove
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+function removePoisAction(type, request, response, next) {
+  if (!request.params.id || !request.params.poiids) return next(HTTP_ERRORS.REMOVE_POIS_MISSING_PARAMETERS);
+
+  var self = this;
+  var params;
+
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.params, {
+      id: {type: 'string', required: true},
+      poiids: {type: 'string', required: true}
+    });
+  } catch (error) {
+    return next(HTTP_ERRORS.REMOVE_POIS_WRONG_PARAMETERS);
+  }
+
+  var media;
+  var totalRemovedPois = 0;
+  var poiIds = params.poiids.split(',');
+  var provider = this.getProvider(request);
+  var mediaFilter = new ResourceFilter().equal('id', params.id);
+
+  async.series([
+
+    // Fetch the media and make sure user has enough privilege to update the media
+    function(callback) {
+      provider.getOne(
+        mediaFilter,
+        {
+          include: ['id', 'metadata', type]
+        },
+        function(getOneError, fetchedMedia) {
+          media = fetchedMedia;
+          if (getOneError) {
+            process.logger.error(getOneError.message, {error: getOneError, method: 'removePoisAction'});
+            return callback(HTTP_ERRORS.REMOVE_POIS_GET_ONE_ERROR);
+          }
+          if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
+            return callback(HTTP_ERRORS.REMOVE_POIS_FORBIDDEN);
+
+          callback();
+        }
+      );
+    },
+
+    // Remove points of interest
+    function(callback) {
+      var poiProvider = new PoiProvider(coreApi.getDatabase());
+
+      poiProvider.remove(new ResourceFilter().in('id', poiIds), function(removeError, total) {
+        if (removeError) {
+          process.logger.error(removeError.message, {error: removeError, method: 'removePoisAction'});
+          return callback(HTTP_ERRORS.REMOVE_POIS_REMOVE_ERROR);
+        }
+        totalRemovedPois = total;
+        callback();
+      });
+    },
+
+    // Remove points of interest from the media
+    function(callback) {
+      var poisIdsToKeep = media[type].filter(function(poiId) {
+        return poiIds.indexOf(poiId) === -1;
+      });
+
+      var data = {};
+      data[type] = poisIdsToKeep;
+      provider.updateOne(mediaFilter, data, function(updateMediaError, total) {
+        if (updateMediaError) {
+          process.logger.error(updateMediaError.message, {error: updateMediaError, method: 'removePoisAction'});
+          return callback(HTTP_ERRORS.REMOVE_POIS_UPDATE_MEDIA_ERROR);
+        }
+        callback();
+      });
+    }
+
+  ], function(error) {
+    if (error) return next(error);
+    response.send({total: totalRemovedPois});
+  });
+
+}
+
+/**
+ * Replaces media chapters ids and tags ids by detailed points of interest.
+ *
+ * @method populateMediaWithPois
+ * @async
+ * @private
+ * @param {Object} media The media to populate
+ * @param {Array} media.chapters The media chapters
+ * @param {Array} media.tags The media tags
+ * @param {Function} callback Function to call when media has been populated
+ */
+function populateMediaWithPois(media, callback) {
+  var poisIds = (media.chapters || []).concat(media.tags || []);
+  if (!poisIds.length) return callback();
+
+  var poiProvider = new PoiProvider(coreApi.getDatabase());
+  poiProvider.getAll(
+    new ResourceFilter().in('id', poisIds),
+    {
+      exclude: ['_id']
+    },
+    {
+      id: 'desc'
+    },
+    function(getPoisError, fetchedPois) {
+      var pois = fetchedPois || [];
+
+      if (getPoisError) {
+        return callback(getPoisError);
+      }
+
+      if (media.tags) {
+        media.tags = pois.filter(function(poi) {
+          if (poi.file) delete poi.file.path;
+          return media.tags.indexOf(poi.id) !== -1;
+        });
+      }
+
+      if (media.chapters) {
+        media.chapters = pois.filter(function(poi) {
+          if (poi.file) delete poi.file.path;
+          return media.chapters.indexOf(poi.id) !== -1;
+        });
+      }
+
+      callback();
+    }
+  );
+}
+
+/**
+ * Updates the given media with corresponding information from its video platform.
+ *
+ * If information from the video platform have already been fetched for this media this does nothing.
+ *
+ * @method updateMediaWithPlatformInfo
+ * @async
+ * @private
+ * @param {Object} media The media to update
+ * @param {String} media.id The media id
+ * @param {String} media.type The id of the associated media platform
+ * @param {Array} media.mediaId The list of medias in the media platform. Could have several media ids if media has
+ * multiple sources
+ * @param {Boolan} media.available true if the media is available, false otherwise, if true information from the video
+ * platform have already been fetched then this does nothing
+ * @param {Array} media.sources The list of media sources
+ * @param {Function} callback Function to call when media has been updated
+ */
+function updateMediaWithPlatformInfo(media, callback) {
+  if (!media.type || !media.mediaId || (media.available && media.sources.length == media.mediaId.length)) {
+
+    // Info from video platform already retrieved for this media
+    return callback();
+
+  }
+
+  // Get information about the media from the medias platform
+  var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
+  var expectedDefinition = media.metadata['profile-settings']['video-height'];
+
+  // Compatibility with old mediaId format
+  var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
+  var provider = this.getProvider();
+
+  // Get media availability and sources
+  mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(error, info) {
+    if (error) return callback(error);
+
+    media.available = info.available;
+    media.sources = info.sources;
+
+    provider.updateOne(new ResourceFilter().equal('id', media.id), info);
+
+    callback();
+  });
 }
 
 /**
@@ -240,7 +625,6 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
 
   var params;
   var self = this;
-  var provider = this.getProvider();
 
   try {
     params = openVeoApi.util.shallowValidateObject(request.params, {
@@ -250,68 +634,75 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
     return next(HTTP_ERRORS.GET_VIDEO_READY_WRONG_PARAMETERS);
   }
 
-  // Get video
-  provider.getOne(
-    new ResourceFilter().equal('id', params.id),
-    null,
-    function(getOneError, media) {
-      if (getOneError) {
-        process.logger.error(getOneError.message, {error: getOneError, method: 'getVideoReadyAction'});
-        return next(HTTP_ERRORS.GET_VIDEO_READY_ERROR);
-      }
+  var media;
+  var provider = this.getProvider();
 
-      if (!media) {
-        process.logger.warn('Not found', {method: 'getVideoReadyAction', entity: params.id});
-        return next(HTTP_ERRORS.GET_VIDEO_READY_NOT_FOUND);
-      }
+  async.series([
 
-      // Media not ready
-      if (media.state !== STATES.READY && media.state !== STATES.PUBLISHED)
-        return next(HTTP_ERRORS.GET_VIDEO_READY_NOT_READY_ERROR);
+    // Get video
+    function(callback) {
+      provider.getOne(
+        new ResourceFilter().equal('id', params.id),
+        null,
+        function(getOneError, fetchedMedia) {
+          media = fetchedMedia;
 
-      // User without enough privilege to read the media in ready state
-      if (media.state === STATES.READY &&
-        !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
-      ) {
-        return next(HTTP_ERRORS.GET_VIDEO_READY_FORBIDDEN);
-      }
+          if (getOneError) {
+            process.logger.error(getOneError.message, {error: getOneError, method: 'getVideoReadyAction'});
+            return callback(HTTP_ERRORS.GET_VIDEO_READY_ERROR);
+          }
 
-      // Video from video platform already retrieved
-      if (!media.type || !media.mediaId || (media.available && media.sources.length == media.mediaId.length)) {
-        resolveResourcesUrls([media]);
-        return response.send({
-          entity: media
-        });
-      }
+          if (!media) {
+            process.logger.warn('Not found', {method: 'getVideoReadyAction', entity: params.id});
+            return callback(HTTP_ERRORS.GET_VIDEO_READY_NOT_FOUND);
+          }
 
-      // Get information about the media from the medias platform
-      var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
-      var expectedDefinition = media.metadata['profile-settings']['video-height'];
+          // Media not ready
+          if (media.state !== STATES.READY && media.state !== STATES.PUBLISHED)
+            return callback(HTTP_ERRORS.GET_VIDEO_READY_NOT_READY_ERROR);
 
-      // Compatibility with old mediaId format
-      var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
+          // User without enough privilege to read the media in ready state
+          if (media.state === STATES.READY &&
+            !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
+          ) {
+            return callback(HTTP_ERRORS.GET_VIDEO_READY_FORBIDDEN);
+          }
 
-      // Get media availability and sources
-      mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
-        if (getInfoError) {
-          process.logger.error(getInfoError.message, {error: getInfoError, method: 'getVideoReadyAction'});
-          return next(HTTP_ERRORS.GET_VIDEO_READY_GET_INFO_ERROR);
+          callback();
         }
+      );
+    },
 
-        media.available = info.available;
-        media.sources = info.sources;
-
-        provider.updateOne(new ResourceFilter().equal('id', media.id), info);
-
-        resolveResourcesUrls([media]);
-
-        return response.send({
-          entity: media
-        });
+    // Populate media with points of interest
+    function(callback) {
+      populateMediaWithPois(media, function(populateError) {
+        if (populateError) {
+          process.logger.error(populateError.message, {error: populateError, method: 'getVideoReadyAction'});
+          return callback(HTTP_ERRORS.GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR);
+        }
+        callback();
       });
+    },
 
+    // Update media with information from the video platform
+    function(callback) {
+      updateMediaWithPlatformInfo.call(self, media, function(error) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'getVideoReadyAction'});
+          return callback(HTTP_ERRORS.GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR);
+        }
+        callback();
+      });
     }
-  );
+
+  ], function(error) {
+    if (error) return next(error);
+
+    resolveResourcesUrls([media]);
+    return response.send({
+      entity: media
+    });
+  });
 };
 
 /**
@@ -356,89 +747,92 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 VideoController.prototype.getEntityAction = function(request, response, next) {
-  if (request.params.id) {
-    var entityId = request.params.id;
-    var provider = this.getProvider();
-    var self = this;
-    var query;
-    var fields;
-    request.query = request.query || {};
+  if (!request.params.id) return next(HTTP_ERRORS.GET_MEDIA_MISSING_PARAMETERS);
 
-    try {
-      query = openVeoApi.util.shallowValidateObject(request.query, {
-        include: {type: 'array<string>'},
-        exclude: {type: 'array<string>'}
-      });
-    } catch (error) {
-      return next(HTTP_ERRORS.GET_MEDIA_WRONG_PARAMETERS);
-    }
+  var entityId = request.params.id;
+  var provider = this.getProvider();
+  var self = this;
+  var query;
+  var fields;
+  var media;
+  request.query = request.query || {};
 
-    // Make sure "metadata" field is not excluded
-    fields = this.removeMetatadaFromFields({
-      exclude: query.exclude,
-      include: query.include
+  try {
+    query = openVeoApi.util.shallowValidateObject(request.query, {
+      include: {type: 'array<string>'},
+      exclude: {type: 'array<string>'}
     });
+  } catch (error) {
+    return next(HTTP_ERRORS.GET_MEDIA_WRONG_PARAMETERS);
+  }
 
-    provider.getOne(
-      new ResourceFilter().equal('id', entityId),
-      fields,
-      function(error, media) {
-        if (error) {
-          process.logger.error(error.message, {error: error, method: 'getEntityAction', entity: entityId});
-          return next(HTTP_ERRORS.GET_MEDIA_ERROR);
-        }
+  // Make sure "metadata" field is not excluded
+  fields = this.removeMetatadaFromFields({
+    exclude: query.exclude,
+    include: query.include
+  });
 
-        if (!media) {
-          process.logger.warn('Not found', {method: 'getEntityAction', entity: entityId});
-          return next(HTTP_ERRORS.GET_MEDIA_NOT_FOUND);
-        }
+  async.series([
 
-        // User without enough privilege to read the media
-        if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)) {
-          return next(HTTP_ERRORS.GET_MEDIA_FORBIDDEN);
-        }
+    // Fetch media and make sure user has enough privilege to read it
+    function(callback) {
+      provider.getOne(
+        new ResourceFilter().equal('id', entityId),
+        fields,
+        function(error, fetchedMedia) {
+          media = fetchedMedia;
 
-        // Video from video platform already retrieved
-        if (!media.type || !media.mediaId || (media.available && media.sources.length == media.mediaId.length)) {
-          resolveResourcesUrls([media]);
-          return response.send({
-            entity: media
-          });
-        }
-
-        // Get information about the media from the medias platform
-        var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
-        var expectedDefinition = media.metadata['profile-settings']['video-height'];
-
-        // Compatibility with old mediaId format
-        var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
-
-        // Get media availability and sources
-        mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(getInfoError, info) {
-          if (getInfoError) {
-            process.logger.error(getInfoError.message, {error: getInfoError, method: 'getEntityAction'});
-            return next(HTTP_ERRORS.GET_MEDIA_GET_INFO_ERROR);
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'getEntityAction', entity: entityId});
+            return next(HTTP_ERRORS.GET_MEDIA_ERROR);
           }
 
-          media.available = info.available;
-          media.sources = info.sources;
+          if (!media) {
+            process.logger.warn('Not found', {method: 'getEntityAction', entity: entityId});
+            return next(HTTP_ERRORS.GET_MEDIA_NOT_FOUND);
+          }
 
-          provider.updateOne(new ResourceFilter().equal('id', media.id), info);
+          // User without enough privilege to read the media
+          if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)) {
+            return next(HTTP_ERRORS.GET_MEDIA_FORBIDDEN);
+          }
 
-          resolveResourcesUrls([media]);
+          callback();
+        }
+      );
+    },
 
-          return response.send({
-            entity: media
-          });
-        });
-      }
-    );
-  } else {
+    // Get media points of interest
+    function(callback) {
+      populateMediaWithPois(media, function(populateError) {
+        if (populateError) {
+          process.logger.error(populateError.message, {error: populateError, method: 'getEntityAction'});
+          return callback(HTTP_ERRORS.GET_MEDIA_POPULATE_WITH_POIS_ERROR);
+        }
+        callback();
+      });
+    },
 
-    // Missing id of the media
-    next(HTTP_ERRORS.GET_MEDIA_MISSING_PARAMETERS);
+    // Update media with information from the video platform
+    function(callback) {
+      updateMediaWithPlatformInfo.call(self, media, function(error) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'getEntityAction'});
+          return callback(HTTP_ERRORS.GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR);
+        }
+        callback();
+      });
+    }
 
-  }
+  ], function(error) {
+    if (error) return next(error);
+
+    resolveResourcesUrls([media]);
+
+    return response.send({
+      entity: media
+    });
+  });
 };
 
 /**
@@ -923,6 +1317,8 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
  * @param {String} [request.query.query] To search on both medias title and description
  * @param {Number} [request.query.useSmartSearch=1] 1 to use a more advanced search mechanism, 0 to use a simple search
  * based on a regular expression
+ * @param {Number} [request.query.searchInPois=0] 1 to also search in points of interest (tags / chapters) titles and
+ * descriptions when useSmartSearch is set to 1
  * @param {String|Array} [request.query.include] The list of fields to include from returned medias
  * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned medias. Ignored if
  * include is also specified.
@@ -950,12 +1346,14 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
   var properties = [];
   var pagination = {};
   var provider = this.getProvider();
+  var poiProvider = new PoiProvider(coreApi.getDatabase());
   var orderedProperties = ['title', 'description', 'date', 'state', 'views', 'category'];
 
   try {
     params = openVeoApi.util.shallowValidateObject(request.query, {
       query: {type: 'string'},
       useSmartSearch: {type: 'number', in: [0, 1], default: 1},
+      searchInPois: {type: 'number', in: [0, 1], default: 0},
       include: {type: 'array<string>'},
       exclude: {type: 'array<string>'},
       states: {type: 'array<number>'},
@@ -976,16 +1374,17 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
 
   // Build sort
   var sort = {};
-  sort[params.sortBy] = params.sortOrder;
 
   // Build filter
   var filter = new ResourceFilter();
+  var querySearchFilters = [];
 
   // Add search query
   if (params.query) {
-    if (params.useSmartSearch)
-      filter.search('"' + params.query + '"');
-    else {
+    if (params.useSmartSearch) {
+      querySearchFilters.push(new ResourceFilter().search('"' + params.query + '"'));
+      sort['score'] = 'score';
+    } else {
       var queryRegExp = new RegExp(openVeoApi.util.escapeTextForRegExp(params.query), 'i');
       filter.or([
         new ResourceFilter().regex('title', queryRegExp),
@@ -993,6 +1392,9 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       ]);
     }
   }
+
+  // Sort
+  sort[params.sortBy] = params.sortOrder;
 
   // Add states
   if (params.states && params.states.length) filter.in('state', params.states);
@@ -1110,8 +1512,38 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
       });
     },
 
+    // Get the list of points of interest matching the query
+    function(callback) {
+      if (!params.query || !params.useSmartSearch || !params.searchInPois) return callback();
+
+      var poisSort = {};
+      poisSort['score'] = 'score';
+      poiProvider.getAll(
+        new ResourceFilter().search('"' + params.query + '"'),
+        {
+          include: ['id']
+        },
+        poisSort,
+        function(error, fetchedPois) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
+            return callback(HTTP_ERRORS.GET_VIDEOS_SEARCH_IN_POIS_ERROR);
+          }
+
+          var matchingPoisIds = fetchedPois.map(function(fetchedPoi) {
+            return fetchedPoi.id;
+          });
+          querySearchFilters.push(new ResourceFilter().in('chapters', matchingPoisIds));
+          querySearchFilters.push(new ResourceFilter().in('tags', matchingPoisIds));
+          callback();
+        }
+      );
+    },
+
     // Get the list of medias
     function(callback) {
+      if (params.query && params.useSmartSearch) filter.or(querySearchFilters);
+
       provider.get(
         self.addAccessFilter(filter, request.user),
         fields,
@@ -1128,6 +1560,24 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
           callback();
         }
       );
+    },
+
+    // Populate medias with points of interest
+    function(callback) {
+      var asyncFunctions = [];
+
+      medias.forEach(function(media) {
+        asyncFunctions.push(function(asyncCallback) {
+          populateMediaWithPois(media, asyncCallback);
+        });
+      });
+      async.parallel(asyncFunctions, function(populateError) {
+        if (populateError) {
+          process.logger.error(populateError.message, {error: populateError, method: 'getEntitiesAction'});
+          return callback(HTTP_ERRORS.GET_VIDEOS_POPULATE_WITH_POIS_ERROR);
+        }
+        callback();
+      });
     }
 
   ], function(error) {
@@ -1456,7 +1906,7 @@ VideoController.prototype.getPublishManager = function() {
  *     // Response example
  *     {
  *       "total": 1,
- *       "tag": ...
+ *       "poi": ...
  *     }
  *
  * @method updateTagAction
@@ -1470,77 +1920,12 @@ VideoController.prototype.getPublishManager = function() {
  * @param {String} [request.body.file] The multipart file associated to the tag
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.id The media id the tag belongs to
- * @param {String} [request.params.tagid] The tag id
+ * @param {String} [request.params.poiid] The tag id
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 VideoController.prototype.updateTagAction = function(request, response, next) {
-  if (!request.params.id) return next(HTTP_ERRORS.UPDATE_TAG_MISSING_PARAMETERS);
-
-  var params;
-  var self = this;
-
-  try {
-    params = openVeoApi.util.shallowValidateObject(request.params, {
-      id: {type: 'string', required: true},
-      tagid: {type: 'string'}
-    });
-  } catch (error) {
-    return next(HTTP_ERRORS.UPDATE_TAG_WRONG_PARAMETERS);
-  }
-
-  var mediaId = params.id;
-  var tagId = params.tagid;
-  var provider = this.getProvider();
-
-  var parser = new MultipartParser(request, [
-    {
-      name: 'file',
-      destinationPath: process.rootPublish + '/assets/player/videos/' + mediaId + '/uploads/',
-      maxCount: 1
-    }
-  ], {
-    fileSize: 20 * 1000 * 1000
-  });
-
-  parser.parse(function(parseError) {
-    if (parseError) {
-      process.logger.error(parseError.message, {error: parseError, method: 'updateTagAction'});
-      return next(HTTP_ERRORS.UPDATE_TAG_UPLOAD_ERROR);
-    }
-
-    if (!request.body.info) return next(HTTP_ERRORS.UPDATE_TAG_MISSING_PARAMETERS);
-
-    var tag = JSON.parse(request.body.info);
-    var file = request.files.file ? request.files.file[0] : null;
-    var filter = new ResourceFilter().equal('id', mediaId);
-    tag.id = tagId;
-
-    // Make sure user has enough privilege to update the media
-    provider.getOne(
-      filter,
-      {
-        include: ['id', 'metadata']
-      },
-      function(getOneError, media) {
-        if (getOneError) {
-          process.logger.error(getOneError.message, {error: getOneError, method: 'updateTagAction'});
-          return next(HTTP_ERRORS.UPDATE_TAG_GET_ONE_ERROR);
-        }
-        if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
-          return next(HTTP_ERRORS.UPDATE_TAG_FORBIDDEN);
-
-        provider.updateOneTag(filter, tag, file, function(updateError, total, tag) {
-          if (updateError) {
-            process.logger.error(updateError.message, {error: updateError, method: 'updateTagAction'});
-            return next(HTTP_ERRORS.UPDATE_TAG_ERROR);
-          }
-
-          response.send({total: total, tag: tag});
-        });
-      }
-    );
-  });
+  updatePoiAction.call(this, 'tags', request, response, next);
 };
 
 /**
@@ -1553,7 +1938,7 @@ VideoController.prototype.updateTagAction = function(request, response, next) {
  *     // Response example
  *     {
  *       "total": 1,
- *       "chapter": ...
+ *       "poi": ...
  *     }
  *
  * @method updateChapterAction
@@ -1566,56 +1951,12 @@ VideoController.prototype.updateTagAction = function(request, response, next) {
  * @param {String} [request.body.info.description] The chapter description
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id the chapter belongs to
- * @param {String} [request.params.chapterid] The chapter id
+ * @param {String} [request.params.poiid] The chapter id
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 VideoController.prototype.updateChapterAction = function(request, response, next) {
-  if (!request.params.id || !request.body) return next(HTTP_ERRORS.UPDATE_CHAPTER_MISSING_PARAMETERS);
-
-  var params;
-  var self = this;
-
-  try {
-    params = openVeoApi.util.shallowValidateObject(request.params, {
-      id: {type: 'string', required: true},
-      chapterid: {type: 'string'}
-    });
-  } catch (error) {
-    return next(HTTP_ERRORS.UPDATE_CHAPTER_WRONG_PARAMETERS);
-  }
-
-  var mediaId = params.id;
-  var chapterId = params.chapterid;
-  var chapter = request.body;
-  var provider = this.getProvider();
-  var filter = new ResourceFilter().equal('id', mediaId);
-  chapter.id = chapterId;
-
-  // Make sure user has enough privilege to update the media
-  provider.getOne(
-    filter,
-    {
-      include: ['id', 'metadata']
-    },
-    function(getOneError, media) {
-      if (getOneError) {
-        process.logger.error(getOneError.message, {error: getOneError, method: 'updateChapterAction'});
-        return next(HTTP_ERRORS.UPDATE_CHAPTER_GET_ONE_ERROR);
-      }
-      if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
-        return next(HTTP_ERRORS.UPDATE_CHAPTER_FORBIDDEN);
-
-      provider.updateOneChapter(filter, chapter, function(updateError, total, chapter) {
-        if (updateError) {
-          process.logger.error(updateError.message, {error: updateError, method: 'updateChapterAction'});
-          return next(HTTP_ERRORS.UPDATE_CHAPTER_ERROR);
-        }
-
-        response.send({total: total, chapter: chapter});
-      });
-    }
-  );
+  updatePoiAction.call(this, 'chapters', request, response, next);
 };
 
 /**
@@ -1633,53 +1974,12 @@ VideoController.prototype.updateChapterAction = function(request, response, next
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
- * @param {String} request.params.tagsids A comma separated list of tags ids to remove
+ * @param {String} request.params.poiids A comma separated list of tags ids to remove
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 VideoController.prototype.removeTagsAction = function(request, response, next) {
-  if (!request.params.id || !request.params.tagsids) return next(HTTP_ERRORS.REMOVE_TAGS_MISSING_PARAMETERS);
-
-  var self = this;
-  var params;
-
-  try {
-    params = openVeoApi.util.shallowValidateObject(request.params, {
-      id: {type: 'string', required: true},
-      tagsids: {type: 'string', required: true}
-    });
-  } catch (error) {
-    return next(HTTP_ERRORS.REMOVE_TAGS_WRONG_PARAMETERS);
-  }
-
-  var tagsIds = params.tagsids.split(',');
-  var provider = this.getProvider(request);
-  var filter = new ResourceFilter().equal('id', params.id);
-
-  // Make sure user has enough privilege to update the media
-  provider.getOne(
-    filter,
-    {
-      include: ['id', 'metadata']
-    },
-    function(getOneError, media) {
-      if (getOneError) {
-        process.logger.error(getOneError.message, {error: getOneError, method: 'removeTagsAction'});
-        return next(HTTP_ERRORS.REMOVE_TAGS_GET_ONE_ERROR);
-      }
-      if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
-        return next(HTTP_ERRORS.REMOVE_TAGS_FORBIDDEN);
-
-      provider.removeTags(filter, tagsIds, function(updateError, total) {
-        if (updateError) {
-          process.logger.error(updateError.message, {error: updateError, method: 'removeTagsAction'});
-          return next(HTTP_ERRORS.REMOVE_TAGS_ERROR);
-        }
-
-        response.send({total: total});
-      });
-    }
-  );
+  removePoisAction.call(this, 'tags', request, response, next);
 };
 
 /**
@@ -1697,53 +1997,12 @@ VideoController.prototype.removeTagsAction = function(request, response, next) {
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
- * @param {String} request.params.chaptersids A comma separated list of chapters ids to remove
+ * @param {String} request.params.poiids A comma separated list of chapters ids to remove
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
  */
 VideoController.prototype.removeChaptersAction = function(request, response, next) {
-  if (!request.params.id || !request.params.chaptersids) return next(HTTP_ERRORS.REMOVE_CHAPTERS_MISSING_PARAMETERS);
-
-  var self = this;
-  var params;
-
-  try {
-    params = openVeoApi.util.shallowValidateObject(request.params, {
-      id: {type: 'string', required: true},
-      chaptersids: {type: 'string', required: true}
-    });
-  } catch (error) {
-    return next(HTTP_ERRORS.REMOVE_CHAPTERS_WRONG_PARAMETERS);
-  }
-
-  var chaptersIds = params.chaptersids.split(',');
-  var provider = this.getProvider(request);
-  var filter = new ResourceFilter().equal('id', params.id);
-
-  // Make sure user has enough privilege to update the media
-  provider.getOne(
-    filter,
-    {
-      include: ['id', 'metadata']
-    },
-    function(getOneError, media) {
-      if (getOneError) {
-        process.logger.error(getOneError.message, {error: getOneError, method: 'removeChaptersAction'});
-        return next(HTTP_ERRORS.REMOVE_CHAPTERS_GET_ONE_ERROR);
-      }
-      if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.UPDATE))
-        return next(HTTP_ERRORS.REMOVE_CHAPTERS_FORBIDDEN);
-
-      provider.removeChapters(filter, chaptersIds, function(updateError, total) {
-        if (updateError) {
-          process.logger.error(updateError.message, {error: updateError, method: 'removeChaptersAction'});
-          return next(HTTP_ERRORS.REMOVE_CHAPTERS_ERROR);
-        }
-
-        response.send({total: total});
-      });
-    }
-  );
+  removePoisAction.call(this, 'chapters', request, response, next);
 };
 
 /**
@@ -1763,7 +2022,6 @@ VideoController.prototype.removeChaptersAction = function(request, response, nex
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
- * @param {String} request.params.chaptersIds A comma separated list of chapters ids to remove
  * @param {String} request.body Information to convert points of interest
  * @param {Number} request.body.duration The media duration in milliseconds
  * @param {Response} response ExpressJS HTTP Response
@@ -1771,7 +2029,7 @@ VideoController.prototype.removeChaptersAction = function(request, response, nex
  */
 VideoController.prototype.convertPoiAction = function(request, response, next) {
   if (!request.params.id || !request.body || !request.body.duration)
-    return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS);
+    return next(HTTP_ERRORS.CONVERT_POIS_MISSING_PARAMETERS);
 
   var params;
   var body;
@@ -1785,78 +2043,143 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
       duration: {type: 'number', required: true}
     });
   } catch (error) {
-    return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS);
+    return next(HTTP_ERRORS.CONVERT_POIS_WRONG_PARAMETERS);
   }
 
+  var pois;
+  var media;
   var provider = this.getProvider();
+  var poiProvider = new PoiProvider(coreApi.getDatabase());
   var duration = body.duration;
   var filter = new ResourceFilter().equal('id', params.id);
+  var convertToMilliseconds = function(percent) {
+    return Math.floor(percent * duration);
+  };
 
-  // Get media
-  provider.getOne(
-    filter,
-    null,
-    function(getOneError, media) {
-      if (getOneError) {
-        process.logger.error(getOneError.message, {error: getOneError, method: 'convertPoiAction'});
-        return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR);
-      }
+  async.series([
 
-      // Media not ready
-      if (media.state !== STATES.READY && media.state !== STATES.PUBLISHED)
-        return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR);
+    // Get media and make sure user has enought privilege to read it
+    function(callback) {
+      provider.getOne(filter, null, function(getOneError, fetchedMedia) {
+        media = fetchedMedia;
 
-      // User without enough privilege to read the media in ready state
-      if (media.state === STATES.READY &&
-        !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
-      ) {
-        return next(HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_FORBIDDEN);
-      }
-
-      if (!media.needPointsOfInterestUnitConversion) {
-        resolveResourcesUrls([media]);
-
-        return response.send({
-          entity: media
-        });
-      }
-
-      var properties = ['chapters', 'tags', 'cut'];
-
-      for (var i = 0; i < properties.length; i++) {
-        if (Array.isArray(media[properties[i]])) {
-          media[properties[i]].forEach(function(pointOfInterest) {
-            pointOfInterest.value = Math.floor(pointOfInterest.value * duration);
-          });
-        } else {
-          media[properties[i]] = [];
+        if (getOneError) {
+          process.logger.error(getOneError.message, {error: getOneError, method: 'convertPoiAction'});
+          return callback(HTTP_ERRORS.CONVERT_POIS_GET_MEDIA_ERROR);
         }
-      }
 
-      delete media.needPointsOfInterestUnitConversion;
+        // Media not ready
+        if (media.state !== STATES.READY && media.state !== STATES.PUBLISHED)
+          return callback(HTTP_ERRORS.CONVERT_POIS_MEDIA_NOT_READY_ERROR);
+
+        // User without enough privilege to read the media in ready state
+        if (media.state === STATES.READY &&
+          !self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.READ)
+        ) {
+          return callback(HTTP_ERRORS.CONVERT_POIS_FORBIDDEN);
+        }
+
+        callback();
+      });
+    },
+
+    // Get media points of interest
+    function(callback) {
+      var poisIds = (media.chapters || []).concat(media.tags || []);
+      if (!poisIds.length) return callback();
+
+      poiProvider.getAll(
+        new ResourceFilter().in('id', poisIds),
+        {
+          include: ['id', 'value']
+        },
+        {
+          id: 'desc'
+        },
+        function(getPoisError, fetchedPois) {
+          pois = fetchedPois;
+
+          if (getPoisError) {
+            process.logger.error(getPoisError.message, {error: getPoisError, method: 'convertPoiAction'});
+            return callback(HTTP_ERRORS.CONVERT_POIS_GET_POIS_ERROR);
+          }
+
+          callback();
+        }
+      );
+    },
+
+    // Convert points of interest
+    function(callback) {
+      if (!media.needPointsOfInterestUnitConversion || !pois) return callback();
+      var asyncFunctions = [];
+
+      pois.forEach(function(poi) {
+        asyncFunctions.push(function(callback) {
+          poi.value = convertToMilliseconds(poi.value);
+          poiProvider.updateOne(
+            new ResourceFilter().equal('id', poi.id),
+            {
+              value: poi.value
+            },
+            callback
+          );
+        });
+      });
+
+      async.parallel(asyncFunctions, function(error) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'convertPoiAction'});
+          return callback(HTTP_ERRORS.CONVERT_POIS_UPDATE_POI_ERROR);
+        }
+        callback();
+      });
+    },
+
+    // Convert cuts
+    function(callback) {
+      if (!media.needPointsOfInterestUnitConversion || !media.cut) return callback();
+
+      media.cut[0].value = convertToMilliseconds(media.cut[0].value);
+      media.cut[1].value = convertToMilliseconds(media.cut[1].value);
 
       provider.updateOne(
         filter,
         {
-          chapters: media.chapters,
           cut: media.cut,
-          tags: media.tags
+          needPointsOfInterestUnitConversion: false
         },
         function(updateError, total) {
           if (updateError) {
             process.logger.error(updateError.message, {error: updateError, method: 'convertPoiAction'});
-            return next(HTTP_ERRORS.CONVERT_VIDEO_POI_ERROR);
+            return next(HTTP_ERRORS.CONVERT_POIS_UPDATE_MEDIA_ERROR);
           }
+          media.needPointsOfInterestUnitConversion = false;
 
-          resolveResourcesUrls([media]);
-
-          response.send({
-            entity: media
-          });
+          callback();
         }
       );
     }
-  );
+
+  ], function(error) {
+    if (error) return next(error);
+
+    if (pois) {
+      media.chapters = pois.filter(function(poi) {
+        if (poi.file) delete poi.file.path;
+        return media.chapters && media.chapters.indexOf(poi.id) !== -1;
+      });
+      media.tags = pois.filter(function(poi) {
+        if (poi.file) delete poi.file.path;
+        return media.tags && media.tags.indexOf(poi.id) !== -1;
+      });
+    }
+    resolveResourcesUrls([media]);
+
+    return response.send({
+      entity: media
+    });
+  });
 };
 
 /**
@@ -1983,6 +2306,8 @@ VideoController.prototype.removeEntitiesAction = function(request, response, nex
           }
           mediaIdsToRemove.push(media.id);
         });
+
+        if (!mediaIdsToRemove.length) return next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
 
         provider.remove(new ResourceFilter().in('id', mediaIdsToRemove), function(error, total) {
           if (error) {

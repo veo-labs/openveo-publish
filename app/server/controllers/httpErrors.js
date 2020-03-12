@@ -149,14 +149,14 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Attaching a file to a tag failed.
+   * Attaching a file to a point of interest failed.
    *
-   * @property UPDATE_TAG_UPLOAD_ERROR
+   * @property UPDATE_POI_UPLOAD_ERROR
    * @type Object
    * @final
    * @default 9
    */
-  UPDATE_TAG_UPLOAD_ERROR: {
+  UPDATE_POI_UPLOAD_ERROR: {
     code: 0x009,
     httpCode: 500,
     module: 'publish'
@@ -249,12 +249,12 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready media failed when getting video platform information.
    *
-   * @property GET_VIDEO_READY_GET_INFO_ERROR
+   * @property GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR
    * @type Object
    * @final
    * @default 16
    */
-  GET_VIDEO_READY_GET_INFO_ERROR: {
+  GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR: {
     code: 0x010,
     httpCode: 500,
     module: 'publish'
@@ -317,113 +317,57 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Updating tag failed when getting the media.
+   * Updating point of interest failed when getting the media.
    *
-   * @property UPDATE_TAG_GET_ONE_ERROR
+   * @property UPDATE_POI_GET_ONE_ERROR
    * @type Object
    * @final
    * @default 21
    */
-  UPDATE_TAG_GET_ONE_ERROR: {
+  UPDATE_POI_GET_ONE_ERROR: {
     code: 0x015,
     httpCode: 500,
     module: 'publish'
   },
 
   /**
-   * Updating chapter failed when getting the media.
+   * Updating point of interest failed.
    *
-   * @property UPDATE_CHAPTER_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 22
-   */
-  UPDATE_CHAPTER_GET_ONE_ERROR: {
-    code: 0x016,
-    httpCode: 500,
-    module: 'publish'
-  },
-
-  /**
-   * Updating tag failed.
-   *
-   * @property UPDATE_TAG_ERROR
+   * @property UPDATE_POI_UPDATE_ERROR
    * @type Object
    * @final
    * @default 23
    */
-  UPDATE_TAG_ERROR: {
+  UPDATE_POI_UPDATE_ERROR: {
     code: 0x017,
     httpCode: 500,
     module: 'publish'
   },
 
   /**
-   * Updating chapter failed.
+   * Removing media points of interest failed when getting the media.
    *
-   * @property UPDATE_CHAPTER_ERROR
-   * @type Object
-   * @final
-   * @default 24
-   */
-  UPDATE_CHAPTER_ERROR: {
-    code: 0x018,
-    httpCode: 500,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media tags failed when getting the media.
-   *
-   * @property REMOVE_TAGS_GET_ONE_ERROR
+   * @property REMOVE_POIS_GET_ONE_ERROR
    * @type Object
    * @final
    * @default 25
    */
-  REMOVE_TAGS_GET_ONE_ERROR: {
+  REMOVE_POIS_GET_ONE_ERROR: {
     code: 0x019,
     httpCode: 500,
     module: 'publish'
   },
 
   /**
-   * Removing tags failed.
+   * Removing points of interest failed.
    *
-   * @property REMOVE_TAGS_ERROR
+   * @property REMOVE_POIS_REMOVE_ERROR
    * @type Object
    * @final
    * @default 26
    */
-  REMOVE_TAGS_ERROR: {
+  REMOVE_POIS_REMOVE_ERROR: {
     code: 0x01a,
-    httpCode: 500,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media chapters failed when getting the media.
-   *
-   * @property REMOVE_CHAPTERS_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 27
-   */
-  REMOVE_CHAPTERS_GET_ONE_ERROR: {
-    code: 0x01b,
-    httpCode: 500,
-    module: 'publish'
-  },
-
-  /**
-   * Removing chapters failed.
-   *
-   * @property REMOVE_CHAPTERS_ERROR
-   * @type Object
-   * @final
-   * @default 28
-   */
-  REMOVE_CHAPTERS_ERROR: {
-    code: 0x01c,
     httpCode: 500,
     module: 'publish'
   },
@@ -431,12 +375,12 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed when getting media.
    *
-   * @property CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR
+   * @property CONVERT_POIS_GET_MEDIA_ERROR
    * @type Object
    * @final
    * @default 29
    */
-  CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR: {
+  CONVERT_POIS_GET_MEDIA_ERROR: {
     code: 0x01d,
     httpCode: 500,
     module: 'publish'
@@ -445,12 +389,12 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, media is not ready.
    *
-   * @property CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR
+   * @property CONVERT_POIS_MEDIA_NOT_READY_ERROR
    * @type Object
    * @final
    * @default 30
    */
-  CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR: {
+  CONVERT_POIS_MEDIA_NOT_READY_ERROR: {
     code: 0x01e,
     httpCode: 500,
     module: 'publish'
@@ -471,14 +415,14 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Convert points of interest error.
+   * Convert points of interest failed when updating the media.
    *
-   * @property CONVERT_VIDEO_POI_ERROR
+   * @property CONVERT_POIS_UPDATE_MEDIA_ERROR
    * @type Object
    * @final
    * @default 32
    */
-  CONVERT_VIDEO_POI_ERROR: {
+  CONVERT_POIS_UPDATE_MEDIA_ERROR: {
     code: 0x020,
     httpCode: 500,
     module: 'publish'
@@ -543,12 +487,12 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed when getting video platform information.
    *
-   * @property GET_MEDIA_GET_INFO_ERROR
+   * @property GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR
    * @type Object
    * @final
    * @default 37
    */
-  GET_MEDIA_GET_INFO_ERROR: {
+  GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR: {
     code: 0x025,
     httpCode: 500,
     module: 'publish'
@@ -680,6 +624,132 @@ var HTTP_ERRORS = {
     module: 'publish'
   },
 
+  /**
+   * Creating point of interest failed.
+   *
+   * @property UPDATE_POI_CREATE_ERROR
+   * @type Object
+   * @final
+   * @default 47
+   */
+  UPDATE_POI_CREATE_ERROR: {
+    code: 0x02f,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Updating point of interest of a media failed.
+   *
+   * @property UPDATE_POI_UPDATE_MEDIA_ERROR
+   * @type Object
+   * @final
+   * @default 48
+   */
+  UPDATE_POI_UPDATE_MEDIA_ERROR: {
+    code: 0x030,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Removing points of interest when updating the media.
+   *
+   * @property REMOVE_POIS_UPDATE_MEDIA_ERROR
+   * @type Object
+   * @final
+   * @default 49
+   */
+  REMOVE_POIS_UPDATE_MEDIA_ERROR: {
+    code: 0x031,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting a ready video failed when getting points of interest.
+   *
+   * @property GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR
+   * @type Object
+   * @final
+   * @default 50
+   */
+  GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR: {
+    code: 0x032,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting media failed when populating with points of interest.
+   *
+   * @property GET_MEDIA_POPULATE_WITH_POIS_ERROR
+   * @type Object
+   * @final
+   * @default 51
+   */
+  GET_MEDIA_POPULATE_WITH_POIS_ERROR: {
+    code: 0x033,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Converting points of interest failed when getting points of interest.
+   *
+   * @property CONVERT_POIS_GET_POIS_ERROR
+   * @type Object
+   * @final
+   * @default 52
+   */
+  CONVERT_POIS_GET_POIS_ERROR: {
+    code: 0x034,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Converting points of interest failed when updating a point of interest.
+   *
+   * @property CONVERT_POIS_UPDATE_POI_ERROR
+   * @type Object
+   * @final
+   * @default 53
+   */
+  CONVERT_POIS_UPDATE_POI_ERROR: {
+    code: 0x035,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting medias failed when getting the list of categories.
+   *
+   * @property GET_VIDEOS_POPULATE_WITH_POIS_ERROR
+   * @type Object
+   * @final
+   * @default 54
+   */
+  GET_VIDEOS_POPULATE_WITH_POIS_ERROR: {
+    code: 0x036,
+    httpCode: 500,
+    module: 'publish'
+  },
+
+  /**
+   * Getting medias failed when searching in points of interest.
+   *
+   * @property GET_VIDEOS_SEARCH_IN_POIS_ERROR
+   * @type Object
+   * @final
+   * @default 55
+   */
+  GET_VIDEOS_SEARCH_IN_POIS_ERROR: {
+    code: 0x037,
+    httpCode: 500,
+    module: 'publish'
+  },
+
   // Authentication errors
 
   /**
@@ -725,14 +795,14 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Updating a media tag failed, user doesn't have enough privilege.
+   * Updating a media point of interest failed, user doesn't have enough privilege.
    *
-   * @property UPDATE_TAG_FORBIDDEN
+   * @property UPDATE_POI_FORBIDDEN
    * @type Object
    * @final
    * @default 259
    */
-  UPDATE_TAG_FORBIDDEN: {
+  UPDATE_POI_FORBIDDEN: {
     code: 0x103,
     httpCode: 403,
     module: 'publish'
@@ -753,43 +823,15 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Updating a media chapter failed, user doesn't have enough privilege.
+   * Removing media points of interest failed, user doesn't have enough privilege.
    *
-   * @property UPDATE_CHAPTER_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 261
-   */
-  UPDATE_CHAPTER_FORBIDDEN: {
-    code: 0x105,
-    httpCode: 403,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media tags failed, user doesn't have enough privilege.
-   *
-   * @property REMOVE_TAGS_FORBIDDEN
+   * @property REMOVE_POIS_FORBIDDEN
    * @type Object
    * @final
    * @default 262
    */
-  REMOVE_TAGS_FORBIDDEN: {
+  REMOVE_POIS_FORBIDDEN: {
     code: 0x106,
-    httpCode: 403,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media chapters failed, user doesn't have enough privilege.
-   *
-   * @property REMOVE_CHAPTERS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 263
-   */
-  REMOVE_CHAPTERS_FORBIDDEN: {
-    code: 0x107,
     httpCode: 403,
     module: 'publish'
   },
@@ -797,12 +839,12 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, user doesn't have enough privilege.
    *
-   * @property CONVERT_POINTS_OF_INTEREST_FORBIDDEN
+   * @property CONVERT_POIS_FORBIDDEN
    * @type Object
    * @final
    * @default 264
    */
-  CONVERT_POINTS_OF_INTEREST_FORBIDDEN: {
+  CONVERT_POIS_FORBIDDEN: {
     code: 0x108,
     httpCode: 403,
     module: 'publish'
@@ -983,28 +1025,28 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Updating a media tag failed, missing parameters.
+   * Updating a media point of interest failed, missing parameters.
    *
-   * @property UPDATE_TAG_MISSING_PARAMETERS
+   * @property UPDATE_POI_MISSING_PARAMETERS
    * @type Object
    * @final
    * @default 522
    */
-  UPDATE_TAG_MISSING_PARAMETERS: {
+  UPDATE_POI_MISSING_PARAMETERS: {
     code: 0x20a,
     httpCode: 400,
     module: 'publish'
   },
 
   /**
-   * Removing media tags failed, missing parameters.
+   * Removing media points of interest failed, missing parameters.
    *
-   * @property REMOVE_TAGS_MISSING_PARAMETERS
+   * @property REMOVE_POIS_MISSING_PARAMETERS
    * @type Object
    * @final
    * @default 523
    */
-  REMOVE_TAGS_MISSING_PARAMETERS: {
+  REMOVE_POIS_MISSING_PARAMETERS: {
     code: 0x20b,
     httpCode: 400,
     module: 'publish'
@@ -1166,85 +1208,29 @@ var HTTP_ERRORS = {
   },
 
   /**
-   * Updating a media tag failed, wrong parameters.
+   * Updating a media point of interest failed, wrong parameters.
    *
-   * @property UPDATE_TAG_WRONG_PARAMETERS
+   * @property UPDATE_POI_WRONG_PARAMETERS
    * @type Object
    * @final
    * @default 535
    */
-  UPDATE_TAG_WRONG_PARAMETERS: {
+  UPDATE_POI_WRONG_PARAMETERS: {
     code: 0x217,
     httpCode: 400,
     module: 'publish'
   },
 
   /**
-   * Updating a media chapter failed, missing parameters.
+   * Removing media points of interest failed, wrong parameters.
    *
-   * @property UPDATE_CHAPTER_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 536
-   */
-  UPDATE_CHAPTER_MISSING_PARAMETERS: {
-    code: 0x218,
-    httpCode: 400,
-    module: 'publish'
-  },
-
-  /**
-   * Updating a media chapter failed, wrong parameters.
-   *
-   * @property UPDATE_CHAPTER_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 537
-   */
-  UPDATE_CHAPTER_WRONG_PARAMETERS: {
-    code: 0x219,
-    httpCode: 400,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media tags failed, wrong parameters.
-   *
-   * @property REMOVE_TAGS_WRONG_PARAMETERS
+   * @property REMOVE_POIS_WRONG_PARAMETERS
    * @type Object
    * @final
    * @default 538
    */
-  REMOVE_TAGS_WRONG_PARAMETERS: {
+  REMOVE_POIS_WRONG_PARAMETERS: {
     code: 0x21a,
-    httpCode: 400,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media chapters failed, missing parameters.
-   *
-   * @property REMOVE_CHAPTERS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 539
-   */
-  REMOVE_CHAPTERS_MISSING_PARAMETERS: {
-    code: 0x21b,
-    httpCode: 400,
-    module: 'publish'
-  },
-
-  /**
-   * Removing media chapters failed, wrong parameters.
-   *
-   * @property REMOVE_CHAPTERS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 540
-   */
-  REMOVE_CHAPTERS_WRONG_PARAMETERS: {
-    code: 0x21c,
     httpCode: 400,
     module: 'publish'
   },
@@ -1252,12 +1238,12 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, missing parameters.
    *
-   * @property CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS
+   * @property CONVERT_POIS_MISSING_PARAMETERS
    * @type Object
    * @final
    * @default 541
    */
-  CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS: {
+  CONVERT_POIS_MISSING_PARAMETERS: {
     code: 0x21d,
     httpCode: 400,
     module: 'publish'
@@ -1266,12 +1252,12 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, wrong parameters.
    *
-   * @property CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS
+   * @property CONVERT_POIS_WRONG_PARAMETERS
    * @type Object
    * @final
    * @default 542
    */
-  CONVERT_POINTS_OF_INTEREST_WRONG_PARAMETERS: {
+  CONVERT_POIS_WRONG_PARAMETERS: {
     code: 0x21e,
     httpCode: 400,
     module: 'publish'

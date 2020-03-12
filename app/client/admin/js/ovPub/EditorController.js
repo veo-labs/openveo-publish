@@ -204,7 +204,7 @@
      */
     function saveChapterSuccessCb(resp) {
       $scope.file = null;
-      $scope.modelToEdit = resp.data[$scope.selectedData.value === 'chapters' ? 'chapter' : 'tag'];
+      $scope.modelToEdit = resp.data.poi;
       $scope.simpleMimeType = $scope.getFileMimeType();
 
       var i = searchPosition($scope.modelToEdit.id);

@@ -7,6 +7,7 @@
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
@@ -157,4 +158,28 @@ module.exports.onGroupsDeleted = function(ids, callback) {
         callback();
     }
   );
+};
+
+/**
+ * Handles event when medias have been deleted.
+ *
+ * Remove points of interest related to the media.
+ *
+ * @method onMediasDeleted
+ * @static
+ * @param {Array} medias The list of deleted medias
+ * @param {Function} callback Function to call when it's done with:
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+module.exports.onMediasDeleted = function(medias, callback) {
+  var poiProvider = new PoiProvider(process.api.getCoreApi().getDatabase());
+  var poiIds = [];
+
+  medias.forEach(function(media) {
+    poiIds = poiIds.concat((media.chapters || []).concat(media.tags || []));
+  });
+
+  if (!poiIds.length) return callback();
+
+  poiProvider.remove(new ResourceFilter().in('id', poiIds), callback);
 };

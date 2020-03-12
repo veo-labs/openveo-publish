@@ -30,9 +30,10 @@ var acceptedImagesExtensions = [
  * @constructor
  * @param {Object} mediaPackage Information about the video
  * @param {VideoProvider} videoProvider A video provider
+ * @param {PoiProvider} poiProvider Points of interest provider
  */
-function VideoPackage(mediaPackage, videoProvider) {
-  VideoPackage.super_.call(this, mediaPackage, videoProvider);
+function VideoPackage(mediaPackage, videoProvider, poiProvider) {
+  VideoPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
 }
 
 module.exports = VideoPackage;

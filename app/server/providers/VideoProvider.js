@@ -13,9 +13,7 @@ var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPla
 var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
-var fileSystemApi = openVeoApi.fileSystem;
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
-var NotFoundError = openVeoApi.errors.NotFoundError;
 
 /**
  * Defines a VideoProvider to get and save videos.
@@ -224,28 +222,27 @@ function updateMedia(id, modifier, callback) {
 }
 
 /**
- * Resolves media tag file path.
+ * Resolves media point of interest file path.
  *
- * @method getTagFilePath
- * @private
- * @param {String} mediaId The media id
+ * @method getPoiFilePath
+ * @param {String} mediaId The media id the point of interest belongs to
  * @param {Object} file The file information
  * @param {String} file.mimeType The file MIME type
- * @param {String} file.fileName The file name to resolve
+ * @param {String} file.fileName The file name
  * @return {String} The resolved file path
  */
-function getTagFilePath(mediaId, file) {
+VideoProvider.prototype.getPoiFilePath = function(mediaId, file) {
   if (file.mimeType.substr(0, 'image'.length) != 'image')
     return '/publish/player/videos/' + mediaId + '/uploads/' + file.fileName;
   else
     return '/publish/' + mediaId + '/uploads/' + file.fileName;
-}
+};
 
 /**
  * Fetches a media.
  *
  * If filter corresponds to more than one media, the first found media will be the returned one.
- * If the media point of interests are in percents, needPointsOfInterestUnitConversion property will be added
+ * If the media point of interest are in percents, needPointsOfInterestUnitConversion property will be added
  * to the media.
  *
  * @method getOne
@@ -581,33 +578,68 @@ VideoProvider.prototype.updateTitle = function(id, title, callback) {
  */
 VideoProvider.prototype.remove = function(filter, callback) {
   var self = this;
+  var medias;
+  var totalRemovedMedias = 0;
 
-  // Find medias
-  this.getAll(
-    filter,
-    {
-      include: ['id', 'mediaId', 'type']
+  async.series([
+
+    // Find medias
+    function(callback) {
+      VideoProvider.super_.prototype.getAll.call(
+        self,
+        filter,
+        {
+          include: ['id', 'mediaId', 'type', 'tags', 'chapters']
+        },
+        {
+          id: 'desc'
+        },
+        function(getAllError, fetchedMedias) {
+          medias = fetchedMedias;
+          return self.executeCallback(callback, getAllError);
+        }
+      );
     },
-    {
-      id: 'desc'
-    },
-    function(getAllError, medias) {
-      if (getAllError) return self.executeCallback(callback, getAllError);
+
+    // Remove medias
+    function(callback) {
       if (!medias || !medias.length) return self.executeCallback(callback);
 
       // Remove medias
       VideoProvider.super_.prototype.remove.call(self, filter, function(removeError, total) {
-        if (removeError) return self.executeCallback(callback, removeError);
-
-        // Remove related datas
-        removeAllDataRelatedToVideo(medias, function(error) {
-          if (error) return callback(error);
-
-          callback(null, total);
-        });
+        totalRemovedMedias = total;
+        return self.executeCallback(callback, removeError);
       });
+
+    },
+
+    // Remove related datas
+    function(callback) {
+      if (!medias || !medias.length) return self.executeCallback(callback);
+
+      removeAllDataRelatedToVideo(medias, function(removeRelatedError) {
+        return self.executeCallback(callback, removeRelatedError);
+      });
+    },
+
+    // Execute hook
+    function(callback) {
+      if (!medias || !medias.length) return self.executeCallback(callback);
+
+      var api = process.api.getCoreApi();
+      var publishApi = process.api.getApi('publish');
+      api.executeHook(
+        publishApi.getHooks().MEDIAS_DELETED,
+        medias,
+        function(hookError) {
+          self.executeCallback(callback, hookError);
+        }
+      );
     }
-  );
+
+  ], function(error, results) {
+    self.executeCallback(callback, error, !error ? totalRemovedMedias : undefined);
+  });
 };
 
 /**
@@ -699,6 +731,8 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
 VideoProvider.prototype.createIndexes = function(callback) {
   this.storage.createIndexes(this.location, [
     {key: {title: 'text', description: 'text'}, weights: {title: 2}, name: 'querySearch'},
+    {key: {tags: 1}, name: 'byTags'},
+    {key: {chapters: 1}, name: 'byChapters'},
     {key: {'metadata.groups': 1}, name: 'byGroups'},
     {key: {'metadata.user': 1}, name: 'byOwner'}
   ], function(error, result) {
@@ -707,427 +741,4 @@ VideoProvider.prototype.createIndexes = function(callback) {
 
     callback(error);
   });
-};
-
-/**
- * Updates a tag associated to a media.
- *
- * If tag does not exist for the media it is created.
- * The associated file replaces the old file.
- *
- * @method updateOneTag
- * @async
- * @param {ResourceFilter} [filter] Rules to filter the media to update
- * @param {Object} tag The tag description object
- * @param String [tag.id] The tag id
- * @param {Number} [tag.value] The tag time in milliseconds
- * @param {String} [tag.name] The tag name
- * @param {String} [tag.description] The tag description
- * @param {String} [tag.file] The tag file description object
- * @param {String} tag.file.originalName The tag file original name
- * @param {String} tag.file.mimeType The tag file MIME type
- * @param {String} tag.file.fileName The tag file name
- * @param {Number} tag.file.size The tag file size
- * @param {String} tag.file.url The tag file URI
- * @param {Object} [file] The new file to associate to the tag
- * @param {String} file.originalname The tag file original name
- * @param {String} file.mimetype The tag file MIME type
- * @param {String} file.filename The tag file name
- * @param {Number} file.size The tag file size
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
- *   - **Object** The tag
- */
-VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
-  var self = this;
-  var fileNameToRemove;
-  var total;
-  var found = false;
-  var asyncFunctions = [];
-  var tagToAdd;
-
-  if (file) {
-    file.originalName = file.originalname;
-    file.mimeType = file.mimetype;
-    file.fileName = file.filename;
-  }
-
-  // Get media
-  this.getOne(
-    filter,
-    {
-      include: ['id', 'tags']
-    },
-    function(getOneError, media) {
-      if (getOneError) return self.executeCallback(callback, getOneError);
-      if (!media) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
-
-      if (!media.tags) media.tags = [];
-
-      if (tag.id) {
-
-        // Tag exists
-        // Try to find it in media tags
-        for (var i = 0; i < media.tags.length; i++) {
-          var mediaTag = media.tags[i];
-
-          if (mediaTag.id === tag.id) {
-
-            // Tag found in media tags
-            // Update it
-
-            found = true;
-
-            // No more file associated to the tag
-            // Mark old file as "to be deleted"
-            if (!tag.file && mediaTag.file)
-              fileNameToRemove = mediaTag.file.fileName;
-
-            if (file) {
-
-              // New file uploaded
-
-              // Old file should be deleted
-              // Mark old file as "to be deleted"
-              if (mediaTag.file)
-                fileNameToRemove = mediaTag.file.fileName;
-
-              mediaTag.file = {
-                originalName: file.originalName,
-                mimeType: file.mimeType,
-                fileName: file.fileName,
-                size: file.size,
-                url: getTagFilePath(media.id, file)
-              };
-
-            } else if (!tag.file) {
-
-              // No new file and no more file associated to the tag
-
-              delete mediaTag.file;
-            }
-
-            if (tag.name) mediaTag.name = tag.name;
-            if (tag.hasOwnProperty('description')) mediaTag.description = tag.description;
-            if (tag.hasOwnProperty('value')) mediaTag.value = tag.value;
-
-            tagToAdd = mediaTag;
-            break;
-
-          }
-        }
-
-        if (!found) {
-          return self.executeCallback(
-            callback,
-            new Error('Tag with id "' + tag.id + '" was not found in media "' + media.id + '"')
-          );
-        }
-
-      } else {
-
-        // Tag does not exist
-        // Add it
-
-        var newTag = {
-          id: shortid.generate(),
-          name: tag.name,
-          description: tag.description,
-          value: tag.value
-        };
-
-        if (file) {
-          newTag.file = {
-            originalName: file.originalName,
-            mimeType: file.mimeType,
-            fileName: file.fileName,
-            size: file.size,
-            url: getTagFilePath(media.id, file)
-          };
-        }
-
-        tagToAdd = newTag;
-        media.tags.push(newTag);
-      }
-
-      // Remove file
-      if (fileNameToRemove) {
-        asyncFunctions.push(function(removeCallback) {
-          var oldFilePath = process.rootPublish + '/assets/player/videos/' + media.id + '/uploads/' + fileNameToRemove;
-          fileSystemApi.rm(oldFilePath, function(removeError) {
-            removeCallback(removeError);
-          });
-        });
-      }
-
-      // Update media tags
-      asyncFunctions.push(function(updateCallback) {
-        self.updateOne(
-          new ResourceFilter().equal('id', media.id),
-          {
-            tags: media.tags
-          },
-          function(updateError, updateTotal) {
-            total = updateTotal;
-            updateCallback(updateError);
-          }
-        );
-      });
-
-      async.parallel(asyncFunctions, function(error) {
-        return self.executeCallback(callback, error, total, tagToAdd);
-      });
-
-    }
-  );
-};
-
-/**
- * Updates a chapter associated to a media.
- *
- * If chapter does not exist for the media it is created.
- *
- * @method updateOneChapter
- * @async
- * @param {ResourceFilter} [filter] Rules to filter the media to update
- * @param {Object} chapter The chapter description object
- * @param String [chapter.id] The chapter id
- * @param {Number} [chapter.value] The chapter time in milliseconds
- * @param {String} [chapter.name] The chapter name
- * @param {String} [chapter.description] The chapter description
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
- *   - **Object** The chapter
- */
-VideoProvider.prototype.updateOneChapter = function(filter, chapter, callback) {
-  var self = this;
-  var found = false;
-  var chapterToAdd;
-
-  // Get media
-  this.getOne(
-    filter,
-    {
-      include: ['id', 'chapters']
-    },
-    function(getOneError, media) {
-      if (getOneError) return self.executeCallback(callback, getOneError);
-      if (!media) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
-
-      if (!media.chapters) media.chapters = [];
-
-      if (chapter.id) {
-
-        // Chapter exists
-        // Try to find it in media chapters
-        for (var i = 0; i < media.chapters.length; i++) {
-          var mediaChapter = media.chapters[i];
-
-          if (mediaChapter.id === chapter.id) {
-
-            // Chapter found in media chapters
-            // Update it
-
-            found = true;
-
-            if (chapter.name) mediaChapter.name = chapter.name;
-            if (chapter.hasOwnProperty('description')) mediaChapter.description = chapter.description;
-            if (chapter.hasOwnProperty('value')) mediaChapter.value = chapter.value;
-
-            chapterToAdd = chapter;
-            break;
-
-          }
-        }
-
-        if (!found) {
-          return self.executeCallback(
-            callback,
-            new Error('Chapter with id "' + chapter.id + '" was not found in media "' + media.id + '"')
-          );
-        }
-
-      } else {
-
-        // Chapter does not exist
-        // Add it
-
-        chapterToAdd = {
-          id: shortid.generate(),
-          name: chapter.name,
-          description: chapter.description,
-          value: chapter.value
-        };
-        media.chapters.push(chapterToAdd);
-      }
-
-      // Update media chapters
-      self.updateOne(
-        new ResourceFilter().equal('id', media.id),
-        {
-          chapters: media.chapters
-        },
-        function(updateError, total) {
-          return self.executeCallback(callback, updateError, total, chapterToAdd);
-        }
-      );
-
-    }
-  );
-};
-
-/**
- * Removes tags associated to a media.
- *
- * Files associated to deleted tags are also removed.
- *
- * @method removeTags
- * @async
- * @param {ResourceFilter} [filter] Rules to filter the media to update
- * @param {Array} tagsIds The list of tags ids
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
- */
-VideoProvider.prototype.removeTags = function(filter, tagsIds, callback) {
-  var self = this;
-  var oldFilesNames = [];
-  var filteredTags = [];
-  var asyncFunctions = [];
-  var total;
-
-  // Get media
-  this.getOne(
-    filter,
-    {
-      include: ['id', 'tags']
-    },
-    function(getOneError, media) {
-      if (getOneError) return self.executeCallback(callback, getOneError);
-      if (!media) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
-
-      // Find tags to remove in media tags
-      if (media.tags && media.tags.length) {
-        filteredTags = media.tags.filter(function(mediaTag) {
-          if (tagsIds.indexOf(mediaTag.id) >= 0) {
-
-            // Found a tag to remove
-            if (mediaTag.file) oldFilesNames.push(mediaTag.file.fileName);
-            return false;
-
-          } else
-            return true;
-        });
-      }
-
-      if (!media.tags || filteredTags.length !== media.tags.length - tagsIds.length) {
-
-        // At least one of the tag was not found in media tags
-        return self.executeCallback(
-          callback,
-          new Error('One of the tags (' + tagsIds.join(',') + ') was not found in media ' + media.id)
-        );
-
-      }
-
-      // Remove all files
-      if (oldFilesNames.length) {
-        oldFilesNames.forEach(function(oldFileName) {
-          asyncFunctions.push(function(removeCallback) {
-            var oldFilePath = process.rootPublish + '/assets/player/videos/' + media.id + '/uploads/' + oldFileName;
-            fileSystemApi.rm(oldFilePath, function(removeError) {
-              removeCallback(removeError);
-            });
-          });
-        });
-      }
-
-      // Update media tags
-      asyncFunctions.push(function(updateCallback) {
-        self.updateOne(
-          new ResourceFilter().equal('id', media.id),
-          {
-            tags: filteredTags
-          },
-          function(updateError, updateTotal) {
-            total = updateTotal;
-            updateCallback(updateError);
-          }
-        );
-      });
-
-      async.parallel(asyncFunctions, function(error) {
-        return self.executeCallback(callback, error, total);
-      });
-
-    }
-  );
-};
-
-/**
- * Removes chapters associated to a media.
- *
- * @method removeChapters
- * @async
- * @param {ResourceFilter} [filter] Rules to filter the media to update
- * @param {Array} chaptersIds The list of chapters ids
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
- */
-VideoProvider.prototype.removeChapters = function(filter, chaptersIds, callback) {
-  var self = this;
-  var filteredChapters = [];
-  var asyncFunctions = [];
-  var total;
-
-  // Get media
-  this.getOne(
-    filter,
-    {
-      include: ['id', 'chapters']
-    },
-    function(getOneError, media) {
-      if (getOneError) return self.executeCallback(callback, getOneError);
-      if (!media) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
-
-      // Find chapters to remove in media chapters
-      if (media.chapters && media.chapters.length) {
-        filteredChapters = media.chapters.filter(function(mediaChapter) {
-          return (chaptersIds.indexOf(mediaChapter.id) === -1);
-        });
-      }
-
-      if (!media.chapters || filteredChapters.length !== media.chapters.length - chaptersIds.length) {
-
-        // At least one of the chapter was not found in media chapters
-        return self.executeCallback(
-          callback,
-          new Error('One of the chapters (' + chaptersIds.join(',') + ') was not found in media ' + media.id)
-        );
-
-      }
-
-      // Update media chapters
-      asyncFunctions.push(function(updateCallback) {
-        self.updateOne(
-          new ResourceFilter().equal('id', media.id),
-          {
-            chapters: filteredChapters
-          },
-          function(updateError, updateTotal) {
-            total = updateTotal;
-            updateCallback(updateError);
-          }
-        );
-      });
-
-      async.parallel(asyncFunctions, function(error) {
-        return self.executeCallback(callback, error, total);
-      });
-
-    }
-  );
 };

@@ -5,12 +5,12 @@ var chai = require('chai');
 var mock = require('mock-require');
 var spies = require('chai-spies');
 var api = require('@openveo/api');
+var PUBLISH_HOOKS = process.requirePublish('app/server/hooks.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var ResourceFilter = api.storages.ResourceFilter;
-var NotFoundError = api.errors.NotFoundError;
 
 var assert = chai.assert;
 chai.should();
@@ -25,6 +25,7 @@ describe('VideoProvider', function() {
   var EntityProvider;
   var storage;
   var coreApi;
+  var publishApi;
   var expectedMedias;
   var originalCoreApi;
   var anonymousId = 'anonymousId';
@@ -44,21 +45,21 @@ describe('VideoProvider', function() {
       var callback = args.shift();
       if (callback) return callback.apply(null, args);
     };
-    EntityProvider.prototype.getAll = function(filter, fields, sort, callback) {
+    EntityProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedMedias);
-    };
-    EntityProvider.prototype.add = function(resources, callback) {
+    });
+    EntityProvider.prototype.add = chai.spy(function(resources, callback) {
       callback(null, expectedMedias.length, resources);
-    };
-    EntityProvider.prototype.getOne = function(filter, fields, callback) {
+    });
+    EntityProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
       callback(null, expectedMedias[0]);
-    };
+    });
     EntityProvider.prototype.remove = chai.spy(function(filter, callback) {
       callback(null, expectedMedias.length);
     });
-    EntityProvider.prototype.updateOne = function(filter, modifications, callback) {
+    EntityProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
-    };
+    });
 
     openVeoApi = {
       providers: {
@@ -89,6 +90,12 @@ describe('VideoProvider', function() {
       videoTmpDir: 'tmp'
     };
 
+    publishApi = {
+      getHooks: function() {
+        return PUBLISH_HOOKS;
+      }
+    };
+
     mediaPlatformFactory = {
       get: function() {
         return {
@@ -105,7 +112,14 @@ describe('VideoProvider', function() {
       },
       getAnonymousUserId: function() {
         return anonymousId;
-      }
+      },
+      getApi: function(pluginName) {
+        if (pluginName === 'publish') return publishApi;
+        return null;
+      },
+      executeHook: chai.spy(function(hook, data, callback) {
+        callback();
+      })
     };
 
     originalCoreApi = process.api;
@@ -923,6 +937,28 @@ describe('VideoProvider', function() {
       });
     });
 
+    it('should execute hook MEDIAS_DELETED with the removed medias', function(done) {
+      expectedMedias = [
+        {
+          id: '42'
+        }
+      ];
+
+      coreApi.executeHook = chai.spy(function(hook, data, callback) {
+        assert.equal(hook, PUBLISH_HOOKS.MEDIAS_DELETED, 'Wrong hook');
+        assert.deepEqual(data, expectedMedias, 'Wrong medias');
+        callback();
+      });
+
+      provider.remove(new ResourceFilter(), function(error, total) {
+        assert.isNull(error, 'Unexpected error');
+        EntityProvider.prototype.getAll.should.have.been.called.exactly(1);
+        EntityProvider.prototype.remove.should.have.been.called.exactly(1);
+        coreApi.executeHook.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
     it('should execute callback with an error if removing associated files failed', function(done) {
       var expectedError = new Error('Something went wrong');
       expectedMedias = [
@@ -989,7 +1025,7 @@ describe('VideoProvider', function() {
     it('should execute callback with an error if getting medias failed', function(done) {
       var expectedError = new Error('Something went wrong');
 
-      provider.getAll = function(filter, fields, sort, callback) {
+      EntityProvider.prototype.getAll = function(filter, fields, sort, callback) {
         callback(expectedError);
       };
 
@@ -1001,8 +1037,29 @@ describe('VideoProvider', function() {
 
     it('should not do anthing if no media found', function(done) {
       provider.remove(new ResourceFilter(), function(error, total) {
-        assert.isUndefined(error, 'Unexpected error');
+        assert.isNull(error, 'Unexpected error');
         EntityProvider.prototype.remove.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if hook MEDIAS_DELETED failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      expectedMedias = [
+        {
+          id: '42'
+        }
+      ];
+
+      coreApi.executeHook = chai.spy(function(hook, data, callback) {
+        callback(expectedError);
+      });
+
+      provider.remove(new ResourceFilter(), function(error, total) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        EntityProvider.prototype.getAll.should.have.been.called.exactly(1);
+        EntityProvider.prototype.remove.should.have.been.called.exactly(1);
+        coreApi.executeHook.should.have.been.called.exactly(1);
         done();
       });
     });
@@ -1117,739 +1174,6 @@ describe('VideoProvider', function() {
 
       provider.updateOne(new ResourceFilter(), expectedModifications, function(error, total) {
         assert.strictEqual(error, expectedError, 'Wrong error');
-        done();
-      });
-    });
-
-  });
-
-  describe('updateOneTag', function() {
-
-    it('should update a media tag', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 42000
-            }
-          ]
-        }
-      ];
-
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedTag = {
-        id: expectedMedias[0].tags[0].id,
-        value: 43000,
-        name: 'New name',
-        description: 'New description',
-        unexpectedProperty: 'Unexpected property value'
-      };
-      var expectedFile = {
-        originalname: 'originalName',
-        mimetype: 'mimetype',
-        filename: 'fileName',
-        size: 42
-      };
-
-      provider.updateOne = function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong filter'
-        );
-        assert.equal(modifications.tags.length, 1, 'Wrong number of tags');
-        assert.equal(modifications.tags[0].name, expectedTag.name, 'Wrong name');
-        assert.equal(modifications.tags[0].value, expectedTag.value, 'Wrong value');
-        assert.equal(modifications.tags[0].description, expectedTag.description, 'Wrong description');
-        assert.equal(modifications.tags[0].file.originalName, expectedFile.originalname, 'Wrong original name');
-        assert.equal(modifications.tags[0].file.mimeType, expectedFile.mimetype, 'Wrong type MIME');
-        assert.equal(modifications.tags[0].file.fileName, expectedFile.filename, 'Wrong file name');
-        assert.equal(modifications.tags[0].file.size, expectedFile.size, 'Wrong file size');
-        assert.notProperty(modifications.tags[0], 'unexpectedProperty', 'Unexpected property');
-        assert.equal(
-          modifications.tags[0].file.url,
-          '/publish/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFile.filename,
-          'Wrong file size'
-        );
-        callback(null, 1);
-      };
-
-      provider.updateOneTag(expectedFilter, expectedTag, expectedFile, function(error, total, tag) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        assert.isNotEmpty(tag, 'Wrong tag');
-        done();
-      });
-    });
-
-    it('should add a media tag if the tag id is not specified', function(done) {
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedTag = {
-        value: 42000,
-        name: 'Name',
-        description: 'Description',
-        unexpectedProperty: 'Unexpected property value'
-      };
-      var expectedFile = {
-        originalname: 'originalName',
-        mimetype: 'mimetype',
-        filename: 'fileName',
-        size: 43
-      };
-
-      provider.updateOne = function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong filter'
-        );
-        assert.equal(modifications.tags.length, 1, 'Wrong number of tags');
-        assert.equal(modifications.tags[0].name, expectedTag.name, 'Wrong name');
-        assert.equal(modifications.tags[0].value, expectedTag.value, 'Wrong value');
-        assert.equal(modifications.tags[0].description, expectedTag.description, 'Wrong description');
-        assert.equal(modifications.tags[0].file.originalName, expectedFile.originalname, 'Wrong original name');
-        assert.equal(modifications.tags[0].file.mimeType, expectedFile.mimetype, 'Wrong type MIME');
-        assert.equal(modifications.tags[0].file.fileName, expectedFile.filename, 'Wrong file name');
-        assert.equal(modifications.tags[0].file.size, expectedFile.size, 'Wrong file size');
-        assert.notProperty(modifications.tags[0], 'unexpectedProperty', 'Unexpected property');
-        assert.equal(
-          modifications.tags[0].file.url,
-          '/publish/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFile.filename,
-          'Wrong file size'
-        );
-        callback(null, 1);
-      };
-
-      provider.updateOneTag(expectedFilter, expectedTag, expectedFile, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        done();
-      });
-    });
-
-    it('should remove old file associated to tag if no file associated anymore', function(done) {
-      var expectedFilenameToRemove = 'fileName';
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              value: 42000,
-              name: 'Name',
-              description: 'Description',
-              file: {
-                originalName: 'originalName',
-                mimeType: 'mimetype',
-                fileName: expectedFilenameToRemove,
-                size: 43
-              }
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedTag = {
-        id: expectedMedias[0].tags[0].id,
-        value: 42000,
-        name: 'Name',
-        description: 'Description'
-      };
-
-      openVeoApi.fileSystem.rm = chai.spy(function(filePath, callback) {
-        assert.equal(
-          filePath,
-          process.rootPublish + '/assets/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFilenameToRemove
-        );
-        callback();
-      });
-
-      provider.updateOneTag(expectedFilter, expectedTag, null, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should remove old file associated to tag if replaced', function(done) {
-      var expectedFilenameToRemove = 'fileName';
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              value: 42000,
-              name: 'Name',
-              description: 'Description',
-              file: {
-                originalName: 'originalName',
-                mimeType: 'mimetype',
-                fileName: expectedFilenameToRemove,
-                size: 43
-              }
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedTag = {
-        id: expectedMedias[0].tags[0].id,
-        value: 42000,
-        name: 'Name',
-        description: 'Description'
-      };
-      var expectedFile = {
-        originalname: 'newOriginalName',
-        mimetype: 'mimetype',
-        filename: 'newOfileName',
-        size: 44
-      };
-
-      openVeoApi.fileSystem.rm = chai.spy(function(filePath, callback) {
-        assert.equal(
-          filePath,
-          process.rootPublish + '/assets/player/videos/' + expectedMedias[0].id + '/uploads/' + expectedFilenameToRemove
-        );
-        callback();
-      });
-
-      provider.updateOneTag(expectedFilter, expectedTag, expectedFile, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if tag has an id not found in media tags', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 42000
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedTag = {
-        id: 'wrongId',
-        value: 42000,
-        name: 'Name',
-        description: 'Description'
-      };
-
-      provider.updateOneTag(expectedFilter, expectedTag, null, function(error, total) {
-        assert.isNotNull(error, 'Expected an error');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if getting media failed', function(done) {
-      var expectedError = new Error('Something went wrong');
-
-      provider.getOne = function(filter, fields, callback) {
-        callback(expectedError);
-      };
-
-      provider.updateOneTag(new ResourceFilter(), {}, {}, function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if updating media failed', function(done) {
-      var expectedError = new Error('Something went wrong');
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-
-      provider.updateOne = function(filter, modifications, callback) {
-        callback(expectedError);
-      };
-
-      provider.updateOneTag(
-        new ResourceFilter(),
-        {
-          value: 42000,
-          name: 'Name',
-          description: 'Description'
-        },
-        null,
-        function(error, total) {
-          assert.strictEqual(error, expectedError, 'Wrong error');
-          done();
-        }
-      );
-    });
-
-    it('should execute callback with an error if media is not found', function(done) {
-      provider.getOne = function(filter, fields, callback) {
-        callback();
-      };
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(null, 1);
-      });
-
-      provider.updateOneTag(new ResourceFilter(), {}, {}, function(error, total) {
-        assert.instanceOf(error, NotFoundError, 'Wrong error');
-        provider.updateOne.should.have.been.called.exactly(0);
-        openVeoApi.fileSystem.rm.should.have.been.called.exactly(0);
-        done();
-      });
-    });
-
-  });
-
-  describe('updateOneChapter', function() {
-
-    it('should update a media chapter', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          chapters: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 42000
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter();
-      var expectedChapter = {
-        id: expectedMedias[0].chapters[0].id,
-        name: 'New name',
-        description: 'New description',
-        value: 43000,
-        unexpectedProperty: 'Unexpected property value'
-      };
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.equal(modifications.chapters[0].name, expectedChapter.name, 'Wrong name');
-        assert.equal(modifications.chapters[0].description, expectedChapter.description, 'Wrong description');
-        assert.equal(modifications.chapters[0].value, expectedChapter.value, 'Wrong value');
-        assert.notProperty(modifications.chapters[0], 'unexpectedProperty', 'Unexpected property');
-        callback(null, 1);
-      });
-
-      provider.updateOneChapter(expectedFilter, expectedChapter, function(error, total, chapter) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        assert.isNotEmpty(chapter, 'Wrong chapter');
-        provider.updateOne.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if media is not found', function(done) {
-      provider.getOne = function(filter, fields, callback) {
-        callback();
-      };
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(null, 1);
-      });
-
-      provider.updateOneChapter(new ResourceFilter(), {}, function(error, total) {
-        assert.instanceOf(error, NotFoundError, 'Wrong error');
-        provider.updateOne.should.have.been.called.exactly(0);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if getting media failed', function(done) {
-      var expectedError = new Error('Something went wrong');
-
-      provider.getOne = function(filter, fields, callback) {
-        callback(expectedError);
-      };
-
-      provider.updateOneChapter(new ResourceFilter(), {}, function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if chapter id is not found in media chapters', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          chapters: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 42000
-            }
-          ]
-        }
-      ];
-      var expectedChapter = {
-        id: 'wrongId',
-        name: 'New name',
-        description: 'New description',
-        value: 43000
-      };
-      provider.updateOneChapter(new ResourceFilter(), expectedChapter, function(error, total) {
-        assert.isNotNull(error, 'Expected an error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-    it('should add a media chapter if the chapter id is not specified', function(done) {
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-      var expectedFilter = new ResourceFilter();
-      var expectedChapter = {
-        name: 'New name',
-        description: 'New description',
-        value: 43000,
-        unexpectedProperty: 'Unexpected property value'
-      };
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.isNotEmpty(modifications.chapters[0].id, 'Expected id to be generated');
-        assert.equal(modifications.chapters[0].name, expectedChapter.name, 'Wrong name');
-        assert.equal(modifications.chapters[0].description, expectedChapter.description, 'Wrong description');
-        assert.equal(modifications.chapters[0].value, expectedChapter.value, 'Wrong value');
-        assert.notProperty(modifications.chapters[0], 'unexpectedProperty', 'Unexpected property');
-        callback(null, 1);
-      });
-
-      provider.updateOneChapter(expectedFilter, expectedChapter, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        provider.updateOne.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if update failed', function(done) {
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-      var expectedError = new Error('Something went wrong');
-      var expectedChapter = {
-        name: 'New name',
-        description: 'New description',
-        value: 43000
-      };
-
-      provider.updateOne = function(filter, modifications, callback) {
-        callback(expectedError);
-      };
-
-      provider.updateOneChapter(new ResourceFilter(), expectedChapter, function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-  });
-
-  describe('removeTags', function() {
-
-    it('should remove tags from a media', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedIds = [expectedMedias[0].tags[0].id];
-
-      provider.updateOne = function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.isEmpty(modifications.tags, 'Unexpected tags');
-        callback(null, 1);
-      };
-
-      provider.removeTags(expectedFilter, expectedIds, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        done();
-      });
-    });
-
-    it('should remove file associated to deleted tags', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000,
-              file: {
-                originalName: 'originalName',
-                mimeType: 'mimetype',
-                fileName: 'fileName',
-                size: 43
-              }
-            }
-          ]
-        }
-      ];
-      var expectedIds = [expectedMedias[0].tags[0].id];
-
-      openVeoApi.fileSystem.rm = chai.spy(function(filePath, callback) {
-        var mediasDirectoryPath = process.rootPublish + '/assets/player/videos/';
-        var tag = expectedMedias[0].tags[0];
-        var expectedPath = mediasDirectoryPath + expectedMedias[0].id + '/uploads/' + tag.file.fileName;
-        assert.equal(filePath, expectedPath, 'Wrong path');
-        callback();
-      });
-
-      provider.removeTags(new ResourceFilter(), expectedIds, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        openVeoApi.fileSystem.rm.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if media is not found', function(done) {
-      provider.getOne = function(filter, fields, callback) {
-        callback();
-      };
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(null, 1);
-      });
-
-      provider.removeTags(new ResourceFilter(), [], function(error, total) {
-        assert.instanceOf(error, NotFoundError, 'Wrong error');
-        provider.updateOne.should.have.been.called.exactly(0);
-        openVeoApi.fileSystem.rm.should.have.been.called.exactly(0);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if getting media failed', function(done) {
-      var expectedError = new Error('Something went wrong');
-
-      provider.getOne = function(filter, fields, callback) {
-        callback(expectedError);
-      };
-
-      provider.removeTags(new ResourceFilter(), [], function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if one of the tags is not found', function(done) {
-      expectedMedias = [
-        {
-          id: '42'
-        }
-      ];
-
-      provider.removeTags(new ResourceFilter(), ['wrongId'], function(error, total) {
-        assert.isNotNull(error, 'Expected an error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if updating media failed', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          tags: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000
-            }
-          ]
-        }
-      ];
-      var expectedError = new Error('Something went wrong');
-      var expectedIds = [expectedMedias[0].tags[0].id];
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(expectedError);
-      });
-
-      provider.removeTags(new ResourceFilter(), expectedIds, function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        assert.isUndefined(total, 'Unexpected total');
-        provider.updateOne.should.have.been.called.exactly(1);
-        done();
-      });
-
-    });
-
-  });
-
-  describe('removeChapters', function() {
-
-    it('should remove chapters from a media', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          chapters: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000
-            }
-          ]
-        }
-      ];
-      var expectedFilter = new ResourceFilter().equal('id', expectedMedias[0].id);
-      var expectedIds = [expectedMedias[0].chapters[0].id];
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.isEmpty(modifications.chapters, 'Unexpected chapters<');
-        callback(null, 1);
-      });
-
-      provider.removeChapters(expectedFilter, expectedIds, function(error, total) {
-        assert.isNull(error, 'Unexpected error');
-        assert.equal(total, 1, 'Wrong total');
-        provider.updateOne.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if media is not found', function(done) {
-      provider.getOne = chai.spy(function(filter, fields, callback) {
-        callback();
-      });
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(null, 1);
-      });
-
-      provider.removeChapters(new ResourceFilter(), [], function(error, total) {
-        assert.instanceOf(error, NotFoundError, 'Wrong error');
-        provider.getOne.should.have.been.called.exactly(1);
-        provider.updateOne.should.have.been.called.exactly(0);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if getting media failed', function(done) {
-      var expectedError = new Error('Something went wrong');
-
-      provider.getOne = chai.spy(function(filter, fields, callback) {
-        callback(expectedError);
-      });
-
-      provider.removeChapters(new ResourceFilter(), [], function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        provider.getOne.should.have.been.called.exactly(1);
-        done();
-      });
-    });
-
-    it('should execute callback with an error if one of the chapters is not found', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          chapters: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000
-            }
-          ]
-        }
-      ];
-
-      provider.removeChapters(new ResourceFilter(), ['wrongId'], function(error, total) {
-        assert.isNotNull(error, 'Expected an error');
-        assert.isUndefined(total, 'Unexpected total');
-        done();
-      });
-    });
-
-    it('should execute callback with an error if updating media failed', function(done) {
-      expectedMedias = [
-        {
-          id: '42',
-          chapters: [
-            {
-              id: '43',
-              name: 'Name',
-              description: 'Description',
-              value: 43000
-            }
-          ]
-        }
-      ];
-      var expectedError = new Error('Something went wrong');
-
-      provider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(expectedError);
-      });
-
-      provider.removeChapters(new ResourceFilter(), [expectedMedias[0].chapters[0].id], function(error, total) {
-        assert.strictEqual(error, expectedError, 'Wrong error');
-        assert.isUndefined(total, 'Unexpected total');
-        provider.updateOne.should.have.been.called.exactly(1);
         done();
       });
     });

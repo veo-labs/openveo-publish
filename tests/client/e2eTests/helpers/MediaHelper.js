@@ -327,13 +327,7 @@ MediaHelper.prototype.getAddExample = function() {
         type: 'end'
       }
     ],
-    chapters: [
-      {
-        name: 'Chapter example',
-        description: 'Chapter example description',
-        value: 0.1
-      }
-    ],
+    chapters: ['1'],
     views: 0
   };
 };
@@ -368,13 +362,7 @@ MediaHelper.prototype.getUpdateExample = function() {
         type: 'end'
       }
     ],
-    chapters: [
-      {
-        name: 'Chapter example new name',
-        description: 'Chapter example new description',
-        value: 0.2
-      }
-    ],
+    chapters: ['2'],
     views: 100
   };
 };

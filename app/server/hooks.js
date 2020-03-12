@@ -33,7 +33,21 @@ var PUBLISH_HOOKS = {
    * @default 'properties.deleted'
    * @final
    */
-  PROPERTIES_DELETED: 'properties.deleted'
+  PROPERTIES_DELETED: 'properties.deleted',
+
+  /**
+   * One or several medias have been deleted.
+   *
+   * With:
+   * - **Array** The list of deleted medias
+   * - **Function** The function to call when action is done
+   *
+   * @property MEDIAS_DELETED
+   * @type String
+   * @default 'medias.deleted'
+   * @final
+   */
+  MEDIAS_DELETED: 'medias.deleted'
 
 };
 

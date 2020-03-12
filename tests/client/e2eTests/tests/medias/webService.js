@@ -8,11 +8,13 @@ var openVeoTest = require('@openveo/test');
 var OpenVeoClient = require('@openveo/rest-nodejs-client').OpenVeoClient;
 var ConfigurationPage = process.requirePublish('tests/client/e2eTests/pages/ConfigurationPage.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var MediaHelper = process.requirePublish('tests/client/e2eTests/helpers/MediaHelper.js');
+var PoiHelper = process.requirePublish('tests/client/e2eTests/helpers/PoiHelper.js');
 var PropertyHelper = process.requirePublish('tests/client/e2eTests/helpers/PropertyHelper.js');
 var CategoryHelper = process.requirePublish('tests/client/e2eTests/helpers/CategoryHelper.js');
 var datas = process.requirePublish('tests/client/e2eTests/resources/data.json');
@@ -26,6 +28,7 @@ describe('Videos web service', function() {
   var page;
   var webServiceClient;
   var mediaHelper;
+  var poiHelper;
   var propertyHelper;
   var categoryHelper;
   var addedProperties;
@@ -56,10 +59,12 @@ describe('Videos web service', function() {
     );
     var coreApi = process.api.getCoreApi();
     var videoProvider = new VideoProvider(coreApi.getDatabase());
+    var poiProvider = new PoiProvider(coreApi.getDatabase());
     var propertyProvider = new PropertyProvider(coreApi.getDatabase());
     var taxonomyProvider = process.api.getCoreApi().taxonomyProvider;
     webServiceClient = new OpenVeoClient(process.protractorConf.webServiceUrl, application.id, application.secret);
     mediaHelper = new MediaHelper(videoProvider);
+    poiHelper = new PoiHelper(poiProvider);
     propertyHelper = new PropertyHelper(propertyProvider);
     categoryHelper = new CategoryHelper(taxonomyProvider);
     page = new ConfigurationPage();
@@ -117,60 +122,275 @@ describe('Videos web service', function() {
   // Remove all videos after each test
   afterEach(function() {
     mediaHelper.removeAllEntities();
+    poiHelper.removeAllEntities();
   });
 
   describe('get /publish/videos', function() {
 
-    it('should be able to search videos without smart search', function(done) {
-      var textSearchPropertyPrefix = 'TestSearch';
-      var textSearchPropertySuffix = 'Smart';
-      var linesToAdd = [mediaHelper.getAddExample()];
+    it('should be able to search videos by keywords without smart search', function(done) {
+      var searchQuery = 'keyword';
+      var mediasToAdd = [
+        {
+          id: '0',
+          description: 'Description: ' + searchQuery
+        },
+        {
+          id: '1',
+          title: 'Title: ' + searchQuery
+        }
+      ];
 
-      /**
-       * Tests search with and without the smart search.
-       *
-       * @param {String} searchProperty The search property of the entity
-       * @return {Promise} Promise resolving when test is done
-       */
-      function testSmartSearch(searchProperty) {
-        var searchQuery = encodeURIComponent(
-          textSearchPropertyPrefix + searchProperty + textSearchPropertySuffix.slice(0, 2)
-        );
-        return webServiceClient.get('publish/videos?useSmartSearch=0&query=' + searchQuery).then(function(results) {
+      mediaHelper.addEntities(mediasToAdd).then(function(addedMedias) {
+        return webServiceClient.get(
+          'publish/videos?useSmartSearch=0&query=' + encodeURIComponent(searchQuery.slice(0, 2))
+        ).then(function(results) {
           var videos = results.entities;
           check(function() {
-            assert.equal(videos.length, 1, 'Unexpected number of videos');
-            assert.equal(videos[0].id, linesToAdd[0].id, 'Wrong video');
+            assert.lengthOf(videos, mediasToAdd.length, 'Unexpected number of videos');
+            assert.equal(videos[0].id, mediasToAdd[0].id, 'Wrong video 1');
+            assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
           }, done, true);
-          return webServiceClient.get('publish/videos?query=' + searchQuery);
+          return webServiceClient.get('publish/videos?query=' + encodeURIComponent(searchQuery.slice(0, 2)));
         }).then(function(results) {
           var videos = results.entities;
           check(function() {
             assert.equal(videos.length, 0, 'Unexpected videos');
-          }, done, true);
+          }, done);
         }).catch(function(error) {
           check(function() {
             assert.ok(false, error.message);
           }, done);
         });
-      }
-
-      mediaHelper.textSearchProperties.forEach(function(searchProperty) {
-        linesToAdd[0][searchProperty] = textSearchPropertyPrefix + searchProperty + textSearchPropertySuffix;
       });
+    });
 
-      mediaHelper.addEntities(linesToAdd).then(function(addedVideos) {
-        var promises = [];
+    it('should be able to search videos by keywords in tags and chapters', function(done) {
+      var searchQuery = 'keyword';
+      var poisToAdd = [
+        {
+          id: '0',
+          value: 0,
+          name: 'Tag name: ' + searchQuery
+        },
+        {
+          id: '1',
+          value: 1000,
+          name: 'Tag description: ' + searchQuery
+        },
+        {
+          id: '2',
+          value: 2000,
+          name: 'Chapter name: ' + searchQuery
+        },
+        {
+          id: '3',
+          value: 3000,
+          name: 'Chapter description: ' + searchQuery
+        }
+      ];
+      var mediasToAdd = [
+        {
+          id: '0',
+          tags: [poisToAdd[0].id]
+        },
+        {
+          id: '1',
+          tags: [poisToAdd[1].id]
+        },
+        {
+          id: '2',
+          chapters: [poisToAdd[2].id]
+        },
+        {
+          id: '3',
+          chapters: [poisToAdd[3].id]
+        }
+      ];
 
-        mediaHelper.textSearchProperties.forEach(function(searchProperty) {
-          promises.push(testSmartSearch(searchProperty));
-        });
-
-        Promise.all(promises).then(function(results) {
-          done();
+      poiHelper.addEntities(poisToAdd).then(function(addedPois) {
+        return mediaHelper.addEntities(mediasToAdd);
+      }).then(function(addedMedias) {
+        return webServiceClient.get(
+          'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery)
+        ).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, mediasToAdd.length, 'Unexpected number of videos');
+            assert.equal(videos[0].id, mediasToAdd[0].id, 'Wrong video 1');
+            assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
+            assert.equal(videos[2].id, mediasToAdd[2].id, 'Wrong video 3');
+            assert.equal(videos[3].id, mediasToAdd[3].id, 'Wrong video 4');
+          }, done);
         }).catch(function(error) {
           check(function() {
-            assert.ok(false, 'Unexpected error: ' + error.message);
+            assert.ok(false, error.message);
+          }, done);
+        });
+      });
+    });
+
+    it('should score results when searching videos by keywords', function(done) {
+      var searchQuery = 'keyword';
+      var poisToAdd = [
+        {
+          id: '0',
+          value: 1000,
+          name: 'Tag name: ' + searchQuery
+        },
+        {
+          id: '1',
+          value: 1000,
+          name: 'Chapter',
+          description: 'Chapter description: ' + searchQuery
+        }
+      ];
+      var mediasToAdd = [
+        {
+          id: '0',
+          chapters: [poisToAdd[1].id]
+        },
+        {
+          id: '1',
+          description: 'Media description: ' + searchQuery
+        },
+        {
+          id: '2',
+          tags: [poisToAdd[0].id]
+        },
+        {
+          id: '3',
+          title: 'Media title: ' + searchQuery
+        }
+      ];
+
+      poiHelper.addEntities(poisToAdd).then(function(addedPois) {
+        return mediaHelper.addEntities(mediasToAdd);
+      }).then(function(addedMedias) {
+        return webServiceClient.get(
+          'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery)
+        ).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, mediasToAdd.length, 'Unexpected number of videos');
+            assert.equal(videos[0].id, mediasToAdd[3].id, 'Wrong video 1');
+            assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
+            assert.equal(videos[2].id, mediasToAdd[0].id, 'Wrong video 3');
+            assert.equal(videos[3].id, mediasToAdd[2].id, 'Wrong video 4');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, error.message);
+          }, done);
+        });
+      });
+    });
+
+    it('should be able to combine search by keywords and filtering', function(done) {
+      var searchQuery = 'keyword';
+      var poisToAdd = [
+        {
+          id: '0',
+          value: 1000,
+          name: 'Tag name: ' + searchQuery
+        }
+      ];
+      var mediasToAdd = [
+        {
+          id: '0',
+          tags: [poisToAdd[0].id],
+          state: STATES.PUBLISHED
+        },
+        {
+          id: '1',
+          state: STATES.READY
+        },
+        {
+          id: '2',
+          title: 'Media title: ' + searchQuery
+        }
+      ];
+
+      poiHelper.addEntities(poisToAdd).then(function(addedPois) {
+        return mediaHelper.addEntities(mediasToAdd);
+      }).then(function(addedMedias) {
+        return webServiceClient.get(
+          'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery) + '&states[]=' + STATES.READY
+        ).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, 0, 'Unexpected videos');
+          }, done, true);
+          return webServiceClient.get(
+            'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery) + '&states[]=' + STATES.PUBLISHED
+          );
+        }).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, 1, 'Wrong number of videos');
+            assert.equal(videos[0].id, mediasToAdd[0].id, 'Wrong video');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, error.message);
+          }, done);
+        });
+      });
+    });
+
+    it('should be able to combine search by keywords and sorting', function(done) {
+      var searchQuery = 'keyword';
+      var poisToAdd = [
+        {
+          id: '0',
+          value: 1000,
+          name: 'Tag name: ' + searchQuery
+        }
+      ];
+      var mediasToAdd = [
+        {
+          id: '0',
+          tags: [poisToAdd[0].id],
+          date: new Date('01/01/2020')
+        },
+        {
+          id: '1',
+          title: 'Media title: ' + searchQuery,
+          date: new Date('02/02/2020')
+        },
+        {
+          id: '2',
+          title: 'Media title: ' + searchQuery,
+          date: new Date('03/03/2020')
+        }
+      ];
+
+      poiHelper.addEntities(poisToAdd).then(function(addedPois) {
+        return mediaHelper.addEntities(mediasToAdd);
+      }).then(function(addedMedias) {
+        return webServiceClient.get(
+          'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery) + '&sortOrder=desc'
+        ).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, mediasToAdd.length, 'Wrong number of videos');
+            assert.equal(videos[0].id, mediasToAdd[2].id, 'Wrong video 1');
+            assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
+            assert.equal(videos[2].id, mediasToAdd[0].id, 'Wrong video 3');
+          }, done, true);
+          return webServiceClient.get(
+            'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery) + '&sortOrder=asc'
+          );
+        }).then(function(results) {
+          var videos = results.entities;
+          check(function() {
+            assert.lengthOf(videos, mediasToAdd.length, 'Wrong number of videos');
+            assert.equal(videos[0].id, mediasToAdd[1].id, 'Wrong video 1');
+            assert.equal(videos[1].id, mediasToAdd[2].id, 'Wrong video 2');
+            assert.equal(videos[2].id, mediasToAdd[0].id, 'Wrong video 3');
+          }, done);
+        }).catch(function(error) {
+          check(function() {
+            assert.ok(false, error.message);
           }, done);
         });
       });

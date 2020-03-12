@@ -88,6 +88,7 @@ function setListeners() {
   coreApi.registerAction(CORE_HOOKS.USERS_DELETED, listener.onUsersDeleted);
   coreApi.registerAction(CORE_HOOKS.GROUPS_DELETED, listener.onGroupsDeleted);
   coreApi.registerAction(PUBLISH_HOOKS.PROPERTIES_DELETED, listener.onPropertiesDeleted);
+  coreApi.registerAction(PUBLISH_HOOKS.MEDIAS_DELETED, listener.onMediasDeleted);
 }
 
 /**

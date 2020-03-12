@@ -15,6 +15,7 @@ describe('Listeners', function() {
   var listener;
   var database;
   var VideoProvider;
+  var PoiProvider;
   var settingProvider;
   var expectedMedias;
   var expectedSettings;
@@ -46,6 +47,11 @@ describe('Listeners', function() {
       })
     };
 
+    PoiProvider = function() {};
+    PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+      callback();
+    });
+
     database = {};
     coreApi = {
       getDatabase: function() {
@@ -60,6 +66,7 @@ describe('Listeners', function() {
     realCoreApi = process.api;
     process.api = coreApi;
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), VideoProvider);
+    mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), PoiProvider);
   });
 
   // Initializes tests
@@ -364,6 +371,70 @@ describe('Listeners', function() {
       listener.onGroupsDeleted(['42'], function(error) {
         assert.strictEqual(error, expectedError, 'Wrong error');
         settingProvider.getOne.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+  });
+
+  describe('onMediasDeleted', function() {
+
+    it('should remove points of interest associated to the removed medias', function(done) {
+      var removedMedias = [
+        {
+          id: '42',
+          tags: ['1'],
+          chapters: ['2']
+        }
+      ];
+
+      PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+        assert.sameMembers(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          removedMedias[0].tags.concat(removedMedias[0].chapters),
+          'Wrong points of interest'
+        );
+
+        callback();
+      });
+
+      listener.onMediasDeleted(removedMedias, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+        PoiProvider.prototype.remove.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should not do anything if medias have no associated points of interest', function(done) {
+      var removedMedias = [
+        {
+          id: '42'
+        }
+      ];
+
+      listener.onMediasDeleted(removedMedias, function(error) {
+        assert.isUndefined(error, 'Unexpected error');
+        PoiProvider.prototype.remove.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if removing points of interest failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      var removedMedias = [
+        {
+          id: '42',
+          tags: ['1']
+        }
+      ];
+
+      PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+        callback(expectedError);
+      });
+
+      listener.onMediasDeleted(removedMedias, function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+        PoiProvider.prototype.remove.should.have.been.called.exactly(1);
         done();
       });
     });

@@ -10,6 +10,10 @@ var STATES = process.requirePublish('app/server/packages/states.js');
 var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
 var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 var ResourceFilter = api.storages.ResourceFilter;
+var POI_TYPE = {
+  TAGS: 'tags',
+  CHAPTERS: 'chapters'
+};
 
 var assert = chai.assert;
 chai.should();
@@ -21,12 +25,14 @@ describe('VideoController', function() {
   var videoController;
   var expectedMedias;
   var expectedProperties;
+  var expectedPois;
   var expectedGroups;
   var expectedUser;
   var expectedFiles;
   var expectedCategories;
   var expectedPagination;
   var VideoProvider;
+  var PoiProvider;
   var PropertyProvider;
   var PublishManager;
   var MultipartParser;
@@ -69,17 +75,18 @@ describe('VideoController', function() {
     expectedUser = null;
     expectedMedias = [];
     expectedProperties = [];
+    expectedPois = [];
     expectedPagination = {};
     VideoProvider = function() {};
-    VideoProvider.prototype.getAll = function(filter, fields, sort, callback) {
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedMedias);
-    };
-    VideoProvider.prototype.add = function(resources, callback) {
+    });
+    VideoProvider.prototype.add = chai.spy(function(resources, callback) {
       callback(null, expectedMedias.length, resources);
-    };
-    VideoProvider.prototype.getOne = function(filter, fields, callback) {
+    });
+    VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
       callback(null, expectedMedias[0]);
-    };
+    });
     VideoProvider.prototype.get = chai.spy(function(filter, fields, page, limit, sort, callback) {
       callback(null, expectedMedias, expectedPagination);
     });
@@ -89,26 +96,26 @@ describe('VideoController', function() {
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
     });
-    VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
-      callback(null, 1);
+    VideoProvider.prototype.getPoiFilePath = function(mediaId, file) {
+      return path.join('/publish', mediaId, 'uploads', file.fileName);
     };
 
     PropertyProvider = function() {};
     PropertyProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedProperties);
     });
-    PropertyProvider.prototype.add = function(resources, callback) {
+    PropertyProvider.prototype.add = chai.spy(function(resources, callback) {
       callback(null, expectedProperties.length, resources);
-    };
-    PropertyProvider.prototype.getOne = function(filter, fields, callback) {
+    });
+    PropertyProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
       callback(null, expectedProperties[0]);
-    };
-    PropertyProvider.prototype.remove = function(filter, callback) {
+    });
+    PropertyProvider.prototype.remove = chai.spy(function(filter, callback) {
       callback(null, expectedProperties.length);
-    };
-    PropertyProvider.prototype.updateOne = function(filter, modifications, callback) {
+    });
+    PropertyProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
-    };
+    });
     PropertyProvider.TYPES = {
       TEXT: 'text',
       LIST: 'list',
@@ -116,12 +123,26 @@ describe('VideoController', function() {
       DATE_TIME: 'dateTime'
     };
 
+    PoiProvider = function() {};
+    PoiProvider.prototype.add = chai.spy(function(pois, callback) {
+      callback(null, pois.length, pois);
+    });
+    PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+      callback(null, 1);
+    });
+    PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+      callback();
+    });
+    PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      callback(null, expectedPois);
+    });
+
     MultipartParser = function(expressRequest, files) {
       expectedFiles = files;
     };
-    MultipartParser.prototype.parse = function(callback) {
+    MultipartParser.prototype.parse = chai.spy(function(callback) {
       callback();
-    };
+    });
 
     PublishManager = {
       get: function() {
@@ -257,6 +278,7 @@ describe('VideoController', function() {
     mock('publish/publishConf.json', publishConf);
     mock('@openveo/api', openVeoApi);
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), VideoProvider);
+    mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), PoiProvider);
     mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
     mock(path.join(process.rootPublish, 'app/server/PublishManager.js'), PublishManager);
     mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), mediaPlatformFactory);
@@ -375,11 +397,118 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.strictEqual(data.entity, expectedMedias[0]);
         VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       };
 
       videoController.getVideoReadyAction(request, response, function(error) {
         assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should send response with the media populated with points of interest if any chapters / tags', function(done) {
+      var expectedMediaId = '42';
+      var poiFileDestinationPath = path.join(process.rootPublish, 'assets/player/videos', expectedMediaId, 'uploads');
+      var expectedTagFileName = 'tagFileName.jpg';
+      var expectedTag = {
+        id: '1',
+        name: 'Tag name',
+        description: 'Tag description',
+        value: 1000,
+        file: {
+          originalName: 'tagOriginalName.jpg',
+          mimeType: 'image/jpeg',
+          fileName: expectedTagFileName,
+          size: 42,
+          url: 'tagFileUri',
+          path: path.join(poiFileDestinationPath, expectedTagFileName)
+        }
+      };
+      var expectedChapter = {
+        id: '2',
+        name: 'Chapter name',
+        description: 'Chapter description',
+        value: 2000
+      };
+      expectedMedias = [
+        {
+          id: expectedMediaId,
+          state: STATES.PUBLISHED,
+          tags: ['1'],
+          chapters: ['2']
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        assert.sameMembers(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          expectedMedias[0].tags.concat(expectedMedias[0].chapters),
+          'Wrong points of interest'
+        );
+
+        callback(null, [expectedTag, expectedChapter]);
+      });
+
+      response.send = function(data) {
+        assert.lengthOf(data.entity.tags, 1, 'Wrong number of tags');
+        assert.lengthOf(data.entity.chapters, 1, 'Wrong number of chapters');
+
+        var tag = data.entity.tags[0];
+        assert.equal(tag.id, expectedTag.id, 'Wrong tag id');
+        assert.equal(tag.name, expectedTag.name, 'Wrong tag name');
+        assert.equal(tag.description, expectedTag.description, 'Wrong tag description');
+        assert.equal(tag.value, expectedTag.value, 'Wrong tag value');
+        assert.equal(tag.file.originalName, expectedTag.file.originalName, 'Wrong tag file original name');
+        assert.equal(tag.file.mimeType, expectedTag.file.mimeType, 'Wrong tag file mime type');
+        assert.equal(tag.file.fileName, expectedTag.file.fileName, 'Wrong tag file name');
+        assert.equal(tag.file.size, expectedTag.file.size, 'Wrong tag file size');
+        assert.equal(tag.file.url, expectedTag.file.url, 'Wrong tag file URL');
+        assert.isUndefined(tag.file.path, 'Unexpected tag file path');
+        assert.isUndefined(tag._id, 'Unexpected tag internal id');
+
+        var chapter = data.entity.chapters[0];
+        assert.equal(chapter.id, expectedChapter.id, 'Wrong chapter id');
+        assert.equal(chapter.name, expectedChapter.name, 'Wrong chapter name');
+        assert.equal(chapter.description, expectedChapter.description, 'Wrong chapter description');
+        assert.equal(chapter.value, expectedChapter.value, 'Wrong chapter value');
+        assert.isUndefined(chapter._id, 'Unexpected chapter internal id');
+
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getVideoReadyAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should execute next with an error if populating with points of interest failed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          state: STATES.PUBLISHED,
+          tags: ['1']
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(data) {
+        assert.fail('Unexpected response');
+      };
+
+      videoController.getVideoReadyAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
       });
     });
 
@@ -511,7 +640,7 @@ describe('VideoController', function() {
       });
     });
 
-    it('should execute next with an error if getting video info from platform failed', function(done) {
+    it('should execute next with an error if updating media with info from platform failed', function(done) {
       expectedMedias = [
         {
           id: '42',
@@ -543,7 +672,7 @@ describe('VideoController', function() {
       };
 
       videoController.getVideoReadyAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEO_READY_GET_INFO_ERROR, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR, 'Wrong error');
         done();
       });
     });
@@ -555,12 +684,20 @@ describe('VideoController', function() {
       });
     });
 
-    it('should resolve media resources urls', function(done) {
+    it('should resolve media resources URLs', function(done) {
       var expectedSmallImageUri = 'smallImageUri';
       var expectedLargeImageUri = 'largeImageUri';
       var expectedTagFileUri = 'tagFileUri';
       var expectedSourceUri = 'sourceUri';
       var expectedThumbnailUri = 'thumbnailUri';
+      expectedPois = [
+        {
+          id: 'tagId',
+          file: {
+            url: expectedTagFileUri
+          }
+        }
+      ];
       expectedMedias = [
         {
           id: 42,
@@ -579,14 +716,7 @@ describe('VideoController', function() {
               }
             }
           ],
-          tags: [
-            {
-              id: 'tagId',
-              file: {
-                url: expectedTagFileUri
-              }
-            }
-          ],
+          tags: [expectedPois[0].id],
           sources: [
             {
               files: [
@@ -742,6 +872,110 @@ describe('VideoController', function() {
       });
     });
 
+    it('should send response with the media populated with points of interest if any chapters / tags', function(done) {
+      var expectedMediaId = '42';
+      var poiFileDestinationPath = path.join(process.rootPublish, 'assets/player/videos', expectedMediaId, 'uploads');
+      var expectedTagFileName = 'tagFileName.jpg';
+      var expectedTag = {
+        id: '1',
+        name: 'Tag name',
+        description: 'Tag description',
+        value: 1000,
+        file: {
+          originalName: 'tagOriginalName.jpg',
+          mimeType: 'image/jpeg',
+          fileName: expectedTagFileName,
+          size: 42,
+          url: 'tagFileUri',
+          path: path.join(poiFileDestinationPath, expectedTagFileName)
+        }
+      };
+      var expectedChapter = {
+        id: '2',
+        name: 'Chapter name',
+        description: 'Chapter description',
+        value: 2000
+      };
+      expectedMedias = [
+        {
+          id: expectedMediaId,
+          tags: ['1'],
+          chapters: ['2']
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        assert.sameMembers(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          expectedMedias[0].tags.concat(expectedMedias[0].chapters),
+          'Wrong points of interest'
+        );
+
+        callback(null, [expectedTag, expectedChapter]);
+      });
+
+      response.send = function(data) {
+        assert.lengthOf(data.entity.tags, 1, 'Wrong number of tags');
+        assert.lengthOf(data.entity.chapters, 1, 'Wrong number of chapters');
+
+        var tag = data.entity.tags[0];
+        assert.equal(tag.id, expectedTag.id, 'Wrong tag id');
+        assert.equal(tag.name, expectedTag.name, 'Wrong tag name');
+        assert.equal(tag.description, expectedTag.description, 'Wrong tag description');
+        assert.equal(tag.value, expectedTag.value, 'Wrong tag value');
+        assert.equal(tag.file.originalName, expectedTag.file.originalName, 'Wrong tag file original name');
+        assert.equal(tag.file.mimeType, expectedTag.file.mimeType, 'Wrong tag file mime type');
+        assert.equal(tag.file.fileName, expectedTag.file.fileName, 'Wrong tag file name');
+        assert.equal(tag.file.size, expectedTag.file.size, 'Wrong tag file size');
+        assert.equal(tag.file.url, expectedTag.file.url, 'Wrong tag file URL');
+        assert.isUndefined(tag.file.path, 'Unexpected tag file path');
+        assert.isUndefined(tag._id, 'Unexpected tag internal id');
+
+        var chapter = data.entity.chapters[0];
+        assert.equal(chapter.id, expectedChapter.id, 'Wrong chapter id');
+        assert.equal(chapter.name, expectedChapter.name, 'Wrong chapter name');
+        assert.equal(chapter.description, expectedChapter.description, 'Wrong chapter description');
+        assert.equal(chapter.value, expectedChapter.value, 'Wrong chapter value');
+        assert.isUndefined(data.entity.chapters[0]._id, 'Unexpected chapter internal id');
+
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should execute next with an error if populating with points of interest failed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          tags: ['1']
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(data) {
+        assert.fail('Unexpected response');
+      };
+
+      videoController.getEntityAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_MEDIA_POPULATE_WITH_POIS_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
     it('should send response with media and information from the video platform', function(done) {
       var expectedVideoDefinition = 720;
       var expectedInfo = {
@@ -793,7 +1027,7 @@ describe('VideoController', function() {
       });
     });
 
-    it('should execute next with an error if getting video info from platform failed', function(done) {
+    it('should execute next with an error if updating media with info from platform failed', function(done) {
       expectedMedias = [
         {
           id: '42',
@@ -825,7 +1059,7 @@ describe('VideoController', function() {
       };
 
       videoController.getEntityAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.GET_MEDIA_GET_INFO_ERROR, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR, 'Wrong error');
         done();
       });
     });
@@ -837,12 +1071,20 @@ describe('VideoController', function() {
       });
     });
 
-    it('should resolve media resources urls', function(done) {
+    it('should resolve media resources URLs', function(done) {
       var expectedSmallImageUri = 'smallImageUri';
       var expectedLargeImageUri = 'largeImageUri';
       var expectedTagFileUri = 'tagFileUri';
       var expectedSourceUri = 'sourceUri';
       var expectedThumbnailUri = 'thumbnailUri';
+      expectedPois = [
+        {
+          id: 'tagId',
+          file: {
+            url: expectedTagFileUri
+          }
+        }
+      ];
       expectedMedias = [
         {
           id: 42,
@@ -861,14 +1103,7 @@ describe('VideoController', function() {
               }
             }
           ],
-          tags: [
-            {
-              id: 'tagId',
-              file: {
-                url: expectedTagFileUri
-              }
-            }
-          ],
+          tags: [expectedPois[0].id],
           sources: [
             {
               files: [
@@ -1926,28 +2161,36 @@ describe('VideoController', function() {
           [request.user.id, anonymousId],
           'Wrong filter'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.SEARCH),
           'Unexpected search query'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'state'),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.SCORE),
+          'Unexpected score'
+        );
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.REGEX),
+          'Unexpected regex'
+        );
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'state'),
           'Unexpected state'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.LESSER_THAN, 'date'),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.LESSER_THAN, 'date'),
           'Unexpected date'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.GREATER_THAN_EQUAL, 'date'),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.GREATER_THAN_EQUAL, 'date'),
           'Unexpected date'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'category'),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'category'),
           'Unexpected category'
         );
-        assert.isNull(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'metadata.groups'),
+        assert.notOk(
+          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'metadata.groups'),
           'Unexpected groups'
         );
         assert.isUndefined(fields.include, 'Unexpected include');
@@ -1972,18 +2215,20 @@ describe('VideoController', function() {
     it('should be able to search by indexed fields', function(done) {
       expectedMedias = [{id: 42}];
       request.query = {query: 'search text'};
-      VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH).value,
           '"' + request.query.query + '"',
-          'Wrong filter'
+          'Wrong search operation'
         );
+        assert.propertyVal(sort, 'score', 'score', 'Wrong score sort');
         callback(null, expectedMedias, expectedPagination);
-      };
+      });
 
       response.send = function(data) {
         assert.strictEqual(data.entities, expectedMedias, 'Wrong medias');
         assert.strictEqual(data.pagination, expectedPagination, 'Wrong pagination');
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
         done();
       };
 
@@ -1992,12 +2237,82 @@ describe('VideoController', function() {
       });
     });
 
+    it('should be able to search by both media indexed fields and points of interest indexed fields', function(done) {
+      request.query = {query: 'search text', searchInPois: 1};
+      expectedMedias = [{id: '42'}];
+      expectedPois = [{id: '43'}];
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(null, expectedPois);
+      });
+
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
+        var orOperation = filter.getLogicalOperation(ResourceFilter.OPERATORS.OR);
+        var searchFilter = orOperation.filters[0];
+        var searchInChaptersFilter = orOperation.filters[1];
+        var searchInTagsFilter = orOperation.filters[2];
+
+        assert.equal(
+          searchFilter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH).value,
+          '"' + request.query.query + '"',
+          'Wrong search operation'
+        );
+        assert.sameMembers(
+          searchInChaptersFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN).value,
+          [expectedPois[0].id],
+          'Wrong search in chapters operation'
+        );
+        assert.sameMembers(
+          searchInTagsFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN).value,
+          [expectedPois[0].id],
+          'Wrong search in tags operation'
+        );
+
+        assert.propertyVal(sort, 'score', 'score', 'Wrong score sort');
+
+        callback(null, expectedMedias, expectedPagination);
+      });
+
+      response.send = function(data) {
+        assert.strictEqual(data.entities, expectedMedias, 'Wrong medias');
+        assert.strictEqual(data.pagination, expectedPagination, 'Wrong pagination');
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function() {
+        assert.equal(false, 'Unexpected error');
+      });
+    });
+
+    it('should execute next with an error if searching in points of interest failed', function(done) {
+      request.query = {query: 'search text', searchInPois: 1};
+      expectedMedias = [{id: '42'}];
+      expectedPois = [{id: '43'}];
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(data) {
+        assert.ok(false, 'Unexpected call to send');
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEOS_SEARCH_IN_POIS_ERROR, 'Wrong error');
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        VideoProvider.prototype.get.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
     it('should be able to deactivate the smart search', function(done) {
       var expectedQuery = '42';
       expectedMedias = [{id: 42}];
       request.query = {query: expectedQuery, useSmartSearch: 0};
 
-      VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'title').value,
           '/' + expectedQuery + '/i',
@@ -2008,10 +2323,13 @@ describe('VideoController', function() {
           '/' + expectedQuery + '/i',
           'Wrong operation on "description"'
         );
+        assert.notOk(filter.hasOperation(ResourceFilter.OPERATORS.SEARCH, 'Unexpected search operation'));
+        assert.notOk(filter.hasOperation(ResourceFilter.OPERATORS.SCORE, 'Unexpected score operation'));
         callback(null, expectedMedias, expectedPagination);
-      };
+      });
 
       response.send = function(data) {
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
         done();
       };
 
@@ -2462,6 +2780,147 @@ describe('VideoController', function() {
       });
     });
 
+    it('should populate medias with points of interest if any chapters / tags', function(done) {
+      var expectedMediaId = '42';
+      var poiFileDestinationPath = path.join(process.rootPublish, 'assets/player/videos', expectedMediaId, 'uploads');
+      var expectedTagFileName = 'tagFileName.jpg';
+      var expectedTag = {
+        id: '1',
+        name: 'Tag name',
+        description: 'Tag description',
+        value: 1000,
+        file: {
+          originalName: 'tagOriginalName.jpg',
+          mimeType: 'image/jpeg',
+          fileName: expectedTagFileName,
+          size: 42,
+          url: 'tagFileUri',
+          path: path.join(poiFileDestinationPath, expectedTagFileName)
+        }
+      };
+      var expectedChapter = {
+        id: '2',
+        name: 'Chapter name',
+        description: 'Chapter description',
+        value: 2000
+      };
+      expectedMedias = [
+        {
+          id: expectedMediaId,
+          tags: ['1'],
+          chapters: ['2']
+        }
+      ];
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        assert.sameMembers(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          expectedMedias[0].tags.concat(expectedMedias[0].chapters),
+          'Wrong points of interest'
+        );
+
+        callback(null, [expectedTag, expectedChapter]);
+      });
+
+      response.send = function(data) {
+        var media = data.entities[0];
+        assert.lengthOf(media.tags, 1, 'Wrong number of tags');
+        assert.lengthOf(media.chapters, 1, 'Wrong number of chapters');
+
+        assert.equal(media.tags[0].id, expectedTag.id, 'Wrong tag id');
+        assert.equal(media.tags[0].name, expectedTag.name, 'Wrong tag name');
+        assert.equal(media.tags[0].description, expectedTag.description, 'Wrong tag description');
+        assert.equal(media.tags[0].value, expectedTag.value, 'Wrong tag value');
+        assert.equal(media.tags[0].file.originalName, expectedTag.file.originalName, 'Wrong tag file original name');
+        assert.equal(media.tags[0].file.mimeType, expectedTag.file.mimeType, 'Wrong tag file mime type');
+        assert.equal(media.tags[0].file.fileName, expectedTag.file.fileName, 'Wrong tag file name');
+        assert.equal(media.tags[0].file.size, expectedTag.file.size, 'Wrong tag file size');
+        assert.equal(media.tags[0].file.url, expectedTag.file.url, 'Wrong tag file URL');
+        assert.isUndefined(media.tags[0].file.path, 'Unexpected tag file path');
+        assert.isUndefined(media.tags[0]._id, 'Unexpected tag internal id');
+
+        assert.equal(media.chapters[0].id, expectedChapter.id, 'Wrong chapter id');
+        assert.equal(media.chapters[0].name, expectedChapter.name, 'Wrong chapter name');
+        assert.equal(media.chapters[0].description, expectedChapter.description, 'Wrong chapter description');
+        assert.equal(media.chapters[0].value, expectedChapter.value, 'Wrong chapter value');
+        assert.isUndefined(media.chapters[0]._id, 'Unexpected chapter internal id');
+
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should not populate medias with points of interest if filtered', function(done) {
+      request.query.exclude = ['tags', 'chapters'];
+      expectedPois = [
+        {
+          id: '1',
+          name: 'Tag name',
+          description: 'Tag description',
+          value: 1000
+        },
+        {
+          id: '2',
+          name: 'Chapter name',
+          description: 'Chapter description',
+          value: 2000
+        }
+      ];
+      expectedMedias = [
+        {
+          id: '42',
+          tags: [expectedPois[0].id],
+          chapters: [expectedPois[1].id]
+        }
+      ];
+
+      VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
+        delete expectedMedias[0].tags;
+        delete expectedMedias[0].chapters;
+        callback(null, expectedMedias, expectedPagination);
+      });
+
+      response.send = function(data) {
+        var media = data.entities[0];
+        assert.isUndefined(media.tags, 'Unexpected tags');
+        assert.isUndefined(media.chapters, 'Unexpected chapters');
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should execute next with an error if populating with points of interest failed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          tags: ['1']
+        }
+      ];
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      response.send = function(data) {
+        assert.fail('Unexpected response');
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.GET_VIDEOS_POPULATE_WITH_POIS_ERROR, 'Wrong error');
+        VideoProvider.prototype.get.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
     it('should get information about media associated properties', function(done) {
       var expectedPropertiesValues = {
         property1: 'value1'
@@ -2496,13 +2955,21 @@ describe('VideoController', function() {
       });
     });
 
-    it('should resolve medias resources urls', function(done) {
+    it('should resolve medias resources URLs', function(done) {
       var expectedSmallImageUri = 'smallImageUri';
       var expectedLargeImageUri = 'largeImageUri';
       var expectedTagFileUri = 'tagFileUri';
       var expectedSourceUri = 'sourceUri';
       var expectedAdaptiveSourceUri = 'media-id/manifest.mpd';
       var expectedThumbnailUri = 'thumbnailUri';
+      expectedPois = [
+        {
+          id: 'tagId',
+          file: {
+            url: expectedTagFileUri
+          }
+        }
+      ];
       expectedMedias = [
         {
           id: 42,
@@ -2520,14 +2987,7 @@ describe('VideoController', function() {
               }
             }
           ],
-          tags: [
-            {
-              id: 'tagId',
-              file: {
-                url: expectedTagFileUri
-              }
-            }
-          ],
+          tags: [expectedPois[0].id],
           sources: [
             {
               files: [
@@ -2858,471 +3318,526 @@ describe('VideoController', function() {
     });
   });
 
-  describe('updateTagAction', function() {
+  Object.values(POI_TYPE).forEach(function(type) {
+    describe(type, function() {
 
-    beforeEach(function() {
-      MultipartParser.prototype.parse = function(callback) {
-        request.files = {
-          file: [
-            {
-              path: 'pathToTagFile'
-            }
-          ]
-        };
-        callback();
-      };
+      describe('updatePoiAction', function() {
+        var method = type === POI_TYPE.TAGS ? 'updateTagAction' : 'updateChapterAction';
+
+        beforeEach(function() {
+          MultipartParser.prototype.parse = chai.spy(function(callback) {
+            request.files = {
+              file: [
+                {
+                  originalname: 'poiFileOriginalName',
+                  mimetype: 'poiFileMimeType',
+                  filename: 'poiFileName',
+                  size: 42,
+                  path: 'pathToPoiFile'
+                }
+              ]
+            };
+            callback();
+          });
+        });
+
+        it('should update media point of interest if id is specified', function(done) {
+          var expectedPoiId = '1';
+          var expectedPoi = {
+            name: 'Name',
+            description: 'Description',
+            value: 2000
+          };
+          var expectedPoiFile = {
+            originalname: 'poiFileOriginalName',
+            mimetype: 'poiFileMimeType',
+            filename: 'poiFileName',
+            size: 42,
+            path: 'pathToPoiFile'
+          };
+          expectedMedias = [{
+            id: '42'
+          }];
+          expectedMedias[0][type] = [expectedPoiId];
+
+          request.params.id = expectedMedias[0].id;
+          request.params.poiid = expectedPoiId;
+          request.body.info = JSON.stringify(expectedPoi);
+
+          MultipartParser.prototype.parse = chai.spy(function(callback) {
+            assert.deepInclude(expectedFiles[0], {
+              name: 'file',
+              destinationPath: path.join(process.rootPublish, 'assets/player/videos', expectedMedias[0].id, 'uploads'),
+              maxCount: 1
+            }, 'Wrong file');
+
+            request.files = {
+              file: [expectedPoiFile]
+            };
+            callback();
+          });
+
+          VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              expectedMedias[0].id,
+              'Wrong media id'
+            );
+            callback(null, expectedMedias[0]);
+          });
+
+          PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              request.params.poiid,
+              'Wrong point of interest id'
+            );
+
+            callback(null, 1);
+          });
+
+          response.send = function(result) {
+            assert.equal(result.total, 1, 'Wrong total');
+
+            assert.equal(result.poi.name, expectedPoi.name, 'Wrong name');
+            assert.equal(result.poi.description, expectedPoi.description, 'Wrong description');
+            assert.equal(result.poi.value, expectedPoi.value, 'Wrong value');
+
+            assert.equal(result.poi.file.originalName, expectedPoiFile.originalname, 'Wrong file original name');
+            assert.equal(result.poi.file.fileName, expectedPoiFile.filename, 'Wrong file name');
+            assert.equal(result.poi.file.mimeType, expectedPoiFile.mimetype, 'Wrong file MIME type');
+            assert.equal(result.poi.file.size, expectedPoiFile.size, 'Wrong file size');
+            assert.equal(result.poi.file.path, expectedPoiFile.path, 'Wrong file path');
+
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(1);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            MultipartParser.prototype.parse.should.have.been.called.exactly(1);
+            done();
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.ok(false, 'Unexpected error');
+          });
+        });
+
+        it('should add media point of interest and update media if id is not specified', function(done) {
+          var expectedPoi = {
+            name: 'Name',
+            description: 'Description',
+            value: 2000
+          };
+          var expectedPoiFile = {
+            originalname: 'poiFileOriginalName',
+            mimetype: 'poiFileMimeType',
+            filename: 'poiFileName',
+            size: 42,
+            path: 'pathToPoiFile'
+          };
+          expectedMedias = [{
+            id: '42'
+          }];
+
+          request.params.id = expectedMedias[0].id;
+          request.body.info = JSON.stringify(expectedPoi);
+
+          MultipartParser.prototype.parse = chai.spy(function(callback) {
+            assert.deepInclude(expectedFiles[0], {
+              name: 'file',
+              destinationPath: path.join(process.rootPublish, 'assets/player/videos', expectedMedias[0].id, 'uploads'),
+              maxCount: 1
+            }, 'Wrong file');
+
+            request.files = {
+              file: [expectedPoiFile]
+            };
+            callback();
+          });
+
+          VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              expectedMedias[0].id,
+              'Wrong media id'
+            );
+            callback(null, expectedMedias[0]);
+          });
+
+          PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              request.params.poiid,
+              'Wrong point of interest id'
+            );
+
+            callback(null, 1);
+          });
+
+          VideoProvider.prototype.updateOne = chai.spy(function(filter, media, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              expectedMedias[0].id,
+              'Wrong media id'
+            );
+
+            callback(null, 1);
+          });
+
+          response.send = function(result) {
+            assert.equal(result.total, 1, 'Wrong total');
+
+            assert.equal(result.poi.name, expectedPoi.name, 'Wrong name');
+            assert.equal(result.poi.description, expectedPoi.description, 'Wrong description');
+            assert.equal(result.poi.value, expectedPoi.value, 'Wrong value');
+
+            assert.equal(result.poi.file.originalName, expectedPoiFile.originalname, 'Wrong file original name');
+            assert.equal(result.poi.file.fileName, expectedPoiFile.filename, 'Wrong file name');
+            assert.equal(result.poi.file.mimeType, expectedPoiFile.mimetype, 'Wrong file MIME type');
+            assert.equal(result.poi.file.size, expectedPoiFile.size, 'Wrong file size');
+            assert.equal(result.poi.file.path, expectedPoiFile.path, 'Wrong file path');
+
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(1);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+            MultipartParser.prototype.parse.should.have.been.called.exactly(1);
+            done();
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.ok(false, 'Unexpected error');
+          });
+        });
+
+        it('should execute next with an error if media id is not specified', function(done) {
+          request.body.info = JSON.stringify({});
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_MISSING_PARAMETERS);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            MultipartParser.prototype.parse.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if body is not specified', function(done) {
+          request.params.id = '42';
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_MISSING_PARAMETERS);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if parsing body failed', function(done) {
+          request.params.id = '42';
+          request.body.info = JSON.stringify({});
+
+          MultipartParser.prototype.parse = chai.spy(function(callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_UPLOAD_ERROR);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            MultipartParser.prototype.parse.should.have.been.called.exactly(1);
+            done();
+          });
+        });
+
+        it('should execute next with an error if getting media failed', function(done) {
+          request.params.id = '42';
+          request.body.info = JSON.stringify({});
+
+          VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_GET_ONE_ERROR);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if user is not authorized to update the media', function(done) {
+          request.params.id = '42';
+          request.body.info = JSON.stringify({});
+
+          videoController.isUserAuthorized = function() {
+            return false;
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_FORBIDDEN);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if updating point of interest failed', function(done) {
+          expectedMedias = [{id: '42'}];
+          request.params.id = '42';
+          request.params.poiid = '1';
+          request.body.info = JSON.stringify({});
+
+          PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_UPDATE_ERROR);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(1);
+            PoiProvider.prototype.add.should.have.been.called.exactly(0);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if adding point of interest failed', function(done) {
+          expectedMedias = [{id: '42'}];
+          request.params.id = '42';
+          request.body.info = JSON.stringify({});
+
+          PoiProvider.prototype.add = chai.spy(function(pois, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_CREATE_ERROR);
+            PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.add.should.have.been.called.exactly(1);
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if updating media failed', function(done) {
+          expectedMedias = [{id: '42'}];
+          request.params.id = '42';
+          request.body.info = JSON.stringify({});
+
+          VideoProvider.prototype.updateOne = function(filter, media, callback) {
+            callback(new Error('Something went wrong'));
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.UPDATE_POI_UPDATE_MEDIA_ERROR);
+            done();
+          });
+        });
+      });
+
+      describe('removePoisAction', function() {
+        var method = type === POI_TYPE.TAGS ? 'removeTagsAction' : 'removeChaptersAction';
+
+        it('should remove points of interest from media', function(done) {
+          var expectedPoiIds = ['42', '43'];
+          expectedMedias = [{id: '42'}];
+          expectedMedias[0][type] = expectedPoiIds;
+          request.params.id = '42';
+          request.params.poiids = expectedPoiIds.join(',');
+
+          VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              expectedMedias[0].id,
+              'Wrong media id'
+            );
+            callback(null, expectedMedias[0]);
+          });
+
+          PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+            assert.sameMembers(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+              expectedPoiIds,
+              'Wrong points of interest ids'
+            );
+            callback(null, 1);
+          });
+
+          VideoProvider.prototype.updateOne = chai.spy(function(filter, media, callback) {
+            assert.equal(
+              filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+              expectedMedias[0].id,
+              'Wrong media id'
+            );
+            assert.lengthOf(media[type], 0, 'Unexpected points of interest');
+
+            callback(null, 1);
+          });
+
+          response.send = function(data) {
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(1);
+            assert.equal(data.total, 1, 'Wrong total');
+            done();
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.ok(false, 'Unexpected error');
+          });
+
+        });
+
+        it('should execute next with an error if media id is not specified', function(done) {
+          request.params.poiids = '42,43';
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_MISSING_PARAMETERS, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if points of interest ids are not specified', function(done) {
+          request.params.id = '42';
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_MISSING_PARAMETERS, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if getting media failed', function(done) {
+          request.params.id = '42';
+          request.params.poiids = '42,43';
+
+          VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_GET_ONE_ERROR, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if user is not authorized to update the media', function(done) {
+          request.params.id = '42';
+          request.params.poiids = '42,43';
+
+          videoController.isUserAuthorized = function() {
+            return false;
+          };
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_FORBIDDEN, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(0);
+            done();
+          });
+        });
+
+        it('should execute next with an error if removing points of interest failed', function(done) {
+          var expectedPoiIds = ['42', '43'];
+          expectedMedias = [{id: '42'}];
+          expectedMedias[0][type] = expectedPoiIds;
+          request.params.id = '42';
+          request.params.poiids = expectedPoiIds.join(',');
+
+          PoiProvider.prototype.remove = chai.spy(function(filter, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_REMOVE_ERROR, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(1);
+            done();
+          });
+        });
+
+        it('should execute next with an error if updating media failed', function(done) {
+          var expectedPoiIds = ['42', '43'];
+          expectedMedias = [{id: '42'}];
+          expectedMedias[0][type] = expectedPoiIds;
+          request.params.id = '42';
+          request.params.poiids = expectedPoiIds.join(',');
+
+          VideoProvider.prototype.updateOne = chai.spy(function(filter, media, callback) {
+            callback(new Error('Something went wrong'));
+          });
+
+          videoController[method](request, response, function(error) {
+            assert.strictEqual(error, HTTP_ERRORS.REMOVE_POIS_UPDATE_MEDIA_ERROR, 'Wrong error');
+            VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+            VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+            PoiProvider.prototype.remove.should.have.been.called.exactly(1);
+            done();
+          });
+        });
+
+      });
+
     });
 
-    it('should update a media tag', function(done) {
-      expectedMedias = [{id: '42'}];
-      var expectedTag = {
-        name: 'Name',
-        description: 'Description'
-      };
-
-      request.params.id = expectedMedias[0].id;
-      request.body.info = JSON.stringify(expectedTag);
-
-      MultipartParser.prototype.parse = chai.spy(function(callback) {
-        assert.deepInclude(expectedFiles, {
-          name: 'file',
-          destinationPath: process.rootPublish + '/assets/player/videos/' + expectedMedias[0].id + '/uploads/',
-          maxCount: 1
-        }, 'Wrong file');
-
-        request.files = {
-          file: [
-            {
-              path: 'pathToVideoFile'
-            }
-          ]
-        };
-        callback();
-      });
-
-      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        callback(null, expectedMedias[0]);
-      });
-
-      VideoProvider.prototype.updateOneTag = chai.spy(function(filter, tag, file, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.equal(tag.name, expectedTag.name, 'Wrong tag name');
-        assert.equal(tag.description, expectedTag.description, 'Wrong tag description');
-        assert.strictEqual(file, request.files.file[0], 'Wrong tag file');
-        callback(null, 1, expectedTag);
-      });
-
-      response.send = function(result) {
-        assert.equal(result.total, 1, 'Wrong total');
-        assert.strictEqual(result.tag, expectedTag, 'Wrong tag');
-        VideoProvider.prototype.updateOneTag.should.have.been.called.exactly(1);
-        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
-        MultipartParser.prototype.parse.should.have.been.called.exactly(1);
-        done();
-      };
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should execute next with an error if media id is not specified', function(done) {
-      request.body.info = JSON.stringify({});
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_MISSING_PARAMETERS);
-        done();
-      });
-    });
-
-    it('should execute next with an error if body is not specified', function(done) {
-      request.params.id = '42';
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_MISSING_PARAMETERS);
-        done();
-      });
-    });
-
-    it('should execute next with an error if parsing body failed', function(done) {
-      request.params.id = '42';
-      request.body.info = JSON.stringify({});
-
-      MultipartParser.prototype.parse = function(callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_UPLOAD_ERROR);
-        done();
-      });
-    });
-
-    it('should execute next with an error if getting media failed', function(done) {
-      request.params.id = '42';
-      request.body.info = JSON.stringify({});
-
-      VideoProvider.prototype.getOne = function(filter, fields, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_GET_ONE_ERROR);
-        done();
-      });
-    });
-
-    it('should execute next with an error if user is not authorized to update the media', function(done) {
-      request.params.id = '42';
-      request.body.info = JSON.stringify({});
-
-      videoController.isUserAuthorized = function() {
-        return false;
-      };
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_FORBIDDEN);
-        done();
-      });
-    });
-
-    it('should execute next with an error if updating media failed', function(done) {
-      request.params.id = '42';
-      request.body.info = JSON.stringify({});
-
-      VideoProvider.prototype.updateOneTag = function(filter, tag, file, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.updateTagAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_TAG_ERROR);
-        done();
-      });
-    });
-  });
-
-
-  describe('updateChapterAction', function() {
-
-    it('should update a media chapter', function(done) {
-      expectedMedias = [{id: '42'}];
-      var expectedChapter = {
-        name: 'Name',
-        description: 'Description'
-      };
-
-      request.params.id = expectedMedias[0].id;
-      request.body = expectedChapter;
-
-      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        callback(null, expectedMedias[0]);
-      });
-
-      VideoProvider.prototype.updateOneChapter = chai.spy(function(filter, chapter, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.equal(chapter.name, expectedChapter.name, 'Wrong tag name');
-        assert.equal(chapter.description, expectedChapter.description, 'Wrong tag description');
-        callback(null, 1, expectedChapter);
-      });
-
-      response.send = function(result) {
-        assert.equal(result.total, 1, 'Wrong total');
-        assert.strictEqual(result.chapter, expectedChapter, 'Wrong tag');
-        VideoProvider.prototype.updateOneChapter.should.have.been.called.exactly(1);
-        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
-        done();
-      };
-
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should execute next with an error if media id is not specified', function(done) {
-      request.body = {};
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_CHAPTER_MISSING_PARAMETERS);
-        done();
-      });
-    });
-
-    it('should execute next with an error if body is not specified', function(done) {
-      request.params.id = '42';
-      request.body = null;
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_CHAPTER_MISSING_PARAMETERS);
-        done();
-      });
-    });
-
-    it('should execute next with an error if getting media failed', function(done) {
-      request.params.id = '42';
-      request.body = {};
-
-      VideoProvider.prototype.getOne = function(filter, fields, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_CHAPTER_GET_ONE_ERROR);
-        done();
-      });
-    });
-
-    it('should execute next with an error if user is not authorized to update the media', function(done) {
-      request.params.id = '42';
-      request.body = {};
-
-      videoController.isUserAuthorized = function() {
-        return false;
-      };
-
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_CHAPTER_FORBIDDEN);
-        done();
-      });
-    });
-
-    it('should execute next with an error if updating media failed', function(done) {
-      request.params.id = '42';
-      request.body = {};
-
-      VideoProvider.prototype.updateOneChapter = function(filter, chapter, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.updateChapterAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.UPDATE_CHAPTER_ERROR);
-        done();
-      });
-    });
-  });
-
-  describe('removeTagsAction', function() {
-
-    it('should remove tags from media', function(done) {
-      expectedMedias = [{id: '42'}];
-      request.params.id = '42';
-      request.params.tagsids = '42,43';
-
-      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        callback(null, expectedMedias[0]);
-      });
-
-      VideoProvider.prototype.removeTags = chai.spy(function(filter, tagsIds, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.deepEqual(tagsIds, request.params.tagsids.split(','), 'Wrong tags ids');
-        callback(null, 1);
-      });
-
-      response.send = function(data) {
-        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
-        VideoProvider.prototype.removeTags.should.have.been.called.exactly(1);
-        assert.equal(data.total, 1, 'Wrong total');
-        done();
-      };
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should execute next with an error if id is not specified', function(done) {
-      request.params.tagsids = '42,43';
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_TAGS_MISSING_PARAMETERS, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if tags ids are not specified', function(done) {
-      request.params.id = '42';
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_TAGS_MISSING_PARAMETERS, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if getting media failed', function(done) {
-      request.params.id = '42';
-      request.params.tagsids = '42,43';
-
-      VideoProvider.prototype.getOne = function(filter, fields, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_TAGS_GET_ONE_ERROR, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if user is not authorized to update the media', function(done) {
-      request.params.id = '42';
-      request.params.tagsids = '42,43';
-
-      videoController.isUserAuthorized = function() {
-        return false;
-      };
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_TAGS_FORBIDDEN, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if updating media failed', function(done) {
-      request.params.id = '42';
-      request.params.tagsids = '42,43';
-
-      VideoProvider.prototype.removeTags = function(filter, tagsIds, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.removeTagsAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_TAGS_ERROR, 'Wrong error');
-        done();
-      });
-    });
-  });
-
-  describe('removeChaptersAction', function() {
-
-    it('should remove chapters from media', function(done) {
-      expectedMedias = [{id: '42'}];
-      request.params.id = '42';
-      request.params.chaptersids = '42,43';
-
-      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        callback(null, expectedMedias[0]);
-      });
-
-      VideoProvider.prototype.removeChapters = chai.spy(function(filter, chaptersIds, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedMedias[0].id,
-          'Wrong id'
-        );
-        assert.deepEqual(chaptersIds, request.params.chaptersids.split(','), 'Wrong chapters ids');
-        callback(null, 1);
-      });
-
-      response.send = function(data) {
-        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
-        VideoProvider.prototype.removeChapters.should.have.been.called.exactly(1);
-        assert.equal(data.total, 1, 'Wrong total');
-        done();
-      };
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should execute next with an error if id is not specified', function(done) {
-      request.params.chaptersids = '42,43';
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_CHAPTERS_MISSING_PARAMETERS, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if chapters ids are not specified', function(done) {
-      request.params.id = '42';
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_CHAPTERS_MISSING_PARAMETERS, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if getting media failed', function(done) {
-      request.params.id = '42';
-      request.params.chaptersids = '42,43';
-
-      VideoProvider.prototype.getOne = function(filter, fields, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_CHAPTERS_GET_ONE_ERROR, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if user is not authorized to update the media', function(done) {
-      request.params.id = '42';
-      request.params.chaptersids = '42,43';
-
-      videoController.isUserAuthorized = function() {
-        return false;
-      };
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_CHAPTERS_FORBIDDEN, 'Wrong error');
-        done();
-      });
-    });
-
-    it('should execute next with an error if updating media failed', function(done) {
-      request.params.id = '42';
-      request.params.chaptersids = '42,43';
-
-      VideoProvider.prototype.removeChapters = function(filter, chaptersIds, callback) {
-        callback(new Error('Something went wrong'));
-      };
-
-      videoController.removeChaptersAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.REMOVE_CHAPTERS_ERROR, 'Wrong error');
-        done();
-      });
-    });
   });
 
   describe('convertPoiAction', function() {
 
     it('should convert points of interest values from percent to milliseconds', function(done) {
+      var expectedTagValue = 0.25;
+      var expectedChapterValue = 0.6;
+      var expectedStartCut = 0;
+      var expectedEndCut = 1;
+      expectedPois = [
+        {
+          id: '1',
+          value: expectedTagValue,
+          name: 'Tag name',
+          description: 'Tag description',
+          file: {
+            originalName: 'tagOriginalName.jpg',
+            mimeType: 'image/jpeg',
+            fileName: 'tagFileName.jpg',
+            size: 42,
+            url: 'tagFileUri',
+            path: 'tagFilePath'
+          }
+        },
+        {
+          id: '2',
+          value: expectedChapterValue,
+          name: 'Chapter name',
+          description: 'Chapter description'
+        }
+      ];
       expectedMedias = [
         {
           id: '42',
-          chapters: [{value: 0.25}, {value: 0.75}],
-          tags: [{value: 0.2}, {value: 0.4}, {value: 0.6}],
-          cut: [{value: 0}, {value: 1}],
+          tags: [expectedPois[0].id],
+          chapters: [expectedPois[1].id],
+          cut: [{value: expectedStartCut}, {value: expectedEndCut}],
           needPointsOfInterestUnitConversion: true,
           state: STATES.PUBLISHED
         }
@@ -3330,35 +3845,172 @@ describe('VideoController', function() {
       request.params.id = '42';
       request.body = {duration: 600000};
 
+      var convertToMilliseconds = function(percent) {
+        return Math.floor(percent * request.body.duration);
+      };
+
       VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
           expectedMedias[0].id,
-          'Wrong id'
+          'Wrong media id'
         );
         callback(null, expectedMedias[0]);
       });
 
-      VideoProvider.prototype.updateOne = chai.spy(function(filter, data, callback) {
-        var expectedData = {
-          chapters: [{value: 150000}, {value: 450000}],
-          cut: [{value: 0}, {value: 600000}],
-          tags: [{value: 120000}, {value: 240000}, {value: 360000}]
-        };
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        assert.sameMembers(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'id').value,
+          expectedMedias[0].tags.concat(expectedMedias[0].chapters),
+          'Wrong points of interest'
+        );
+        callback(null, expectedPois);
+      });
 
-        for (var prop in expectedData) {
-          for (var i in expectedData[prop]) {
-            assert.strictEqual(expectedData[prop][i].value, data[prop][i].value);
-          }
+      PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+        var poiId = filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value;
+
+        if (poiId === expectedPois[0].id) {
+          assert.equal(poi.value, convertToMilliseconds(expectedTagValue), 'Wrong tag value');
+        } else {
+          assert.equal(poi.value, convertToMilliseconds(expectedChapterValue), 'Wrong chapter value');
         }
 
         callback(null, 1);
       });
 
+      VideoProvider.prototype.updateOne = chai.spy(function(filter, data, callback) {
+        var expectedData = {
+          cut: [
+            {value: convertToMilliseconds(expectedStartCut)},
+            {value: convertToMilliseconds(expectedEndCut)}
+          ],
+          needPointsOfInterestUnitConversion: false
+        };
+
+        assert.deepEqual(data, expectedData);
+
+        callback(null, 1);
+      });
+
       response.send = function(data) {
+        var media = data.entity;
+        var tag = media.tags[0];
+        var chapter = media.chapters[0];
+        var expectedMedia = expectedMedias[0];
+        var expectedTag = expectedMedia.tags[0];
+        var expectedChapter = expectedMedia.chapters[0];
+
+        assert.equal(media.id, expectedMedia.id, 'Wrong media id');
+        assert.equal(media.cut[0].value, 0, 'Wrong start cut value');
+        assert.equal(media.cut[1].value, 600000, 'Wrong start cut value');
+        assert.isNotOk(
+          media.needPointsOfInterestUnitConversion,
+          'Expected needPointsOfInterestUnitConversion to be false'
+        );
+
+        assert.equal(tag.id, expectedTag.id, 'Wrong tag id');
+        assert.equal(tag.name, expectedTag.name, 'Wrong tag name');
+        assert.equal(tag.description, expectedTag.description, 'Wrong tag description');
+        assert.equal(tag.value, convertToMilliseconds(expectedTagValue), 'Wrong tag value');
+        assert.equal(tag.file.originalName, expectedTag.file.originalName, 'Wrong tag file original name');
+        assert.equal(tag.file.fileName, expectedTag.file.fileName, 'Wrong tag file name');
+        assert.equal(tag.file.mimeType, expectedTag.file.mimeType, 'Wrong tag MIME type');
+        assert.equal(tag.file.size, expectedTag.file.size, 'Wrong tag size');
+        assert.equal(tag.file.url, expectedTag.file.url, 'Wrong tag URL');
+        assert.isUndefined(tag.path, 'Unexpected tag file path');
+
+        assert.equal(chapter.id, expectedChapter.id, 'Wrong chapter id');
+        assert.equal(chapter.name, expectedChapter.name, 'Wrong chapter name');
+        assert.equal(chapter.description, expectedChapter.description, 'Wrong chapter description');
+        assert.equal(chapter.value, convertToMilliseconds(expectedChapterValue), 'Wrong chapter value');
+
         VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
-        assert.notProperty(data, 'needPointsOfInterestUnitConversion', 'Unexpected property');
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(2);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.convertPoiAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected error');
+      });
+    });
+
+    it('should resolve media resources URLs', function(done) {
+      var expectedSmallImageUri = 'smallImageUri';
+      var expectedLargeImageUri = 'largeImageUri';
+      var expectedTagFileUri = 'tagFileUri';
+      var expectedSourceUri = 'sourceUri';
+      var expectedThumbnailUri = 'thumbnailUri';
+      expectedPois = [
+        {
+          id: 'tagId',
+          file: {
+            url: expectedTagFileUri
+          }
+        }
+      ];
+      expectedMedias = [
+        {
+          id: 42,
+          type: TYPES.LOCAL,
+          state: STATES.PUBLISHED,
+          timecodes: [
+            {
+              image: {
+                small: {
+                  url: expectedSmallImageUri
+                },
+                large: expectedLargeImageUri
+              }
+            }
+          ],
+          tags: [expectedPois[0].id],
+          sources: [
+            {
+              files: [
+                {
+                  link: expectedSourceUri
+                }
+              ]
+            }
+          ],
+          thumbnail: expectedThumbnailUri
+        }
+      ];
+
+      request.params.id = '42';
+      request.body = {duration: 600000};
+
+      response.send = function(data) {
+        var media = data.entity;
+
+        assert.strictEqual(
+          media.thumbnail,
+          coreApi.getCdnUrl() + expectedThumbnailUri,
+          'Wrong thumbnail'
+        );
+        assert.strictEqual(
+          media.timecodes[0].image.small.url,
+          coreApi.getCdnUrl() + expectedSmallImageUri,
+          'Wrong small timecode'
+        );
+        assert.strictEqual(
+          media.timecodes[0].image.large,
+          coreApi.getCdnUrl() + expectedLargeImageUri,
+          'Wrong large timecode'
+        );
+        assert.strictEqual(
+          media.tags[0].file.url,
+          coreApi.getCdnUrl() + expectedTagFileUri,
+          'Wrong tag file'
+        );
+        assert.strictEqual(
+          media.sources[0].files[0].link,
+          coreApi.getCdnUrl() + expectedSourceUri,
+          'Wrong source link'
+        );
         done();
       };
 
@@ -3371,7 +4023,11 @@ describe('VideoController', function() {
       request.body = {duration: 600000};
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_MISSING_PARAMETERS, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       });
     });
@@ -3380,7 +4036,11 @@ describe('VideoController', function() {
       request.params.id = '42';
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_MISSING_PARAMETERS, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_MISSING_PARAMETERS, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(0);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       });
     });
@@ -3395,12 +4055,16 @@ describe('VideoController', function() {
       request.params.id = '42';
       request.body = {duration: 600000};
 
-      VideoProvider.prototype.getOne = function(filter, fields, callback) {
+      VideoProvider.prototype.getOne = chai.spy(function(filter, fields, callback) {
         callback(new Error('Something went wrong'));
-      };
+      });
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_GET_ONE_ERROR, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_GET_MEDIA_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       });
     });
@@ -3417,7 +4081,11 @@ describe('VideoController', function() {
       request.body = {duration: 600000};
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_NOT_READY_ERROR, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_MEDIA_NOT_READY_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       });
     });
@@ -3441,7 +4109,75 @@ describe('VideoController', function() {
       };
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POINTS_OF_INTEREST_FORBIDDEN, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_FORBIDDEN, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute next with an error if getting points of interest failed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          state: STATES.PUBLISHED,
+          tags: ['1'],
+          cut: [{value: 0}, {value: 1}],
+          needPointsOfInterestUnitConversion: true
+        }
+      ];
+
+      request.params.id = '42';
+      request.body = {duration: 600000};
+
+      PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      videoController.convertPoiAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_GET_POIS_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
+        done();
+      });
+    });
+
+    it('should execute next with an error if updating points of interest failed', function(done) {
+      expectedPois = [
+        {
+          id: '1',
+          value: 1000,
+          name: 'Tag name',
+          description: 'Tag description'
+        }
+      ];
+      expectedMedias = [
+        {
+          id: '42',
+          tags: [expectedPois[0].id],
+          cut: [{value: 0}, {value: 1}],
+          needPointsOfInterestUnitConversion: true,
+          state: STATES.PUBLISHED
+        }
+      ];
+
+      request.params.id = '42';
+      request.body = {duration: 600000};
+
+      PoiProvider.prototype.updateOne = chai.spy(function(filter, poi, callback) {
+        callback(new Error('Something went wrong'));
+      });
+
+      videoController.convertPoiAction(request, response, function(error) {
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_UPDATE_POI_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(1);
         done();
       });
     });
@@ -3451,6 +4187,7 @@ describe('VideoController', function() {
         {
           id: '42',
           state: STATES.PUBLISHED,
+          cut: [{value: 0}, {value: 1}],
           needPointsOfInterestUnitConversion: true
         }
       ];
@@ -3458,12 +4195,16 @@ describe('VideoController', function() {
       request.params.id = '42';
       request.body = {duration: 600000};
 
-      VideoProvider.prototype.updateOne = function(filter, modifications, callback) {
+      VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
         callback(new Error('Something went wrong'));
-      };
+      });
 
       videoController.convertPoiAction(request, response, function(error) {
-        assert.strictEqual(error, HTTP_ERRORS.CONVERT_VIDEO_POI_ERROR, 'Wrong error');
+        assert.strictEqual(error, HTTP_ERRORS.CONVERT_POIS_UPDATE_MEDIA_ERROR, 'Wrong error');
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       });
     });
@@ -3481,7 +4222,10 @@ describe('VideoController', function() {
       request.body = {duration: 600000};
 
       response.send = function() {
+        VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.updateOne.should.have.been.called.exactly(0);
+        PoiProvider.prototype.getAll.should.have.been.called.exactly(0);
         done();
       };
 

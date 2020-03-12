@@ -277,7 +277,12 @@
      * @return {HttpPromise} The HTTP promise
      */
     function updateChapter(id, chapter) {
-      return $http.post(basePath + 'publish/videos/' + id + '/chapters/' + (chapter.id || ''), chapter);
+      return Upload.upload({
+        url: '/be/publish/videos/' + id + '/chapters/' + (chapter.id || ''),
+        data: {
+          info: Upload.json(chapter)
+        }
+      });
     }
 
     /**

@@ -14,6 +14,7 @@ Name | Type | Required | Default | Details
 ---- | ---- | ---- | ---- | ----
 query | String | No | - | To search on both videos title and description
 useSmartSearch | Number | No | 1 | **1** to use a more advanced search mechanism, **0** to use a simple search based on a regular expression
+searchInPois | Number | No | 0 | **1** to also search in tags / chapters titles and descriptions, **0** to search only on title and description of videos
 states | String/Array | No | - | To filter videos by state
 dateStart | String/Number | No | - | To get videos after or equal to a date (in any format supported by JavaScript Date object)
 dateEnd | String/Number | No | - | To get videos before or equal to a date (in any format supported by JavaScript Date object)

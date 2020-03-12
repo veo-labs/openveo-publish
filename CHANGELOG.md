@@ -1,3 +1,26 @@
+# 11.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- OpenVeo Publish now requires OpenVeo Core &gte; 9.0.0
+- HTTP error code 23 still refers to a failed point of interest update but no longer to a failed point of interest creation, use code 47 for failed point of interest creation and 48 for failed media update
+- HTTP error code 26 still refers to a failed points of interests removal but no longer to a failed media update, use code 49 for failed failed media update
+- The following HTTP error codes have been removed:
+  - 536: Use 522 instead
+  - 537: Use 535 instead
+  - 539: Use 523 instead
+  - 540: Use 538 instead
+  - 22: Use 21 instead
+  - 24: Use 23, 47 and 48 instead
+  - 27: Use 25 instead
+  - 28: Use 25 and 26 instead
+  - 261: Use 259 instead
+  - 263: Use 262 instead
+
+## NEW FEATURES
+
+- Web service endpoint GET /videos now accepts searchInPois parameter to extend the smart search to tags titles / descriptions and chapters titles / descriptions
+
 # 10.2.3 / 2019-10-10
 
 ## BUG FIXES

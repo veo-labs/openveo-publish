@@ -48,8 +48,9 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * @constructor
  * @param {Object} mediaPackage Information about the media
  * @param {VideoProvider} videoProvider Media provider
+ * @param {PoiProvider} poiProvider Points of interest provider
  */
-function Package(mediaPackage, videoProvider) {
+function Package(mediaPackage, videoProvider, poiProvider) {
 
   Object.defineProperties(this, {
 
@@ -70,6 +71,15 @@ function Package(mediaPackage, videoProvider) {
      * @final
      */
     videoProvider: {value: videoProvider},
+
+    /**
+     * Points of interest provider.
+     *
+     * @property poiProvider
+     * @type PoiProvider
+     * @final
+     */
+    poiProvider: {value: poiProvider},
 
     /**
      * Media package description object.

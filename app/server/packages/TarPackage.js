@@ -64,9 +64,10 @@ var shortid = require('shortid');
  * @constructor
  * @param {Object} mediaPackage The media description object
  * @param {VideoProvider} videoProvider A video provider
+ * @param {PoiProvider} poiProvider Points of interest provider
  */
-function TarPackage(mediaPackage, videoProvider) {
-  TarPackage.super_.call(this, mediaPackage, videoProvider);
+function TarPackage(mediaPackage, videoProvider, poiProvider) {
+  TarPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
@@ -476,7 +477,7 @@ TarPackage.prototype.validatePackage = function() {
 };
 
 /**
- * Saves package points of interests.
+ * Saves package points of interest.
  *
  * It expects package metadata to have a property "indexes" containing a list of points of interest with for each one:
  *  - **String** type The type of the point of interest, either "image" or "tag"
@@ -570,17 +571,15 @@ TarPackage.prototype.saveTimecodes = function() {
       );
     },
 
-    // Save points of interest
+    // Format points of interest
     function(pointsOfInterest, spriteReferences, callback) {
-      var videoInfo = {};
+      var tags = [];
+      var timecodes = [];
 
       if (!pointsOfInterest) return callback();
 
       // Got points of interest for this video
       // Dissociate points of interest regarding types
-
-      videoInfo.timecodes = [];
-      videoInfo.tags = [];
 
       for (var i = 0; i < pointsOfInterest.length; i++) {
         var pointOfInterest = pointsOfInterest[i];
@@ -601,7 +600,7 @@ TarPackage.prototype.saveTimecodes = function() {
             // Get the name of the sprite file
             var spriteFileName = imageReference.sprite.match(/\/([^/]*)$/)[1];
 
-            videoInfo.timecodes.push({
+            timecodes.push({
               id: shortid.generate(),
               timecode: pointOfInterest.timecode,
               image: {
@@ -616,24 +615,41 @@ TarPackage.prototype.saveTimecodes = function() {
             break;
 
           case 'tag':
-            videoInfo.tags.push({
-              id: shortid.generate(),
+            tags.push({
               value: pointOfInterest.timecode,
               name: pointOfInterest.data && pointOfInterest.data.tagname ?
-                pointOfInterest.data.tagname : 'Tag' + (videoInfo.tags.length + 1)
+                pointOfInterest.data.tagname : 'Tag' + (tags.length + 1)
             });
             break;
           default:
         }
       }
+      callback(null, timecodes, tags);
+    },
+
+    // Save points of interest
+    function(timecodes, tags, callback) {
+      self.poiProvider.add(tags, function(error, total, addedTags) {
+        if (error) return callback(error);
+
+        callback(null, timecodes, addedTags);
+      });
+    },
+
+    // Save timecodes and tags into the media
+    function(timecodes, tags, callback) {
       self.videoProvider.updateOne(
         new ResourceFilter().equal('id', self.mediaPackage.id),
-        videoInfo,
-        function(error) {
-          return callback(error);
-        }
+        {
+          tags: tags.map(function(tag) {
+            return tag.id;
+          }),
+          timecodes: timecodes
+        },
+        callback
       );
     }
+
   ], function(error) {
     if (error)
       self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
@@ -641,7 +657,6 @@ TarPackage.prototype.saveTimecodes = function() {
       self.fsm.transition();
   });
 };
-
 
 /**
  * Gets the media file path of the package.

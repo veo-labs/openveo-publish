@@ -17,6 +17,7 @@ chai.use(spies);
 describe('TarPackage', function() {
   var tarPackage;
   var videoProvider;
+  var poiProvider;
   var expectedMediaPackage;
   var openVeoApi;
   var xml2js;
@@ -39,6 +40,12 @@ describe('TarPackage', function() {
       }),
       updateMetadata: chai.spy(function(id, metadata, callback) {
         callback(null, 1);
+      })
+    };
+
+    poiProvider = {
+      add: chai.spy(function(pois, callback) {
+        callback(null, pois.length, pois);
       })
     };
 
@@ -94,6 +101,7 @@ describe('TarPackage', function() {
     mock('xml2js', xml2js);
     mock('fs', fs);
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), videoProvider);
+    mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), poiProvider);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/publishConf.json'), publishConf);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/videoPlatformConf.json'), videoPlatformConf);
   });
@@ -103,7 +111,7 @@ describe('TarPackage', function() {
     mock.reRequire(path.join(process.rootPublish, 'app/server/packages/Package.js'));
     mock.reRequire(path.join(process.rootPublish, 'app/server/packages/VideoPackage.js'));
     var TarPackage = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/TarPackage.js'));
-    tarPackage = new TarPackage(expectedMediaPackage, videoProvider);
+    tarPackage = new TarPackage(expectedMediaPackage, videoProvider, poiProvider);
     tarPackage.fsm = {};
     tarPackage.updateState = chai.spy(function(id, state, callback) {
       callback();
@@ -170,18 +178,25 @@ describe('TarPackage', function() {
           }
         }
       ];
+      var expectedTag = expectedMediaPackage.metadata.indexes[0];
+      var expectedTagId = '42';
+
+      poiProvider.add = chai.spy(function(pois, callback) {
+        pois[0].id = expectedTagId;
+        assert.lengthOf(pois, expectedMediaPackage.metadata.indexes.length, 'Wrong number of tags');
+        assert.equal(pois[0].name, expectedTag.data.tagname, 'Wrong tag name');
+        assert.equal(pois[0].value, expectedTag.timecode, 'Wrong tag value');
+        callback(null, pois.length, pois);
+      });
 
       videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        var expectedTag = expectedMediaPackage.metadata.indexes[0];
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
           expectedMediaPackage.id,
           'Wrong media package id'
         );
-        assert.lengthOf(modifications.tags, expectedMediaPackage.metadata.indexes.length, 'Wrong number of tags');
-        assert.isString(modifications.tags[0].id, 'Expected tag id to be generated');
-        assert.equal(modifications.tags[0].name, expectedTag.data.tagname, 'Wrong tag name');
-        assert.equal(modifications.tags[0].value, expectedTag.timecode, 'Wrong tag timecode');
+
+        assert.sameMembers(modifications.tags, [expectedTagId], 'Wrong tags associated to the media');
         callback(null, 1);
       });
 
@@ -192,6 +207,7 @@ describe('TarPackage', function() {
       tarPackage.fsm.transition = function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
         done();
       };
 
@@ -206,9 +222,9 @@ describe('TarPackage', function() {
         }
       ];
 
-      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        assert.isString(modifications.tags[0].name, 'Expected tag name to be generated');
-        callback(null, 1);
+      poiProvider.add = chai.spy(function(pois, callback) {
+        assert.isString(pois[0].name, 'Expected tag name to be generated');
+        callback(null, pois.length, pois);
       });
 
       tarPackage.setError = function(error) {
@@ -217,8 +233,38 @@ describe('TarPackage', function() {
 
       tarPackage.fsm.transition = function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
         done();
+      };
+
+      tarPackage.saveTimecodes();
+    });
+
+    it('should set package as on error if adding tags failed', function(done) {
+      var expectedError = new Error('Something went wrong');
+      expectedMediaPackage.metadata.indexes = [
+        {
+          type: 'tag',
+          timecode: 42000
+        }
+      ];
+
+      poiProvider.add = chai.spy(function(pois, callback) {
+        callback(expectedError);
+      });
+
+      tarPackage.setError = function(error) {
+        tarPackage.updateState.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+        assert.instanceOf(error, TarPackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
+        done();
+      };
+
+      tarPackage.fsm.transition = function() {
+        assert.fail('Unexpected transition');
       };
 
       tarPackage.saveTimecodes();
