@@ -25,6 +25,7 @@
 ## DEPENDENCIES
 
 - **async** has been upgraded from 2.1.4 to **3.2.0**
+- **express** has been upgraded from 4.14.0 to **4.17.1**
 
 # 10.2.3 / 2019-10-10
 
