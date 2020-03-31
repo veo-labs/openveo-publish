@@ -3155,9 +3155,9 @@
       }
     },
     "ftps": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/ftps/-/ftps-1.0.0.tgz",
-      "integrity": "sha1-SIvdZ9I7+Wa+Z9vNp3YeF7CpLD0=",
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/ftps/-/ftps-1.1.1.tgz",
+      "integrity": "sha512-SPMvp+lKgBq3G9lKEknRal1iC/mIBnvEoZDqWoDDqKtLnraGOr4ctmCmOo4B99epxs2spwlxofdRcMq+g7wN0Q==",
       "requires": {
         "duplex-child-process": "0.0.5",
         "lodash": "^4.4.0"

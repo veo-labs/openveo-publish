@@ -29,7 +29,7 @@
     "dashjs": "2.9.2",
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
-    "ftps": "1.0.0",
+    "ftps": "^1.1.1",
     "googleapis": "16.0.0",
     "html5shiv": "3.7.3",
     "javascript-state-machine": "2.4.0",
