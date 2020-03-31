@@ -22,6 +22,10 @@
 
 - Web service endpoint GET /videos now accepts searchInPois parameter to extend the smart search to tags titles / descriptions and chapters titles / descriptions
 
+## DEPENDENCIES
+
+- **async** has been upgraded from 2.1.4 to **3.2.0**
+
 # 10.2.3 / 2019-10-10
 
 ## BUG FIXES

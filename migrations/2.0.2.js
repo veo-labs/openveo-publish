@@ -23,16 +23,18 @@ module.exports.update = function(callback) {
         else {
           var series = [];
           medias.forEach(function(media) {
-            var modifications = {};
-            var metadata = media.metadata || {};
+            series.push(function(callback) {
+              var modifications = {};
+              var metadata = media.metadata || {};
 
-            if (!metadata.user) modifications.user = coreApi.getAnonymousUserId();
-            if (!metadata.groups) modifications.groups = [];
+              if (!metadata.user) modifications.user = coreApi.getAnonymousUserId();
+              if (!metadata.groups) modifications.groups = [];
 
-            if (modifications.user || modifications.groups)
-              videoProvider.updateOne(new ResourceFilter().equal('id', media.id), modifications, callback);
-            else
-              callback();
+              if (modifications.user || modifications.groups)
+                videoProvider.updateOne(new ResourceFilter().equal('id', media.id), modifications, callback);
+              else
+                callback();
+            });
           });
 
           async.series(series, callback);

@@ -25,7 +25,7 @@
     "angular": "1.5.11",
     "angular-animate": "1.5.11",
     "angular-cookies": "1.5.11",
-    "async": "2.1.4",
+    "async": "^3.2.0",
     "dashjs": "2.9.2",
     "express": "4.14.0",
     "fluent-ffmpeg": "2.1.0",
