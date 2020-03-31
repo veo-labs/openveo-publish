@@ -28,6 +28,7 @@
 - **express** has been upgraded from 4.14.0 to **4.17.1**
 - **fluent-ffmpeg** has been upgraded from 2.1.0 to **2.1.2**
 - **ftps** has been upgraded from 1.0.0 to **1.1.1**
+- **googleapis** has been upgraded from 16.0.0 to **48.0.0**
 
 # 10.2.3 / 2019-10-10
 

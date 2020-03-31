@@ -4,7 +4,7 @@
  * @module providers
  */
 
-var google = require('googleapis');
+var google = require('googleapis').google;
 var path = require('path');
 var OAuth2 = google.auth.OAuth2;
 var openVeoApi = require('@openveo/api');

@@ -8,7 +8,7 @@ var fs = require('fs');
 var util = require('util');
 var mime = require('mime');
 var async = require('async');
-var google = require('googleapis');
+var google = require('googleapis').google;
 var youtube = google.youtube('v3');
 var YoutubeResumableUpload = process.requirePublish(
   'app/server/providers/mediaPlatforms/youtube/YoutubeResumableUpload.js'

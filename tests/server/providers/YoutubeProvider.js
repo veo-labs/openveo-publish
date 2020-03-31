@@ -36,8 +36,10 @@ describe('YoutubeProvider', function() {
     };
 
     mock('googleapis', {
-      youtube: function() {
-        return youtubeApi;
+      google: {
+        youtube: function() {
+          return youtubeApi;
+        }
       }
     });
   });
