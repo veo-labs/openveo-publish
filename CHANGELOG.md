@@ -32,6 +32,7 @@
 - **javascript-state-machine** has been upgraded from 2.4.0 to **3.1.0**
 - **mime** has been upgraded from 1.3.4 to **2.4.4**
 - **request** has been upgraded from 2.79.0 to **2.88.0**
+- **shortid** has been upgraded from 2.2.6 to **2.2.15**
 
 # 10.2.3 / 2019-10-10
 
