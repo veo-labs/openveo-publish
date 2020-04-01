@@ -56,6 +56,7 @@
 - **mocha** has been upgraded from 5.2.0 to **7.1.1**
 - **mock-require** has been upgraded from 3.0.2 to **3.0.3**
 - **pre-commit** sub dependencies have been upgraded
+- **tinymce** has been upgraded from 4.8.4 to **5.2.1**
 
 # 10.2.3 / 2019-10-10
 
