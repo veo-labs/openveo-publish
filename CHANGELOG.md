@@ -54,6 +54,7 @@
 - **karma-firefox-launcher** has been upgraded from 1.1.0 to **1.3.0**
 - **karma-ie-launcher** has been removed has no tests are performed on Internet Explorer
 - **mocha** has been upgraded from 5.2.0 to **7.1.1**
+- **mock-require** has been upgraded from 3.0.2 to **3.0.3**
 
 # 10.2.3 / 2019-10-10
 
