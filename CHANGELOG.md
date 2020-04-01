@@ -38,6 +38,7 @@
 - **dashjs** has been upgraded from 2.9.2 to **3.0.3**
 - **vimeo** has been upgraded from 1.2.0 to **2.1.1**
 - **xml2js** has been upgraded from 0.4.17 to **0.4.23**
+- **flightplan** has been upgraded from 0.6.19 to **0.6.20**
 
 # 10.2.3 / 2019-10-10
 
