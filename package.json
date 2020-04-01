@@ -71,7 +71,7 @@
     "mock-require": "^3.0.3",
     "pre-commit": "^1.2.2",
     "tinymce": "^5.2.1",
-    "yuidoc-theme-blue": "0.1.9"
+    "yuidoc-theme-blue": "^0.1.9"
   },
   "peerDependencies": {
     "@openveo/core": ">=8.*"
