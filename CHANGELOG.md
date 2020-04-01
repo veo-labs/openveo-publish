@@ -34,6 +34,7 @@
 - **request** has been upgraded from 2.79.0 to **2.88.0**
 - **shortid** has been upgraded from 2.2.6 to **2.2.15**
 - **video.js** has been upgraded from 7.3.0 to **7.7.5**
+- **videojs-contrib-dash** has been upgraded from 2.10.0 to **2.11.0**
 
 # 10.2.3 / 2019-10-10
 
