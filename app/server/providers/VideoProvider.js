@@ -699,20 +699,20 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (data.packageType) modifications.packageType = data.packageType;
   if (data.mediaId) modifications.mediaId = data.mediaId;
   if (data.link) modifications.link = data.link;
-  if (data.hasOwnProperty('lastState')) modifications.lastState = data.lastState;
-  if (data.hasOwnProperty('views')) modifications.views = parseInt(data.views);
-  if (data.hasOwnProperty('category')) modifications.category = data.category;
-  if (data.hasOwnProperty('leadParagraph')) modifications.leadParagraph = data.leadParagraph;
-  if (data.hasOwnProperty('description')) modifications.description = data.description;
-  if (data.hasOwnProperty('state')) modifications.state = data.state;
-  if (data.hasOwnProperty('errorCode')) modifications.errorCode = data.errorCode;
-  if (data.hasOwnProperty('available')) modifications.available = Boolean(data.available);
+  if (Object.prototype.hasOwnProperty.call(data, 'lastState')) modifications.lastState = data.lastState;
+  if (Object.prototype.hasOwnProperty.call(data, 'views')) modifications.views = parseInt(data.views);
+  if (Object.prototype.hasOwnProperty.call(data, 'category')) modifications.category = data.category;
+  if (Object.prototype.hasOwnProperty.call(data, 'leadParagraph')) modifications.leadParagraph = data.leadParagraph;
+  if (Object.prototype.hasOwnProperty.call(data, 'description')) modifications.description = data.description;
+  if (Object.prototype.hasOwnProperty.call(data, 'state')) modifications.state = data.state;
+  if (Object.prototype.hasOwnProperty.call(data, 'errorCode')) modifications.errorCode = data.errorCode;
+  if (Object.prototype.hasOwnProperty.call(data, 'available')) modifications.available = Boolean(data.available);
   if (data.groups) {
     modifications['metadata.groups'] = data.groups.filter(function(group) {
       return group ? true : false;
     });
   }
-  if (data.hasOwnProperty('user'))
+  if (Object.prototype.hasOwnProperty.call(data, 'user'))
     modifications['metadata.user'] = data.user || process.api.getCoreApi().getAnonymousUserId();
 
   VideoProvider.super_.prototype.updateOne.call(self, filter, modifications, function(updateError, total) {

@@ -142,7 +142,7 @@
       objToSave[collectionName] = [];
       var tmpEl;
       if (!cleanAll) {
-        if ($scope.media.hasOwnProperty(collectionName)) {
+        if (Object.prototype.hasOwnProperty.call($scope.media, collectionName)) {
           for (var i = 0; i < $scope.media[collectionName].length; i++) {
             tmpEl = angular.copy($scope.media[collectionName][i]);
             delete tmpEl['_depth'];

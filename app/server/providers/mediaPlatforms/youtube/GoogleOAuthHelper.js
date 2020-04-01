@@ -98,7 +98,7 @@ GoogleOAuthHelper.prototype.fetchToken = function(callback) {
  * @return {String} The url to the google association page
  */
 GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
-  if (!options.hasOwnProperty('scope')) {
+  if (!Object.prototype.hasOwnProperty.call(options, 'scope')) {
     throw new Error('Please specify the scope');
   }
 

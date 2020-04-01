@@ -53,7 +53,7 @@ PoiProvider.prototype.add = function(pois, callback) {
   for (var i = 0; i < pois.length; i++) {
     var poi = pois[i];
 
-    if (!poi.name || !poi.hasOwnProperty('value'))
+    if (!poi.name || !Object.prototype.hasOwnProperty.call(poi, 'value'))
       return this.executeCallback(callback, new TypeError('Requires name and value to add a point of interest'));
 
     var poiToAdd = {
@@ -153,8 +153,8 @@ PoiProvider.prototype.updateOne = function(filter, poi, callback) {
       }
 
       if (poi.name) storedPoi.name = poi.name;
-      if (poi.hasOwnProperty('description')) storedPoi.description = poi.description;
-      if (poi.hasOwnProperty('value')) storedPoi.value = poi.value;
+      if (Object.prototype.hasOwnProperty.call(poi, 'description')) storedPoi.description = poi.description;
+      if (Object.prototype.hasOwnProperty.call(poi, 'value')) storedPoi.value = poi.value;
 
       // Remove file
       if (oldFilePath) {

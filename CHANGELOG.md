@@ -45,6 +45,7 @@
 - **grunt-contrib-uglify** has been upgraded from 4.0.0 to **4.0.1**
 - **grunt-contrib-watch** sub dependencies have been upgraded
 - **grunt-contrib-yuidoc** sub dependencies have been upgraded
+- **grunt-eslint** has been upgraded from 19.0.0 to **22.0.0**
 
 # 10.2.3 / 2019-10-10
 

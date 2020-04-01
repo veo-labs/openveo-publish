@@ -225,7 +225,7 @@ YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams
 
     // Upload media
     function(callback) {
-      if (!uploadParams.hasOwnProperty('auth') || !uploadParams.auth) {
+      if (!Object.prototype.hasOwnProperty.call(uploadParams, 'auth') || !uploadParams.auth) {
         callback(new Error('Auth has not been set correctly'));
         return;
       }
