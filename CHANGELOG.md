@@ -39,6 +39,8 @@
 - **vimeo** has been upgraded from 1.2.0 to **2.1.1**
 - **xml2js** has been upgraded from 0.4.17 to **0.4.23**
 - **flightplan** has been upgraded from 0.6.19 to **0.6.20**
+- **grunt** has been upgraded from 1.0.3 to **1.1.0**
+- **grunt-cli** has been upgraded from 1.3.0 to **1.3.2**
 
 # 10.2.3 / 2019-10-10
 
