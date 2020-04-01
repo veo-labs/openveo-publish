@@ -125,50 +125,39 @@ describe('TarPackage', function() {
 
   describe('saveTimecodes', function() {
 
-    it('should update package state', function(done) {
-      tarPackage.setError = function(error) {
-        assert.fail('Unexpected error');
-      };
-
-      tarPackage.fsm.transition = function() {
-        tarPackage.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
-        done();
-      };
-
+    it('should update package state', function() {
       tarPackage.updateState = chai.spy(function(id, state, callback) {
         assert.equal(id, expectedMediaPackage.id, 'Wrong id');
         assert.equal(state, STATES.SAVING_TIMECODES, 'Wrong state');
         callback();
       });
 
-      tarPackage.saveTimecodes();
+      return tarPackage.saveTimecodes().then(function() {
+        tarPackage.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
     });
 
-    it('should set package as on error if updating state failed', function(done) {
+    it('should set package as on error if updating state failed', function() {
       var expectedError = new Error('Something went wrong');
+      tarPackage.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
 
-      tarPackage.fsm.transition = function() {
-        assert.fail('Unexpected transition');
-      };
-
-      tarPackage.setError = function(error) {
+      return tarPackage.saveTimecodes().then(function() {
+        assert.fail('Unexpected resolve');
+      }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
-        done();
-      };
-
-      tarPackage.updateState = chai.spy(function(id, state, callback) {
-        callback(expectedError);
       });
-
-      tarPackage.saveTimecodes();
     });
 
-    it('should save media package tags based on package metadata', function(done) {
+    it('should save media package tags based on package metadata', function() {
       expectedMediaPackage.metadata.indexes = [
         {
           type: 'tag',
@@ -200,21 +189,16 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      tarPackage.setError = function(error) {
-        assert.fail('Unexpected error');
-      };
-
-      tarPackage.fsm.transition = function() {
+      return tarPackage.saveTimecodes().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
-        done();
-      };
-
-      tarPackage.saveTimecodes();
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
     });
 
-    it('should generate a tag name if not specified', function(done) {
+    it('should generate a tag name if not specified', function() {
       expectedMediaPackage.metadata.indexes = [
         {
           type: 'tag',
@@ -227,20 +211,15 @@ describe('TarPackage', function() {
         callback(null, pois.length, pois);
       });
 
-      tarPackage.setError = function(error) {
-        assert.fail('Unexpected error');
-      };
-
-      tarPackage.fsm.transition = function() {
+      return tarPackage.saveTimecodes().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
-        done();
-      };
-
-      tarPackage.saveTimecodes();
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
     });
 
-    it('should set package as on error if adding tags failed', function(done) {
+    it('should set package as on error if adding tags failed', function() {
       var expectedError = new Error('Something went wrong');
       expectedMediaPackage.metadata.indexes = [
         {
@@ -253,24 +232,19 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      tarPackage.setError = function(error) {
+      return tarPackage.saveTimecodes().then(function() {
+        assert.fail('Unexpected transition');
+      }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
-        done();
-      };
-
-      tarPackage.fsm.transition = function() {
-        assert.fail('Unexpected transition');
-      };
-
-      tarPackage.saveTimecodes();
+      });
     });
 
-    it('should set package as on error if updating media failed', function(done) {
+    it('should set package as on error if updating media failed', function() {
       var expectedError = new Error('Something went wrong');
       expectedMediaPackage.metadata.indexes = [
         {
@@ -283,23 +257,18 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      tarPackage.setError = function(error) {
+      return tarPackage.saveTimecodes().then(function() {
+        assert.fail('Unexpected transition');
+      }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
-        done();
-      };
-
-      tarPackage.fsm.transition = function() {
-        assert.fail('Unexpected transition');
-      };
-
-      tarPackage.saveTimecodes();
+      });
     });
 
-    it('should save media package images', function(done) {
+    it('should save media package images', function() {
       expectedMediaPackage.metadata.indexes = [
         {
           type: 'image',
@@ -357,21 +326,16 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      tarPackage.setError = function(error) {
-        assert.fail('Unexpected error');
-      };
-
-      tarPackage.fsm.transition = function() {
+      return tarPackage.saveTimecodes().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
-        done();
-      };
-
-      tarPackage.saveTimecodes();
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
     });
 
-    it('should set package as on error if generating sprite failed', function(done) {
+    it('should set package as on error if generating sprite failed', function() {
       expectedMediaPackage.metadata.indexes = [
         {
           type: 'image',
@@ -388,24 +352,19 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      tarPackage.setError = function(error) {
+      return tarPackage.saveTimecodes().then(function() {
+        assert.fail('Unexpected transition');
+      }).catch(function(error) {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
-        done();
-      };
-
-      tarPackage.fsm.transition = function() {
-        assert.fail('Unexpected transition');
-      };
-
-      tarPackage.saveTimecodes();
+      });
     });
 
-    it('should retrieve points of interest images from synchro.xml if not specified in metadata', function(done) {
+    it('should retrieve points of interest images from synchro.xml if not specified in metadata', function() {
       expectedMediaPackage.metadata.indexes = null;
       var expectedXmlAsJs = {
         player: {
@@ -470,20 +429,15 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      tarPackage.setError = function(error) {
-        assert.fail('Unexpected error');
-      };
-
-      tarPackage.fsm.transition = function() {
+      return tarPackage.saveTimecodes().then(function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         videoProvider.updateMetadata.should.have.been.called.exactly(1);
         xml2js.parseString.should.have.been.called.exactly(1);
-        done();
-      };
-
-      tarPackage.saveTimecodes();
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
     });
 
   });

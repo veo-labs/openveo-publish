@@ -143,66 +143,67 @@ Object.freeze(VideoPackage.stateMachine);
  * known "nb_frames" property in ffprobe output metadata.
  *
  * @method defragmentMp4
+ * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.defragmentMp4 = function() {
   var self = this;
-  var filePath = this.getMediaFilePath();
 
-  this.updateState(this.mediaPackage.id, STATES.DEFRAGMENT_MP4, function() {
-    // Detect if file need defragmentation (unknown "nb_frames")
-    ffmpeg.ffprobe(filePath, function(error, metadata) {
-      if (metadata && Array.isArray(metadata.streams)) {
-        var fragmentedStreams = metadata.streams.filter(function(stream) {
-          if (stream.codec_type !== 'video')
-            return false;
+  return new Promise(function(resolve, reject) {
+    var filePath = self.getMediaFilePath();
 
-          return stream.nb_frames === 'N/A';
-        });
+    self.updateState(self.mediaPackage.id, STATES.DEFRAGMENT_MP4, function() {
+      // Detect if file need defragmentation (unknown "nb_frames")
+      ffmpeg.ffprobe(filePath, function(error, metadata) {
+        if (metadata && Array.isArray(metadata.streams)) {
+          var fragmentedStreams = metadata.streams.filter(function(stream) {
+            if (stream.codec_type !== 'video')
+              return false;
 
-        if (fragmentedStreams.length === 0) {
-          process.logger.debug('No defragmentation is needed (' + self.mediaPackage.id + ')');
+            return stream.nb_frames === 'N/A';
+          });
 
-          return self.fsm.transition();
-        }
+          if (fragmentedStreams.length === 0) {
+            process.logger.debug('No defragmentation is needed (' + self.mediaPackage.id + ')');
 
-        var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
-        var defragmentedFile = path.join(destinationPath, 'video_defrag.mp4');
+            return resolve();
+          }
 
-        // MP4 defragmentation
-        ffmpeg(filePath)
-          .audioCodec('copy')
-          .videoCodec('copy')
-          .outputOptions('-movflags faststart')
-          .on('start', function() {
-            process.logger.debug('Starting defragmentation (' + self.mediaPackage.id + ') ' +
-                                 'of ' + filePath + ' to ' + defragmentedFile);
-          })
-          .on('error', function(error) {
-            self.setError(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
-          })
-          .on('end', function() {
-            process.logger.debug('Defragmentation complete (' + self.mediaPackage.id + ')');
+          var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+          var defragmentedFile = path.join(destinationPath, 'video_defrag.mp4');
 
-            // Replace original file
-            process.logger.debug('Removing fragmented file ' + filePath);
-            fs.unlink(filePath, function(error) {
-              if (error)
-                self.setError(new VideoPackageError(error.message, ERRORS.UNLINK_FRAGMENTED));
+          // MP4 defragmentation
+          ffmpeg(filePath)
+            .audioCodec('copy')
+            .videoCodec('copy')
+            .outputOptions('-movflags faststart')
+            .on('start', function() {
+              process.logger.debug('Starting defragmentation (' + self.mediaPackage.id + ') ' +
+                                   'of ' + filePath + ' to ' + defragmentedFile);
+            })
+            .on('error', function(error) {
+              reject(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
+            })
+            .on('end', function() {
+              process.logger.debug('Defragmentation complete (' + self.mediaPackage.id + ')');
 
-              process.logger.debug('Replacing original file (' + self.mediaPackage.id + ') with ' + defragmentedFile);
-              fs.rename(defragmentedFile, filePath, function(error) {
-                if (error)
-                  self.setError(new VideoPackageError(error.message, ERRORS.REPLACE_FRAGMENTED));
+              // Replace original file
+              process.logger.debug('Removing fragmented file ' + filePath);
+              fs.unlink(filePath, function(error) {
+                if (error) reject(new VideoPackageError(error.message, ERRORS.UNLINK_FRAGMENTED));
 
-                process.logger.debug('Original file replaced (' + self.mediaPackage.id + ')');
+                process.logger.debug('Replacing original file (' + self.mediaPackage.id + ') with ' + defragmentedFile);
+                fs.rename(defragmentedFile, filePath, function(error) {
+                  if (error) reject(new VideoPackageError(error.message, ERRORS.REPLACE_FRAGMENTED));
 
-                return self.fsm.transition();
+                  process.logger.debug('Original file replaced (' + self.mediaPackage.id + ')');
+
+                  return resolve();
+                });
               });
-            });
-          })
-          .save(defragmentedFile);
-      } else
-        return self.fsm.transition();
+            })
+            .save(defragmentedFile);
+        } else return resolve();
+      });
     });
   });
 };
@@ -216,67 +217,68 @@ VideoPackage.prototype.defragmentMp4 = function() {
  * This is a transition.
  *
  * @method generateThumb
+ * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.generateThumb = function() {
   var self = this;
-  var filePath = this.getMediaFilePath();
 
-  this.updateState(this.mediaPackage.id, STATES.GENERATE_THUMB, function() {
-    var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+  return new Promise(function(resolve, reject) {
+    var filePath = self.getMediaFilePath();
 
-    if (self.mediaPackage.originalThumbnailPath !== undefined) {
+    self.updateState(self.mediaPackage.id, STATES.GENERATE_THUMB, function() {
+      var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
 
-      async.series([
+      if (self.mediaPackage.originalThumbnailPath !== undefined) {
 
-        // Thumbnail already exists for this package, copy the thumbnail
-        function(callback) {
-          process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-          openVeoApi.fileSystem.copy(
-            self.mediaPackage.originalThumbnailPath,
-            path.join(destinationPath, 'thumbnail.jpg'),
-            callback
-          );
-        },
+        async.series([
 
-        // Remove original thumbnail
-        function(callback) {
-          process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
-          fs.unlink(self.mediaPackage.originalThumbnailPath, callback);
-        }
+          // Thumbnail already exists for this package, copy the thumbnail
+          function(callback) {
+            process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
+            openVeoApi.fileSystem.copy(
+              self.mediaPackage.originalThumbnailPath,
+              path.join(destinationPath, 'thumbnail.jpg'),
+              callback
+            );
+          },
 
-      ], function(error) {
-        if (error) {
-          self.setError(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
-        } else {
+          // Remove original thumbnail
+          function(callback) {
+            process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+            fs.unlink(self.mediaPackage.originalThumbnailPath, callback);
+          }
+
+        ], function(error) {
+          if (error) return reject(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
           self.videoProvider.updateThumbnail(
             self.mediaPackage.id,
             '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
             function() {
-              self.fsm.transition();
+              resolve();
             }
           );
-        }
-      });
+        });
 
-    } else {
-    // Generate thumb
-      process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-      ffmpeg(filePath).screenshots({
-        timestamps: ['10%'],
-        filename: 'thumbnail.jpg',
-        folder: destinationPath
-      }).on('error', function(error) {
-        self.setError(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
-      }).on('end', function() {
-        self.videoProvider.updateThumbnail(
-          self.mediaPackage.id,
-          '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
-          function() {
-            self.fsm.transition();
-          }
-        );
-      });
-    }
+      } else {
+      // Generate thumb
+        process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
+        ffmpeg(filePath).screenshots({
+          timestamps: ['10%'],
+          filename: 'thumbnail.jpg',
+          folder: destinationPath
+        }).on('error', function(error) {
+          reject(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
+        }).on('end', function() {
+          self.videoProvider.updateThumbnail(
+            self.mediaPackage.id,
+            '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+            function() {
+              resolve();
+            }
+          );
+        });
+      }
+    });
   });
 };
 
@@ -286,21 +288,24 @@ VideoPackage.prototype.generateThumb = function() {
  * This is a transition.
  *
  * @method preparePublicDirectory
+ * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.preparePublicDirectory = function() {
   var self = this;
-  var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
 
-  this.updateState(this.mediaPackage.id, STATES.PREPARING, function() {
-    process.logger.debug('Prepare package public directory ' + publicDirectory);
+  return new Promise(function(resolve, reject) {
+    var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + self.mediaPackage.id);
 
-    openVeoApi.fileSystem.mkdir(publicDirectory,
-      function(error) {
-        if (error && error.code !== 'EEXIST')
-          self.setError(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
-        else
-          self.fsm.transition();
-      });
+    self.updateState(self.mediaPackage.id, STATES.PREPARING, function() {
+      process.logger.debug('Prepare package public directory ' + publicDirectory);
+
+      openVeoApi.fileSystem.mkdir(publicDirectory,
+        function(error) {
+          if (error && error.code !== 'EEXIST')
+            reject(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
+          else resolve();
+        });
+    });
   });
 };
 
@@ -310,41 +315,39 @@ VideoPackage.prototype.preparePublicDirectory = function() {
  * This is a transition.
  *
  * @method getMetadata
+ * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.getMetadata = function() {
   var self = this;
-  var filePath = this.getMediaFilePath();
 
-  this.updateState(this.mediaPackage.id, STATES.GET_METADATA, function() {
-    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-    self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
+  return new Promise(function(resolve, reject) {
+    var filePath = self.getMediaFilePath();
 
-    if (self.mediaPackage.metadata['profile-settings']['video-height'])
-      self.fsm.transition();
-    else {
+    self.updateState(self.mediaPackage.id, STATES.GET_METADATA, function() {
+      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+      self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
+
+      if (self.mediaPackage.metadata['profile-settings']['video-height']) return resolve();
+
       ffmpeg.ffprobe(filePath, function(error, metadata) {
-        if (error || !metadata.streams)
-          self.setError(new VideoPackageError(error.message, ERRORS.GET_METADATA));
-        else {
+        if (error || !metadata.streams) return reject(new VideoPackageError(error.message, ERRORS.GET_METADATA));
 
-          // Find video stream
-          var videoStream;
-          for (var i = 0; i < metadata.streams.length; i++) {
-            if (metadata.streams[i]['codec_type'] === 'video')
-              videoStream = metadata.streams[i];
-          }
-
-          // Got video stream associated to the video file
-          if (videoStream) {
-            self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-            self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
-              self.fsm.transition();
-            });
-          } else
-            self.setError(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
+        // Find video stream
+        var videoStream;
+        for (var i = 0; i < metadata.streams.length; i++) {
+          if (metadata.streams[i]['codec_type'] === 'video')
+            videoStream = metadata.streams[i];
         }
+
+        // Got video stream associated to the video file
+        if (videoStream) {
+          self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
+          self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
+            self.fsm.transition();
+          });
+        } else reject(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
       });
-    }
+    });
   });
 };
 
@@ -354,82 +357,86 @@ VideoPackage.prototype.getMetadata = function() {
  * This is a transition.
  *
  * @method copyImages
+ * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.copyImages = function() {
   var self = this;
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-  var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + this.mediaPackage.id);
-  var resources = [];
-  var filesToCopy = [];
 
-  process.logger.debug('Copy images to ' + videoFinalDir);
-  async.series([
+  return new Promise(function(resolve, reject) {
+    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + self.mediaPackage.id);
+    var resources = [];
+    var filesToCopy = [];
 
-    // Read directory
-    function(callback) {
-      process.logger.verbose('Scan directory ' + extractDirectory + ' for images');
-      fs.readdir(extractDirectory, function(error, files) {
-        if (error)
-          callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
-        else {
-          resources = files;
-          callback();
-        }
-      });
-    },
+    process.logger.debug('Copy images to ' + videoFinalDir);
+    async.series([
 
-    // Validate files in the directory to keep only accepted types
-    function(callback) {
-      var filesToValidate = {};
-      var filesValidationDescriptor = {};
+      // Read directory
+      function(callback) {
+        process.logger.verbose('Scan directory ' + extractDirectory + ' for images');
+        fs.readdir(extractDirectory, function(error, files) {
+          if (error)
+            callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
+          else {
+            resources = files;
+            callback();
+          }
+        });
+      },
 
-      resources.forEach(function(resource) {
-        filesToValidate[resource] = path.join(extractDirectory, resource);
-        filesValidationDescriptor[resource] = {in: acceptedImagesExtensions};
-      });
+      // Validate files in the directory to keep only accepted types
+      function(callback) {
+        var filesToValidate = {};
+        var filesValidationDescriptor = {};
 
-      openVeoApi.util.validateFiles(filesToValidate, filesValidationDescriptor, function(error, files) {
-        if (error)
-          process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
+        resources.forEach(function(resource) {
+          filesToValidate[resource] = path.join(extractDirectory, resource);
+          filesValidationDescriptor[resource] = {in: acceptedImagesExtensions};
+        });
 
-        for (var filePath in files) {
-          if (files[filePath].isValid)
-            filesToCopy.push(filePath);
-        }
-
-        callback();
-      });
-    },
-
-    // Copy images
-    function(callback) {
-      var filesLeftToCopy = filesToCopy.length;
-
-      if (!filesToCopy.length) return callback();
-
-      filesToCopy.forEach(function(file) {
-        process.logger.verbose('Copy image ' + path.join(extractDirectory, file) +
-                               ' to ' + path.join(videoFinalDir, file));
-        openVeoApi.fileSystem.copy(path.join(extractDirectory, file), path.join(videoFinalDir, file), function(error) {
-
+        openVeoApi.util.validateFiles(filesToValidate, filesValidationDescriptor, function(error, files) {
           if (error)
             process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
 
-          filesLeftToCopy--;
+          for (var filePath in files) {
+            if (files[filePath].isValid)
+              filesToCopy.push(filePath);
+          }
 
-          if (filesLeftToCopy === 0)
-            callback();
+          callback();
         });
-      });
+      },
 
-    }
-  ], function(error) {
-    if (error)
-      self.setError(error);
-    else
-      self.fsm.transition();
+      // Copy images
+      function(callback) {
+        var filesLeftToCopy = filesToCopy.length;
+
+        if (!filesToCopy.length) return callback();
+
+        filesToCopy.forEach(function(file) {
+          process.logger.verbose('Copy image ' + path.join(extractDirectory, file) +
+                                 ' to ' + path.join(videoFinalDir, file));
+          openVeoApi.fileSystem.copy(
+            path.join(extractDirectory, file),
+            path.join(videoFinalDir, file),
+            function(error) {
+              if (error)
+                process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
+
+              filesLeftToCopy--;
+
+              if (filesLeftToCopy === 0)
+                callback();
+            }
+          );
+        });
+
+      }
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
   });
-
 };
 
 /**

@@ -399,32 +399,27 @@ TarPackage.prototype.getStateMachine = function() {
  * This is a transition.
  *
  * @method extractPackage
+ * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.extractPackage = function() {
   var self = this;
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
-  // Extract package
-  this.updateState(this.mediaPackage.id, STATES.EXTRACTING, function() {
+  return new Promise(function(resolve, reject) {
+    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
 
-    // Copy destination
-    var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.tar');
+    // Extract package
+    self.updateState(self.mediaPackage.id, STATES.EXTRACTING, function() {
 
-    process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
-    openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
+      // Copy destination
+      var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.tar');
 
-      // Extraction failed
-      if (error) {
-        self.setError(new TarPackageError(error.message, ERRORS.EXTRACT));
-      } else {
-
-        // Extraction done
-        self.fsm.transition();
-
-      }
+      process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
+      openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
+        if (error) reject(new TarPackageError(error.message, ERRORS.EXTRACT));
+        else resolve();
+      });
 
     });
-
   });
 };
 
@@ -434,20 +429,22 @@ TarPackage.prototype.extractPackage = function() {
  * This is a transition.
  *
  * @method validatePackage
+ * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.validatePackage = function() {
   var self = this;
 
-  process.logger.debug('Validate package ' + this.mediaPackage.originalPackagePath);
-  this.updateState(this.mediaPackage.id, STATES.VALIDATING, function() {
+  return new Promise(function(resolve, reject) {
+    process.logger.debug('Validate package ' + self.mediaPackage.originalPackagePath);
 
-    // Validate package content
-    if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
-      self.fsm.transition();
-    else validatePackage.call(self, function(error, metadata) {
-      if (error)
-        self.setError(new TarPackageError(error.message, ERRORS.VALIDATION));
-      else {
+    self.updateState(self.mediaPackage.id, STATES.VALIDATING, function() {
+
+      // Validate package content
+      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
+        self.fsm.transition();
+      else validatePackage.call(self, function(error, metadata) {
+        if (error) return reject(new TarPackageError(error.message, ERRORS.VALIDATION));
+
         if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
 
         openVeoApi.util.merge(self.mediaPackage.metadata, metadata);
@@ -468,11 +465,11 @@ TarPackage.prototype.validatePackage = function() {
             else callback();
           }
         ], function() {
-          self.fsm.transition();
+          resolve();
         });
-      }
-    });
+      });
 
+    });
   });
 };
 
@@ -507,154 +504,156 @@ TarPackage.prototype.validatePackage = function() {
  * This is a transition.
  *
  * @method saveTimecodes
+ * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.saveTimecodes = function() {
   var self = this;
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
 
-  process.logger.debug('Save points of interests');
+  return new Promise(function(resolve, reject) {
+    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
 
-  async.waterfall([
+    process.logger.debug('Save points of interests');
 
-    // Update state
-    function(callback) {
-      self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, function(error) {
-        callback(error);
-      });
-    },
+    async.waterfall([
 
-    // Retrieve points of interest either from metadata or "synchro.xml" file
-    function(callback) {
-      var pointsOfInterest;
-
-      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
-        pointsOfInterest = self.mediaPackage.metadata.indexes;
-        callback(null, pointsOfInterest);
-      } else {
-        saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
-          if (error && self.mediaPackage.metadata['rich-media'])
-            callback(error);
-          else {
-            pointsOfInterest = formatedTimecodes;
-            callback(null, pointsOfInterest);
-          }
+      // Update state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, function(error) {
+          callback(error);
         });
-      }
-    },
+      },
 
-    // Generate sprites for the points of interest of type "image"
-    function(pointsOfInterest, callback) {
-      if (!pointsOfInterest) return callback(null, null, pointsOfInterest);
+      // Retrieve points of interest either from metadata or "synchro.xml" file
+      function(callback) {
+        var pointsOfInterest;
 
-      // Gets points of interest of type "image"
-      var poiImagesPaths = pointsOfInterest.reduce(function(filtered, pointOfInterest) {
-        if (pointOfInterest.type === 'image' && pointOfInterest.data)
-          filtered.push(path.join(extractDirectory, pointOfInterest.data.filename));
-        return filtered;
-      }, []);
-
-      if (!poiImagesPaths.length) return callback(null, pointsOfInterest, pointsOfInterest);
-
-      // Generate one or more sprite of 740x400 containing all video images
-      openVeoApi.imageProcessor.generateSprites(
-        poiImagesPaths,
-        path.join(extractDirectory, 'points-of-interest-images.jpg'),
-        142,
-        80,
-        5,
-        5,
-        90,
-        extractDirectory,
-        function(error, spriteReferences) {
-          callback(error, pointsOfInterest, spriteReferences);
-        }
-      );
-    },
-
-    // Format points of interest
-    function(pointsOfInterest, spriteReferences, callback) {
-      var tags = [];
-      var timecodes = [];
-
-      if (!pointsOfInterest) return callback();
-
-      // Got points of interest for this video
-      // Dissociate points of interest regarding types
-
-      for (var i = 0; i < pointsOfInterest.length; i++) {
-        var pointOfInterest = pointsOfInterest[i];
-
-        switch (pointOfInterest.type) {
-          case 'image':
-            if (!pointOfInterest.data || !pointOfInterest.data.filename) break;
-
-            // Find image in sprite
-            var imageReference;
-            for (var j = 0; j < spriteReferences.length; j++) {
-              if (path.join(extractDirectory, pointOfInterest.data.filename) === spriteReferences[j].image) {
-                imageReference = spriteReferences[j];
-                break;
-              }
+        if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
+          pointsOfInterest = self.mediaPackage.metadata.indexes;
+          callback(null, pointsOfInterest);
+        } else {
+          saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
+            if (error && self.mediaPackage.metadata['rich-media'])
+              callback(error);
+            else {
+              pointsOfInterest = formatedTimecodes;
+              callback(null, pointsOfInterest);
             }
-
-            // Get the name of the sprite file
-            var spriteFileName = imageReference.sprite.match(/\/([^/]*)$/)[1];
-
-            timecodes.push({
-              id: shortid.generate(),
-              timecode: pointOfInterest.timecode,
-              image: {
-                small: {
-                  url: '/publish/' + self.mediaPackage.id + '/' + spriteFileName,
-                  x: imageReference.x,
-                  y: imageReference.y
-                },
-                large: '/publish/' + self.mediaPackage.id + '/' + pointOfInterest.data.filename
-              }
-            });
-            break;
-
-          case 'tag':
-            tags.push({
-              value: pointOfInterest.timecode,
-              name: pointOfInterest.data && pointOfInterest.data.tagname ?
-                pointOfInterest.data.tagname : 'Tag' + (tags.length + 1)
-            });
-            break;
-          default:
+          });
         }
+      },
+
+      // Generate sprites for the points of interest of type "image"
+      function(pointsOfInterest, callback) {
+        if (!pointsOfInterest) return callback(null, null, pointsOfInterest);
+
+        // Gets points of interest of type "image"
+        var poiImagesPaths = pointsOfInterest.reduce(function(filtered, pointOfInterest) {
+          if (pointOfInterest.type === 'image' && pointOfInterest.data)
+            filtered.push(path.join(extractDirectory, pointOfInterest.data.filename));
+          return filtered;
+        }, []);
+
+        if (!poiImagesPaths.length) return callback(null, pointsOfInterest, pointsOfInterest);
+
+        // Generate one or more sprite of 740x400 containing all video images
+        openVeoApi.imageProcessor.generateSprites(
+          poiImagesPaths,
+          path.join(extractDirectory, 'points-of-interest-images.jpg'),
+          142,
+          80,
+          5,
+          5,
+          90,
+          extractDirectory,
+          function(error, spriteReferences) {
+            callback(error, pointsOfInterest, spriteReferences);
+          }
+        );
+      },
+
+      // Format points of interest
+      function(pointsOfInterest, spriteReferences, callback) {
+        var tags = [];
+        var timecodes = [];
+
+        if (!pointsOfInterest) return callback();
+
+        // Got points of interest for this video
+        // Dissociate points of interest regarding types
+
+        for (var i = 0; i < pointsOfInterest.length; i++) {
+          var pointOfInterest = pointsOfInterest[i];
+
+          switch (pointOfInterest.type) {
+            case 'image':
+              if (!pointOfInterest.data || !pointOfInterest.data.filename) break;
+
+              // Find image in sprite
+              var imageReference;
+              for (var j = 0; j < spriteReferences.length; j++) {
+                if (path.join(extractDirectory, pointOfInterest.data.filename) === spriteReferences[j].image) {
+                  imageReference = spriteReferences[j];
+                  break;
+                }
+              }
+
+              // Get the name of the sprite file
+              var spriteFileName = imageReference.sprite.match(/\/([^/]*)$/)[1];
+
+              timecodes.push({
+                id: shortid.generate(),
+                timecode: pointOfInterest.timecode,
+                image: {
+                  small: {
+                    url: '/publish/' + self.mediaPackage.id + '/' + spriteFileName,
+                    x: imageReference.x,
+                    y: imageReference.y
+                  },
+                  large: '/publish/' + self.mediaPackage.id + '/' + pointOfInterest.data.filename
+                }
+              });
+              break;
+
+            case 'tag':
+              tags.push({
+                value: pointOfInterest.timecode,
+                name: pointOfInterest.data && pointOfInterest.data.tagname ?
+                  pointOfInterest.data.tagname : 'Tag' + (tags.length + 1)
+              });
+              break;
+            default:
+          }
+        }
+        callback(null, timecodes, tags);
+      },
+
+      // Save points of interest
+      function(timecodes, tags, callback) {
+        self.poiProvider.add(tags, function(error, total, addedTags) {
+          if (error) return callback(error);
+
+          callback(null, timecodes, addedTags);
+        });
+      },
+
+      // Save timecodes and tags into the media
+      function(timecodes, tags, callback) {
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            tags: tags.map(function(tag) {
+              return tag.id;
+            }),
+            timecodes: timecodes
+          },
+          callback
+        );
       }
-      callback(null, timecodes, tags);
-    },
 
-    // Save points of interest
-    function(timecodes, tags, callback) {
-      self.poiProvider.add(tags, function(error, total, addedTags) {
-        if (error) return callback(error);
-
-        callback(null, timecodes, addedTags);
-      });
-    },
-
-    // Save timecodes and tags into the media
-    function(timecodes, tags, callback) {
-      self.videoProvider.updateOne(
-        new ResourceFilter().equal('id', self.mediaPackage.id),
-        {
-          tags: tags.map(function(tag) {
-            return tag.id;
-          }),
-          timecodes: timecodes
-        },
-        callback
-      );
-    }
-
-  ], function(error) {
-    if (error)
-      self.setError(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
-    else
-      self.fsm.transition();
+    ], function(error) {
+      if (error) reject(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
+      else resolve();
+    });
   });
 };
 
