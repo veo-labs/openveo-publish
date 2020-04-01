@@ -1319,20 +1319,13 @@
       }
     },
     "dashjs": {
-      "version": "2.9.2",
-      "resolved": "https://registry.npmjs.org/dashjs/-/dashjs-2.9.2.tgz",
-      "integrity": "sha512-a/hivdWbxn41E8rlQzPPMLphwCq80AW2zL916Wm386AFsUZb7gm1tbdxHuW52QOL1axYIrmV+v9nqnoCCGoImQ==",
+      "version": "3.0.3",
+      "resolved": "https://registry.npmjs.org/dashjs/-/dashjs-3.0.3.tgz",
+      "integrity": "sha512-K5hnf9aEaGpC9AwWSFgxeENFjomVYHX88O5+ADbUTr2THd2GBKBC1v4Z9ERkXgVK+bNMFhRJYT4jOdR91g73bg==",
       "requires": {
         "codem-isoboxer": "0.3.6",
-        "fast-deep-equal": "1.1.0",
-        "imsc": "^1.0.1-rc.3"
-      },
-      "dependencies": {
-        "fast-deep-equal": {
-          "version": "1.1.0",
-          "resolved": "http://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz",
-          "integrity": "sha1-wFNHeBfIa1HaqFPIHgWbcz0CNhQ="
-        }
+        "fast-deep-equal": "2.0.1",
+        "imsc": "^1.0.2"
       }
     },
     "date-format": {
@@ -4115,16 +4108,16 @@
       "dev": true
     },
     "imsc": {
-      "version": "1.0.1",
-      "resolved": "https://registry.npmjs.org/imsc/-/imsc-1.0.1.tgz",
-      "integrity": "sha512-Q45EauAGmaueWBOwhDB/WteSji1/pJH9GVjQsiAc5b9QDEUq9Z93HoRK+uBzgbIx5kkhOdloOdUGSIiDx74NIw==",
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/imsc/-/imsc-1.1.1.tgz",
+      "integrity": "sha512-kfWjrmg/vdcqM65FPxpq46RyxKTpfMikDk0PhXOeAlZ6o1OkWBZsll4TlmSj261WcuNT252VBB0aGqSQ+vBZ/A==",
       "requires": {
         "sax": "1.2.1"
       },
       "dependencies": {
         "sax": {
           "version": "1.2.1",
-          "resolved": "http://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
+          "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
           "integrity": "sha1-e45lYZCyKOgaZq6nSEgNgozS03o="
         }
       }
