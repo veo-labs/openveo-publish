@@ -49,6 +49,7 @@
 - **grunt-gh-pages** sub dependencies have been upgraded
 - **grunt-karma** has been upgraded from 3.0.0 to **3.0.2**
 - **grunt-mkdocs** has been upgraded from 1.0.0 to **1.0.1**
+- **karma** has been upgraded from 3.1.1 to **4.1.1**
 
 # 10.2.3 / 2019-10-10
 
