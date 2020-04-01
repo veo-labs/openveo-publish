@@ -4,7 +4,6 @@
  * @module providers
  */
 
-var path = require('path');
 var util = require('util');
 var fs = require('fs');
 var vimeoAPI = require('vimeo');
@@ -104,15 +103,15 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
 
     // Upload media
     function(callback) {
-      self.vimeo.streamingUpload(mediaFilePath, function(error, body, statusCode, headers) {
-        if (error) {
+      self.vimeo.upload(
+        mediaFilePath,
+        function(uri) {
+          mediaId = uri.match(/\/videos\/(.*)$/)[1];
+          callback();
+        }, null, function(error) {
           callback(error);
-          return;
         }
-
-        mediaId = path.basename(headers.location);
-        callback();
-      });
+      );
     }
 
   ], function(error) {
