@@ -44,6 +44,7 @@
 - **grunt-contrib-compass** sub dependencies have been upgraded
 - **grunt-contrib-uglify** has been upgraded from 4.0.0 to **4.0.1**
 - **grunt-contrib-watch** sub dependencies have been upgraded
+- **grunt-contrib-yuidoc** sub dependencies have been upgraded
 
 # 10.2.3 / 2019-10-10
 
