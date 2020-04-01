@@ -46,6 +46,7 @@
 - **grunt-contrib-watch** sub dependencies have been upgraded
 - **grunt-contrib-yuidoc** sub dependencies have been upgraded
 - **grunt-eslint** has been upgraded from 19.0.0 to **22.0.0**
+- **grunt-gh-pages** sub dependencies have been upgraded
 
 # 10.2.3 / 2019-10-10
 
