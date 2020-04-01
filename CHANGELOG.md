@@ -52,6 +52,7 @@
 - **karma** has been upgraded from 3.1.1 to **4.1.1**
 - **karma-chrome-launcher** has been upgraded from 2.2.0 to **3.1.0**
 - **karma-firefox-launcher** has been upgraded from 1.1.0 to **1.3.0**
+- **karma-ie-launcher** has been removed has no tests are performed on Internet Explorer
 
 # 10.2.3 / 2019-10-10
 
