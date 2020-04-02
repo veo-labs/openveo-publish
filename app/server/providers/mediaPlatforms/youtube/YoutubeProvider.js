@@ -144,7 +144,7 @@ YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, 
   var media = fs.createReadStream(mediaFilePath);
 
   uploadParams.media = {
-    mediaType: mime.lookup(mediaFilePath),
+    mediaType: mime.getType(mediaFilePath),
     body: media
   };
 

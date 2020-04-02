@@ -156,7 +156,7 @@ ResumableUpload.prototype.send = function() {
     }
   };
   options.headers['Content-Length'] = self.stats.size - self.byteCount;
-  options.headers['Content-Type'] = mime.lookup(self.filepath);
+  options.headers['Content-Type'] = mime.getType(self.filepath);
 
   try {
     // creates file stream, pipes it to self.location
