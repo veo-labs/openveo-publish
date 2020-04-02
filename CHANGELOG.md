@@ -22,6 +22,10 @@
 
 - Web service endpoint GET /videos now accepts searchInPois parameter to extend the smart search to tags titles / descriptions and chapters titles / descriptions
 
+## BUG FIXES
+
+- The message indicating that the player is loading was displayed instead of the message indicating that the video is not yet available on the platform
+
 ## DEPENDENCIES
 
 - **async** has been upgraded from 2.1.4 to **3.2.0**

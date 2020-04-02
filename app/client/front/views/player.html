@@ -38,11 +38,11 @@
         opl-cuts="{{cutsEnabled}}"
         ng-style="{'visibility': (data && data.available && ready) ? 'visible' : 'hidden'}"
       ></opl-player>
-      <div class="disclaimer" ng-if="data && !data.available">
-        <span ng-bind-html="availabilityMessage"></span>
-      </div>
       <div class="disclaimer" ng-if="!ready">
         <span ng-bind-html="loadingMessage"></span>
+      </div>
+      <div class="disclaimer" ng-if="data && !data.available">
+        <span ng-bind-html="availabilityMessage"></span>
       </div>
     </div>
 
