@@ -441,7 +441,7 @@ TarPackage.prototype.validatePackage = function() {
 
       // Validate package content
       if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
-        self.fsm.transition();
+        resolve();
       else validatePackage.call(self, function(error, metadata) {
         if (error) return reject(new TarPackageError(error.message, ERRORS.VALIDATION));
 

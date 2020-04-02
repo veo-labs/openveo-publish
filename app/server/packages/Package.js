@@ -238,11 +238,11 @@ Package.prototype.init = function(initialState, initialTransition) {
 
   // Handle each leave state event to execute the corresponding transition
   this.fsm.observe('onLeaveState', function(event) {
-    process.logger.verbose('Transition = ' + event, {id: self.mediaPackage.id});
+    process.logger.verbose('Transition = ' + event.transition, {id: self.mediaPackage.id});
 
     // Executes function corresponding to transition
-    if (self[event]) {
-      return self[event]().catch(function(error) {
+    if (self[event.transition]) {
+      return self[event.transition]().catch(function(error) {
 
         // TODO: see if it is possible to test current transition for setError second parameter
         self.setError(error, error.code === ERRORS.SAVE_PACKAGE_DATA);
@@ -250,7 +250,7 @@ Package.prototype.init = function(initialState, initialTransition) {
 
       });
     } else {
-      self.setError(new PackageError('Transition ' + event + ' does not exist', ERRORS.TRANSITION), true);
+      self.setError(new PackageError('Transition ' + event.transition + ' does not exist', ERRORS.TRANSITION), true);
       return false;
     }
 
@@ -339,7 +339,7 @@ Package.prototype.initPackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var filter = new ResourceFilter().equal('originalFileName', this.mediaPackage.originalFileName);
+    var filter = new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName);
     if (self.mediaPackage.type) filter.equal('type', self.mediaPackage.type);
 
     self.videoProvider.getOne(

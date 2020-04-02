@@ -343,7 +343,7 @@ VideoPackage.prototype.getMetadata = function() {
         if (videoStream) {
           self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
           self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
-            self.fsm.transition();
+            resolve();
           });
         } else reject(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
       });
