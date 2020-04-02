@@ -105,7 +105,7 @@ ResumableUpload.prototype.upload = function() {
   options.headers['Content-Length'] = Buffer.from(JSON.stringify(self.metadata)).length;
   options.headers['Content-Type'] = 'application/json';
   options.headers['X-Upload-Content-Length'] = self.stats.size;
-  options.headers['X-Upload-Content-Type'] = mime.lookup(self.filepath);
+  options.headers['X-Upload-Content-Type'] = mime.getType(self.filepath);
 
   // Send request and start upload if success
   request.post(options, function(err, res, body) {
