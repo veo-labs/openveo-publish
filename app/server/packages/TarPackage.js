@@ -641,7 +641,7 @@ TarPackage.prototype.saveTimecodes = function() {
         self.videoProvider.updateOne(
           new ResourceFilter().equal('id', self.mediaPackage.id),
           {
-            tags: tags.map(function(tag) {
+            tags: (tags || []).map(function(tag) {
               return tag.id;
             }),
             timecodes: timecodes
