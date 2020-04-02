@@ -164,7 +164,7 @@ VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
                   quality: self.qualitiesMap[file.quality],
                   width: file.width,
                   height: file.height,
-                  link: file.link_secure
+                  link: file.link
                 });
 
                 // Vimeo set the media as "available" as soon as any definition has been transcoded not when all
