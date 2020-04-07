@@ -1444,7 +1444,7 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
                 var validationDescriptor = {};
 
                 if (properties[j].type === PropertyProvider.TYPES.BOOLEAN)
-                  validationDescriptor[properties[j].id] = {type: 'boolean', required: true};
+                  validationDescriptor[properties[j].id] = {type: 'number', in: [0, 1], required: true};
 
                 else if (properties[j].type === PropertyProvider.TYPES.LIST)
                   validationDescriptor[properties[j].id] = {type: 'string', required: true};
@@ -1472,6 +1472,8 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
                     endDate.setDate(startDate.getDate() + 1);
                     filter.greaterThanEqual('properties.' + properties[j].id, startDate.getTime());
                     filter.lesserThan('properties.' + properties[j].id, endDate.getTime());
+                  } else if (properties[j].type === PropertyProvider.TYPES.BOOLEAN) {
+                    filter.equal('properties.' + properties[j].id, Boolean(validatedProperty[properties[j].id]));
                   } else
                     filter.equal('properties.' + properties[j].id, validatedProperty[properties[j].id]);
                 }

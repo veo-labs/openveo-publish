@@ -17,6 +17,7 @@
   - 28: Use 25 and 26 instead
   - 261: Use 259 instead
   - 263: Use 262 instead
+- Web service endpoint GET /videos now expects values of custom properties of type boolean to be 0 and 1 instead of false and true
 
 ## NEW FEATURES
 

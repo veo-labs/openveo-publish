@@ -2638,7 +2638,7 @@ describe('VideoController', function() {
       ];
       expectedQueryProperties[expectedProperties[0].id] = 'value1';
       expectedQueryProperties[expectedProperties[1].id] = 'value2';
-      expectedQueryProperties[expectedProperties[2].id] = true;
+      expectedQueryProperties[expectedProperties[2].id] = 1;
       expectedQueryProperties[expectedProperties[3].id] = date.getTime();
       request.query = {properties: expectedQueryProperties};
 
