@@ -23,6 +23,7 @@
 
 - Web service endpoint GET /videos now accepts searchInPois parameter to extend the smart search to tags titles / descriptions and chapters titles / descriptions
 - Web service endpoint GET /videos has been improved when looking for a text inside video descriptions when useSmartSearch is set to 1
+- The player page now supports URL parameter t to specify a starting time
 
 ## BUG FIXES
 
