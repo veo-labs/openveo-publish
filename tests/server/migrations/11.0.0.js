@@ -31,6 +31,12 @@ describe('Migration 11.0.0', function() {
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
     });
+    VideoProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      callback();
+    });
+    VideoProvider.prototype.createIndexes = chai.spy(function(callback) {
+      callback();
+    });
 
     PoiProvider = function() {};
     PoiProvider.prototype.add = chai.spy(function(pois, callback) {
@@ -74,7 +80,21 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should execute callback with an error if creating indexes failed', function(done) {
+  it('should re-create querySearch index for the videos collection', function(done) {
+    VideoProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      assert(indexName, 'querySearch', 'Wrong index removed');
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      VideoProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if creating points of interest indexes failed', function(done) {
     var expectedError = new Error('Something went wrong');
 
     PoiProvider.prototype.createIndexes = chai.spy(function(callback) {
@@ -84,6 +104,22 @@ describe('Migration 11.0.0', function() {
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Wrong error');
       PoiProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if dropping querySearch index failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    VideoProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      VideoProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      VideoProvider.prototype.createIndexes.should.have.been.called.exactly(0);
       done();
     });
   });
@@ -133,11 +169,22 @@ describe('Migration 11.0.0', function() {
       assert.equal(pois[0].file.size, expectedTag.file.size, 'Wrong tag file size');
       assert.equal(pois[0].file.url, expectedTag.file.url, 'Wrong tag file URL');
       assert.equal(pois[0].file.path, expectedTag.file.url, 'Wrong tag file path');
+      assert.equal(
+        pois[0].descriptionText,
+        api.util.removeHtmlFromText(expectedTag.description),
+        'Wrong tag description text'
+      );
 
       assert.equal(pois[1].id, expectedChapter.id, 'Wrong chapter id');
       assert.equal(pois[1].name, expectedChapter.name, 'Wrong chapter name');
       assert.equal(pois[1].description, expectedChapter.description, 'Wrong chapter description');
       assert.equal(pois[1].value, expectedChapter.value, 'Wrong chapter value');
+      assert.equal(
+        pois[1].descriptionText,
+        api.util.removeHtmlFromText(expectedChapter.description),
+        'Wrong chapter description text'
+      );
+
       callback();
     });
 
@@ -165,6 +212,38 @@ describe('Migration 11.0.0', function() {
     });
   });
 
+  it('should add descriptionText property to medias which have a description', function(done) {
+    expectedMedias = [
+      {
+        id: '1',
+        description: '<p>Description</p> with HTML'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+
+      assert.equal(modifications.description, expectedMedias[0].description, 'Wrong description');
+      assert.equal(
+        modifications.descriptionText,
+        api.util.removeHtmlFromText(expectedMedias[0].description),
+        'Wrong description text'
+      );
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
   it('should not update medias if no medias found', function(done) {
     migration.update(function(error) {
       assert.isUndefined(error, 'Unexpected error');
@@ -174,7 +253,7 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should not update medias without tags nor chapters', function(done) {
+  it('should not update medias without tags nor chapters nor description', function(done) {
     expectedMedias = [
       {
         id: '42'
@@ -189,7 +268,7 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should execute callback with an error if getting medias failed', function(done) {
+  it('should execute callback with an error if getting medias for points of interest failed', function(done) {
     var expectedError = new Error('Something went wrong');
 
     VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
@@ -199,6 +278,24 @@ describe('Migration 11.0.0', function() {
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Unexpected error');
       VideoProvider.prototype.getAll.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      PoiProvider.prototype.add.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting medias for description failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+    var count = 0;
+
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      count++;
+      callback(count === 2 ? expectedError : 0);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Unexpected error');
+      VideoProvider.prototype.getAll.should.have.been.called.exactly(2);
       VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
       PoiProvider.prototype.add.should.have.been.called.exactly(0);
       done();
@@ -233,7 +330,7 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should execute callback with an error if updating media failed', function(done) {
+  it('should execute callback with an error if updating media points of interest failed', function(done) {
     var expectedError = new Error('Something went wrong');
     expectedMedias = [
       {
@@ -256,6 +353,27 @@ describe('Migration 11.0.0', function() {
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Unexpected error');
       PoiProvider.prototype.add.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if adding descriptionText property failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    expectedMedias = [
+      {
+        id: '42',
+        description: '<p>Description with HTML</p>'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Unexpected error');
       VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
       done();
     });

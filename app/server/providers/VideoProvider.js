@@ -352,6 +352,7 @@ VideoProvider.prototype.add = function(medias, callback) {
       title: media.title,
       leadParagraph: media.leadParagraph,
       description: media.description,
+      descriptionText: media.description && openVeoApi.util.removeHtmlFromText(media.description),
       state: media.state,
       date: media.date,
       type: media.type,
@@ -703,10 +704,13 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (Object.prototype.hasOwnProperty.call(data, 'views')) modifications.views = parseInt(data.views);
   if (Object.prototype.hasOwnProperty.call(data, 'category')) modifications.category = data.category;
   if (Object.prototype.hasOwnProperty.call(data, 'leadParagraph')) modifications.leadParagraph = data.leadParagraph;
-  if (Object.prototype.hasOwnProperty.call(data, 'description')) modifications.description = data.description;
   if (Object.prototype.hasOwnProperty.call(data, 'state')) modifications.state = data.state;
   if (Object.prototype.hasOwnProperty.call(data, 'errorCode')) modifications.errorCode = data.errorCode;
   if (Object.prototype.hasOwnProperty.call(data, 'available')) modifications.available = Boolean(data.available);
+  if (Object.prototype.hasOwnProperty.call(data, 'description')) {
+    modifications.description = data.description;
+    modifications.descriptionText = openVeoApi.util.removeHtmlFromText(data.description);
+  }
   if (data.groups) {
     modifications['metadata.groups'] = data.groups.filter(function(group) {
       return group ? true : false;
@@ -730,7 +734,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
  */
 VideoProvider.prototype.createIndexes = function(callback) {
   this.storage.createIndexes(this.location, [
-    {key: {title: 'text', description: 'text'}, weights: {title: 2}, name: 'querySearch'},
+    {key: {title: 'text', descriptionText: 'text'}, weights: {title: 2}, name: 'querySearch'},
     {key: {tags: 1}, name: 'byTags'},
     {key: {chapters: 1}, name: 'byChapters'},
     {key: {'metadata.groups': 1}, name: 'byGroups'},
@@ -738,6 +742,24 @@ VideoProvider.prototype.createIndexes = function(callback) {
   ], function(error, result) {
     if (result && result.note)
       process.logger.debug('Create videos indexes : ' + result.note);
+
+    callback(error);
+  });
+};
+
+/**
+ * Drops an index from database collection.
+ *
+ * @method dropIndex
+ * @async
+ * @param {String} indexName The name of the index to drop
+ * @param {Function} callback Function to call when it's done with:
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+VideoProvider.prototype.dropIndex = function(indexName, callback) {
+  this.storage.dropIndex(this.location, indexName, function(error, result) {
+    if (result && result.ok)
+      process.logger.debug('Index "' + indexName + '" dropped');
 
     callback(error);
   });

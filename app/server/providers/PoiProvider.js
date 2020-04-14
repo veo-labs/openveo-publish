@@ -61,6 +61,7 @@ PoiProvider.prototype.add = function(pois, callback) {
       name: poi.name,
       value: poi.value,
       description: poi.description,
+      descriptionText: poi.description && openVeoApi.util.removeHtmlFromText(poi.description),
       file: null
     };
 
@@ -153,8 +154,11 @@ PoiProvider.prototype.updateOne = function(filter, poi, callback) {
       }
 
       if (poi.name) storedPoi.name = poi.name;
-      if (Object.prototype.hasOwnProperty.call(poi, 'description')) storedPoi.description = poi.description;
       if (Object.prototype.hasOwnProperty.call(poi, 'value')) storedPoi.value = poi.value;
+      if (Object.prototype.hasOwnProperty.call(poi, 'description')) {
+        storedPoi.description = poi.description;
+        storedPoi.descriptionText = openVeoApi.util.removeHtmlFromText(poi.description);
+      }
 
       // Remove file
       if (oldFilePath) {
@@ -268,7 +272,7 @@ PoiProvider.prototype.remove = function(filter, callback) {
  */
 PoiProvider.prototype.createIndexes = function(callback) {
   this.storage.createIndexes(this.location, [
-    {key: {name: 'text', description: 'text'}, weights: {name: 2}, name: 'querySearch'}
+    {key: {name: 'text', descriptionText: 'text'}, weights: {name: 2}, name: 'querySearch'}
   ], function(error, result) {
     if (result && result.note)
       process.logger.debug('Create points of interest indexes : ' + result.note);

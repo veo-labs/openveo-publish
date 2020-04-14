@@ -28,6 +28,9 @@ module.exports.update = function(callback) {
      * properties are now extracted in the new points of interest collection. "tags" and "chapters" properties will now
      * contains the list of points of interest ids.
      * Tags and chapters are now both considered as points of interest.
+     *
+     * It also adds property "descriptionText" for each point of interest.
+     * Property "descriptionText" contains the decoded version of the "description" property which may contains HTML.
      */
     function(callback) {
       videoProvider.getAll(null, {include: ['chapters', 'tags', 'id']}, {id: 'desc'}, function(error, medias) {
@@ -50,7 +53,7 @@ module.exports.update = function(callback) {
           asyncActions.push(function(callback) {
             async.series([
 
-              // Save points of interest and add path to points of interest files
+              // Save points of interest, add descriptionText property and add path to points of interest files
               function(callback) {
                 var pois = (media.tags || []).concat(media.chapters || []);
                 if (!pois.length) return callback();
@@ -59,6 +62,8 @@ module.exports.update = function(callback) {
                   if (poi.file) {
                     poi.file.path = path.join(poiFileDestinationPath, poi.file.fileName);
                   }
+                  if (poi.description)
+                    poi.descriptionText = openVeoApi.util.removeHtmlFromText(poi.description);
                 });
 
                 poiProvider.add(pois, callback);
@@ -87,6 +92,65 @@ module.exports.update = function(callback) {
 
         async.parallel(asyncActions, callback);
       });
+    },
+
+    /**
+     * Add "descriptionText" property to all documents of the video collection.
+     *
+     * "descriptionText" holds the decoded version of the "description" property to be indexed by the database.
+     * The database can't ignore HTML when performing search so we create a version of the property that doesn't
+     * contain HTML.
+     */
+    function(callback) {
+      videoProvider.getAll(null, {include: ['description', 'id']}, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
+
+        // No medias
+        // No need to change anything
+        if (!medias || !medias.length) return callback();
+
+        var asyncActions = [];
+
+        medias.forEach(function(media) {
+
+          // No description for this media
+          // Nothing to do
+          if (!media.description) return;
+
+          asyncActions.push(function(callback) {
+            videoProvider.updateOne(
+              new ResourceFilter().equal('id', media.id),
+              {
+                description: media.description,
+                descriptionText: openVeoApi.util.removeHtmlFromText(media.description)
+              },
+              callback
+            );
+          });
+
+        });
+
+        async.parallel(asyncActions, callback);
+      });
+    },
+
+    /**
+     * Re-creates query search index on the video collection.
+     */
+    function(callback) {
+      async.series([
+
+        // Drop querySearch index
+        function(callback) {
+          videoProvider.dropIndex('querySearch', callback);
+        },
+
+        // Re-create querySearch index
+        function(callback) {
+          videoProvider.createIndexes(callback);
+        }
+
+      ], callback);
     }
 
   ], function(error, results) {

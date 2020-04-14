@@ -86,7 +86,7 @@ describe('PoiProvider', function() {
         {
           id: '42',
           name: 'Name',
-          description: 'Description',
+          description: 'Description with <strong>HTML</strong>',
           value: 1000,
           file: {
             originalName: 'originalFileName',
@@ -100,6 +100,7 @@ describe('PoiProvider', function() {
       ];
 
       EntityProvider.prototype.add = chai.spy(function(pois, callback) {
+        expectedPois[0].descriptionText = api.util.removeHtmlFromText(expectedPois[0].description);
         assert.deepEqual(pois, expectedPois, 'Wrong points of interest');
         assert.notStrictEqual(pois[0], expectedPois[0], 'Unexpected reference to the point of interest object');
         callback(null, pois.length, pois);
@@ -226,7 +227,7 @@ describe('PoiProvider', function() {
       var expectedFilter = new ResourceFilter().equal('id', expectedPois[0].id);
       var expectedModifications = {
         name: 'New name',
-        description: 'New description',
+        description: 'New description with <strong>HTML</strong>',
         value: 2000
       };
 
@@ -240,6 +241,11 @@ describe('PoiProvider', function() {
         assert.equal(modifications.description, expectedModifications.description, 'Wrong description');
         assert.equal(modifications.value, expectedModifications.value, 'Wrong values');
         assert.notStrictEqual(modifications, expectedModifications, 'Unexpected reference');
+        assert.equal(
+          modifications.descriptionText,
+          api.util.removeHtmlFromText(expectedModifications.description),
+          'Wrong description text'
+        );
         callback(null, 1);
       });
 

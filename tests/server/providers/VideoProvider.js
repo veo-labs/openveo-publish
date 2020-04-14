@@ -285,7 +285,7 @@ describe('VideoProvider', function() {
           available: true,
           title: 'Title',
           leadParagraph: 'Lead paragraph',
-          description: 'Description',
+          description: 'Description with <strong>HTML</strong>',
           state: STATES.PUBLISHED,
           date: new Date(),
           type: TYPES.VIMEO,
@@ -311,6 +311,8 @@ describe('VideoProvider', function() {
       ];
 
       provider.add(expectedMedias, function(error, total, medias) {
+        expectedMedias[0].descriptionText = openVeoApi.util.removeHtmlFromText(expectedMedias[0].description);
+
         assert.isNull(error, 'Unexpected error');
         assert.equal(total, expectedMedias.length, 'Wrong total');
         assert.deepInclude(medias[0], expectedMedias[0], 'Wrong medias');
@@ -1074,7 +1076,7 @@ describe('VideoProvider', function() {
         title: 'Title',
         date: new Date(),
         leadParagraph: 'Lead paragraph',
-        description: 'Description',
+        description: 'Description containing <strong>HTML</strong>',
         properties: {},
         category: 'categoryId',
         cut: [],
@@ -1087,6 +1089,8 @@ describe('VideoProvider', function() {
 
       EntityProvider.prototype.updateOne = function(filter, modifications, callback) {
         assert.strictEqual(filter, expectedFilter, 'Wrong filter');
+
+        expectedModifications.descriptionText = openVeoApi.util.removeHtmlFromText(expectedModifications.description);
         assert.deepEqual(modifications, expectedModifications, 'Wrong modifications');
         callback(null, 1);
       };
