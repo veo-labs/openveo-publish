@@ -28,6 +28,7 @@
 ## BUG FIXES
 
 - The message indicating that the player is loading was displayed instead of the message indicating that the video is not yet available on the platform
+- Fix chapters and tags URL parameters on video URL which wasn't working since version 10.0.0
 
 ## DEPENDENCIES
 
