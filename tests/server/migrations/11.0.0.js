@@ -16,6 +16,7 @@ describe('Migration 11.0.0', function() {
   var database;
   var VideoProvider;
   var PoiProvider;
+  var PropertyProvider;
   var expectedMedias;
   var coreApi;
   var realCoreApi;
@@ -46,6 +47,14 @@ describe('Migration 11.0.0', function() {
       callback();
     });
 
+    PropertyProvider = function() {};
+    PropertyProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      callback();
+    });
+    PropertyProvider.prototype.createIndexes = chai.spy(function(callback) {
+      callback();
+    });
+
     coreApi = {
       getDatabase: function() {
         return database;
@@ -59,6 +68,7 @@ describe('Migration 11.0.0', function() {
     process.api = coreApi;
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), VideoProvider);
     mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), PoiProvider);
+    mock(path.join(process.rootPublish, 'app/server/providers/PropertyProvider.js'), PropertyProvider);
   });
 
   // Initialize tests
@@ -94,6 +104,20 @@ describe('Migration 11.0.0', function() {
     });
   });
 
+  it('should re-create querySearch index for the properties collection', function(done) {
+    PropertyProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      assert(indexName, 'querySearch', 'Wrong index removed');
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      PropertyProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      PropertyProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
   it('should execute callback with an error if creating points of interest indexes failed', function(done) {
     var expectedError = new Error('Something went wrong');
 
@@ -108,18 +132,58 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should execute callback with an error if dropping querySearch index failed', function(done) {
+  it('should not execute callback with an error if dropping videos querySearch index failed', function(done) {
+    VideoProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      callback(new Error('Something went wrong'));
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      VideoProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should not execute callback with an error if dropping properties querySearch index failed', function(done) {
+    PropertyProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+      callback(new Error('Something went wrong'));
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      PropertyProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      PropertyProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if re-creating videos indexes failed', function(done) {
     var expectedError = new Error('Something went wrong');
 
-    VideoProvider.prototype.dropIndex = chai.spy(function(indexName, callback) {
+    VideoProvider.prototype.createIndexes = chai.spy(function(callback) {
       callback(expectedError);
     });
 
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Wrong error');
       VideoProvider.prototype.dropIndex.should.have.been.called.exactly(1);
-      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
-      VideoProvider.prototype.createIndexes.should.have.been.called.exactly(0);
+      VideoProvider.prototype.createIndexes.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if re-creating properties indexes failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+
+    PropertyProvider.prototype.createIndexes = chai.spy(function(callback) {
+      callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      PropertyProvider.prototype.dropIndex.should.have.been.called.exactly(1);
+      PropertyProvider.prototype.createIndexes.should.have.been.called.exactly(1);
       done();
     });
   });

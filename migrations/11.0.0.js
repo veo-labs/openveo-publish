@@ -5,12 +5,14 @@ var async = require('async');
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 11.0.0 migration launched.');
   var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
   var poiProvider = new PoiProvider(process.api.getCoreApi().getDatabase());
+  var propertyProvider = new PropertyProvider(process.api.getCoreApi().getDatabase());
 
   async.series([
 
@@ -135,19 +137,53 @@ module.exports.update = function(callback) {
     },
 
     /**
-     * Re-creates query search index on the video collection.
+     * Re-creates text indexes of all collections with the language defined in OpenVeo Core.
      */
     function(callback) {
       async.series([
 
         // Drop querySearch index
         function(callback) {
-          videoProvider.dropIndex('querySearch', callback);
+          async.parallel([
+
+            // Drop text index from video and property collection
+            function(callback) {
+              var asyncFunctions = [];
+
+              [videoProvider, propertyProvider].forEach(function(provider) {
+                asyncFunctions.push(function(callback) {
+                  provider.dropIndex('querySearch', function(error) {
+                    if (error) {
+                      process.logger.warn(
+                        'Dropping "querySearch" index failed on collection ' +
+                        provider.location + ' with message: ' + error.message
+                      );
+                    }
+                    callback();
+                  });
+                });
+              });
+              async.parallel(asyncFunctions, callback);
+            }
+
+          ], callback);
         },
 
         // Re-create querySearch index
         function(callback) {
-          videoProvider.createIndexes(callback);
+          async.series([
+
+            // Re-create text index of the video collection
+            function(callback) {
+              videoProvider.createIndexes(callback);
+            },
+
+            // Re-create text index of the property collection
+            function(callback) {
+              propertyProvider.createIndexes(callback);
+            }
+
+          ], callback);
         }
 
       ], callback);

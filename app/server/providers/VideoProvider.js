@@ -729,12 +729,24 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
  *
  * @method createIndexes
  * @async
- * @param {Function} callback Function to call when it's done with :
+ * @param {Function} callback Function to call when it's done with:
  *  - **Error** An error if something went wrong, null otherwise
  */
 VideoProvider.prototype.createIndexes = function(callback) {
+  var language = process.api.getCoreApi().getContentLanguage();
+
   this.storage.createIndexes(this.location, [
-    {key: {title: 'text', descriptionText: 'text'}, weights: {title: 2}, name: 'querySearch'},
+
+    {
+      key: {title: 'text', descriptionText: 'text'},
+      weights: {title: 2},
+
+      // eslint-disable-next-line camelcase
+      default_language: language,
+
+      name: 'querySearch'
+    },
+
     {key: {tags: 1}, name: 'byTags'},
     {key: {chapters: 1}, name: 'byChapters'},
     {key: {'metadata.groups': 1}, name: 'byGroups'},
