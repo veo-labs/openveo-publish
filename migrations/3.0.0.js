@@ -92,6 +92,38 @@ module.exports.update = function(callback) {
           async.parallel(asyncFunctions, callback);
         }
       );
+    },
+
+    /**
+     * Transforms property "sources" of videos into an Array instead of an Object.
+     */
+    function(callback) {
+      videoProvider.getAll(null, {include: ['sources', 'id']}, {id: 'desc'}, function(error, medias) {
+        if (error) return callback(error);
+        if (!medias || !medias.length) return callback();
+
+        var asyncUpdateActions = [];
+
+        medias.forEach(function(media) {
+          if (!media.sources || Object.prototype.toString.call(media.sources) !== '[object Object]') return;
+
+          asyncUpdateActions.push(function(callback) {
+            videoProvider.updateOne(
+              new ResourceFilter().equal('id', media.id),
+              {
+                sources: [media.sources]
+              },
+              function(error) {
+                if (error) return callback(error);
+                process.logger.debug('Media "' + media.id + '" updated\n');
+                callback();
+              }
+            );
+          });
+        });
+
+        async.parallel(asyncUpdateActions, callback);
+      });
     }
 
   ], function(error, results) {

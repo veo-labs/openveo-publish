@@ -27,9 +27,9 @@ describe('Migration 3.0.0', function() {
     expectedMedias = [];
 
     VideoProvider = function() {};
-    VideoProvider.prototype.getAll = function(filter, fields, sort, callback) {
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedMedias);
-    };
+    });
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
     });
@@ -164,7 +164,7 @@ describe('Migration 3.0.0', function() {
     });
   });
 
-  it('should execute callback with an error if gettings all medias failed', function(done) {
+  it('should execute callback with an error if getting all medias failed when changing medias user', function(done) {
     var expectedError = new Error('Something went wrong');
 
     VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
@@ -271,6 +271,110 @@ describe('Migration 3.0.0', function() {
 
     migration.update(function(error) {
       assert.strictEqual(error, expectedError, 'Wrong error');
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting all medias failed when updating chapters', function(done) {
+    var expectedError = new Error('Something went wrong');
+    coreConf.anonymousUserId = null;
+
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      if (fields && fields.include && fields.include.indexOf('chapters') !== -1)
+        callback(expectedError);
+      else
+        callback();
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      VideoProvider.prototype.getAll.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should transforms property "sources" of videos into an Array', function(done) {
+    coreConf.anonymousUserId = null;
+    expectedMedias = [
+      {
+        id: '42',
+        sources: {}
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+      assert.isArray(modifications.sources, 'Wrong sources');
+      assert.lengthOf(modifications.sources, 1, 'Wrong number of sources');
+      assert.strictEqual(modifications.sources[0], expectedMedias[0].sources, 'Wrong source');
+      callback(null, 1);
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should not update media if "sources" property is already an Array', function(done) {
+    coreConf.anonymousUserId = null;
+    expectedMedias = [
+      {
+        id: '42',
+        sources: [{}]
+      }
+    ];
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting all medias failed when transforming "sources"', function(done) {
+    var expectedError = new Error('Something went wrong');
+    coreConf.anonymousUserId = null;
+
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      if (fields && fields.include && fields.include.indexOf('sources') !== -1)
+        callback(expectedError);
+      else
+        callback();
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      VideoProvider.prototype.getAll.should.have.been.called.exactly(2);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if transforming "sources" failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+    coreConf.anonymousUserId = null;
+    expectedMedias = [
+      {
+        id: '42',
+        sources: {}
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Wrong error');
+      VideoProvider.prototype.getAll.should.have.been.called.exactly(2);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
       done();
     });
   });

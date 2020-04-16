@@ -30,6 +30,8 @@
 
 - The message indicating that the player is loading was displayed instead of the message indicating that the video is not yet available on the platform
 - Fix chapters and tags URL parameters on video URL which wasn't working since version 10.0.0
+- Fix 3.0.0 migration script which did not transformed "sources" property of videos into Array (instead of Object), this could led to
+  JavaScript errors when encountering a video created with OpenVeo Publish &lt; 3.0.0
 
 ## DEPENDENCIES
 
