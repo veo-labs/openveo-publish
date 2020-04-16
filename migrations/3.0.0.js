@@ -62,6 +62,11 @@ module.exports.update = function(callback) {
           id: 'desc'
         },
         function(error, medias) {
+          if (error) return callback(error);
+
+          // No need to change anything
+          if (!medias || !medias.length) return callback();
+
           var asyncFunctions = [];
 
           medias.forEach(function(media) {
