@@ -709,7 +709,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (Object.prototype.hasOwnProperty.call(data, 'available')) modifications.available = Boolean(data.available);
   if (Object.prototype.hasOwnProperty.call(data, 'description')) {
     modifications.description = data.description;
-    modifications.descriptionText = openVeoApi.util.removeHtmlFromText(data.description);
+    modifications.descriptionText = data.description ? openVeoApi.util.removeHtmlFromText(data.description) : null;
   }
   if (data.groups) {
     modifications['metadata.groups'] = data.groups.filter(function(group) {

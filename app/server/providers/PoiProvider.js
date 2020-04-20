@@ -157,7 +157,7 @@ PoiProvider.prototype.updateOne = function(filter, poi, callback) {
       if (Object.prototype.hasOwnProperty.call(poi, 'value')) storedPoi.value = poi.value;
       if (Object.prototype.hasOwnProperty.call(poi, 'description')) {
         storedPoi.description = poi.description;
-        storedPoi.descriptionText = openVeoApi.util.removeHtmlFromText(poi.description);
+        storedPoi.descriptionText = poi.description ? openVeoApi.util.removeHtmlFromText(poi.description) : null;
       }
 
       // Remove file
