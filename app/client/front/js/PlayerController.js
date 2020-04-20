@@ -61,7 +61,7 @@
         $scope.tagsDisplayed = isParameterTrue(urlParams['tags'], true);
         $scope.cutsEnabled = isParameterTrue(urlParams['cuts'], true);
         $scope.defaultTemplate = urlParams['template'] || $scope.defaultTemplate;
-        $scope.startTime = Number(urlParams['t']) || 0;
+        $scope.startTime = Number(urlParams['t']) || undefined;
         $scope.playerType = $scope.data.type == 'youtube' ? 'youtube' : urlParams['type'] || 'html';
       }
     }
