@@ -108,7 +108,9 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
         function(uri) {
           mediaId = uri.match(/\/videos\/(.*)$/)[1];
           callback();
-        }, null, function(error) {
+        },
+        function(bytesUploaded, bytesTotal) {},
+        function(error) {
           callback(error);
         }
       );
