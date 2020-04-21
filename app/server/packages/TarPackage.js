@@ -90,7 +90,6 @@ util.inherits(TarPackage, VideoPackage);
 TarPackage.STATES = {
   PACKAGE_EXTRACTED: 'packageExtracted',
   PACKAGE_VALIDATED: 'packageValidated',
-  PUBLIC_DIR_PREPARED: 'publicDirectoryPrepared',
   TIMECODES_SAVED: 'timecodesSaved'
 };
 Object.freeze(TarPackage.STATES);
@@ -128,12 +127,12 @@ TarPackage.stateTransitions = [
   VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
   VideoPackage.TRANSITIONS.GENERATE_THUMB,
   VideoPackage.TRANSITIONS.GET_METADATA,
-  TarPackage.TRANSITIONS.PREPARE_PACKAGE,
   Package.TRANSITIONS.UPLOAD_MEDIA,
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   TarPackage.TRANSITIONS.SAVE_TIMECODES,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
-  Package.TRANSITIONS.CLEAN_DIRECTORY
+  Package.TRANSITIONS.CLEAN_DIRECTORY,
+  VideoPackage.TRANSITIONS.GROUP
 ];
 Object.freeze(TarPackage.stateTransitions);
 
@@ -157,28 +156,13 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
     to: VideoPackage.STATES.MP4_DEFRAGMENTED
   },
   {
-    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
-    from: VideoPackage.STATES.MP4_DEFRAGMENTED,
-    to: VideoPackage.STATES.THUMB_GENERATED
-  },
-  {
-    name: TarPackage.TRANSITIONS.PREPARE_PACKAGE,
-    from: VideoPackage.STATES.METADATA_RETRIEVED,
-    to: TarPackage.STATES.PUBLIC_DIR_PREPARED
-  },
-  {
     name: TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
     from: TarPackage.STATES.PACKAGE_EXTRACTED,
     to: TarPackage.STATES.PACKAGE_VALIDATED
   },
   {
-    name: TarPackage.TRANSITIONS.PREPARE_PACKAGE,
-    from: TarPackage.STATES.PACKAGE_VALIDATED,
-    to: TarPackage.STATES.PUBLIC_DIR_PREPARED
-  },
-  {
     name: Package.TRANSITIONS.UPLOAD_MEDIA,
-    from: TarPackage.STATES.PUBLIC_DIR_PREPARED,
+    from: VideoPackage.STATES.METADATA_RETRIEVED,
     to: Package.STATES.MEDIA_UPLOADED
   },
   {
@@ -454,15 +438,17 @@ TarPackage.prototype.validatePackage = function() {
             self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, callback);
           },
           function(callback) {
-            if (self.mediaPackage.metadata.date)
-              self.videoProvider.updateDate(self.mediaPackage.id, self.mediaPackage.metadata.date * 1000, callback);
-            else callback();
+            if (self.mediaPackage.metadata.date) {
+              self.mediaPackage.date = self.mediaPackage.metadata.date * 1000;
+              self.videoProvider.updateDate(self.mediaPackage.id, self.mediaPackage.date, callback);
+            } else callback();
           },
           function(callback) {
             var pathDescriptor = path.parse(self.mediaPackage.originalPackagePath);
-            if (self.mediaPackage.metadata.name && self.mediaPackage.title === pathDescriptor.name)
-              self.videoProvider.updateTitle(self.mediaPackage.id, self.mediaPackage.metadata.name, callback);
-            else callback();
+            if (self.mediaPackage.metadata.name && self.mediaPackage.title === pathDescriptor.name) {
+              self.mediaPackage.title = self.mediaPackage.metadata.name;
+              self.videoProvider.updateTitle(self.mediaPackage.id, self.mediaPackage.title, callback);
+            } else callback();
           }
         ], function() {
           resolve();
@@ -638,13 +624,15 @@ TarPackage.prototype.saveTimecodes = function() {
 
       // Save timecodes and tags into the media
       function(timecodes, tags, callback) {
+        self.mediaPackage.timecodes = timecodes;
+        self.mediaPackage.tags = (tags || []).map(function(tag) {
+          return tag.id;
+        });
         self.videoProvider.updateOne(
           new ResourceFilter().equal('id', self.mediaPackage.id),
           {
-            tags: (tags || []).map(function(tag) {
-              return tag.id;
-            }),
-            timecodes: timecodes
+            tags: self.mediaPackage.tags,
+            timecodes: self.mediaPackage.timecodes
           },
           callback
         );
@@ -665,4 +653,27 @@ TarPackage.prototype.saveTimecodes = function() {
  */
 TarPackage.prototype.getMediaFilePath = function() {
   return path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
+};
+
+/**
+ * Selects the media to use as the base media in multi-sources scenario.
+ *
+ * Finds which media has the most timecodes / tags.
+ *
+ * @method selectMultiSourcesMedia
+ * @param {Object} media1 A media
+ * @param {Object} media2 A media
+ * @return {Object} Either media1 or media2
+ */
+TarPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
+  var media1TotalTimecodes = media1.timecodes ? media1.timecodes.length : 0;
+  var media2TotalTimecodes = media2.timecodes ? media2.timecodes.length : 0;
+
+  if ((!media1TotalTimecodes && !media2TotalTimecodes) || media1TotalTimecodes === media2TotalTimecodes) {
+    var media1TotalTags = media1.tags ? media1.tags.length : 0;
+    var media2TotalTags = media2.tags ? media2.tags.length : 0;
+    return (media1TotalTags > media2TotalTags) ? media1 : media2;
+  }
+
+  return (media1TotalTimecodes > media2TotalTimecodes) ? media1 : media2;
 };

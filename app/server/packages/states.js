@@ -169,7 +169,15 @@ var STATES = {
    * @default 15
    * @final
    */
-  DEFRAGMENT_MP4: 15
+  DEFRAGMENT_MP4: 15,
+
+  /**
+   * Package is grouping with another one.
+   * @type Number
+   * @default 16
+   * @final
+   */
+  GROUPING: 16
 
 };
 Object.freeze(STATES);

@@ -95,10 +95,11 @@ function removeDirectories(directories, callback) {
  * @private
  * @async
  * @param {Array} videosToRemove The list of videos to remove
+ * @param {Boolean} keepRemote true to keep the video in the videos platform
  * @param {Function} callback The function to call when it's done
  *   - **Error** The error if an error occurred, null otherwise
  */
-function removeAllDataRelatedToVideo(videosToRemove, callback) {
+function removeAllDataRelatedToVideo(videosToRemove, keepRemote, callback) {
   var parallel = [];
 
   // Remove videos public directories
@@ -126,6 +127,8 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
   });
 
   videosToRemove.forEach(function(video) {
+    if (keepRemote) return;
+
     parallel.push(
       function(callback) {
         var mediaId = [];
@@ -149,7 +152,8 @@ function removeAllDataRelatedToVideo(videosToRemove, callback) {
             });
           else callback();
         } else callback();
-      });
+      }
+    );
   });
 
   async.parallel(parallel, function(error) {
@@ -219,6 +223,87 @@ function updateMedia(id, modifier, callback) {
   // execute the oldest operation in the queue
   if (!this.pendingUpdate)
     executeOperation();
+}
+
+/**
+ * Removes medias.
+ *
+ * All datas associated to the deleted medias will also be deleted.
+ *
+ * @method remove
+ * @private
+ * @async
+ * @param {ResourceFilter} [filter] Rules to filter medias to remove
+ * @param {Boolean} keepRemote true to keep the video on the videos platform, false to also remove the video from the
+ * platform
+ * @param {Function} [callback] The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of removed medias
+ */
+function removeMedia(filter, keepRemote, callback) {
+  var self = this;
+  var medias;
+  var totalRemovedMedias = 0;
+
+  async.series([
+
+    // Find medias
+    function(callback) {
+      VideoProvider.super_.prototype.getAll.call(
+        self,
+        filter,
+        {
+          include: ['id', 'mediaId', 'type', 'tags', 'chapters']
+        },
+        {
+          id: 'desc'
+        },
+        function(getAllError, fetchedMedias) {
+          medias = fetchedMedias;
+          return self.executeCallback(callback, getAllError);
+        }
+      );
+    },
+
+    // Remove medias
+    function(callback) {
+      if (!medias || !medias.length) return self.executeCallback(callback);
+
+      // Remove medias
+      VideoProvider.super_.prototype.remove.call(self, filter, function(removeError, total) {
+        totalRemovedMedias = total;
+        return self.executeCallback(callback, removeError);
+      });
+
+    },
+
+    // Remove related datas
+    function(callback) {
+      if (!medias || !medias.length) return self.executeCallback(callback);
+
+      removeAllDataRelatedToVideo(medias, keepRemote, function(removeRelatedError) {
+        return self.executeCallback(callback, removeRelatedError);
+      });
+    },
+
+    // Execute hook
+    function(callback) {
+      if (!medias || !medias.length) return self.executeCallback(callback);
+
+      var api = process.api.getCoreApi();
+      var publishApi = process.api.getApi('publish');
+      api.executeHook(
+        publishApi.getHooks().MEDIAS_DELETED,
+        medias,
+        function(hookError) {
+          self.executeCallback(callback, hookError);
+        }
+      );
+    }
+
+  ], function(error, results) {
+    self.executeCallback(callback, error, !error ? totalRemovedMedias : undefined);
+  });
 }
 
 /**
@@ -578,69 +663,23 @@ VideoProvider.prototype.updateTitle = function(id, title, callback) {
  *   - **Number** The number of removed medias
  */
 VideoProvider.prototype.remove = function(filter, callback) {
-  var self = this;
-  var medias;
-  var totalRemovedMedias = 0;
+  removeMedia.call(this, filter, false, callback);
+};
 
-  async.series([
-
-    // Find medias
-    function(callback) {
-      VideoProvider.super_.prototype.getAll.call(
-        self,
-        filter,
-        {
-          include: ['id', 'mediaId', 'type', 'tags', 'chapters']
-        },
-        {
-          id: 'desc'
-        },
-        function(getAllError, fetchedMedias) {
-          medias = fetchedMedias;
-          return self.executeCallback(callback, getAllError);
-        }
-      );
-    },
-
-    // Remove medias
-    function(callback) {
-      if (!medias || !medias.length) return self.executeCallback(callback);
-
-      // Remove medias
-      VideoProvider.super_.prototype.remove.call(self, filter, function(removeError, total) {
-        totalRemovedMedias = total;
-        return self.executeCallback(callback, removeError);
-      });
-
-    },
-
-    // Remove related datas
-    function(callback) {
-      if (!medias || !medias.length) return self.executeCallback(callback);
-
-      removeAllDataRelatedToVideo(medias, function(removeRelatedError) {
-        return self.executeCallback(callback, removeRelatedError);
-      });
-    },
-
-    // Execute hook
-    function(callback) {
-      if (!medias || !medias.length) return self.executeCallback(callback);
-
-      var api = process.api.getCoreApi();
-      var publishApi = process.api.getApi('publish');
-      api.executeHook(
-        publishApi.getHooks().MEDIAS_DELETED,
-        medias,
-        function(hookError) {
-          self.executeCallback(callback, hookError);
-        }
-      );
-    }
-
-  ], function(error, results) {
-    self.executeCallback(callback, error, !error ? totalRemovedMedias : undefined);
-  });
+/**
+ * Removes medias from OpenVeo but keep videos on the videos platform.
+ *
+ * All datas associated to the deleted medias will also be deleted.
+ *
+ * @method removeLocal
+ * @async
+ * @param {ResourceFilter} [filter] Rules to filter medias to remove
+ * @param {Function} [callback] The function to call when it's done
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of removed medias
+ */
+VideoProvider.prototype.removeLocal = function(filter, callback) {
+  removeMedia.call(this, filter, true, callback);
 };
 
 /**

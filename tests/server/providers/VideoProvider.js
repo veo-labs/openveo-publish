@@ -1068,6 +1068,41 @@ describe('VideoProvider', function() {
 
   });
 
+  describe('removeLocal', function() {
+
+    it('should not remove videos associated to the deleted medias from the platform', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          mediaId: ['43', '44'],
+          type: TYPES.LOCAL
+        }
+      ];
+
+      var expectedVideoPlatformConfiguration = {};
+      var platformRemoveMock = chai.spy(function(ids, callback) {
+        callback();
+      });
+
+      videoPlatformConf[expectedMedias[0].type] = expectedVideoPlatformConfiguration;
+
+      mediaPlatformFactory.get = function(type, configuration) {
+        assert.equal(type, expectedMedias[0].type, 'Wrong type');
+        assert.equal(configuration, expectedVideoPlatformConfiguration, 'Wrong configuration');
+        return {
+          remove: platformRemoveMock
+        };
+      };
+
+      provider.removeLocal(new ResourceFilter(), function(error, total) {
+        assert.isNull(error, 'Unexpected error');
+        platformRemoveMock.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+  });
+
   describe('updateOne', function() {
 
     it('should update a media', function(done) {

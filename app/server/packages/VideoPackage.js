@@ -14,6 +14,7 @@ var Package = process.requirePublish('app/server/packages/Package.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var VideoPackageError = process.requirePublish('app/server/packages/VideoPackageError.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
 var fileSystem = openVeoApi.fileSystem;
 
 // Accepted images files extensions in the package
@@ -51,7 +52,8 @@ VideoPackage.STATES = {
   MP4_DEFRAGMENTED: 'mp4Defragmented',
   THUMB_GENERATED: 'thumbGenerated',
   COPIED_IMAGES: 'copiedImages',
-  METADATA_RETRIEVED: 'metadataRetrieved'
+  METADATA_RETRIEVED: 'metadataRetrieved',
+  GROUPED: 'grouped'
 };
 Object.freeze(VideoPackage.STATES);
 
@@ -67,7 +69,8 @@ VideoPackage.TRANSITIONS = {
   DEFRAGMENT_MP4: 'defragmentMp4',
   GENERATE_THUMB: 'generateThumb',
   COPY_IMAGES: 'copyImages',
-  GET_METADATA: 'getMetadata'
+  GET_METADATA: 'getMetadata',
+  GROUP: 'group'
 };
 Object.freeze(VideoPackage.TRANSITIONS);
 
@@ -89,7 +92,8 @@ VideoPackage.stateTransitions = [
   Package.TRANSITIONS.UPLOAD_MEDIA,
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
-  Package.TRANSITIONS.CLEAN_DIRECTORY
+  Package.TRANSITIONS.CLEAN_DIRECTORY,
+  VideoPackage.TRANSITIONS.GROUP
 ];
 Object.freeze(VideoPackage.stateTransitions);
 
@@ -131,9 +135,47 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
     name: Package.TRANSITIONS.CLEAN_DIRECTORY,
     from: VideoPackage.STATES.COPIED_IMAGES,
     to: Package.STATES.DIRECTORY_CLEANED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.GROUP,
+    from: Package.STATES.DIRECTORY_CLEANED,
+    to: VideoPackage.STATES.GROUPED
   }
 ]);
 Object.freeze(VideoPackage.stateMachine);
+
+/**
+ * Waits for the given media to be in one of the given states.
+ *
+ * Waiting time is 1 second.
+ *
+ * @method waitForMediaState
+ * @async
+ * @private
+ * @param {Object} media The media
+ * @param {Object} media.id The media id
+ * @param {Array} states The authorized states
+ * @param {Function} callback The function to call when done with:
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Object** The media with all properties
+ */
+function waitForMediaState(media, states, callback) {
+  var self = this;
+
+  this.videoProvider.getOne(
+    new ResourceFilter().equal('id', media.id),
+    null,
+    function(error, fetchedMedia) {
+      if (error) return callback(error);
+      if (!fetchedMedia) return callback(new Error('Media "' + media.id + '" not found'));
+      if (states.indexOf(fetchedMedia.state) !== -1) return callback(null, fetchedMedia);
+
+      setTimeout(function() {
+        waitForMediaState.call(self, media, states, callback);
+      }, 1000);
+    }
+  );
+}
 
 /**
  * Defragment the MP4
@@ -250,9 +292,10 @@ VideoPackage.prototype.generateThumb = function() {
 
         ], function(error) {
           if (error) return reject(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
+          self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
           self.videoProvider.updateThumbnail(
             self.mediaPackage.id,
-            '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+            self.mediaPackage.thumbnail,
             function() {
               resolve();
             }
@@ -269,42 +312,16 @@ VideoPackage.prototype.generateThumb = function() {
         }).on('error', function(error) {
           reject(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
         }).on('end', function() {
+          self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
           self.videoProvider.updateThumbnail(
             self.mediaPackage.id,
-            '/publish/' + self.mediaPackage.id + '/thumbnail.jpg',
+            self.mediaPackage.thumbnail,
             function() {
               resolve();
             }
           );
         });
       }
-    });
-  });
-};
-
-/**
- * Prepares public directory where the media associated files will be deployed.
- *
- * This is a transition.
- *
- * @method preparePublicDirectory
- * @return {Promise} Promise resolving when transition is done
- */
-VideoPackage.prototype.preparePublicDirectory = function() {
-  var self = this;
-
-  return new Promise(function(resolve, reject) {
-    var publicDirectory = path.normalize(process.rootPublish + '/assets/player/videos/' + self.mediaPackage.id);
-
-    self.updateState(self.mediaPackage.id, STATES.PREPARING, function() {
-      process.logger.debug('Prepare package public directory ' + publicDirectory);
-
-      openVeoApi.fileSystem.mkdir(publicDirectory,
-        function(error) {
-          if (error && error.code !== 'EEXIST')
-            reject(new VideoPackageError(error.message, ERRORS.CREATE_VIDEO_PUBLIC_DIR));
-          else resolve();
-        });
     });
   });
 };
@@ -437,6 +454,135 @@ VideoPackage.prototype.copyImages = function() {
       else resolve();
     });
   });
+};
+
+/**
+ * Groups the video with the first found video having the same original name.
+ *
+ * Grouping consists of merging the two videos into one in OpenVeo. It means that both videos still exist on the video
+ * platform but only one reference exists in OpenVeo with multi remote videos.
+ * Depending on the type of package, global information are taken from the current video or the video we are grouping
+ * with.
+ *
+ * This is a transition.
+ *
+ * @method group
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.group = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    var otherMedia;
+    var mediaToKeep;
+    var mediaToRemove;
+
+    async.series([
+
+      // Change media state to GROUPING
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GROUPING, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_CHANGE_MEDIA_STATE));
+          callback();
+        });
+      },
+
+      // Find another video with the same name
+      function(callback) {
+        self.videoProvider.getOne(
+          new ResourceFilter().and([
+            new ResourceFilter().notEqual('id', self.mediaPackage.id),
+            new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName)
+          ]),
+          null,
+          function(error, media) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_GET_MEDIA_ERROR));
+            otherMedia = media;
+            callback();
+          }
+        );
+      },
+
+      // Wait for the other media to be in READY or PUBLISHED state
+      function(callback) {
+        if (!otherMedia) return callback();
+
+        var expectedStates = [STATES.READY, STATES.PUBLISHED];
+        if (expectedStates.indexOf(otherMedia.state) !== -1) return callback();
+
+        waitForMediaState.call(self, otherMedia, expectedStates, function(error, media) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_WAIT_FOR_MEDIA_ERROR));
+          otherMedia = media;
+          callback();
+        });
+      },
+
+      // Change other media state to GROUPING
+      function(callback) {
+        if (!otherMedia) return callback();
+
+        self.updateState(otherMedia.id, STATES.GROUPING, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_CHANGE_OTHER_MEDIA_STATE));
+          callback();
+        });
+      },
+
+      // Merge media with other media
+      function(callback) {
+        if (!otherMedia) return callback();
+
+        var media = self.selectMultiSourcesMedia(otherMedia, self.mediaPackage);
+
+        if (media.id === otherMedia.id) {
+          mediaToKeep = otherMedia;
+          mediaToRemove = self.mediaPackage;
+        } else {
+          mediaToKeep = self.mediaPackage;
+          mediaToRemove = otherMedia;
+        }
+
+        mediaToKeep.mediaId = mediaToKeep.mediaId.concat(mediaToRemove.mediaId);
+        self.videoProvider.updateMediaId(
+          mediaToKeep.id,
+          mediaToKeep.mediaId,
+          function(error) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_MERGE_MEDIAS));
+            callback();
+          }
+        );
+      },
+
+      // Remove not kept media from OpenVeo but not from the video platform!
+      function(callback) {
+        if (!otherMedia) return callback();
+
+        // Current media package becomes the chosen media
+        self.mediaPackage = mediaToKeep;
+
+        self.videoProvider.removeLocal(new ResourceFilter().equal('id', mediaToRemove.id), function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_REMOVE_NOT_CHOSEN));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+
+  });
+};
+
+/**
+ * Selects the media to use as the base media in multi-sources scenario.
+ *
+ * @method selectMultiSourcesMedia
+ * @param {Object} media1 A media
+ * @param {Object} media2 A media
+ * @return {Object} Either media1 or media2
+ */
+VideoPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
+  return media1;
 };
 
 /**
