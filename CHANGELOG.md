@@ -32,6 +32,7 @@
 - Fix chapters and tags URL parameters on video URL which wasn't working since version 10.0.0
 - Fix 3.0.0 migration script which did not transformed "sources" property of videos into Array (instead of Object), this could led to JavaScript errors when encountering a video created with OpenVeo Publish &lt; 3.0.0
 - Fix potential errors when uploading several videos using FTP with the same name (multi-sources). The publication process for these kind of videos could have stayed blocked when videos were uploaded simultaneously.
+- Fix error when using custom properties of type "date & time" it wasn't possible to set the value of the property when editing a media
 
 ## DEPENDENCIES
 

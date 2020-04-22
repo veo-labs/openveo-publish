@@ -318,6 +318,7 @@
             }
           });
         } else if (property.type === 'dateTime') {
+          model[property.id] = model[property.id] && new Date(model[property.id]);
           fields.push({
             key: property.id,
             type: inlineEditable ? 'horizontalEditableDateTimePicker' : 'horizontalDateTimePicker',
