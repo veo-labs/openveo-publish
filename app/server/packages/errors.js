@@ -246,64 +246,64 @@ var ERRORS = {
   DUPLICATE_MEDIA: 23,
 
   /**
-   * Grouping the media failed while changing state.
+   * Merging the media failed while changing state.
    *
    * @property
    * @type Number
    * @default 24
    * @final
    */
-  GROUP_CHANGE_MEDIA_STATE: 24,
+  MERGE_CHANGE_MEDIA_STATE: 24,
 
   /**
-   * Grouping the media failed while trying to get a media with the same name.
+   * Merging the media failed while trying to get a media with the same name.
    *
    * @property
    * @type Number
    * @default 25
    * @final
    */
-  GROUP_GET_MEDIA_ERROR: 25,
+  MERGE_GET_MEDIA_ERROR: 25,
 
   /**
-   * Grouping the media failed while waiting for a media with the same name to have a stable state.
+   * Merging the media failed while waiting for a media with the same name to have a stable state.
    *
    * @property
    * @type Number
    * @default 26
    * @final
    */
-  GROUP_WAIT_FOR_MEDIA_ERROR: 26,
+  MERGE_WAIT_FOR_MEDIA_ERROR: 26,
 
   /**
-   * Grouping the media failed while changing state of the other media.
+   * Merging the media failed while changing state of the other media.
    *
    * @property
    * @type Number
    * @default 27
    * @final
    */
-  GROUP_CHANGE_OTHER_MEDIA_STATE: 27,
+  MERGE_CHANGE_OTHER_MEDIA_STATE: 27,
 
   /**
-   * Grouping the media failed while merging medias.
+   * Merging the media failed while merging medias.
    *
    * @property
    * @type Number
    * @default 28
    * @final
    */
-  GROUP_MERGE_MEDIAS: 28,
+  MERGE_MEDIAS: 28,
 
   /**
-   * Grouping the media failed while removing the not chosen media.
+   * Merging the media failed while removing the not chosen media.
    *
    * @property
    * @type Number
    * @default 29
    * @final
    */
-  GROUP_REMOVE_NOT_CHOSEN: 29
+  MERGE_REMOVE_NOT_CHOSEN: 29
 
 };
 

@@ -132,7 +132,7 @@ TarPackage.stateTransitions = [
   TarPackage.TRANSITIONS.SAVE_TIMECODES,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY,
-  VideoPackage.TRANSITIONS.GROUP
+  VideoPackage.TRANSITIONS.MERGE
 ];
 Object.freeze(TarPackage.stateTransitions);
 

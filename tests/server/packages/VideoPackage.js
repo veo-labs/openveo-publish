@@ -107,9 +107,9 @@ describe('VideoPackage', function() {
     mock.stopAll();
   });
 
-  describe('group', function() {
+  describe('merge', function() {
 
-    it('should group current package with the first video found having the same original file name', function() {
+    it('should merge current package with the first video found having the same original file name', function() {
       var updateStateCount = 0;
       var videoPackageId = '42';
       videoPackage.mediaPackage.mediaId = ['2'];
@@ -123,7 +123,7 @@ describe('VideoPackage', function() {
       videoPackage.updateState = chai.spy(function(id, state, callback) {
         var expectedId = updateStateCount === 0 ? videoPackage.mediaPackage.id : expectedMedias[0].id;
         assert.equal(id, expectedId, 'Wrong id');
-        assert.equal(state, STATES.GROUPING, 'Wrong state');
+        assert.equal(state, STATES.MERGING, 'Wrong state');
         updateStateCount++;
         callback();
       });
@@ -163,7 +163,7 @@ describe('VideoPackage', function() {
         callback();
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         videoPackage.updateState.should.have.been.called.exactly(2);
         videoProvider.getOne.should.have.been.called.exactly(1);
         videoProvider.updateMediaId.should.have.been.called.exactly(1);
@@ -179,7 +179,7 @@ describe('VideoPackage', function() {
       expectedMedias = [{
         id: '43',
         originalFileName: videoPackage.mediaPackage.originalFileName,
-        state: STATES.GROUPING,
+        state: STATES.MERGING,
         mediaId: ['1']
       }];
 
@@ -209,7 +209,7 @@ describe('VideoPackage', function() {
         callback(null, expectedMedias[0]);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         videoPackage.updateState.should.have.been.called.exactly(2);
         videoProvider.getOne.should.have.been.called.exactly(3);
         videoProvider.updateMediaId.should.have.been.called.exactly(1);
@@ -233,7 +233,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(1);
@@ -243,7 +243,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_CHANGE_MEDIA_STATE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_CHANGE_MEDIA_STATE, 'Wrong error code');
       });
     });
 
@@ -261,7 +261,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(1);
@@ -271,7 +271,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_GET_MEDIA_ERROR, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_GET_MEDIA_ERROR, 'Wrong error code');
       });
     });
 
@@ -282,7 +282,7 @@ describe('VideoPackage', function() {
       expectedMedias = [{
         id: '43',
         originalFileName: videoPackage.mediaPackage.originalFileName,
-        state: STATES.GROUPING,
+        state: STATES.MERGING,
         mediaId: ['1']
       }];
 
@@ -294,7 +294,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(1);
@@ -304,7 +304,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_WAIT_FOR_MEDIA_ERROR, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_WAIT_FOR_MEDIA_ERROR, 'Wrong error code');
       });
     });
 
@@ -327,7 +327,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(2);
@@ -337,7 +337,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_CHANGE_OTHER_MEDIA_STATE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_CHANGE_OTHER_MEDIA_STATE, 'Wrong error code');
       });
     });
 
@@ -355,7 +355,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(2);
@@ -365,7 +365,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_MERGE_MEDIAS, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_MEDIAS, 'Wrong error code');
       });
     });
 
@@ -383,7 +383,7 @@ describe('VideoPackage', function() {
         callback(expectedError);
       });
 
-      return videoPackage.group().then(function() {
+      return videoPackage.merge().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         videoPackage.updateState.should.have.been.called.exactly(2);
@@ -393,7 +393,7 @@ describe('VideoPackage', function() {
 
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GROUP_REMOVE_NOT_CHOSEN, 'Wrong error code');
+        assert.equal(error.code, ERRORS.MERGE_REMOVE_NOT_CHOSEN, 'Wrong error code');
       });
     });
 

@@ -53,7 +53,7 @@ VideoPackage.STATES = {
   THUMB_GENERATED: 'thumbGenerated',
   COPIED_IMAGES: 'copiedImages',
   METADATA_RETRIEVED: 'metadataRetrieved',
-  GROUPED: 'grouped'
+  MERGED: 'merged'
 };
 Object.freeze(VideoPackage.STATES);
 
@@ -70,7 +70,7 @@ VideoPackage.TRANSITIONS = {
   GENERATE_THUMB: 'generateThumb',
   COPY_IMAGES: 'copyImages',
   GET_METADATA: 'getMetadata',
-  GROUP: 'group'
+  MERGE: 'merge'
 };
 Object.freeze(VideoPackage.TRANSITIONS);
 
@@ -93,7 +93,7 @@ VideoPackage.stateTransitions = [
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY,
-  VideoPackage.TRANSITIONS.GROUP
+  VideoPackage.TRANSITIONS.MERGE
 ];
 Object.freeze(VideoPackage.stateTransitions);
 
@@ -137,9 +137,9 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
     to: Package.STATES.DIRECTORY_CLEANED
   },
   {
-    name: VideoPackage.TRANSITIONS.GROUP,
+    name: VideoPackage.TRANSITIONS.MERGE,
     from: Package.STATES.DIRECTORY_CLEANED,
-    to: VideoPackage.STATES.GROUPED
+    to: VideoPackage.STATES.MERGED
   }
 ]);
 Object.freeze(VideoPackage.stateMachine);
@@ -457,19 +457,19 @@ VideoPackage.prototype.copyImages = function() {
 };
 
 /**
- * Groups the video with the first found video having the same original name.
+ * Merges the video with the first found video having the same original name.
  *
- * Grouping consists of merging the two videos into one in OpenVeo. It means that both videos still exist on the video
+ * Merging consists of merging the two videos into one in OpenVeo. It means that both videos still exist on the video
  * platform but only one reference exists in OpenVeo with multi remote videos.
- * Depending on the type of package, global information are taken from the current video or the video we are grouping
+ * Depending on the type of package, global information are taken from the current video or the video we are merging
  * with.
  *
  * This is a transition.
  *
- * @method group
+ * @method merge
  * @return {Promise} Promise resolving when transition is done
  */
-VideoPackage.prototype.group = function() {
+VideoPackage.prototype.merge = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
@@ -479,10 +479,10 @@ VideoPackage.prototype.group = function() {
 
     async.series([
 
-      // Change media state to GROUPING
+      // Change media state to MERGING
       function(callback) {
-        self.updateState(self.mediaPackage.id, STATES.GROUPING, function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_CHANGE_MEDIA_STATE));
+        self.updateState(self.mediaPackage.id, STATES.MERGING, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_CHANGE_MEDIA_STATE));
           callback();
         });
       },
@@ -496,7 +496,7 @@ VideoPackage.prototype.group = function() {
           ]),
           null,
           function(error, media) {
-            if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_GET_MEDIA_ERROR));
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_GET_MEDIA_ERROR));
             otherMedia = media;
             callback();
           }
@@ -511,18 +511,18 @@ VideoPackage.prototype.group = function() {
         if (expectedStates.indexOf(otherMedia.state) !== -1) return callback();
 
         waitForMediaState.call(self, otherMedia, expectedStates, function(error, media) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_WAIT_FOR_MEDIA_ERROR));
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_WAIT_FOR_MEDIA_ERROR));
           otherMedia = media;
           callback();
         });
       },
 
-      // Change other media state to GROUPING
+      // Change other media state to MERGING
       function(callback) {
         if (!otherMedia) return callback();
 
-        self.updateState(otherMedia.id, STATES.GROUPING, function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_CHANGE_OTHER_MEDIA_STATE));
+        self.updateState(otherMedia.id, STATES.MERGING, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_CHANGE_OTHER_MEDIA_STATE));
           callback();
         });
       },
@@ -546,7 +546,7 @@ VideoPackage.prototype.group = function() {
           mediaToKeep.id,
           mediaToKeep.mediaId,
           function(error) {
-            if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_MERGE_MEDIAS));
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_MEDIAS));
             callback();
           }
         );
@@ -560,7 +560,7 @@ VideoPackage.prototype.group = function() {
         self.mediaPackage = mediaToKeep;
 
         self.videoProvider.removeLocal(new ResourceFilter().equal('id', mediaToRemove.id), function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.GROUP_REMOVE_NOT_CHOSEN));
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_REMOVE_NOT_CHOSEN));
           callback();
         });
       }
