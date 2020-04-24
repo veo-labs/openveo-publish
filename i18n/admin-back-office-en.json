@@ -115,6 +115,7 @@
     "STATE_13" : "Generating thumbnail",
     "STATE_14" : "Retrieving metadatas",
     "STATE_15" : "Defragmenting MP4",
+    "STATE_16" : "Merging",
     "ADD_MEDIA" : "Add a video",
     "REMOVE_SUCCESS" : "Video successfully removed.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",
