@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Web Service - Openveo Publish</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Web Service";
+    var mkdocs_page_input_path = "pluginsDevelopers/web-service.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Openveo Publish</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">INTRODUCTION</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">USERS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../prerequisites/">Prerequisites</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../getting-started/">Getting started</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../watcher/">Watcher</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../player-parameters/">Player URL parameters</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../advanced-configuration/">Advanced configuration</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">PLUGINS DEVELOPERS</span>
+    <ul class="subnav">
+                <li class=" current">
+                    
+    <a class="current" href="./">Web Service</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#introduction">Introduction</a></li>
+    
+
+    <li class="toctree-l3"><a href="#endpoints">Endpoints</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#videos">Videos</a></li>
+        
+            <li><a class="toctree-l4" href="#properties">Properties</a></li>
+        
+            <li><a class="toctree-l4" href="#platforms">Platforms</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../api/">API</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">PUBLISH DEVELOPERS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../developers/basics/">Basics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/installation/">Installation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/back-end/">Back end AngularJS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/compilation/">CSS / SASS / JS compilation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/unit-tests/">Unit tests</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/end-to-end-tests/">End to end tests</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developers/api/">API</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Openveo Publish</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PLUGINS DEVELOPERS &raquo;</li>
+        
+      
+    
+    <li>Web Service</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/veo-labs/openveo-publish/edit/master/docs/pluginsDevelopers/web-service.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="introduction">Introduction</h1>
+<p>OpenVeo Publish defines its own Web Service endpoints. Web Service authentication is documented in <a href="https://github.com/veo-labs/openveo-core">OpenVeo</a> project.</p>
+<h1 id="endpoints">Endpoints</h1>
+<h2 id="videos">Videos</h2>
+<p>Get videos.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/videos
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>query</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>To search on both videos title and description</td>
+</tr>
+<tr>
+<td>useSmartSearch</td>
+<td>Number</td>
+<td>No</td>
+<td>1</td>
+<td><strong>1</strong> to use a more advanced search mechanism, <strong>0</strong> to use a simple search based on a regular expression</td>
+</tr>
+<tr>
+<td>searchInPois</td>
+<td>Number</td>
+<td>No</td>
+<td>0</td>
+<td><strong>1</strong> to also search in tags / chapters titles and descriptions, <strong>0</strong> to search only on title and description of videos</td>
+</tr>
+<tr>
+<td>states</td>
+<td>String/Array</td>
+<td>No</td>
+<td>-</td>
+<td>To filter videos by state</td>
+</tr>
+<tr>
+<td>dateStart</td>
+<td>String/Number</td>
+<td>No</td>
+<td>-</td>
+<td>To get videos after or equal to a date (in any format supported by JavaScript Date object)</td>
+</tr>
+<tr>
+<td>dateEnd</td>
+<td>String/Number</td>
+<td>No</td>
+<td>-</td>
+<td>To get videos before or equal to a date (in any format supported by JavaScript Date object)</td>
+</tr>
+<tr>
+<td>categories</td>
+<td>String/Array</td>
+<td>No</td>
+<td>-</td>
+<td>To filter videos by category</td>
+</tr>
+<tr>
+<td>groups</td>
+<td>String/Array</td>
+<td>No</td>
+<td>-</td>
+<td>To filter videos by group</td>
+</tr>
+<tr>
+<td>user</td>
+<td>String/Array</td>
+<td>No</td>
+<td>-</td>
+<td>To filter videos by user</td>
+</tr>
+<tr>
+<td>sortBy</td>
+<td>String</td>
+<td>No</td>
+<td>date</td>
+<td>To sort videos by either <strong>title</strong>, <strong>description</strong>, <strong>date</strong>, <strong>state</strong>, <strong>views</strong> or <strong>category</strong></td>
+</tr>
+<tr>
+<td>sortOrder</td>
+<td>String</td>
+<td>No</td>
+<td>desc</td>
+<td>Sort order (either <strong>asc</strong> or <strong>desc</strong>)</td>
+</tr>
+<tr>
+<td>page</td>
+<td>Number</td>
+<td>No</td>
+<td>0</td>
+<td>The expected page</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>Number</td>
+<td>No</td>
+<td>10</td>
+<td>To limit the number of videos per page</td>
+</tr>
+<tr>
+<td>properties</td>
+<td>Object</td>
+<td>No</td>
+<td>-</td>
+<td>A list of custom properties with the property id as the key and the expected property value as the value (e.g. <strong>properties[property1Id]=property1Value</strong>) <strong>Date time</strong> properties accept either timestamps or literal dates</td>
+</tr>
+<tr>
+<td>include</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to include from returned videos</td>
+</tr>
+<tr>
+<td>exclude</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to exclude from returned videos. Ignored if include is also specified</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the list of videos</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Wrong list of parameters</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;entities&quot; : [
+    {
+      &quot;id&quot; : 1444396683105, // Id of the video
+      &quot;state&quot; : 12, // Video state
+      &quot;date&quot; : 1425916390000, // Date in timestamp
+      &quot;type&quot; : &quot;vimeo&quot;, // Video associated platform
+      &quot;errorCode&quot; : -1, // Video error code or -1 if no error
+      &quot;category&quot; : &quot;&quot;, // Video category
+      &quot;properties&quot; : { // Video custom properties
+        &quot;1444809111034&quot;: { // Custom property id
+          &quot;id&quot; : 1444809111034, // Custom property id
+          &quot;name&quot; : &quot;Property name&quot;, // Custom property name
+          &quot;description&quot; : &quot;Property description&quot;, // Custom property description
+          &quot;type&quot; : &quot;text&quot;, // Custom property type
+          &quot;value&quot; : &quot;Property value&quot; // Custom property value
+        }
+        ...
+      },
+      &quot;link&quot; : &quot;http://openveo.local/publish/video/1444396683105&quot;, // Path to play the video
+      &quot;mediaId&quot; : &quot;141902178&quot;, // Video id on video platform
+      &quot;available&quot; : true, // Indicates if video is available or is being encoded
+      &quot;thumbnail&quot; : &quot;http://openveo-cdn.local/1444396683105/thumbnail.jpg&quot;,
+      &quot;title&quot; : &quot;Video title&quot;,
+      &quot;leadParagraph&quot; : &quot;Video lead paragraph&quot;,
+      &quot;description&quot; : &quot;Video description&quot;,
+      &quot;chapters&quot; : [ // Chapters
+        {
+          &quot;name&quot; : &quot;Chapter 1&quot;, // Chapter name
+          &quot;description&quot; : &quot;Chapter 1&quot;, // Chapter description
+          &quot;value&quot; : 0.04 // Chapter timecode in percent (percentage of the video)
+        },
+        ...
+      ],
+      &quot;tags&quot; : [ // Tags
+        {
+          &quot;name&quot; : &quot;Tag 1&quot;, // Tag name
+          &quot;description&quot; : &quot;Tag 1 description&quot;, // Tag description
+          &quot;value&quot; : 0.3, // Tag timecode in percent (percentage of the video)
+          &quot;file&quot; : { // Tag associated file
+            &quot;mimeType&quot; : &quot;video/mp4&quot;,
+            &quot;url&quot; : &quot;http://openveo-cdn.local/path/to/ressource/video.mp4&quot;,
+            &quot;originalName&quot; : &quot;original-name.mp4&quot;,
+            &quot;fileName&quot; : &quot;name.mp4&quot;,
+            &quot;size&quot; : 102458
+          }
+        },
+        ...
+      ],
+      &quot;cut&quot; : [ // Cut information (begin and end)
+        {
+          &quot;type&quot; : &quot;begin&quot;, // Cut type
+          &quot;value&quot; : 0 // Begin timecode (percentage of the media)
+        },
+        {
+          &quot;type&quot; : &quot;end&quot;, // Cut type
+          &quot;value&quot; : 0.9 // End timecode (percentage of the media)
+        }
+      ],
+      &quot;timecodes&quot; : [ // Video synchronized images
+        {
+          &quot;image&quot; : {
+            &quot;large&quot; : &quot;http://openveo-cdn.local/1440175380631/slide_00000.jpeg&quot;, // Large image
+            &quot;small&quot; : {
+              &quot;url&quot; : &quot;http://openveo-cdn.local/1440175380631/points-of-interest-images.jpg&quot;, // Sprite containing the small image
+              &quot;x&quot; : 0, // x coordinate of the small image inside the sprite
+              &quot;y&quot; : 0 // y coordinate of the small image inside the sprite
+            }
+          },
+          &quot;timecode&quot; : 0 // Timecode when to display the image (in ms)
+        },
+        ...
+      ]
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;limit&quot;: 1,
+    &quot;page&quot;: 0,
+    &quot;pages&quot;: 2,
+    &quot;size&quot;: 2
+  }
+}
+</code></pre>
+
+<p>Videos can be in different states:</p>
+<ul>
+<li><strong>0</strong> : The video is on error</li>
+<li><strong>1</strong> : The video is waiting to be treated</li>
+<li><strong>2</strong> : The video is copying</li>
+<li><strong>3</strong> : The video package is extracting</li>
+<li><strong>4</strong> : The video package is validating</li>
+<li><strong>5</strong> : The video package is preparing</li>
+<li><strong>6</strong> : The video is waiting for manual upload</li>
+<li><strong>7</strong> : The video is uploading to the video platform</li>
+<li><strong>8</strong> : The video is being configured on the video platform</li>
+<li><strong>9</strong> : The video timecodes are being saved</li>
+<li><strong>10</strong> : The video synchronized images are being saved</li>
+<li><strong>11</strong> : The video is uploaded and ready but unpublished</li>
+<li><strong>12</strong> : The video is uploaded, ready and published</li>
+<li><strong>13</strong> : The video thumbnail is generated</li>
+<li><strong>14</strong> : The video metadatas are being retrieved</li>
+<li><strong>15</strong> : The video is defragmenting</li>
+</ul>
+<hr />
+<p>Get a video.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/videos/{video_id}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>include</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to include from returned video</td>
+</tr>
+<tr>
+<td>exclude</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to exclude from returned video. Ignored if include is also specified</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the video</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>The id of the video is missing</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Video not found</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;entity&quot; : {
+    &quot;id&quot; : 1444396683105, // Id of the video
+    &quot;state&quot; : 12, // Video state
+    &quot;date&quot; : 1425916390000, // Date in timestamp
+    &quot;type&quot; : &quot;vimeo&quot;, // Video associated platform
+    &quot;errorCode&quot; : -1, // Video error code or -1 if no error
+    &quot;category&quot; : &quot;&quot;, // Video category
+    &quot;properties&quot; : { // Video custom properties
+      &quot;1444809111034&quot;: { // Custom property id
+        &quot;id&quot; : 1444809111034, // Custom property id
+        &quot;name&quot; : &quot;Property name&quot;, // Custom property name
+        &quot;description&quot; : &quot;Property description&quot;, // Custom property description
+        &quot;type&quot; : &quot;text&quot;, // Custom property type
+        &quot;value&quot; : &quot;Property value&quot; // Custom property value
+      },
+      ...
+    },
+    &quot;packageType&quot; : &quot;tar&quot;, // Initialize package type (either tar or mp4)
+    &quot;link&quot; : &quot;http://openveo.local/publish/video/1444396683105&quot;, // Path to play the video
+    &quot;mediaId&quot; : &quot;141902178&quot;, // Video id on video platform
+    &quot;available&quot; : true, // Indicates if video is available or is being encoded
+    &quot;thumbnail&quot; : &quot;http://openveo-cdn.local//1444396683105/thumbnail.jpg&quot;,
+    &quot;title&quot; : &quot;Video title&quot;,
+    &quot;leadParagraph&quot; : &quot;Video lead paragraph&quot;,
+    &quot;description&quot; : &quot;Video description&quot;,
+    &quot;chapters&quot; : [ // Chapters
+      {
+        &quot;name&quot; : &quot;Chapter 1&quot;, // Chapter name
+        &quot;description&quot; : &quot;Chapter 1&quot;, // Chapter description
+        &quot;value&quot; : 0.04 // Chapter timecode in percent (percentage of the video)
+      },
+      ...
+    ],
+    &quot;tags&quot; : [ // Tags
+      {
+        &quot;name&quot; : &quot;Tag 1&quot;, // Tag name
+        &quot;description&quot; : &quot;Tag 1 description&quot;, // Tag description
+        &quot;value&quot; : 0.3, // Tag timecode in percent (percentage of the video)
+        &quot;file&quot; : { // Tag associated file
+          &quot;mimeType&quot; : &quot;video/mp4&quot;,
+          &quot;url&quot; : &quot;http://openveo-cdn.local/path/to/ressource/video.mp4&quot;,
+          &quot;originalName&quot; : &quot;original-name.mp4&quot;,
+          &quot;fileName&quot; : &quot;name.mp4&quot;,
+          &quot;size&quot; : 102458
+        }
+      },
+      ...
+    ],
+    &quot;cut&quot; : [ // Cut information (begin and end)
+      {
+        &quot;type&quot; : &quot;begin&quot;, // Cut type
+        &quot;value&quot; : 0 // Begin timecode (percentage of the media)
+      },
+      {
+        &quot;type&quot; : &quot;end&quot;, // Cut type
+        &quot;value&quot; : 0.9 // End timecode (percentage of the media)
+      }
+    ],
+    &quot;timecodes&quot; : [ // Video synchronized images
+      {
+        &quot;image&quot; : {
+          &quot;large&quot; : &quot;http://openveo-cdn.local/1440175380631/slide_00000.jpeg&quot;, // Large image
+          &quot;small&quot; : {
+            &quot;url&quot; : &quot;http://openveo-cdn.local/1440175380631/points-of-interest-images.jpg&quot;, // Sprite containing the small image
+            &quot;x&quot; : 0, // x coordinate of the small image inside the sprite
+            &quot;y&quot; : 0 // y coordinate of the small image inside the sprite
+          }
+        },
+        &quot;timecode&quot; : 0 // Timecode when to display the image (in ms)
+      },
+      ...
+    ]
+  }
+}
+</code></pre>
+
+<hr />
+<p>Delete videos.</p>
+<pre><code>DELETE WEB_SERVICE_URL/publish/videos/{video_id}
+</code></pre>
+<p>With <strong>{video_id}</strong> a comma separated list of video ids to delete.</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The videos have been deleted</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing the video ids</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;total&quot;: 42
+}
+</code></pre>
+
+<hr />
+<p>Add video.</p>
+<pre><code>POST WEB_SERVICE_URL/publish/videos
+</code></pre>
+<p>Expects a multipart/form-data body containing:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>file</td>
+<td>File</td>
+<td>Yes</td>
+<td>-</td>
+<td>The video file</td>
+</tr>
+<tr>
+<td>thumbnail</td>
+<td>File</td>
+<td>No</td>
+<td>-</td>
+<td>The video thumbnail</td>
+</tr>
+<tr>
+<td>info</td>
+<td>Object</td>
+<td>Yes</td>
+<td>-</td>
+<td>The video metadata</td>
+</tr>
+<tr>
+<td>info.title</td>
+<td>String</td>
+<td>Yes</td>
+<td>-</td>
+<td>The video title</td>
+</tr>
+<tr>
+<td>info.properties</td>
+<td>Object</td>
+<td>No</td>
+<td>-</td>
+<td>The custom properties of the video with the keys as custom property ids and values as custom property values</td>
+</tr>
+<tr>
+<td>info.category</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The id of the category the video belongs to</td>
+</tr>
+<tr>
+<td>info.date</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The date of the video (in any format supported by JavaScript Date object)</td>
+</tr>
+<tr>
+<td>info.leadParagraph</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The video lead paragraph</td>
+</tr>
+<tr>
+<td>info.description</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The video description</td>
+</tr>
+<tr>
+<td>info.groups</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of content groups (ids) the video belongs to</td>
+</tr>
+<tr>
+<td>info.platform</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The platform to upload the file to. If no platform is specified the video will be in "<em>Waiting for upload</em>" state. Platform could be one of the platforms defined in <em>videoPlatformConf.json</em> configuration file (either <strong>vimeo</strong>, <strong>wowza</strong>, <strong>youtube</strong> or <strong>local</strong>)</td>
+</tr>
+<tr>
+<td>info.user</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The id of the OpenVeo user to use as the video owner (default is the super admin id)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The video has been added</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing body</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;id&quot;: 42
+}
+</code></pre>
+
+<hr />
+<p>Publish videos.</p>
+<pre><code>POST WEB_SERVICE_URL/publish/videos/{video_id}/publish
+</code></pre>
+<p>With <strong>{video_id}</strong> a comma separated list of video ids to publish.</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The videos have been published</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing the video ids</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;total&quot;: 42
+}
+</code></pre>
+
+<hr />
+<p>Unpublish videos.</p>
+<pre><code>POST WEB_SERVICE_URL/publish/videos/{video_id}/unpublish
+</code></pre>
+<p>With <strong>{video_id}</strong> a comma separated list of video ids to unpublish.</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The videos have been unpublished</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing the video ids</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;total&quot;: 42
+}
+</code></pre>
+
+<h2 id="properties">Properties</h2>
+<p>Get custom properties.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/properties
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>query</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>To search on both properties name and description</td>
+</tr>
+<tr>
+<td>useSmartSearch</td>
+<td>Number</td>
+<td>No</td>
+<td>1</td>
+<td><strong>1</strong> to use a more advanced search mechanism, <strong>0</strong> to use a simple search based on a regular expression</td>
+</tr>
+<tr>
+<td>types</td>
+<td>String/Array</td>
+<td>No</td>
+<td>-</td>
+<td>To filter properties by type</td>
+</tr>
+<tr>
+<td>sortBy</td>
+<td>String</td>
+<td>No</td>
+<td>name</td>
+<td>To sort properties by either <strong>name</strong> or <strong>description</strong></td>
+</tr>
+<tr>
+<td>sortOrder</td>
+<td>String</td>
+<td>No</td>
+<td>desc</td>
+<td>Sort order (either <strong>asc</strong> or <strong>desc</strong>)</td>
+</tr>
+<tr>
+<td>page</td>
+<td>Number</td>
+<td>No</td>
+<td>0</td>
+<td>The expected page</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>Number</td>
+<td>No</td>
+<td>10</td>
+<td>To limit the number of properties per page</td>
+</tr>
+<tr>
+<td>include</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to include from returned properties</td>
+</tr>
+<tr>
+<td>exclude</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to exclude from returned properties. Ignored if include is also specified</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the list of properties</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Wrong list of parameters</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;entities&quot;: [
+    {
+      &quot;id&quot;: &quot;4JMy6htjpe&quot;,
+      &quot;name&quot;: &quot;Property name&quot;,
+      &quot;description&quot;: &quot;Property description&quot;,
+      &quot;type&quot;: &quot;text&quot;
+    },
+    {
+      &quot;id&quot;: &quot;4JMy6htjpe&quot;,
+      &quot;name&quot;: &quot;Property name&quot;,
+      &quot;description&quot;: &quot;Property description&quot;,
+      &quot;type&quot;: &quot;list&quot;,
+      &quot;values&quot;: [&quot;value1&quot;, &quot;value2&quot;]
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;limit&quot;: 1,
+    &quot;page&quot;: 0,
+    &quot;pages&quot;: 2,
+    &quot;size&quot;: 2
+  }
+}
+</code></pre>
+
+<hr />
+<p>Get a property.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/properties/{property_id}
+</code></pre>
+<p>With <strong>{property_id}</strong> the id of the property to retrieve.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>include</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to include from returned property</td>
+</tr>
+<tr>
+<td>exclude</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The list of fields to exclude from returned property. Ignored if include is also specified</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the property</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>The id of the property is missing</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Property not found</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;entity&quot;: {
+    &quot;id&quot;: &quot;NyiBTYjTe&quot;,
+    &quot;name&quot;: &quot;Property name&quot;,
+    &quot;description&quot;: &quot;Property description&quot;,
+    &quot;type&quot;: &quot;text&quot;
+  }
+}
+</code></pre>
+
+<hr />
+<p>Get the list of properties types.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/propertiesTypes
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the list of properties types</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;types&quot;: [
+    &quot;text&quot;,
+    &quot;list&quot;,
+    &quot;boolean&quot;
+  ]
+}
+</code></pre>
+
+<hr />
+<p>Add custom properties.</p>
+<pre><code>PUT WEB_SERVICE_URL/publish/properties
+</code></pre>
+<p>Expects an Array of objects containing:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>Yes</td>
+<td>-</td>
+<td>The custom property name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>String</td>
+<td>Yes</td>
+<td>-</td>
+<td>The custom property description</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Yes</td>
+<td>-</td>
+<td>The custom property type (either <strong>text</strong>, <strong>list</strong>, or <strong>boolean</strong>)</td>
+</tr>
+<tr>
+<td>values</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The custom property values if type is <strong>list</strong></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The properties have been added</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Wrong PUT parameters</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;entities&quot;: [
+    {
+      &quot;id&quot;: &quot;4JMy6htjpe&quot;,
+      &quot;name&quot;: &quot;Property name&quot;,
+      &quot;description&quot;: &quot;Property description&quot;,
+      &quot;type&quot;: &quot;list&quot;,
+      &quot;values&quot;: [&quot;value1&quot;, &quot;value2&quot;]
+    },
+    ...
+  ]
+}
+</code></pre>
+
+<hr />
+<p>Update a property.</p>
+<pre><code>POST WEB_SERVICE_URL/publish/properties/{property_id}
+</code></pre>
+<p>With <strong>{property_id}</strong> the id of the property to update.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The custom property name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The custom property description</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>No</td>
+<td>-</td>
+<td>The custom property type (either <strong>text</strong>, <strong>list</strong>, or <strong>boolean</strong>)</td>
+</tr>
+<tr>
+<td>values</td>
+<td>Array</td>
+<td>No</td>
+<td>-</td>
+<td>The custom property values if type is <strong>list</strong></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The property has been updated</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing the property id</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;total&quot;: 1
+}
+</code></pre>
+
+<hr />
+<p>Delete properties.</p>
+<pre><code>DELETE WEB_SERVICE_URL/publish/properties/{property_id}
+</code></pre>
+<p>With <strong>{property_id}</strong> a comma separated list of property ids to delete.</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>The properties have been deleted</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Missing the property ids</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;total&quot;: 42
+}
+</code></pre>
+
+<h2 id="platforms">Platforms</h2>
+<p>Get configured video platforms.</p>
+<pre><code>GET WEB_SERVICE_URL/publish/platforms
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>HTTP Status Code</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Got the platforms</td>
+</tr>
+<tr>
+<td>500</td>
+<td>An error occured on the server side</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Authentication to the web service failed</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Authorization forbidden for this end point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="json">{
+  &quot;platforms&quot;: [
+    &quot;vimeo&quot;,
+    &quot;youtube&quot;,
+    &quot;local&quot;,
+    &quot;tls&quot;,
+    &quot;wowza&quot;
+  ]
+}
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api/" class="btn btn-neutral float-right" title="API">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../advanced-configuration/" class="btn btn-neutral" title="Advanced configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/veo-labs/openveo-publish/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../../advanced-configuration/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../api/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>
