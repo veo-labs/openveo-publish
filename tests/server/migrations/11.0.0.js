@@ -276,6 +276,51 @@ describe('Migration 11.0.0', function() {
     });
   });
 
+  it('should generate an id for chapters and tags of medias missing it', function(done) {
+    var expectedGeneratedTagId;
+    var expectedGeneratedChapterId;
+    var expectedMediaId = '42';
+    var expectedTag = {
+      name: 'Tag name',
+      description: 'Tag description',
+      value: 1000
+    };
+    var expectedChapter = {
+      name: 'Chapter name',
+      description: 'Chapter description',
+      value: 2000
+    };
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        tags: [expectedTag],
+        chapters: [expectedChapter]
+      }
+    ];
+
+    PoiProvider.prototype.add = chai.spy(function(pois, callback) {
+      assert.isDefined(pois[0].id, 'Missing tag id');
+      assert.isDefined(pois[1].id, 'Missing chapter id');
+
+      expectedGeneratedTagId = pois[0].id;
+      expectedGeneratedChapterId = pois[1].id;
+      callback();
+    });
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.sameMembers(modifications.tags, [expectedGeneratedTagId], 'Missing tag');
+      assert.sameMembers(modifications.chapters, [expectedGeneratedChapterId], 'Missing chapter');
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      PoiProvider.prototype.add.should.have.been.called.exactly(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
   it('should add descriptionText property to medias which have a description', function(done) {
     expectedMedias = [
       {

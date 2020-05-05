@@ -1,3 +1,9 @@
+# 11.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix 11.0.0 migration which wasn't properly migrating chapters / tags with old format
+
 # 11.0.0 / 2020-05-04
 
 ## BREAKING CHANGES

@@ -2,6 +2,7 @@
 
 var path = require('path');
 var async = require('async');
+var shortid = require('shortid');
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
@@ -61,11 +62,15 @@ module.exports.update = function(callback) {
                 if (!pois.length) return callback();
 
                 pois.forEach(function(poi) {
-                  if (poi.file) {
+                  if (poi.file)
                     poi.file.path = path.join(poiFileDestinationPath, poi.file.fileName);
-                  }
+
                   if (poi.description)
                     poi.descriptionText = openVeoApi.util.removeHtmlFromText(poi.description);
+
+                  if (!poi.id)
+                    poi.id = shortid.generate();
+
                 });
 
                 poiProvider.add(pois, callback);

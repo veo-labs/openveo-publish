@@ -53,7 +53,7 @@ PoiProvider.prototype.add = function(pois, callback) {
   for (var i = 0; i < pois.length; i++) {
     var poi = pois[i];
 
-    if (!poi.name || !Object.prototype.hasOwnProperty.call(poi, 'value'))
+    if (!Object.prototype.hasOwnProperty.call(poi, 'name') || !Object.prototype.hasOwnProperty.call(poi, 'value'))
       return this.executeCallback(callback, new TypeError('Requires name and value to add a point of interest'));
 
     var poiToAdd = {
