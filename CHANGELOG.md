@@ -1,3 +1,9 @@
+# 11.0.2 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix 7.0.0 migration which wasn't working for videos in a transitional state crashing the server
+
 # 11.0.1 / 2020-05-05
 
 ## BUG FIXES

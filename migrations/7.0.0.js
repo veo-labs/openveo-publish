@@ -3,10 +3,13 @@
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var Package = process.requirePublish('app/server/packages/Package.js');
 
 module.exports.update = function(callback) {
   process.logger.info('Publish 7.0.0 migration launched.');
   var settingProvider = process.api.getCoreApi().settingProvider;
+  var videoProvider = new VideoProvider(process.api.getCoreApi().getDatabase());
 
   async.series([
 
@@ -62,6 +65,57 @@ module.exports.update = function(callback) {
             // Remove publish-defaultUpload settings
             settingProvider.remove(new ResourceFilter().equal('id', 'publish-defaultUpload'), callback);
           });
+        }
+      );
+    },
+
+    /**
+     * Renames mediaConfigured state and configureMedia transition.
+     *
+     * Transition configureMedia and its associated state mediaConfigured have been respectively renamed into
+     * synchronizeMedia and mediaSynchronized.
+     * Videos with lastState set to mediaConfigured or lastTransition to configureMedia have to be migrated.
+     */
+    function(callback) {
+      videoProvider.getAll(
+        null,
+        {
+          include: ['id', 'lastState', 'lastTransition']
+        },
+        {id: 'desc'},
+        function(error, medias) {
+          if (error) return callback(error);
+
+          // No medias
+          // No need to change anything
+          if (!medias || !medias.length) return callback();
+
+          var asyncActions = [];
+
+          medias.forEach(function(media) {
+            if (media.lastState !== 'mediaConfigured' && media.lastTransition !== 'configureMedia') {
+              return;
+            }
+
+            var data = {};
+            if (media.lastState === 'mediaConfigured') {
+              data.lastState = Package.STATES.MEDIA_SYNCHRONIZED;
+            }
+
+            if (media.lastTransition === 'configureMedia') {
+              data.lastTransition = Package.TRANSITIONS.SYNCHRONIZE_MEDIA;
+            }
+
+            asyncActions.push(function(callback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                data,
+                callback
+              );
+            });
+          });
+
+          async.parallel(asyncActions, callback);
         }
       );
     }
