@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>app/client/admin/js/ovPub/PublishService.js - OpenVeo Publish AngularJS back end</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish AngularJS back end</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 11.0.2
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/millisecondsToTime.html">millisecondsToTime</a></li>
+                                <li><a href="../classes/ovpTime.html">ovpTime</a></li>
+                                <li><a href="../classes/publishService.html">publishService</a></li>
+                                <li><a href="../classes/timeToMilliseconds.html">timeToMilliseconds</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/ov.publish.html">ov.publish</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: app/client/admin/js/ovPub/PublishService.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+(function(app) {
+
+  /**
+   * Defines a publish service to manage medias, categories and properties.
+   *
+   * @module ov.publish
+   * @class publishService
+   */
+  function PublishService($http, $q, entityService, publishName, Upload) {
+    var basePath = &#x27;/be/&#x27;;
+    var properties;
+    var taxonomyCategory;
+    var categoriesOptions;
+    var categoriesByKey;
+    var platforms;
+    var mediaChapter = {};
+
+    /**
+     * Retries a media.
+     *
+     * If a media is on error, the upload / publication process has stopped and can be retried.
+     *
+     * @param {String} id The id of the media to retry
+     * @return {Promise} The HTTP promise
+     * @method retryMedia
+     */
+    function retryMedia(id) {
+      entityService.deleteCache(&#x27;videos&#x27;, publishName);
+      return $http.post(basePath + &#x27;publish/retryVideo/&#x27; + id);
+    }
+
+    /**
+     * Publishes the given media.
+     *
+     * @param {String} id The id of the media to publish
+     * @return {Promise} The HTTP promise
+     * @method publishMedia
+     */
+    function publishMedia(id) {
+      entityService.deleteCache(&#x27;videos&#x27;, publishName);
+      return $http.post(basePath + &#x27;publish/publishVideo/&#x27; + id);
+    }
+
+    /**
+     * Unpublishes the given media.
+     *
+     * @param {String} id The id of the media to unpublish
+     * @return {Promise} The HTTP promise
+     * @method unpublishMedia
+     */
+    function unpublishMedia(id) {
+      entityService.deleteCache(&#x27;videos&#x27;, publishName);
+      return $http.post(basePath + &#x27;publish/unpublishVideo/&#x27; + id);
+    }
+
+    /**
+     * Loads all properties from server.
+     *
+     * @return {Promise} The HTTP promise
+     * @method loadProperties
+     */
+    function loadProperties() {
+      if (!properties) {
+        return entityService.getAllEntities(&#x27;properties&#x27;, publishName).then(function(results) {
+          properties = results.data.entities;
+          return $q.when(results);
+        });
+      }
+
+      return $q.when({
+        data: {
+          entities: properties
+        }
+      });
+    }
+
+    /**
+     * Gets list of properties.
+     *
+     * @return {Promise} The HTTP promise
+     * @method getProperties
+     */
+    function getProperties() {
+      return properties;
+    }
+
+    /**
+     * Loads the list of available media platforms from server.
+     *
+     * @return {Promise} The promise used to retrieve platforms from server
+     * @method loadPlatforms
+     */
+    function loadPlatforms() {
+      if (!platforms) {
+        return $http.get(basePath + &#x27;publish/getPlatforms&#x27;).then(function(results) {
+          platforms = results.data.platforms;
+          return $q.when(results);
+        });
+      }
+
+      return $q.when({
+        data: {
+          platforms: platforms
+        }
+      });
+    }
+
+    /**
+     * Gets the list of available platforms.
+     *
+     * @return {Promise} The HTTP promise
+     * @method getPlatforms
+     */
+    function getPlatforms() {
+      return platforms;
+    }
+
+    /**
+     * Asks server to start uploading a media waiting for manual upload.
+     *
+     * @param {String} id The id of the media to start uploading
+     * @param {String} platform The media platform to upload to
+     * @return {Promise} The HTTP promise
+     * @method startMediaUpload
+     */
+    function startMediaUpload(id, platform) {
+      entityService.deleteCache(&#x27;videos&#x27;, publishName);
+      return $http.post(basePath + &#x27;publish/startUpload/&#x27; + id + &#x27;/&#x27; + platform);
+    }
+
+    /**
+     * Loads taxonomy &quot;categories&quot;.
+     *
+     * @return {Promise} The HTTP promise
+     * @method loadTaxonomyCategory
+     */
+    function loadTaxonomyCategory() {
+      if (!taxonomyCategory) {
+
+        categoriesByKey = {};
+        categoriesOptions = [];
+
+        var loadCategory = function(category) {
+          if (!category) return;
+
+          var term = {
+            value: category.id,
+            name: category.title
+          };
+          categoriesByKey[category.id] = term;
+          categoriesOptions.push(term);
+
+          if (category.items &amp;&amp; category.items.length) {
+            category.items.forEach(function(subCategory) {
+              loadCategory(subCategory);
+            });
+          }
+        };
+
+        // Get taxonomy &quot;categories&quot; from server
+        return $http.get(basePath + &#x27;taxonomies?query=categories&#x27;).then(function(results) {
+          taxonomyCategory = results.data.entities &amp;&amp; results.data.entities[0];
+
+          if (taxonomyCategory &amp;&amp; taxonomyCategory.tree) {
+            taxonomyCategory.tree.forEach(function(category) {
+              loadCategory(category);
+            });
+          }
+
+          return $q.when({
+            data: taxonomyCategory
+          });
+        });
+
+      }
+      return $q.when({
+        data: taxonomyCategory
+      });
+    }
+
+    /**
+     * Gets the taxonomy &quot;categories&quot;.
+     *
+     * @return {Object} The taxonomy
+     * @method getTaxonomyCategory
+     */
+    function getTaxonomyCategory() {
+      return taxonomyCategory;
+    }
+
+    /**
+     * Gets the list of categories formatted for an HTMLSelect element.
+     *
+     * @return {Array} The list of categories
+     * @method getCategoriesOptions
+     */
+    function getCategoriesOptions() {
+      return categoriesOptions;
+    }
+
+    /**
+     * Gets list of categories indexed by keys.
+     *
+     * @return {Object} The list of categories
+     * @method getCategoriesByKey
+     */
+    function getCategoriesByKey() {
+      return categoriesByKey;
+    }
+
+    /**
+     * Loads a media by its id.
+     *
+     * @param {String} id The media id
+     * @return {Promise} The HTTP promise
+     * @method loadMedia
+     */
+    function loadMedia(id) {
+      if (!mediaChapter[id]) {
+        return entityService.getEntity(&#x27;videos&#x27;, publishName, id).then(function(results) {
+          mediaChapter[id] = results.data.entity;
+          return $q.when(results);
+        });
+      }
+      return $q.when({
+        data: {
+          entity: mediaChapter[id]
+        }
+      });
+    }
+
+    /**
+     * Saves watcher settings.
+     *
+     * @method saveWatcherSettings
+     * @param {Object} data The watcher settings
+     * @return {HttpPromise} The HTTP promise
+     */
+    function saveWatcherSettings(data) {
+      return $http.post(basePath + &#x27;publish/configuration/watcher/&#x27;, data);
+    }
+
+    /**
+     * Saves TLS settings.
+     *
+     * @method saveTlsSettings
+     * @param {Object} data The TLS settings
+     * @return {HttpPromise} The HTTP promise
+     */
+    function saveTlsSettings(data) {
+      return $http.post(basePath + &#x27;publish/configuration/tls/&#x27;, data);
+    }
+
+    /**
+     * Saves catalog settings.
+     *
+     * @method saveCatalogSettings
+     * @param {Object} data The catalog settings
+     * @return {HttpPromise} The HTTP promise
+     */
+    function saveCatalogSettings(data) {
+      return $http.post(basePath + &#x27;publish/configuration/catalog/&#x27;, data);
+    }
+
+    /**
+     * Updates a chapter associated to the specified media.
+     *
+     * @method updateChapter
+     * @param {String} id The media id
+     * @param {Object} chapter Information about the chapter
+     * @param {String} [chapter.id] The chapter id
+     * @param {Number} [chapter.value] The chapter time in milliseconds
+     * @param {String} [chapter.name] The chapter name
+     * @param {String} [chapter.description] The chapter description
+     * @return {HttpPromise} The HTTP promise
+     */
+    function updateChapter(id, chapter) {
+      return Upload.upload({
+        url: &#x27;/be/publish/videos/&#x27; + id + &#x27;/chapters/&#x27; + (chapter.id || &#x27;&#x27;),
+        data: {
+          info: Upload.json(chapter)
+        }
+      });
+    }
+
+    /**
+     * Updates a tag associated to the specified media.
+     *
+     * @method updateTag
+     * @param {String} id The media id
+     * @param {Object} file The file to upload
+     * @param {Object} tag Information about the tag
+     * @param {String} [tag.id] The tag id
+     * @param {Number} [tag.value] The tag time in milliseconds
+     * @param {String} [tag.name] The tag name
+     * @param {String} [tag.description] The tag description
+     * @return {Promise} The HTTP promise
+     */
+    function updateTag(id, file, tag) {
+      return Upload.upload({
+        url: &#x27;/be/publish/videos/&#x27; + id + &#x27;/tags/&#x27; + (tag.id || &#x27;&#x27;),
+        data: {info: Upload.json(tag), file: file}
+      });
+    }
+
+    /**
+     * Remove tags from media.
+     *
+     * @method removeTags
+     * @param {String} id The media id
+     * @param {Array} tagIds The list of tag ids to remove
+     * @return {Promise} The HTTP promise
+     */
+    function removeTags(id, tagIds) {
+      return $http.delete(basePath + &#x27;publish/videos/&#x27; + id + &#x27;/tags/&#x27; + tagIds.join(&#x27;,&#x27;));
+    }
+
+    /**
+     * Removes chapters from media.
+     *
+     * @method removeChapters
+     * @param {String} id The media id
+     * @param {Array} chapterIds The list of chapter ids to remove
+     * @return {HttpPromise} The HTTP promise
+     */
+    function removeChapters(id, chapterIds) {
+      return $http.delete(basePath + &#x27;publish/videos/&#x27; + id + &#x27;/chapters/&#x27; + chapterIds.join(&#x27;,&#x27;));
+    }
+
+    /**
+     * Clears a publish service cache.
+     *
+     * @param {String} [type] The cache element to clear (**properties**, **categories** or **editor**), null to
+     * clear all caches
+     * @method cacheClear
+     */
+    function cacheClear(type) {
+      if (!type) {
+        properties = taxonomyCategory = null;
+        mediaChapter = {};
+      } else
+        switch (type) {
+          case &#x27;properties&#x27;:
+            properties = null;
+            break;
+          case &#x27;categories&#x27;:
+            taxonomyCategory = null;
+            categoriesOptions = null;
+            categoriesByKey = null;
+            break;
+          case &#x27;editor&#x27;:
+            mediaChapter = {};
+            break;
+          default:
+            return;
+        }
+    }
+
+    /**
+     * Retrieves publish plugin configuration.
+     *
+     * @return {Promise} The HTTP promise
+     * @method getConfiguration
+     */
+    function getConfiguration() {
+      return $http.get(basePath + &#x27;publish/configuration/all&#x27;);
+    }
+
+    /**
+     * Adds a media.
+     *
+     * @param {Object} Information about the media
+     * @return {Promise} An HTTP promise resolving when media has been added
+     * @method addMedia
+     */
+    function addMedia(data) {
+      var file = data.file;
+      var thumbnail = data.thumbnail;
+      delete data.file;
+      delete data.thumbnail;
+
+      return Upload.upload({
+        url: &#x27;/be/publish/addMedia&#x27;,
+        data: {info: Upload.json(data), file: file, thumbnail: thumbnail}
+      });
+    }
+
+    /**
+     * Update a media
+     *
+     * @param {Object} Information about the media
+     * @return {Promise} An HTTP promise resolving when media has been updated
+     * @method updateMedia
+     */
+    function updateMedia(id, data) {
+      var thumbnail = data.thumbnail;
+
+      delete data.thumbnail;
+
+      entityService.deleteCache(&#x27;videos&#x27;, publishName);
+
+      return Upload.upload({
+        url: &#x27;/be/publish/videos/&#x27; + id,
+        data: {info: Upload.json(data), thumbnail: thumbnail}
+      });
+    }
+
+    return {
+      addMedia: addMedia,
+      updateMedia: updateMedia,
+      retryMedia: retryMedia,
+      publishMedia: publishMedia,
+      unpublishMedia: unpublishMedia,
+      startMediaUpload: startMediaUpload,
+      loadProperties: loadProperties,
+      getProperties: getProperties,
+      loadTaxonomyCategory: loadTaxonomyCategory,
+      getTaxonomyCategory: getTaxonomyCategory,
+      getCategoriesOptions: getCategoriesOptions,
+      getCategoriesByKey: getCategoriesByKey,
+      loadPlatforms: loadPlatforms,
+      getPlatforms: getPlatforms,
+      loadMedia: loadMedia,
+      getConfiguration: getConfiguration,
+      saveWatcherSettings: saveWatcherSettings,
+      saveTlsSettings: saveTlsSettings,
+      saveCatalogSettings: saveCatalogSettings,
+      updateTag: updateTag,
+      updateChapter: updateChapter,
+      removeTags: removeTags,
+      removeChapters: removeChapters,
+      cacheClear: cacheClear
+    };
+
+  }
+
+  app.factory(&#x27;publishService&#x27;, PublishService);
+  PublishService.$inject = [&#x27;$http&#x27;, &#x27;$q&#x27;, &#x27;entityService&#x27;, &#x27;publishName&#x27;, &#x27;Upload&#x27;];
+
+})(angular.module(&#x27;ov.publish&#x27;));
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

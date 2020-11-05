@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>app/server/providers/PoiProvider.js - OpenVeo Publish server</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish server</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 11.0.2
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/ConfigurationController.html">ConfigurationController</a></li>
+                                <li><a href="../classes/DirectoryFsWatcher.html">DirectoryFsWatcher</a></li>
+                                <li><a href="../classes/DirectoryWatcher.html">DirectoryWatcher</a></li>
+                                <li><a href="../classes/ERRORS.html">ERRORS</a></li>
+                                <li><a href="../classes/factory.html">factory</a></li>
+                                <li><a href="../classes/GoogleOAuthHelper.html">GoogleOAuthHelper</a></li>
+                                <li><a href="../classes/HTTP_ERRORS.html">HTTP_ERRORS</a></li>
+                                <li><a href="../classes/listener.html">listener</a></li>
+                                <li><a href="../classes/LocalProvider.html">LocalProvider</a></li>
+                                <li><a href="../classes/mediaPlatformFactory.html">mediaPlatformFactory</a></li>
+                                <li><a href="../classes/MediaPlatformProvider.html">MediaPlatformProvider</a></li>
+                                <li><a href="../classes/Package.html">Package</a></li>
+                                <li><a href="../classes/PackageError.html">PackageError</a></li>
+                                <li><a href="../classes/PoiProvider.html">PoiProvider</a></li>
+                                <li><a href="../classes/PropertyController.html">PropertyController</a></li>
+                                <li><a href="../classes/PropertyProvider.html">PropertyProvider</a></li>
+                                <li><a href="../classes/PUBLISH_HOOKS.html">PUBLISH_HOOKS</a></li>
+                                <li><a href="../classes/PublishError.html">PublishError</a></li>
+                                <li><a href="../classes/PublishManager.html">PublishManager</a></li>
+                                <li><a href="../classes/PublishPlugin.html">PublishPlugin</a></li>
+                                <li><a href="../classes/PublishPluginApi.html">PublishPluginApi</a></li>
+                                <li><a href="../classes/ResumableUpload.html">ResumableUpload</a></li>
+                                <li><a href="../classes/STATES.html">STATES</a></li>
+                                <li><a href="../classes/StatisticsController.html">StatisticsController</a></li>
+                                <li><a href="../classes/TarPackage.html">TarPackage</a></li>
+                                <li><a href="../classes/TarPackageError.html">TarPackageError</a></li>
+                                <li><a href="../classes/TlsClient.html">TlsClient</a></li>
+                                <li><a href="../classes/TlsProvider.html">TlsProvider</a></li>
+                                <li><a href="../classes/TYPES.html">TYPES</a></li>
+                                <li><a href="../classes/VideoController.html">VideoController</a></li>
+                                <li><a href="../classes/VideoPackage.html">VideoPackage</a></li>
+                                <li><a href="../classes/VideoPackageError.html">VideoPackageError</a></li>
+                                <li><a href="../classes/VideoProvider.html">VideoProvider</a></li>
+                                <li><a href="../classes/VimeoProvider.html">VimeoProvider</a></li>
+                                <li><a href="../classes/Watcher.html">Watcher</a></li>
+                                <li><a href="../classes/WatcherError.html">WatcherError</a></li>
+                                <li><a href="../classes/WowzaProvider.html">WowzaProvider</a></li>
+                                <li><a href="../classes/YoutubeProvider.html">YoutubeProvider</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/controllers.html">controllers</a></li>
+                                <li><a href="../modules/packages.html">packages</a></li>
+                                <li><a href="../modules/providers.html">providers</a></li>
+                                <li><a href="../modules/publish.html">publish</a></li>
+                                <li><a href="../modules/watcher.html">watcher</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: app/server/providers/PoiProvider.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+/**
+ * @module providers
+ */
+
+var util = require(&#x27;util&#x27;);
+var async = require(&#x27;async&#x27;);
+var shortid = require(&#x27;shortid&#x27;);
+var openVeoApi = require(&#x27;@openveo/api&#x27;);
+var fileSystemApi = openVeoApi.fileSystem;
+var NotFoundError = openVeoApi.errors.NotFoundError;
+
+/**
+ * Defines a PoiProvider to get and save points of interest.
+ *
+ * @class PoiProvider
+ * @extends EntityProvider
+ * @constructor
+ * @param {Database} database The database to interact with
+ */
+function PoiProvider(database) {
+  PoiProvider.super_.call(this, database, &#x27;publish_poi&#x27;);
+}
+
+module.exports = PoiProvider;
+util.inherits(PoiProvider, openVeoApi.providers.EntityProvider);
+
+/**
+ * Adds points of interest.
+ *
+ * @method add
+ * @async
+ * @param {Array} pois The list of points of interest to store with for each point of interest:
+ *   - **String** name The point of interest name
+ *   - **Number** value The point of interest time in milliseconds
+ *   - **String** [description] The point of interest description
+ *   - **Object** [poi.file] The file to associate to the point of interest
+ *     - **String** poi.file.originalName The file original name
+ *     - **String** poi.file.mimeType The file MIME type
+ *     - **String** poi.file.fileName The file name
+ *     - **Number** poi.file.size The file size in Bytes
+ *     - **String** poi.file.url The file URL
+ *     - **String** poi.file.path The file path on the file system
+ * @param {Function} [callback] The function to call when it&#x27;s done with:
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The total amount of points of interest inserted
+ *   - **Array** The list of added points of interest
+ */
+PoiProvider.prototype.add = function(pois, callback) {
+  var poisToAdd = [];
+
+  for (var i = 0; i &lt; pois.length; i++) {
+    var poi = pois[i];
+
+    if (!Object.prototype.hasOwnProperty.call(poi, &#x27;name&#x27;) || !Object.prototype.hasOwnProperty.call(poi, &#x27;value&#x27;))
+      return this.executeCallback(callback, new TypeError(&#x27;Requires name and value to add a point of interest&#x27;));
+
+    var poiToAdd = {
+      id: poi.id || shortid.generate(),
+      name: poi.name,
+      value: poi.value,
+      description: poi.description,
+      descriptionText: poi.description &amp;&amp; openVeoApi.util.removeHtmlFromText(poi.description),
+      file: null
+    };
+
+    if (poi.file) {
+      poiToAdd.file = {
+        originalName: poi.file.originalName,
+        mimeType: poi.file.mimeType,
+        fileName: poi.file.fileName,
+        size: poi.file.size,
+        url: poi.file.url,
+        path: poi.file.path
+      };
+    }
+
+    poisToAdd.push(poiToAdd);
+  }
+
+  PoiProvider.super_.prototype.add.call(this, poisToAdd, callback);
+};
+
+/**
+ * Updates a point of interest.
+ *
+ * @method updateOne
+ * @async
+ * @param {ResourceFilter} [filter] Rules to filter the point of interest to update
+ * @param {Object} poi The point of interest description object
+ * @param {Number} [poi.value] The point of interest time in milliseconds
+ * @param {String} [poi.name] The point of interest name
+ * @param {String} [poi.description] The point of interest description
+ * @param {Object} [poi.file] The new file to associate to the point of interest replacing the previous one, if null
+ * the file is removed
+ * @param {String} [poi.file.originalName] The file original name
+ * @param {String} [poi.file.mimeType] The file MIME type
+ * @param {String} [poi.file.fileName] The file name
+ * @param {String} [poi.file.size] The file size in Bytes
+ * @param {String} [poi.file.url] The file URL
+ * @param {String} [poi.file.path] The file path on the file system
+ * @param {Function} [callback] The function to call when it&#x27;s done with:
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** 1 if everything went fine
+ */
+PoiProvider.prototype.updateOne = function(filter, poi, callback) {
+  var self = this;
+  var oldFilePath;
+  var total;
+  var asyncFunctions = [];
+
+  // Get point of interest
+  this.getOne(
+    filter,
+    {
+      include: [&#x27;id&#x27;, &#x27;file&#x27;]
+    },
+    function(getOneError, storedPoi) {
+      if (getOneError) return self.executeCallback(callback, getOneError);
+      if (!storedPoi) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
+
+      if (poi.file) {
+
+        // New file
+
+        // Old file should be deleted
+        // Mark old file as &quot;to be deleted&quot;
+        if (storedPoi.file)
+          oldFilePath = storedPoi.file.path;
+
+        storedPoi.file = {
+          originalName: poi.file.originalName,
+          mimeType: poi.file.mimeType,
+          fileName: poi.file.fileName,
+          size: poi.file.size,
+          url: poi.file.url,
+          path: poi.file.path
+        };
+
+      } else if (poi.file === null) {
+
+        // No file is associated to the point of interest anymore
+
+        if (storedPoi.file) {
+
+          // No more file associated to the point of interest
+          // Mark old file as &quot;to be deleted&quot;
+          oldFilePath = storedPoi.file.path;
+
+        }
+
+        storedPoi.file = null;
+      }
+
+      if (poi.name) storedPoi.name = poi.name;
+      if (Object.prototype.hasOwnProperty.call(poi, &#x27;value&#x27;)) storedPoi.value = poi.value;
+      if (Object.prototype.hasOwnProperty.call(poi, &#x27;description&#x27;)) {
+        storedPoi.description = poi.description;
+        storedPoi.descriptionText = poi.description ? openVeoApi.util.removeHtmlFromText(poi.description) : null;
+      }
+
+      // Remove file
+      if (oldFilePath) {
+        asyncFunctions.push(function(removeCallback) {
+          fileSystemApi.rm(oldFilePath, function(removeError) {
+            removeCallback(removeError);
+          });
+        });
+      }
+
+      // Update point of interest
+      asyncFunctions.push(function(updateCallback) {
+        PoiProvider.super_.prototype.updateOne.call(self, filter, storedPoi, function(error, updateTotal) {
+          total = updateTotal;
+          self.executeCallback(updateCallback, error);
+        });
+      });
+
+      async.parallel(asyncFunctions, function(error) {
+        return self.executeCallback(callback, error, total);
+      });
+
+    }
+  );
+};
+
+/**
+ * Removes points of interest.
+ *
+ * File associated to the points of interest will be removed as well.
+ *
+ * @method remove
+ * @async
+ * @param {ResourceFilter} [filter] Rules to filter points of interest to remove
+ * @param {Function} [callback] The function to call when it&#x27;s done with:
+ *   - **Error** The error if an error occurred, null otherwise
+ *   - **Number** The number of removed points of interest
+ */
+PoiProvider.prototype.remove = function(filter, callback) {
+  var self = this;
+  var pois;
+  var totalRemovedPois = 0;
+
+  async.series([
+
+    // Get points of interest
+    function(callback) {
+      self.getAll(filter,
+        {
+          include: [&#x27;id&#x27;, &#x27;file&#x27;]
+        },
+        {
+          id: &#x27;desc&#x27;
+        },
+        function(getAllError, fetchedPois) {
+          pois = fetchedPois;
+          return self.executeCallback(callback, getAllError);
+        }
+      );
+    },
+
+    // Remove related files
+    function(callback) {
+      if (!pois || !pois.length) return callback();
+
+      var asyncFunctions = [];
+      var filesPaths = pois.map(function(poi) {
+        return poi.file ? poi.file.path : null;
+      });
+
+      if (!filesPaths.length) return callback();
+      filesPaths.forEach(function(filePath) {
+        if (!filePath) return;
+
+        asyncFunctions.push(function(removeCallback) {
+          fileSystemApi.rm(filePath, function(removeError) {
+            if (removeError &amp;&amp; removeError.code !== &#x27;ENOENT&#x27;) return removeCallback(removeError);
+            removeCallback();
+          });
+        });
+      });
+
+      async.parallel(asyncFunctions, function(error) {
+        self.executeCallback(callback, error);
+      });
+    },
+
+    // Remove points of interest
+    function(callback) {
+      if (!pois || !pois.length) return callback();
+
+      PoiProvider.super_.prototype.remove.call(self, filter, function(error, total) {
+        totalRemovedPois = total;
+        self.executeCallback(callback, error);
+      });
+    }
+
+  ], function(error) {
+    self.executeCallback(callback, error, totalRemovedPois);
+  });
+
+};
+
+/**
+ * Creates points of interest indexes.
+ *
+ * @method createIndexes
+ * @async
+ * @param {Function} callback Function to call when it&#x27;s done with:
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+PoiProvider.prototype.createIndexes = function(callback) {
+  var language = process.api.getCoreApi().getContentLanguage();
+
+  this.storage.createIndexes(this.location, [
+
+    // eslint-disable-next-line camelcase
+    {key: {name: &#x27;text&#x27;, descriptionText: &#x27;text&#x27;}, weights: {name: 2}, default_language: language, name: &#x27;querySearch&#x27;}
+
+  ], function(error, result) {
+    if (result &amp;&amp; result.note)
+      process.logger.debug(&#x27;Create points of interest indexes : &#x27; + result.note);
+
+    callback(error);
+  });
+};
+
+/**
+ * Drops an index from database collection.
+ *
+ * @method dropIndex
+ * @async
+ * @param {String} indexName The name of the index to drop
+ * @param {Function} callback Function to call when it&#x27;s done with:
+ *  - **Error** An error if something went wrong, null otherwise
+ */
+PoiProvider.prototype.dropIndex = function(indexName, callback) {
+  this.storage.dropIndex(this.location, indexName, function(error, result) {
+    if (result &amp;&amp; result.ok)
+      process.logger.debug(&#x27;Index &quot;&#x27; + indexName + &#x27;&quot; dropped&#x27;);
+
+    callback(error);
+  });
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
