@@ -105,7 +105,6 @@ Object.freeze(TarPackage.STATES);
 TarPackage.TRANSITIONS = {
   EXTRACT_PACKAGE: 'extractPackage',
   VALIDATE_PACKAGE: 'validatePackage',
-  PREPARE_PACKAGE: 'preparePublicDirectory',
   SAVE_TIMECODES: 'saveTimecodes'
 };
 Object.freeze(TarPackage.TRANSITIONS);

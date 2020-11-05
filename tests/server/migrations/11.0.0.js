@@ -6,6 +6,8 @@ var spies = require('chai-spies');
 var api = require('@openveo/api');
 var mock = require('mock-require');
 var ResourceFilter = api.storages.ResourceFilter;
+var Package = process.requirePublish('app/server/packages/Package.js');
+var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
 
 var assert = chai.assert;
 chai.should();
@@ -26,9 +28,9 @@ describe('Migration 11.0.0', function() {
     expectedMedias = [];
 
     VideoProvider = function() {};
-    VideoProvider.prototype.getAll = function(filter, fields, sort, callback) {
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
       callback(null, expectedMedias);
-    };
+    });
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(null, 1);
     });
@@ -362,7 +364,7 @@ describe('Migration 11.0.0', function() {
     });
   });
 
-  it('should not update medias without tags nor chapters nor description', function(done) {
+  it('should not update medias without tags, chapters or description', function(done) {
     expectedMedias = [
       {
         id: '42'
@@ -479,6 +481,169 @@ describe('Migration 11.0.0', function() {
 
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
       callback(expectedError);
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should rename "grouped" lastState into "merged"', function(done) {
+    var expectedMediaId = '42';
+
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        lastState: 'grouped'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+      assert.equal(modifications.lastState, VideoPackage.STATES.MERGED, 'Wrong last state');
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should rename "group" lastTransition into "merge"', function(done) {
+    var expectedMediaId = '42';
+
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        lastTransition: 'group'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+      assert.equal(modifications.lastTransition, VideoPackage.TRANSITIONS.MERGE, 'Wrong last transition');
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should rename "publicDirectoryPrepared" lastState into "metadataRetrieved"', function(done) {
+    var expectedMediaId = '42';
+
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        lastState: 'publicDirectoryPrepared'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+      assert.equal(modifications.lastState, VideoPackage.STATES.METADATA_RETRIEVED, 'Wrong last state');
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should rename "preparePublicDirectory" lastTransition into "uploadMedia"', function(done) {
+    var expectedMediaId = '42';
+
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        lastTransition: 'preparePublicDirectory'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      assert.equal(
+        filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+        expectedMedias[0].id,
+        'Wrong id'
+      );
+      assert.equal(modifications.lastTransition, Package.TRANSITIONS.UPLOAD_MEDIA, 'Wrong last transition');
+
+      callback();
+    });
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if getting medias for transitions failed', function(done) {
+    var expectedMediaId = '42';
+    var expectedError = new Error('Something went wrong');
+
+    expectedMedias = [
+      {
+        id: expectedMediaId,
+        lastTransition: 'preparePublicDirectory'
+      }
+    ];
+
+    VideoProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
+      if (fields.include.indexOf('lastState') >= 0) {
+        callback(expectedError);
+      } else {
+        callback();
+      }
+    });
+
+    migration.update(function(error) {
+      assert.strictEqual(error, expectedError, 'Unexpected error');
+      VideoProvider.prototype.getAll.should.have.been.called.at.least(1);
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
+  it('should execute callback with an error if renaming media lastState or lastTransition failed', function(done) {
+    var expectedError = new Error('Something went wrong');
+    expectedMedias = [
+      {
+        id: '42',
+        lastState: 'grouped'
+      }
+    ];
+
+    VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
+      if (modifications.lastState === VideoPackage.STATES.MERGED) {
+        callback(expectedError);
+      } else {
+        callback();
+      }
     });
 
     migration.update(function(error) {

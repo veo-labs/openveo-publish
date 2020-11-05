@@ -7,6 +7,8 @@ var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var Package = process.requirePublish('app/server/packages/Package.js');
+var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 module.exports.update = function(callback) {
@@ -192,6 +194,64 @@ module.exports.update = function(callback) {
         }
 
       ], callback);
+    },
+
+    /**
+     * Updates transitional videos lastState and lastTransition.
+     *
+     * Transition "preparePublicDirectory" and associated state "publicDirectoryPrepared" have been removed and should
+     * be replaced respectively by "uploadMedia" and "metadataRetrieved".
+     * Also the "group" transition and its associated state "grouped" have been renamed into "merge" and "merged".
+     *
+     * All videos with these transitions / states have to be migrated.
+     */
+    function(callback) {
+      videoProvider.getAll(
+        null,
+        {
+          include: ['id', 'lastState', 'lastTransition']
+        },
+        {id: 'desc'},
+        function(error, medias) {
+          if (error) return callback(error);
+
+          // No medias
+          // No need to change anything
+          if (!medias || !medias.length) return callback();
+
+          var asyncActions = [];
+
+          medias.forEach(function(media) {
+            var data = {};
+
+            if (media.lastState === 'grouped') {
+              data.lastState = VideoPackage.STATES.MERGED;
+            } else if (media.lastState === 'publicDirectoryPrepared') {
+              data.lastState = VideoPackage.STATES.METADATA_RETRIEVED;
+            }
+
+            if (media.lastTransition === 'group') {
+              data.lastTransition = VideoPackage.TRANSITIONS.MERGE;
+            } else if (media.lastTransition === 'preparePublicDirectory') {
+              data.lastTransition = Package.TRANSITIONS.UPLOAD_MEDIA;
+            }
+
+            if (!data.lastState && !data.lastTransition) {
+              return;
+            }
+
+            asyncActions.push(function(callback) {
+              videoProvider.updateOne(
+                new ResourceFilter().equal('id', media.id),
+                data,
+                callback
+              );
+            });
+          });
+
+          async.parallel(asyncActions, callback);
+        }
+      );
     }
 
   ], function(error, results) {

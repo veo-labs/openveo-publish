@@ -2,7 +2,7 @@
 
 ## BUG FIXES
 
-- Fix 7.0.0 migration which wasn't working for videos in a transitional state crashing the server
+- Fix 7.0.0 and 11.0.0 migrations which weren't working for videos in a transitional state crashing the server. To avoid problems during migration make sure all videos are in a stable state (either "Ready", "Waiting for upload" or "Published"), videos in "Error" should be treated before updating
 
 # 11.0.1 / 2020-05-05
 
