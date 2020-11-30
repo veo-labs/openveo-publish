@@ -1,8 +1,8 @@
-# 11.0.3 / YYYY-MM-DD
+# 11.0.3 / 2020-11-30
 
 ## BUG FIXES
 
-- Reduce the number of request made on Youtube API. A request was sent to Youtube API each time a Youtube video was played
+- Fix crash when trying to access a Youtube video while OpenVeo Publish is configured without Youtube configuration. This is a safe guard as it shouldn't be possible to have Youtube videos without Youtube configuration
 
 # 11.0.2 / 2020-11-05
 
