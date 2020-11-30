@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>app/client/admin/js/ovPub/EditorController.js - OpenVeo Publish AngularJS back end</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish AngularJS back end</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 11.0.3
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/millisecondsToTime.html">millisecondsToTime</a></li>
+                                <li><a href="../classes/ovpTime.html">ovpTime</a></li>
+                                <li><a href="../classes/publishService.html">publishService</a></li>
+                                <li><a href="../classes/timeToMilliseconds.html">timeToMilliseconds</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/ov.publish.html">ov.publish</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: app/client/admin/js/ovPub/EditorController.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+(function(app) {
+
+  /**
+   * Defines the categories controller for the categories page.
+   */
+  function EditorController(
+    $window,
+    $scope,
+    $http,
+    $filter,
+    $timeout,
+    i18nService,
+    ovMultirangeViews,
+    media,
+    publishName,
+    publishService
+  ) {
+
+    var orderBy = $filter(&#x27;orderBy&#x27;);
+    var uploadAborted = false;
+
+    /**
+     * Reconstructs ranges with chapters and cut array.
+     */
+    function updateRange() {
+      $scope.ranges = ($scope.media[$scope.selectedData.value] || []).concat($scope.media.cut || []);
+      $scope.ranges.forEach(function(range) {
+        range.value = parseInt(range.value);
+      });
+
+      orderBy($scope.ranges, &#x27;+value&#x27;, false);
+    }
+
+    /**
+     * Initializes chapters and start / end cuts.
+     */
+    function init() {
+
+      // If no chapter, add timecodes with empty values and sort them
+      if (!$scope.media.chapters) {
+        $scope.media.chapters = [];
+      }
+
+      // If no cut add it
+      if (!$scope.media.cut) {
+        $scope.media.cut = [];
+      }
+
+      // If no cut add it
+      if (!$scope.media.tags) {
+        $scope.media.tags = [];
+      }
+
+      if (null === $scope.endCut.range.value) {
+        $scope.endCut.range.value = $scope.duration;
+      }
+
+      $scope.slider = {
+        views: ovMultirangeViews.TIME($scope.duration),
+        view: 0
+      };
+    }
+
+    var myPlayer = document.getElementById(&#x27;editorPlayer&#x27;);
+    var playerController;
+
+    /**
+     * Executes, safely, the given function in AngularJS process.
+     *
+     * @param {Function} functionToExecute The function to execute as part of
+     * the angular digest process.
+     */
+    function safeApply(functionToExecute) {
+
+      // Execute each apply on a different loop
+      $timeout(function() {
+
+        // Make sure we&#x27;re not on a digestion cycle
+        var phase = $scope.$root.$$phase;
+
+        if (phase === &#x27;$apply&#x27; || phase === &#x27;$digest&#x27;)
+          functionToExecute();
+        else
+          $scope.$apply(functionToExecute);
+      }, 1);
+    }
+
+    /**
+     * Gathers some parameters before calling init.
+     *
+     * @param {Number} duration Media duration
+     */
+    function preinit(duration) {
+      safeApply(function() {
+
+        // only gets called once
+        if (!playerController || duration) {
+          playerController = angular.element(myPlayer).controller(&#x27;oplPlayer&#x27;);
+
+          // Set Duration
+          $scope.duration = duration;
+          init();
+        }
+      });
+    }
+
+    angular.element(myPlayer).on(&#x27;needPoiConversion&#x27;, function(event, duration) {
+      $http
+        .post(&#x27;/publish/videos/&#x27; + $scope.media.id + &#x27;/poi/convert&#x27;, {duration: duration})
+        .then(function(response) {
+          $scope.media = response.data.entity;
+          preinit(duration);
+        });
+    });
+
+    /**
+     *  TAG
+     */
+
+    /**
+     * Abort upload and delete file
+     *
+     */
+    function deleteUpload() {
+      if ($scope.upload) {
+        uploadAborted = true;
+        $scope.upload.abort();
+        $scope.file = null;
+      }
+    }
+
+    /**
+     * Clean object to save deleting all unecessary data
+     * @param  {String} collectionName object key of the properties to clean
+     * @param  {Bool} cleanAll condition if all Object has to be cleaned
+     * @return {Object} clean Object
+     */
+    function cleanObjectToSave(collectionName, cleanAll) {
+      var objToSave = {};
+      objToSave[collectionName] = [];
+      var tmpEl;
+      if (!cleanAll) {
+        if (Object.prototype.hasOwnProperty.call($scope.media, collectionName)) {
+          for (var i = 0; i &lt; $scope.media[collectionName].length; i++) {
+            tmpEl = angular.copy($scope.media[collectionName][i]);
+            delete tmpEl[&#x27;_depth&#x27;];
+            delete tmpEl[&#x27;select&#x27;];
+            delete tmpEl[&#x27;check&#x27;];
+            objToSave[collectionName].push(tmpEl);
+          }
+          orderBy(objToSave[collectionName], &#x27;+value&#x27;, false);
+        }
+      } else {
+        tmpEl = angular.copy($scope.selectRow ? $scope.selectRow : $scope.modelToEdit);
+        delete tmpEl[&#x27;_depth&#x27;];
+        delete tmpEl[&#x27;select&#x27;];
+        delete tmpEl[&#x27;check&#x27;];
+        objToSave[collectionName].push(tmpEl);
+      }
+
+      return objToSave;
+    }
+
+    /**
+     * Retreive element position in array by its id
+     * @param  {String} id The element id to search
+     * @return {Number} The position of this element, -1 otherwise
+     */
+    function searchPosition(id) {
+      var ids = $scope.media[$scope.selectedData.value].map(function(item) {
+        return item.id;
+      });
+      return ids.indexOf(id);
+    }
+
+
+    /**
+     * Save chapter error callback
+     */
+    function saveChapterErrorCb(resp) {
+      var fileError;
+      if (resp.status &gt; 0 &amp;&amp; !resp.data.error)
+        fileError = {message: resp.statusText};
+
+      // emit alert
+      if (uploadAborted) {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;warning&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.UPLOAD_CANCELED&#x27;), 4000);
+        uploadAborted = false;
+      } else if (fileError) {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;danger&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.SAVE_TAG_ERROR&#x27;, null, fileError));
+      } else {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;danger&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.SAVE_ERROR&#x27;));
+        if (status === 401)
+          $scope.$parent.logout();
+      }
+      $scope.upload = null;
+      $scope.file = null;
+    }
+
+    /**
+     * Save chapter success callback
+     */
+    function saveChapterSuccessCb(resp) {
+      $scope.file = null;
+      $scope.modelToEdit = resp.data.poi;
+      $scope.simpleMimeType = $scope.getFileMimeType();
+
+      var i = searchPosition($scope.modelToEdit.id);
+      if (i &lt; 0) { // ADD the new model
+        $scope.media[$scope.selectedData.value].push($scope.modelToEdit);
+      } else {
+        $scope.media[$scope.selectedData.value][i] = $scope.modelToEdit;
+      }
+
+      if ($scope.selectRow) {
+        $scope.selectRow.select = false;
+        $scope.selectRow = null;
+      }
+      updateRange();
+      $scope.isCollapsed = true;
+      $scope.upload = null;
+    }
+
+    /**
+     * Save chapter
+     */
+    function saveChapter() {
+      var objToSave = cleanObjectToSave($scope.selectedData.value, true);
+
+      if ($scope.selectedData.value === &#x27;tags&#x27;)
+        $scope.upload = publishService.updateTag($scope.media.id, $scope.file, objToSave.tags[0]);
+      else if ($scope.selectedData.value === &#x27;chapters&#x27;)
+        $scope.upload = publishService.updateChapter($scope.media.id, objToSave.chapters[0]);
+
+      $scope.upload.then(
+        saveChapterSuccessCb,
+        saveChapterErrorCb,
+        function(evt) {
+          if ($scope.file)
+            $scope.file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+        }
+      );
+    }
+
+    /*
+     * CUT
+     */
+
+    /**
+     * Selects and unselect a provided cut.
+     *
+     * @param {Object} cut The cut to toggle
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleCut(cut, addOrRemove) {
+      var index = $scope.media.cut.indexOf(cut);
+
+      // cuts will be updated by the watchCollection
+      if (index === -1 &amp;&amp; addOrRemove !== false) {
+        $scope.media.cut.push(cut);
+      } else if (index !== -1 &amp;&amp; addOrRemove !== true) {
+        cut.select = false;
+        $scope.media.cut.splice(index, 1);
+      }
+
+    }
+
+    /**
+     * Selects or unselect the begin cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleBegin(addOrRemove) {
+      toggleCut($scope.beginCut.range, addOrRemove);
+    }
+
+    /**
+     * Selects or unselect the ending cut.
+     *
+     * @param {Boolean} addOrRemove Forces the addition or removal of the cut
+     */
+    function toggleEnd(addOrRemove) {
+      toggleCut($scope.endCut.range, addOrRemove);
+    }
+
+    /**
+     * Save chapter and cut
+     */
+    function saveCut() {
+
+      // Validate if end is after begin
+      if ($scope.endCut.isInArray &amp;&amp; $scope.beginCut.isInArray &amp;&amp;
+        $scope.endCut.range.value &lt;= $scope.beginCut.range.value) {
+        // Reset end
+        $scope.endCut.range.value = $scope.duration;
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;warning&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.DELETE_END_CUT&#x27;), 8000);
+        toggleEnd(false);
+
+        // the watch for endCut.isInArray will save everything
+        $scope.endCut.isInArray = false;
+        return;
+      }
+
+      // CALL SAVE HTTP
+      var objToSave = cleanObjectToSave(&#x27;cut&#x27;);
+      publishService.updateMedia($scope.media.id, objToSave).then(function() {
+        if ($scope.selectRow) {
+          $scope.selectRow.select = false;
+          $scope.selectRow = null;
+        }
+        updateRange();
+        $scope.isCollapsed = true;
+      }).catch(function(response) {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;danger&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.SAVE_ERROR&#x27;));
+        if (response.status === 401)
+          $scope.$parent.logout();
+      });
+    }
+
+
+    /**
+     * Calling preinit with a duration chnage on the player, it sometimes fail so...
+     */
+    angular.element(myPlayer).on(&#x27;durationChange&#x27;, function(event, duration) {
+      preinit(duration);
+    });
+
+    // Listen to player errors
+    // If an error occurs go back to catalog with an alert
+    angular.element(myPlayer).on(&#x27;error&#x27;, function(event, error) {
+      if (error) {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;danger&#x27;, error.message);
+        $scope.back();
+      }
+    });
+
+    // inject Math
+    $scope.Math = window.Math;
+
+    // Init
+    $scope.dataId = [&#x27;chapters&#x27;, &#x27;tags&#x27;];
+    $scope.selectedData = {value: $scope.dataId[0]};
+
+    $scope.media = media.data.entity;
+    $scope.playerType = $scope.media.type == &#x27;youtube&#x27; ? &#x27;youtube&#x27; : &#x27;html&#x27;;
+
+    $scope.isCollapsed = true;
+    $scope.selectRow = null;
+    $scope.checkAllSelected = false;
+
+    // Copy of object to edit or add
+    $scope.modelToEdit = {};
+
+    // Backup of an existing object to cancel its edition
+    $scope.backUpRow = {};
+
+    // Init object for player
+    $scope.mediaPlayer = angular.copy($scope.media);
+
+    // Set player language
+    $scope.playerLanguage = i18nService.getLanguage();
+
+    // Init default cuts
+    $scope.beginCut = {
+      isInArray: undefined,
+      range: {
+        value: 0,
+        name: &#x27;CORE.UI.BEGIN&#x27;,
+        description: &#x27;&#x27;,
+        type: &#x27;begin&#x27;
+      }
+    };
+    $scope.endCut = {
+      isInArray: undefined,
+      range: {
+        value: null,
+        name: &#x27;CORE.UI.END&#x27;,
+        description: &#x27;&#x27;,
+        type: &#x27;end&#x27;
+      }
+    };
+
+    $scope.nbCheckRow = 0;
+
+    $scope.tinymceOptions = {
+      plugins: &#x27;lists link autolink autoresize textpattern&#x27;,
+      autoresize_bottom_margin: 20, // eslint-disable-line
+      menubar: false,
+      toolbar: &#x27;undo redo | styleselect removeformat | bold italic &#x27; +
+      &#x27;| alignleft aligncenter alignright alignjustify | bullist numlist | link&#x27;,
+      style_formats: [{ // eslint-disable-line
+        title: &#x27;Headers&#x27;,
+        items: [
+          {title: &#x27;Header 1&#x27;, format: &#x27;h1&#x27;},
+          {title: &#x27;Header 2&#x27;, format: &#x27;h2&#x27;},
+          {title: &#x27;Header 3&#x27;, format: &#x27;h3&#x27;},
+          {title: &#x27;Header 4&#x27;, format: &#x27;h4&#x27;}
+        ]
+      }, {
+        title: &#x27;Inline&#x27;, items: [
+          {title: &#x27;Bold&#x27;, icon: &#x27;bold&#x27;, format: &#x27;bold&#x27;},
+          {title: &#x27;Italic&#x27;, icon: &#x27;italic&#x27;, format: &#x27;italic&#x27;},
+          {title: &#x27;Underline&#x27;, icon: &#x27;underline&#x27;, format: &#x27;underline&#x27;},
+          {title: &#x27;Code&#x27;, icon: &#x27;code&#x27;, format: &#x27;code&#x27;}
+        ]
+      }, {
+        title: &#x27;Blocks&#x27;,
+        items: [
+          {title: &#x27;Paragraph&#x27;, format: &#x27;p&#x27;},
+          {title: &#x27;Blockquote&#x27;, format: &#x27;blockquote&#x27;}
+        ]
+      }],
+      content_css: &#x27;/be/css/tinymce.css?&#x27; + new Date().getTime() // eslint-disable-line
+    };
+
+    $scope.$watch(&#x27;selectedData.value&#x27;, function() {
+      $scope.updateGlobalCheck();
+      $scope.select(null);
+      $scope.cancel();
+      updateRange();
+    });
+
+    // Check all chapters for removal
+    $scope.checkAll = function() {
+      for (var i = 0; i &lt; $scope.media[$scope.selectedData.value].length; i++) {
+        $scope.media[$scope.selectedData.value][i].check = $scope.checkAllSelected;
+      }
+      $scope.nbCheckRow = $scope.checkAllSelected ? $scope.media[$scope.selectedData.value].length : 0;
+    };
+
+    // Update GlobalCheck according to selectedData
+    $scope.updateGlobalCheck = function() {
+      $scope.nbCheckRow = 0;
+      angular.forEach($scope.media[$scope.selectedData.value], function(row) {
+        if (row.check)
+          $scope.nbCheckRow++;
+      });
+      $scope.checkAllSelected = $scope.media[$scope.selectedData.value] &amp;&amp;
+        $scope.media[$scope.selectedData.value].length ?
+        $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length : false;
+    };
+
+    // Check a chapter for removal
+    $scope.checkRow = function(bool) {
+      if (!bool) {
+        $scope.checkAllSelected = false;
+        $scope.nbCheckRow--;
+      } else {
+        $scope.nbCheckRow++;
+        $scope.checkAllSelected = $scope.nbCheckRow == $scope.media[$scope.selectedData.value].length;
+      }
+    };
+
+    // Open a new value
+    $scope.openNew = function() {
+      $scope.modelToEdit = {
+        value: 0
+      };
+      if ($scope.selectRow) {
+        $scope.selectRow.select = false;
+        $scope.selectRow = null;
+      }
+      deleteUpload();
+      $scope.simpleMimeType = null;
+      $scope.isCollapsed = false;
+    };
+
+    // Open an value to edit
+    $scope.openEdit = function() {
+      if ($scope.isCollapsed) {
+
+        // Set backup
+        angular.copy($scope.selectRow, $scope.backUpRow);
+
+        // Copy
+        $scope.modelToEdit = $scope.selectRow;
+        $scope.simpleMimeType = $scope.getFileMimeType();
+        $scope.isCollapsed = false;
+      } else {
+
+        // Close edit on toggle
+        $scope.cancel();
+      }
+    };
+
+    // on Submit Edit Form
+    $scope.submit = function() {
+      if ($scope.modelToEdit.type) saveCut();
+      else saveChapter();
+    };
+
+    // on cancel Edit Form
+    $scope.cancel = function() {
+
+      // Copy backup
+      $scope.file = null;
+      $scope.errorFile = null;
+      angular.copy($scope.backUpRow, $scope.selectRow);
+      $scope.isCollapsed = true;
+    };
+
+    // Select or deselect a line by clicking
+    $scope.select = function(object) {
+      if ($scope.isCollapsed) {
+        $scope.selectRow = null;
+        if ($scope.ranges &amp;&amp; $scope.ranges.length) {
+          for (var i = 0; i &lt; $scope.ranges.length; i++) {
+            if ($scope.ranges[i] === object &amp;&amp; !$scope.ranges[i].select &amp;&amp; !$scope.selectRow) {
+              $scope.ranges[i].select = true;
+              $scope.selectRow = $scope.ranges[i];
+            } else {
+              $scope.ranges[i].select = false;
+            }
+          }
+        }
+      } else { // if close by toggle, close edit form
+        $scope.cancel();
+        $scope.select(object);
+      }
+    };
+
+    // Select row and open edit
+    $scope.selectAndOpen = function(row) {
+      if (row.select) $scope.openEdit();
+      else {
+        $scope.select(row);
+        $scope.openEdit();
+      }
+    };
+
+    // Get simple mimeType
+    $scope.getFileMimeType = function() {
+      if (!$scope.modelToEdit || !$scope.modelToEdit.file) return null;
+      else if ($scope.modelToEdit.file.mimeType.substr(0, &#x27;image&#x27;.length) == &#x27;image&#x27;) return &#x27;image&#x27;;
+      else if ($scope.modelToEdit.file.mimeType.substr(0, &#x27;video&#x27;.length) == &#x27;video&#x27;) return &#x27;video&#x27;;
+      else if ($scope.modelToEdit.file.mimeType.substr(0, &#x27;audio&#x27;.length) == &#x27;audio&#x27;) return &#x27;audio&#x27;;
+      else return $scope.modelToEdit.file.mimeType;
+    };
+
+    /*
+     * Slider
+     */
+    $scope.changeSliderView = function(event, direction) {
+      var indexView = $scope.slider.view + direction;
+      if (0 &gt; indexView) {
+        indexView = 0;
+      } else if (indexView &gt;= $scope.slider.views.length) {
+        indexView = $scope.slider.views.length - 1;
+      }
+      $scope.slider.view = indexView;
+    };
+
+    $scope.releaseRange = function(range) {
+      var value;
+      if (!range.select) {
+        value = range.value;
+      } else {
+        value = $scope.selectRow.value;
+      }
+      playerController.setTime(value);
+
+      // we only save the chnage if the time of the selected row has changed
+      if (!range.select || $scope.selectRow.value !== $scope.selectRowInitialValue) {
+        if (range.type) saveCut();
+        else saveChapter();
+      }
+      if (range.select)
+        $scope.selectRowInitialValue = range.value;
+    };
+
+    // remove chapter and tags
+    $scope.remove = function() {
+      var removeMethodPromise;
+      var ranges = $scope.media[$scope.selectedData.value];
+      var pointsOfInterestToRemove = {};
+      var rangesToRemove = pointsOfInterestToRemove[$scope.selectedData.value] = [];
+      for (var i = 0; i &lt; ranges.length; i++) {
+        if (ranges[i].check) rangesToRemove.push(ranges[i].id);
+      }
+      $scope.selectRow = null;
+
+      if ($scope.selectedData.value === &#x27;tags&#x27;)
+        removeMethodPromise = publishService.removeTags($scope.media.id, pointsOfInterestToRemove.tags);
+      else if ($scope.selectedData.value === &#x27;chapters&#x27;)
+        removeMethodPromise = publishService.removeChapters($scope.media.id, pointsOfInterestToRemove.chapters);
+
+      removeMethodPromise.then(function(resp) {
+        if ($scope.checkAllSelected) {
+          $scope.media[$scope.selectedData.value] = [];
+          $scope.checkAllSelected = false;
+        } else for (var i = 0; i &lt; pointsOfInterestToRemove[$scope.selectedData.value].length; i++) {
+          var id = pointsOfInterestToRemove[$scope.selectedData.value][i];
+          var k = searchPosition(id);
+          if (k &gt;= 0) {
+            $scope.media[$scope.selectedData.value].splice(k, 1);
+          }
+        }
+        updateRange();
+      }).catch(function(error) {
+        $scope.$emit(&#x27;setAlert&#x27;, &#x27;danger&#x27;, $filter(&#x27;translate&#x27;)(&#x27;PUBLISH.EDITOR.SAVE_ERROR&#x27;));
+      });
+    };
+
+    $scope.back = function() {
+      deleteUpload();
+      $window.history.back();
+    };
+
+    /*
+     *
+     *  Time
+     */
+    var changebyRange = true;
+    $scope.updateTime = function() {
+      if (changebyRange) {
+        $scope.editTime = $scope.modelToEdit.value;
+      } else
+        changebyRange = true;
+    };
+    $scope.updateRange = function() {
+      if ($scope.myForm.time.$valid) {
+        $scope.modelToEdit.value = $scope.editTime;
+      }
+    };
+    $scope.$watch(&#x27;modelToEdit.value&#x27;, function() {
+      $scope.updateTime();
+    });
+
+    // watching ref to the selected row to keep its initial time value
+    $scope.$watch(&#x27;selectRow&#x27;, function(newVal) {
+      if (newVal)
+        $scope.selectRowInitialValue = newVal.value;
+    });
+
+    // range depends on chapters and cut
+    $scope.$watchCollection(&#x27;media.tags&#x27;, updateRange);
+    $scope.$watchCollection(&#x27;media.chapters&#x27;, updateRange);
+    $scope.$watchCollection(&#x27;media.cut&#x27;, updateRange);
+
+    // watching the button to toggle begin in and out of the cut array
+    // we do the same for end
+    // we do not toggle if previous value was undefined cause it means we are still initiating the controller
+    $scope.$watch(&#x27;beginCut.isInArray&#x27;, function(newVal, oldVal) {
+      if (newVal !== oldVal &amp;&amp; oldVal !== undefined) {
+        toggleBegin(newVal);
+        saveCut();
+      }
+    });
+    $scope.$watch(&#x27;endCut.isInArray&#x27;, function(newVal, oldVal) {
+      if (newVal !== oldVal &amp;&amp; oldVal !== undefined) {
+        toggleEnd(newVal);
+        saveCut();
+      }
+    });
+
+    // maintain the data consistency when cuts are moved/deleted and during initition of the controller
+    $scope.$watchCollection(&#x27;media.cut&#x27;, function() {
+      $scope.beginCut.isInArray = false;
+      $scope.endCut.isInArray = false;
+      if (!$scope.media.cut) {
+        return;
+      }
+
+      // we use angular.extend to keep the same object reference
+      for (var i = 0; i &lt; $scope.media.cut.length; i++) {
+        if ($scope.media.cut[i].type === &#x27;begin&#x27;) {
+          $scope.media.cut[i] = angular.extend($scope.beginCut.range, $scope.media.cut[i]);
+          $scope.beginCut.isInArray = true;
+        }
+        if ($scope.media.cut[i].type === &#x27;end&#x27;) {
+          $scope.media.cut[i] = angular.extend($scope.endCut.range, $scope.media.cut[i]);
+          $scope.endCut.isInArray = true;
+        }
+      }
+    });
+
+    $scope.$watch(&#x27;isCollapsed&#x27;, function(oldval, newVal) {
+      if (!newVal) deleteUpload();
+    });
+
+    $scope.$on(&#x27;$destroy&#x27;, function() {
+      deleteUpload();
+    });
+
+    $scope.editTime = 0;
+  }
+
+  app.controller(&#x27;EditorController&#x27;, EditorController);
+  EditorController.$inject = [
+    &#x27;$window&#x27;,
+    &#x27;$scope&#x27;,
+    &#x27;$http&#x27;,
+    &#x27;$filter&#x27;,
+    &#x27;$timeout&#x27;,
+    &#x27;i18nService&#x27;,
+    &#x27;ovMultirangeViews&#x27;,
+    &#x27;media&#x27;,
+    &#x27;publishName&#x27;,
+    &#x27;publishService&#x27;
+  ];
+
+})(angular.module(&#x27;ov.publish&#x27;));
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
