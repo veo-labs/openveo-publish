@@ -470,7 +470,14 @@ function populateMediaWithPois(media, callback) {
  * @param {Function} callback Function to call when media has been updated
  */
 function updateMediaWithPlatformInfo(media, callback) {
-  if (!media.type || !media.mediaId || (media.available && media.sources.length == media.mediaId.length)) {
+  if (
+    !media.type ||
+    !media.mediaId ||
+    (media.available &&
+      (media.sources.length == media.mediaId.length) ||
+      (media.type === TYPES.YOUTUBE)
+    )
+  ) {
 
     // Info from video platform already retrieved for this media
     return callback();

@@ -1,3 +1,9 @@
+# 11.0.3 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Reduce the number of request made on Youtube API. A request was sent to Youtube API each time a Youtube video was played
+
 # 11.0.2 / 2020-11-05
 
 ## BUG FIXES
