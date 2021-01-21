@@ -67,7 +67,7 @@ It can contain some optional properties:
 "indexes" property is used to map each video timecode to an image or a tag and must be present if **rich-media** property is set to "true". In this example:
 
 - at time **0ms**, image **slide_00000.jpeg** will be displayed (**slide_00000.jpeg** file must be present in the package)
-- a chapter named "**Very important moment**" will be created and will redirect video at time **9500ms**.
+- a tag named "**Very important moment**" will be created and will redirect video at time **9500ms**.
 
 **Nb:** All extra properties are kept but won't be used directly by Publish.
 
