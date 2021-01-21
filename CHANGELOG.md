@@ -1,3 +1,9 @@
+# 11.1.0 / YYYY-MM-DD
+
+## NEW FEATURES
+
+- Add support for "category" property of tag indexes in tar archives. Actually the property data.tagname was used as the tag name with a fallback to "Tag N". An intermediate fallback has been added with the property "category" as the first fallback if data.tagname is not set.
+
 # 11.0.3 / 2020-11-30
 
 ## BUG FIXES

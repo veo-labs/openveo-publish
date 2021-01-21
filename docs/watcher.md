@@ -57,7 +57,8 @@ It can contain some optional properties:
       "timecode": 9500, // timecode in ms
       "type": "tag", // timecode type (must be "image" or "tag")
       "data": { // Optional - related information for tag timecode
-        "tagname": "Very important moment" // tagname to display, if not defined, will be replaced by 'Tag N' where N is the number of the tag
+        "category": "Tag category", // Optional - The name of the category the tag belongs to used as a fallback when no tag name is specified
+        "tagname": "Very important moment" // Optional - Tag name, if not defined the category will be used as the tag name and if neither category nor tag name are defined it will be replaced by 'TagN' where N is an incremental number
       }
     },
     ...

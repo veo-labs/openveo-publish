@@ -558,6 +558,7 @@ TarPackage.prototype.saveTimecodes = function() {
 
       // Format points of interest
       function(pointsOfInterest, spriteReferences, callback) {
+        var countTagsWithoutName = 0;
         var tags = [];
         var timecodes = [];
 
@@ -602,8 +603,8 @@ TarPackage.prototype.saveTimecodes = function() {
             case 'tag':
               tags.push({
                 value: pointOfInterest.timecode,
-                name: pointOfInterest.data && pointOfInterest.data.tagname ?
-                  pointOfInterest.data.tagname : 'Tag' + (tags.length + 1)
+                name: (pointOfInterest.data && (pointOfInterest.data.tagname || pointOfInterest.data.category)) ||
+                'Tag' + (++countTagsWithoutName)
               });
               break;
             default:
