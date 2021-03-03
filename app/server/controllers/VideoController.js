@@ -474,8 +474,10 @@ function updateMediaWithPlatformInfo(media, callback) {
     !media.type ||
     !media.mediaId ||
     (media.available &&
-      (media.sources.length == media.mediaId.length) ||
-      (media.type === TYPES.YOUTUBE)
+      (
+        media.sources.length == media.mediaId.length ||
+        media.type === TYPES.YOUTUBE
+      )
     )
   ) {
 

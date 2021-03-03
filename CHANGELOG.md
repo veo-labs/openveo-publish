@@ -1,3 +1,9 @@
+# 11.1.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix message "This media is not yet available on the streaming platform..." appearing when displaying videos stored in Youtube. Bug introcued in version 11.0.3
+
 # 11.1.0 / 2021-01-21
 
 ## NEW FEATURES
