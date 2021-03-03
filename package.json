@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@openveo/player": "^6.0.0",
-    "angular": "1.5.11",
+    "angular": "1.8.0",
     "angular-animate": "1.5.11",
     "angular-cookies": "1.5.11",
     "async": "^3.2.0",
