@@ -1,0 +1,3876 @@
+<!DOCTYPE html>
+<html lang="en" class="yui-overrride">
+<head>
+    <meta charset="utf-8">
+    <title>VideoController - OpenVeo Publish server</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1 class="blue-main-title">OpenVeo Publish server</h1>
+        </div>
+        <div class="yui3-u-1-4 version project-version">
+            API Docs for: 11.1.1
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/ConfigurationController.html">ConfigurationController</a></li>
+                                <li><a href="../classes/DirectoryFsWatcher.html">DirectoryFsWatcher</a></li>
+                                <li><a href="../classes/DirectoryWatcher.html">DirectoryWatcher</a></li>
+                                <li><a href="../classes/ERRORS.html">ERRORS</a></li>
+                                <li><a href="../classes/factory.html">factory</a></li>
+                                <li><a href="../classes/GoogleOAuthHelper.html">GoogleOAuthHelper</a></li>
+                                <li><a href="../classes/HTTP_ERRORS.html">HTTP_ERRORS</a></li>
+                                <li><a href="../classes/listener.html">listener</a></li>
+                                <li><a href="../classes/LocalProvider.html">LocalProvider</a></li>
+                                <li><a href="../classes/mediaPlatformFactory.html">mediaPlatformFactory</a></li>
+                                <li><a href="../classes/MediaPlatformProvider.html">MediaPlatformProvider</a></li>
+                                <li><a href="../classes/Package.html">Package</a></li>
+                                <li><a href="../classes/PackageError.html">PackageError</a></li>
+                                <li><a href="../classes/PoiProvider.html">PoiProvider</a></li>
+                                <li><a href="../classes/PropertyController.html">PropertyController</a></li>
+                                <li><a href="../classes/PropertyProvider.html">PropertyProvider</a></li>
+                                <li><a href="../classes/PUBLISH_HOOKS.html">PUBLISH_HOOKS</a></li>
+                                <li><a href="../classes/PublishError.html">PublishError</a></li>
+                                <li><a href="../classes/PublishManager.html">PublishManager</a></li>
+                                <li><a href="../classes/PublishPlugin.html">PublishPlugin</a></li>
+                                <li><a href="../classes/PublishPluginApi.html">PublishPluginApi</a></li>
+                                <li><a href="../classes/ResumableUpload.html">ResumableUpload</a></li>
+                                <li><a href="../classes/STATES.html">STATES</a></li>
+                                <li><a href="../classes/StatisticsController.html">StatisticsController</a></li>
+                                <li><a href="../classes/TarPackage.html">TarPackage</a></li>
+                                <li><a href="../classes/TarPackageError.html">TarPackageError</a></li>
+                                <li><a href="../classes/TlsClient.html">TlsClient</a></li>
+                                <li><a href="../classes/TlsProvider.html">TlsProvider</a></li>
+                                <li><a href="../classes/TYPES.html">TYPES</a></li>
+                                <li><a href="../classes/VideoController.html">VideoController</a></li>
+                                <li><a href="../classes/VideoPackage.html">VideoPackage</a></li>
+                                <li><a href="../classes/VideoPackageError.html">VideoPackageError</a></li>
+                                <li><a href="../classes/VideoProvider.html">VideoProvider</a></li>
+                                <li><a href="../classes/VimeoProvider.html">VimeoProvider</a></li>
+                                <li><a href="../classes/Watcher.html">Watcher</a></li>
+                                <li><a href="../classes/WatcherError.html">WatcherError</a></li>
+                                <li><a href="../classes/WowzaProvider.html">WowzaProvider</a></li>
+                                <li><a href="../classes/YoutubeProvider.html">YoutubeProvider</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/controllers.html">controllers</a></li>
+                                <li><a href="../modules/packages.html">packages</a></li>
+                                <li><a href="../modules/providers.html">providers</a></li>
+                                <li><a href="../modules/publish.html">publish</a></li>
+                                <li><a href="../modules/watcher.html">watcher</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>VideoController</h1>
+<div class="meta">
+
+        <div class="extends">
+            Extends ContentController
+        </div>
+
+        <div class="foundat">
+            Defined in: <a href="../files/app_server_controllers_VideoController.js.html#l32"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:32</code></a>
+        </div>
+
+            Module: <a href="../modules/controllers.html">controllers</a>
+
+</div>
+
+
+<h3>Summary</h3>
+<div class="intro">
+    <p>Defines a controller to handle actions relative to videos' routes.</p>
+
+</div>
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+<div id="method_VideoController" class="method item">
+  <h3 class="blue-method-name">VideoController</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l32"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:32</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>VideoController</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        
+    </div>
+
+
+
+
+</div>
+    </div>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods extends">
+                            <li class="index-item method">
+                                <a href="#method_addEntitiesAction">addEntitiesAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_addEntityAction">addEntityAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_convertPoiAction">convertPoiAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_displayVideoAction">displayVideoAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getAnonymousId">getAnonymousId</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getEntitiesAction">getEntitiesAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getEntityAction">getEntityAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getPlatformsAction">getPlatformsAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getProvider">getProvider</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getPublishManager">getPublishManager</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getSuperAdminId">getSuperAdminId</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getVideoReadyAction">getVideoReadyAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_isUserManager">isUserManager</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_populateMediaWithPois">populateMediaWithPois</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_publishVideosAction">publishVideosAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_removeChaptersAction">removeChaptersAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_removeEntitiesAction">removeEntitiesAction</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_removePoisAction">removePoisAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_removeTagsAction">removeTagsAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_retryVideosAction">retryVideosAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_startUploadAction">startUploadAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_unpublishVideosAction">unpublishVideosAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_updateChapterAction">updateChapterAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_updateEntityAction">updateEntityAction</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_updateMediaWithPlatformInfo">updateMediaWithPlatformInfo</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_updatePoiAction">updatePoiAction</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_updateTagAction">updateTagAction</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method_addEntitiesAction" class="method item">
+  <h3 class="blue-method-name">addEntitiesAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2235"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2235</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>addEntitiesAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Adds medias.</p>
+<p>It is not possible to add several medias at a time.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_addEntityAction" class="method item">
+  <h3 class="blue-method-name">addEntityAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l847"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:847</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>addEntityAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Adds a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">body</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>The media information as multipart body</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[file]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media file as multipart data
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[thumbnail]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media thumbnail as multipart data
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">info</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                            <div class="param-description">
+                                                The media information
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">info.title</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media title
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.properties]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media custom properties values with property id as keys
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.category]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media category id it belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.date]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" class="crosslink external" target="_blank">Date</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media date
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.leadParagraph]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media lead paragraph
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.description]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media description
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.groups]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media content groups it belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.platform]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The platform to upload the file to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.user]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The id of the OpenVeo user to use as the video owner
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_convertPoiAction" class="method item">
+  <h3 class="blue-method-name">convertPoiAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2019"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2019</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>convertPoiAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Converts points of interest (chapters, tags &amp; cut) units
+from percents to milliseconds (depending on the video
+duration).</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">body</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>Information to convert points of interest</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">duration</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+
+                                            <div class="param-description">
+                                                The media duration in milliseconds
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;entity&quot;: ...
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_displayVideoAction" class="method item">
+  <h3 class="blue-method-name">displayVideoAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l510"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:510</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>displayVideoAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Displays video player template.</p>
+<p>Checks first if the video id is valid and if the video is published
+before returning the template.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_getAnonymousId" class="method item">
+  <h3 class="blue-method-name">getAnonymousId</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2206"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2206</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getAnonymousId</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+        </span>
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets the id of the anonymous user.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>:
+                <div class="blue-return-desc">
+                    <p>The id of the anonymous user</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getEntitiesAction" class="method item">
+  <h3 class="blue-method-name">getEntitiesAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1307"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1307</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getEntitiesAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets medias.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">query</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's query parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[query]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To search on both medias title and description
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[useSmartSearch=1]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                1 to use a more advanced search mechanism, 0 to use a simple search
+based on a regular expression
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[searchInPois=0]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                1 to also search in points of interest (tags / chapters) titles and
+descriptions when useSmartSearch is set to 1
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[include]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The list of fields to include from returned medias
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[exclude]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The list of fields to exclude from returned medias. Ignored if
+include is also specified.
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[states]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To filter medias by state
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[dateStart]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To filter medias after or equal to a date (in format mm/dd/yyyy)
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[dateEnd]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To get medias before a date (in format mm/dd/yyyy)
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[categories]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To filter medias by category
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[groups]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To filter medias by group
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[user]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To filter medias by user
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[sortBy=&quot;date&quot;]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To sort medias by either **title**, **description**, **date**,
+**state**, **views** or **category**
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[sortOrder=&quot;desc&quot;]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                Sort order (either **asc** or **desc**)
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[page=0]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The expected page
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[limit=10]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                To limit the number of medias per page
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[properties]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                A list of properties with the property id as the key and the expected
+property value as the value
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;entities&quot; : [ ... ],
+  &quot;pagination&quot; : {
+    &quot;limit&quot;: ..., // The limit number of medias by page
+    &quot;page&quot;: ..., // The actual page
+    &quot;pages&quot;: ..., // The total number of pages
+    &quot;size&quot;: ... // The total number of medias
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_getEntityAction" class="method item">
+  <h3 class="blue-method-name">getEntityAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l717"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:717</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getEntityAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The id of the media to retrieve
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">query</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request query</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[include]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The list of fields to include from returned media
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[exclude]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The list of fields to exclude from returned media. Ignored if
+include is also specified.
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;entity&quot; : {
+    &quot;id&quot;: ..., // The media id
+    &quot;state&quot;: ..., // The media state
+    &quot;date&quot;: ..., // The media published date as a timestamp
+    &quot;type&quot;: ..., // The video associated platform
+    &quot;errorCode&quot;: ..., // The media error code or -1 if no error
+    &quot;category&quot;: ..., // The media category
+    &quot;properties&quot;: {...}, // The media custom properties
+    &quot;link&quot;: ..., // The media URL
+    &quot;mediaId&quot;: [...], // The media id on the video platform
+    &quot;available&quot;: ..., // The media availability on the video platform
+    &quot;thumbnail&quot;: ..., // The media thumbnail URL
+    &quot;title&quot;: ..., // The media title
+    &quot;leadParagraph&quot;: ..., // The media lead paragraph
+    &quot;description&quot;: ..., // The media description
+    &quot;chapters&quot;: [...], // The media chapters
+    &quot;tags&quot;: [...], // The media tags
+    &quot;cut&quot;: [...], // The media begin and end cuts
+    &quot;timecodes&quot;: [...], // The media associated images
+  }
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_getPlatformsAction" class="method item">
+  <h3 class="blue-method-name">getPlatformsAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l568"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:568</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getPlatformsAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets all media platforms available.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>{
+  &quot;platforms&quot; : [
+    ...
+  ]
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_getProvider" class="method item">
+  <h3 class="blue-method-name">getProvider</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1890"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1890</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getProvider</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/VideoProvider.html" class="crosslink">VideoProvider</a></span>
+        </span>
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets an instance of the controller associated provider.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="../classes/VideoProvider.html" class="crosslink">VideoProvider</a></span>:
+                <div class="blue-return-desc">
+                    <p>The provider</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getPublishManager" class="method item">
+  <h3 class="blue-method-name">getPublishManager</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1900"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1900</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getPublishManager</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/PublishManager.html" class="crosslink">PublishManager</a></span>
+        </span>
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets PublishManager singleton.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="../classes/PublishManager.html" class="crosslink">PublishManager</a></span>:
+                <div class="blue-return-desc">
+                    <p>The PublishManager singleton</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getSuperAdminId" class="method item">
+  <h3 class="blue-method-name">getSuperAdminId</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2196"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2196</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getSuperAdminId</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+        </span>
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets the id of the super administrator.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>:
+                <div class="blue-return-desc">
+                    <p>The id of the super admin</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getVideoReadyAction" class="method item">
+  <h3 class="blue-method-name">getVideoReadyAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l592"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:592</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>getVideoReadyAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Gets a ready media.</p>
+<p>A ready media is a media with a state set to ready or published.
+Connected users may have access to ready medias but unconnected users can only access published medias.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;entity&quot; : {
+    &quot;id&quot;: ..., // The media id
+    &quot;state&quot;: ..., // The media state
+    &quot;date&quot;: ..., // The media published date as a timestamp
+    &quot;type&quot;: ..., // The video associated platform
+    &quot;errorCode&quot;: ..., // The media error code or -1 if no error
+    &quot;category&quot;: ..., // The media category
+    &quot;properties&quot;: {...}, // The media custom properties
+    &quot;link&quot;: ..., // The media URL
+    &quot;mediaId&quot;: [...], // The media id on the video platform
+    &quot;available&quot;: ..., // The media availability on the video platform
+    &quot;thumbnail&quot;: ..., // The media thumbnail URL
+    &quot;title&quot;: ..., // The media title
+    &quot;leadParagraph&quot;: ..., // The media lead paragraph
+    &quot;description&quot;: ..., // The media description
+    &quot;chapters&quot;: [...], // The media chapters
+    &quot;tags&quot;: [...], // The media tags
+    &quot;cut&quot;: [...], // The media begin and end cuts
+    &quot;timecodes&quot;: [...], // The media associated images
+  }
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_isUserManager" class="method item">
+  <h3 class="blue-method-name">isUserManager</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2216"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2216</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>isUserManager</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>user</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
+
+
+
+
+
+
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Tests if user is a contents manager.</p>
+<p>A contents manager can perform CRUD operations on medias.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">user</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The user to test</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">permissions</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+                                <div class="param-description">
+                                    <p>The user's permissions</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                <div class="blue-return-desc">
+                    <p>true if the user has permission to manage medias, false otherwise</p>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_populateMediaWithPois" class="method item private">
+  <h3 class="blue-method-name">populateMediaWithPois</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l404"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:404</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>populateMediaWithPois</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>media</code>
+                </li>
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Replaces media chapters ids and tags ids by detailed points of interest.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">media</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media to populate</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">chapters</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+                                <div class="param-description">
+                                    <p>The media chapters</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">tags</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+                                <div class="param-description">
+                                    <p>The media tags</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to call when media has been populated</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_publishVideosAction" class="method item">
+  <h3 class="blue-method-name">publishVideosAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1632"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1632</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>publishVideosAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Publishes medias.</p>
+<p>Change the state of medias to published.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">ids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of media ids
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 42
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_removeChaptersAction" class="method item">
+  <h3 class="blue-method-name">removeChaptersAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1996"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1996</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>removeChaptersAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Removes chapters from a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">poiids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of chapters ids to remove
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_removeEntitiesAction" class="method item">
+  <h3 class="blue-method-name">removeEntitiesAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l2251"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:2251</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>removeEntitiesAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Removes medias.</p>
+<p>User must have permission to remove the medias. If user doesn't have permission to remove a particular media an
+HTTP forbidden error will be sent as response.
+Only medias in a stable state can be removed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of media ids to remove
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 42
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_removePoisAction" class="method item private">
+  <h3 class="blue-method-name">removePoisAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l301"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:301</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>removePoisAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Removes points of interest from a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                        <p>The type of points of interest (either 'tags' or 'chapters')</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">poiids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of points of interest ids to remove
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_removeTagsAction" class="method item">
+  <h3 class="blue-method-name">removeTagsAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1973"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1973</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>removeTagsAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Removes tags from a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">poiids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of tags ids to remove
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_retryVideosAction" class="method item">
+  <h3 class="blue-method-name">retryVideosAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1802"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1802</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>retryVideosAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Retries to publish videos on error.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">ids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                Comma separated list of media ids
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_startUploadAction" class="method item">
+  <h3 class="blue-method-name">startUploadAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1845"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1845</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>startUploadAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Starts uploading videos to the media platform.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">ids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                Comma separated list of media ids
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">platform</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The id of the platform to upload to
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_unpublishVideosAction" class="method item">
+  <h3 class="blue-method-name">unpublishVideosAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1717"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1717</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>unpublishVideosAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Unpublishes medias.</p>
+<p>Change the state of medias to unpublished.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">ids</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                A comma separated list of media ids
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 42
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_updateChapterAction" class="method item">
+  <h3 class="blue-method-name">updateChapterAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1942"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1942</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>updateChapterAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Updates a chapter associated to the given media.</p>
+<p>If chapter does not exist it is created.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[body]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Request body</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[info]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                Modifications to perform on the chapter
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.value]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The chapter time in milliseconds
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.name]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The chapter name
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.description]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The chapter description
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id the chapter belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[poiid]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The chapter id
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1,
+  &quot;poi&quot;: ...
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_updateEntityAction" class="method item">
+  <h3 class="blue-method-name">updateEntityAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1123"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1123</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>updateEntityAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Updates a media.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">params.id</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>Id of the media to update</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">body</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>The media information as multipart body</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[thumbnail]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media thumbnail as multipart data
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name">info</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                            <div class="param-description">
+                                                The media information
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.title]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media title
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.properties]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media custom properties values with property id as keys
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.category]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media category id it belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.date]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" class="crosslink external" target="_blank">Date</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media date
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.leadParagraph]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media lead paragraph
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.description]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media description
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.groups]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The media content groups it belongs to
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_updateMediaWithPlatformInfo" class="method item private">
+  <h3 class="blue-method-name">updateMediaWithPlatformInfo</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l454"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:454</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>updateMediaWithPlatformInfo</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>media</code>
+                </li>
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Updates the given media with corresponding information from its video platform.</p>
+<p>If information from the video platform have already been fetched for this media this does nothing.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">media</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <p>The media to update</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">id</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>The media id</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">type</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                <div class="param-description">
+                                    <p>The id of the associated media platform</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">mediaId</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+                                <div class="param-description">
+                                    <p>The list of medias in the media platform. Could have several media ids if media has
+multiple sources</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">available</code>
+                                    <span class="type">Boolan</span>
+
+                                <div class="param-description">
+                                    <p>true if the media is available, false otherwise, if true information from the video
+platform have already been fetched then this does nothing</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">sources</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+                                <div class="param-description">
+                                    <p>The list of media sources</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to call when media has been updated</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_updatePoiAction" class="method item private">
+  <h3 class="blue-method-name">updatePoiAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l117"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:117</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>updatePoiAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>type</code>
+                </li>
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Updates a point of interest associated to the given media.</p>
+<p>If point of interest does not exist it is created.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">type</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                        <p>The type of point of interest (either 'tags' or 'chapters')</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[body]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Request multipart body</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[info]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                Point of interest information
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.value]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The point of interest time in milliseconds
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.name]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The point of interest name
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.description]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The point of interest description
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[file]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The multipart file associated to the point of interest
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id the point of interest belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[poiid]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The point of interest id
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1,
+  &quot;poi&quot;: ...
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+<div id="method_updateTagAction" class="method item">
+  <h3 class="blue-method-name">updateTagAction</h3>
+
+  <div class="meta method-meta">
+      <p>
+          Defined in
+      <a href="../files/app_server_controllers_VideoController.js.html#l1910"><code>app&#x2F;server&#x2F;controllers&#x2F;VideoController.js:1910</code></a>
+  </p>
+
+
+
+  </div>
+
+  <h3>Syntax</h3>
+  <div class="blue-method-syntax">
+  <h3 class="name"><code>updateTagAction</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>request</code>
+                </li>
+                <li class="arg">
+                        <code>response</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+        <span class="flag async">async</span>
+
+  </div>
+    <div class="description">
+      <h3>Summary</h3>
+        <p>Updates a tag associated to the given media.</p>
+<p>If tag does not exist it is created.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">request</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" class="crosslink external" target="_blank">Request</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Request</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[body]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Request multipart body</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name optional">[info]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                Modifications to perform on the tag
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.value]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The tag time in milliseconds
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.name]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The tag name
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[info.description]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The tag description
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[file]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The multipart file associated to the tag
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">params</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+                                <div class="param-description">
+                                    <p>Request's parameters</p>
+
+                                </div>
+
+                                    <ul class="params-list">
+                                        <li class="param">
+                                                <code class="param-name">id</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+                                            <div class="param-description">
+                                                The media id the tag belongs to
+                                            </div>
+                                        </li>
+                                        <li class="param">
+                                                <code class="param-name optional">[poiid]</code>
+                                                <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                                <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                            <div class="param-description">
+                                                The tag id
+                                            </div>
+                                        </li>
+                                    </ul>
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">response</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" class="crosslink external" target="_blank">Response</a></span>
+
+
+                    <div class="param-description">
+                        <p>ExpressJS HTTP Response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                        <p>Function to defer execution to the next registered middleware</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+<pre class="code prettyprint"><code>// Response example
+{
+  &quot;total&quot;: 1,
+  &quot;poi&quot;: ...
+}</code></pre>
+
+            </div>
+        </div>
+
+</div>
+            </div>
+
+
+
+    </div>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
