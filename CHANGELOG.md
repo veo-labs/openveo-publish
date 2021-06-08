@@ -1,3 +1,9 @@
+# 12.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- No longer tested on NodeJS &lt; 16.3.0 and NPM &lt; 7.15.1
+
 # 11.1.1 / 2021-03-03
 
 ## BUG FIXES
