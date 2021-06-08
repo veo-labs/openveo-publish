@@ -6,16 +6,16 @@ OpenVeo does not automatically compile SASS and JavaScript files for his plugins
 
 # Compiling SASS files
 
-You can compile the back end SASS files using the following command:
+You can compile only the back end SASS files using the following command:
 
-    grunt compass:dist
+    npm run build:back-office-scss
 
 Or you can watch SASS files changes using the following command:
 
-    grunt
+    npm run watch
 
-# Compiling JavaScript files
+# Compiling OpenVeo Publish
 
-You'll probably want to compile AngularJS files, in production, for better performance. You can do it using:
+To compile OpenVeo Publish plugin use:
 
-    grunt prod
+    npm run build
