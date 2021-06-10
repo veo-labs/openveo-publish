@@ -88,7 +88,7 @@
     "test:server": "npx grunt mochaTest",
     "watch": "npx grunt watch",
     "watch:back-office-client": "npx grunt watch:back-office",
-    "watch:front-office-client": "npx grunt watch:front"
+    "watch:front-office-client": "npx grunt watch:front-office"
   },
   "precommit": [
     "lint",

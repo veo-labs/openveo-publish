@@ -67,7 +67,7 @@ module.exports = function(grunt) {
   ]);
 
   // Build front office client
-  grunt.registerTask('build-front-office-client', ['uglify:front', 'concat:front-js']);
+  grunt.registerTask('build-front-office-client', ['uglify:front-office', 'concat:front-office-js']);
 
   // Generate documentation
   grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);

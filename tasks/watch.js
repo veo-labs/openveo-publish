@@ -13,7 +13,7 @@ module.exports = {
   },
 
   // Automatically rebuild front office when a file is modified
-  front: {
+  'front-office': {
     files: [
       '<%= publish.player %>/**/*',
       '<%= publish.basePath %>/conf.js'

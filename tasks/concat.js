@@ -33,7 +33,7 @@ module.exports = {
   },
 
   // Concatenate all front office client JavaScript files
-  'front-js': {
+  'front-office-js': {
     src: getMinifiedJSFiles(applicationConf['custom']['scriptFiles']['publishPlayer']['dev']),
     dest: '<%= publish.playerJSAssets %>/openveoPublishPlayer.js'
   }
