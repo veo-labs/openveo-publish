@@ -1,7 +1,9 @@
 'use strict';
 
 module.exports = {
-  lib: {
+
+  // Compress back office client libraries
+  'admin-libraries': {
     files: [
       {
 
