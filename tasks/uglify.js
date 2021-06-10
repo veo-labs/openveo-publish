@@ -51,7 +51,9 @@ module.exports = {
       }
     ]
   },
-  frontJS: {
+
+  // Compress front office client JavaScript files
+  front: {
     files: [
       {
 
