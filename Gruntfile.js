@@ -57,9 +57,6 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('rename', openVeoApi.grunt.renameTask(grunt));
   grunt.registerMultiTask('remove', openVeoApi.grunt.removeTask(grunt));
 
-  // Listen to changes on SCSS files and generate CSS files
-  grunt.registerTask('default', ['compass', 'watch']);
-
   // Build back office client
   grunt.registerTask('build-back-office-client', [
     'compass:admin',

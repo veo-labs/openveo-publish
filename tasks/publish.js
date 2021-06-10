@@ -12,6 +12,7 @@ module.exports = {
   beAssets: ['<%= publish.basePath %>/assets/be'],
   beCSSAssets: ['<%= publish.beAssets %>/css'],
   beJSAssets: ['<%= publish.beAssets %>/js'],
+  beViewsAssets: ['<%= publish.beAssets %>/views'],
   playerJSAssets: ['<%= publish.playerAssets %>/js'],
   uglify: ['<%= publish.basePath %>/build/uglify']
 };
