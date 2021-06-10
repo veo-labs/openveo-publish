@@ -20,7 +20,7 @@ nav:
   - 'Basics': 'developers/basics.md'
   - 'Installation': 'developers/installation.md'
   - 'Back end AngularJS': 'developers/back-end.md'
-  - 'CSS / SASS / JS compilation': 'developers/compilation.md'
+  - 'Compilation': 'developers/compilation.md'
   - 'Unit tests': 'developers/unit-tests.md'
   - 'End to end tests': 'developers/end-to-end-tests.md'
   - 'API': 'developers/api.md'

@@ -74,8 +74,9 @@
     "yuidoc-theme-blue": "^0.1.9"
   },
   "scripts": {
-    "build": "npx grunt prod",
-    "build:back-office-scss": "npx grunt compass",
+    "build": "npm run build:front-office-client && npm run build:back-office-client",
+    "build:front-office-client": "npx grunt build-front-office-client",
+    "build:back-office-client": "npx grunt build-back-office-client",
     "doc": "npx grunt doc",
     "e2e": "npx grunt test-e2e",
     "lint": "npx grunt eslint",

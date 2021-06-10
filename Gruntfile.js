@@ -60,8 +60,17 @@ module.exports = function(grunt) {
   // Listen to changes on SCSS files and generate CSS files
   grunt.registerTask('default', ['compass', 'watch']);
 
-  // Prepare project for production
-  grunt.registerTask('prod', ['compass', 'uglify', 'concat']);
+  // Build back office client
+  grunt.registerTask('build-back-office-client', [
+    'compass:admin',
+    'uglify:admin',
+    'uglify:admin-libraries',
+    'concat:admin-libraries',
+    'concat:admin-js'
+  ]);
+
+  // Build front office client
+  grunt.registerTask('build-front-office-client', ['uglify:front', 'concat:front-js']);
 
   // Generate documentation
   grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);
