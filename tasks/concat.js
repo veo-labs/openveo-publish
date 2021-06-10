@@ -31,13 +31,11 @@ module.exports = {
     src: getMinifiedJSFiles(applicationConf['backOffice']['scriptFiles']['dev']),
     dest: '<%= publish.beJSAssets %>/openveoPublish.js'
   },
-  frontJS: {
 
-    // Concatenate all front JavaScript files
+  // Concatenate all front office client JavaScript files
+  'front-js': {
     src: getMinifiedJSFiles(applicationConf['custom']['scriptFiles']['publishPlayer']['dev']),
-
-    // Concatenate all files into openveoPublishPlayer.js
     dest: '<%= publish.playerJSAssets %>/openveoPublishPlayer.js'
-
   }
+
 };
