@@ -25,7 +25,9 @@ module.exports = {
       }
     ]
   },
-  publishprod: {
+
+  // Compress back office client JavaScript files
+  admin: {
     files: [
       {
 
