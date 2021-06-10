@@ -75,7 +75,7 @@
   },
   "scripts": {
     "build": "npx grunt prod",
-    "build:back-office-scss": "npx grunt compass:dist",
+    "build:back-office-scss": "npx grunt compass",
     "doc": "npx grunt doc",
     "e2e": "npx grunt test-e2e",
     "lint": "npx grunt eslint",

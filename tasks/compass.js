@@ -1,17 +1,12 @@
 'use strict';
 
 module.exports = {
-  publishdev: {
+
+  // Build the back office stylesheet
+  // Use grunt compass:admin --with-source-maps to add source maps generation
+  admin: {
     options: {
-      sourcemap: true,
-      sassDir: '<%= publish.sass %>',
-      cssDir: '<%= publish.beCSSAssets %>',
-      environment: 'development'
-    }
-  },
-  publishdist: {
-    options: {
-      sourcemap: false,
+      sourcemap: process.withSourceMaps,
       sassDir: '<%= publish.sass %>',
       cssDir: '<%= publish.beCSSAssets %>',
       environment: 'production',
@@ -19,4 +14,5 @@ module.exports = {
       force: true
     }
   }
+
 };
