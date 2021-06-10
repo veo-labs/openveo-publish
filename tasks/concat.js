@@ -21,13 +21,13 @@ function getMinifiedJSFiles(files) {
 module.exports = {
 
   // Concatenate back office client JavaScript library files
-  'admin-libraries': {
+  'back-office-libraries': {
     src: getMinifiedJSFiles(applicationConf['backOffice']['scriptLibFiles']['dev']),
     dest: '<%= publish.beJSAssets %>/libOpenveoPublish.js'
   },
 
   // Concatenate all back office client JavaScript files
-  'admin-js': {
+  'back-office-js': {
     src: getMinifiedJSFiles(applicationConf['backOffice']['scriptFiles']['dev']),
     dest: '<%= publish.beJSAssets %>/openveoPublish.js'
   },

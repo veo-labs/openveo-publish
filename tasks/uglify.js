@@ -3,7 +3,7 @@
 module.exports = {
 
   // Compress back office client libraries
-  'admin-libraries': {
+  'back-office-libraries': {
     files: [
       {
 
@@ -27,7 +27,7 @@ module.exports = {
   },
 
   // Compress back office client JavaScript files
-  admin: {
+  'back-office': {
     files: [
       {
 

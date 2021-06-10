@@ -3,7 +3,7 @@
 module.exports = {
 
   // Automatically rebuild back office when a file is modified
-  admin: {
+  'back-office': {
     files: [
       '<%= publish.be %>/**/*',
       '<%= publish.beViewsAssets %>/**/*',

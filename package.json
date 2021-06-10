@@ -87,7 +87,7 @@
     "test:client": "npx grunt karma",
     "test:server": "npx grunt mochaTest",
     "watch": "npx grunt watch",
-    "watch:back-office-client": "npx grunt watch:admin",
+    "watch:back-office-client": "npx grunt watch:back-office",
     "watch:front-office-client": "npx grunt watch:front"
   },
   "precommit": [
