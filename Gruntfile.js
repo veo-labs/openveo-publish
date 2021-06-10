@@ -60,11 +60,8 @@ module.exports = function(grunt) {
   // Listen to changes on SCSS files and generate CSS files
   grunt.registerTask('default', ['compass', 'watch']);
 
-  // Minify and concat back end AngularJS Javascript files
-  grunt.registerTask('concatpublish', ['uglify', 'concat']);
-
   // Prepare project for production
-  grunt.registerTask('prod', ['compass', 'concatpublish']);
+  grunt.registerTask('prod', ['compass', 'uglify', 'concat']);
 
   // Generate documentation
   grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);
