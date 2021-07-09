@@ -11,7 +11,4 @@ All end to end tests are located in **tests/client/e2eTests/**. Suites are descr
 # Launch publish end to end tests
 
     # Launch all publish end to end tests on chrome
-    npm run e2e -- --capabilities="{\"browserName\": \"chrome\"}" --directConnect=true --suite="publish"
-
-    # Launch all publish end to end tests on firefox
-    npm run e2e -- --capabilities="{\"browserName\": \"firefox\"}" --directConnect=true --suite="publish"
+    npm run e2e -- --suite="publish"
