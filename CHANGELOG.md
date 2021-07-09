@@ -7,6 +7,7 @@
 ## BUG FIXES
 
 - Fix video loading for Wowza and local providers which wasn't always loading the second time
+- Fix unhandled promise rejection in publication process when an error occurred
 
 # 11.1.1 / 2021-03-03
 

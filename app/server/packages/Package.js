@@ -242,13 +242,7 @@ Package.prototype.init = function(initialState, initialTransition) {
 
     // Executes function corresponding to transition
     if (self[event.transition]) {
-      return self[event.transition]().catch(function(error) {
-
-        // TODO: see if it is possible to test current transition for setError second parameter
-        self.setError(error, error.code === ERRORS.SAVE_PACKAGE_DATA);
-        throw error;
-
-      });
+      return self[event.transition]();
     } else {
       self.setError(new PackageError('Transition ' + event.transition + ' does not exist', ERRORS.TRANSITION), true);
       return false;
@@ -317,7 +311,13 @@ Package.prototype.executeTransition = function(transition) {
     } else {
 
       // Continue by executing the next transition in the stack
-      self.fsm[transition]();
+      var result = self.fsm[transition]();
+
+      if (result && typeof result.then === 'function') {
+        result.catch((error) => {
+          self.setError(error, transition === Package.TRANSITIONS.INIT);
+        });
+      }
 
     }
 
