@@ -6,6 +6,7 @@
 
 var util = require('util');
 var Field = process.requireTest('lib/e2e/fields/Field.js');
+var browserExt = process.requireTest('lib/e2e/browser.js');
 
 /**
  * Define a time field to manage three inputs (hours, minutes & seconds)
@@ -41,7 +42,7 @@ OvpTimeField.prototype.getValue = function() {
     fieldElements = elementFinder.all(by.css('input'));
 
     return fieldElements.map(function(element, index) {
-      return element.getAttribute('value');
+      return browserExt.getProperty(element, 'value');
     }).then(function(value) {
       return protractor.promise.fulfilled(value.join(':'));
     });

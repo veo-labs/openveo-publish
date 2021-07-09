@@ -172,7 +172,7 @@ CategoryPage.prototype.getCategoryElement = function(name) {
 
     // Search for the category by searching input values
     self.treeElement.all(by.css('input')).each(function(input, index) {
-      input.getAttribute('value').then(function(categoryName) {
+      browserExt.getProperty(input, 'value').then(function(categoryName) {
         if (categoryName === name)
           categoryElement = input.element(by.xpath('../..'));
       });
@@ -196,7 +196,7 @@ CategoryPage.prototype.getCategoryElement = function(name) {
  * @return {Promise} Promise resolving with the category name
  */
 CategoryPage.prototype.getCategoryName = function(categoryElement) {
-  return categoryElement.element(by.xpath('./div/input')).getAttribute('value');
+  return browserExt.getProperty(categoryElement.element(by.xpath('./div/input')), 'value');
 };
 
 /**
