@@ -501,9 +501,7 @@ function updateMediaWithPlatformInfo(media, callback) {
     media.available = info.available;
     media.sources = info.sources;
 
-    provider.updateOne(new ResourceFilter().equal('id', media.id), info);
-
-    callback();
+    provider.updateOne(new ResourceFilter().equal('id', media.id), info, callback);
   });
 }
 

@@ -625,6 +625,7 @@ describe('VideoController', function() {
         );
         assert.equal(modifications.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(modifications.sources, expectedInfo.sources, 'Wrong sources');
+        callback();
       });
 
       response.send = function(data) {
@@ -1012,6 +1013,7 @@ describe('VideoController', function() {
         );
         assert.equal(modifications.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(modifications.sources, expectedInfo.sources, 'Wrong sources');
+        callback();
       });
 
       response.send = function(data) {

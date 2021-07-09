@@ -4,6 +4,10 @@
 
 - No longer tested on NodeJS &lt; 16.3.0 and NPM &lt; 7.15.1
 
+## BUG FIXES
+
+- Fix video loading for Wowza and local providers which wasn't always loading the second time
+
 # 11.1.1 / 2021-03-03
 
 ## BUG FIXES
