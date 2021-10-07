@@ -12,6 +12,7 @@
 
 ## DEPENDENCIES
 
+- **chai** has been upgraded from 4.2.0 to **4.3.4**
 - **dashjs** has been upgraded from 3.0.3 to **4.1.0**
 - **googleapis** has been upgraded from 48.0.0 to **88.2.0**
 - **mime** has been upgraded from 2.4.4 to **2.5.2**
