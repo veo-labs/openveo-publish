@@ -7,7 +7,6 @@ module.exports = {
       'conf.js',
       'Gruntfile.js',
       'install.js',
-      'backup.js',
       'tasks/**/*.js',
       'tests/**/*.js',
       'app/**/*.js',
