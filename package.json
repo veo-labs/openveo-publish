@@ -33,7 +33,7 @@
     "googleapis": "^88.2.0",
     "html5shiv": "^3.7.3",
     "javascript-state-machine": "^3.1.0",
-    "mime": "^2.4.4",
+    "mime": "^2.5.2",
     "request": "^2.88.0",
     "shortid": "^2.2.15",
     "video.js": "^7.15.4",
