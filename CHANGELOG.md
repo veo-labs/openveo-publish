@@ -18,6 +18,7 @@
 - **flightplan** has been removed
 - **googleapis** has been upgraded from 48.0.0 to **88.2.0**
 - **karma** has been upgraded from 4.4.1 to **6.3.4**
+- **karma-mocha** has been upgraded from 1.3.0 to **2.0.1**
 - **mime** has been upgraded from 2.4.4 to **2.5.2**
 - **shortid** has been replaced by nanoid
 - **video.js** has been upgraded from 7.7.5 to **7.15.4**
