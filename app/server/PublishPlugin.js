@@ -2,10 +2,11 @@
 
 var path = require('path');
 var util = require('util');
-var express = require('express');
+
 var async = require('async');
+var express = require('express');
 var openVeoApi = require('@openveo/api');
-var Watcher = process.requirePublish('app/server/watcher/Watcher.js');
+
 var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PublishManager = process.requirePublish('app/server/PublishManager.js');
@@ -146,7 +147,7 @@ PublishPlugin.prototype.start = function(callback) {
 
   // Do not start the watcher if the process is the web service
   if (!process.isWebService) {
-    var watcher = new Watcher();
+    var watcher = new openVeoApi.watcher.Watcher();
     var hotFoldersPaths = [];
 
     // Retrieve the list of hot folders paths from configuration
