@@ -57,7 +57,7 @@
         "mocha": "^9.1.1",
         "mock-require": "^3.0.3",
         "pre-commit": "^1.2.2",
-        "tinymce": "^5.2.1",
+        "tinymce": "^5.9.1",
         "yuidoc-theme-blue": "^0.1.9"
       },
       "engines": {
@@ -7862,9 +7862,9 @@
       "dev": true
     },
     "node_modules/tinymce": {
-      "version": "5.2.1",
-      "resolved": "https://registry.npmjs.org/tinymce/-/tinymce-5.2.1.tgz",
-      "integrity": "sha512-X/riqIrSOyB/pF6J993ICuDbSU/dL89XfhSdmroojbdBIT73wZF2dMPTfwtL5Hn0G5vBLefMDqLwESVuiPLEPg==",
+      "version": "5.9.1",
+      "resolved": "https://registry.npmjs.org/tinymce/-/tinymce-5.9.1.tgz",
+      "integrity": "sha512-GaG15OhQB1zR2L63fywhEAViTxkAlhX5JbA+48+O0zCo1FwDuQ8iUVi/FzaOX9Uo7ULp+Y2gu4r3P4ZNueDVPQ==",
       "dev": true
     },
     "node_modules/tmp": {
@@ -15278,9 +15278,9 @@
       }
     },
     "tinymce": {
-      "version": "5.2.1",
-      "resolved": "https://registry.npmjs.org/tinymce/-/tinymce-5.2.1.tgz",
-      "integrity": "sha512-X/riqIrSOyB/pF6J993ICuDbSU/dL89XfhSdmroojbdBIT73wZF2dMPTfwtL5Hn0G5vBLefMDqLwESVuiPLEPg==",
+      "version": "5.9.1",
+      "resolved": "https://registry.npmjs.org/tinymce/-/tinymce-5.9.1.tgz",
+      "integrity": "sha512-GaG15OhQB1zR2L63fywhEAViTxkAlhX5JbA+48+O0zCo1FwDuQ8iUVi/FzaOX9Uo7ULp+Y2gu4r3P4ZNueDVPQ==",
       "dev": true
     },
     "tmp": {
