@@ -10,6 +10,12 @@
 - Fix video loading for Wowza and local providers which wasn't always loading the second time
 - Fix unhandled promise rejection in publication process when an error occurred
 
+## DEPENDENCIES
+
+- **dashjs** has been upgraded from 3.0.3 to **4.1.0**
+- **video.js** has been upgraded from 7.7.5 to **7.15.4**
+- **videojs-contrib-dash** has been upgraded from 2.11.0 to **5.1.0**
+
 # 11.1.1 / 2021-03-03
 
 ## BUG FIXES
