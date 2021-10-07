@@ -1,0 +1,11 @@
+{
+  "file": ["tests/server/init.js"],
+  "spec": [
+    "tests/server/controllers/*.js",
+    "tests/server/providers/*.js",
+    "tests/server/migrations/*.js",
+    "tests/server/packages/*.js",
+    "tests/server/listener.js"
+  ]
+}
+
