@@ -13,6 +13,7 @@
 ## DEPENDENCIES
 
 - **dashjs** has been upgraded from 3.0.3 to **4.1.0**
+- **googleapis** has been upgraded from 48.0.0 to **88.2.0**
 - **video.js** has been upgraded from 7.7.5 to **7.15.4**
 - **videojs-contrib-dash** has been upgraded from 2.11.0 to **5.1.0**
 
