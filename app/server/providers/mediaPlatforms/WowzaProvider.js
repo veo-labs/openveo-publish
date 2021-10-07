@@ -8,7 +8,7 @@ var path = require('path');
 var util = require('util');
 var async = require('async');
 var FTPS = require('ftps');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
 
 /**
@@ -77,7 +77,7 @@ util.inherits(WowzaProvider, MediaPlatformProvider);
  */
 WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
-  var mediaId = shortid.generate();
+  var mediaId = nanoid();
 
   async.series([
 

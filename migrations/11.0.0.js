@@ -2,7 +2,7 @@
 
 var path = require('path');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
@@ -71,7 +71,7 @@ module.exports.update = function(callback) {
                     poi.descriptionText = openVeoApi.util.removeHtmlFromText(poi.description);
 
                   if (!poi.id)
-                    poi.id = shortid.generate();
+                    poi.id = nanoid();
 
                 });
 

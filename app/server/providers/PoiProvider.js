@@ -6,7 +6,7 @@
 
 var util = require('util');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var fileSystemApi = openVeoApi.fileSystem;
 var NotFoundError = openVeoApi.errors.NotFoundError;
@@ -57,7 +57,7 @@ PoiProvider.prototype.add = function(pois, callback) {
       return this.executeCallback(callback, new TypeError('Requires name and value to add a point of interest'));
 
     var poiToAdd = {
-      id: poi.id || shortid.generate(),
+      id: poi.id || nanoid(),
       name: poi.name,
       value: poi.value,
       description: poi.description,

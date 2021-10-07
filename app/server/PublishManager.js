@@ -7,7 +7,7 @@
 var util = require('util');
 var events = require('events');
 var path = require('path');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var packageFactory = process.requirePublish('app/server/packages/packageFactory.js');
@@ -311,7 +311,7 @@ PublishManager.prototype.publish = function(mediaPackage) {
     // Media package can be in queue and already have an id
     if (!mediaPackage.id) {
       var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
-      mediaPackage.id = shortid.generate();
+      mediaPackage.id = nanoid();
       mediaPackage.title = mediaPackage.title || pathDescriptor.name;
     }
 

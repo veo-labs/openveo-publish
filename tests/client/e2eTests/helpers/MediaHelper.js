@@ -3,7 +3,7 @@
 var util = require('util');
 var path = require('path');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
@@ -307,7 +307,7 @@ MediaHelper.prototype.setCategories = function(categories) {
  */
 MediaHelper.prototype.getAddExample = function() {
   return {
-    id: shortid.generate(),
+    id: nanoid(),
     date: new Date('2017/12/13').getTime(),
     title: 'Video example',
     description: 'Video example description',

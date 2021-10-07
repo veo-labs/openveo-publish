@@ -2,7 +2,7 @@
 
 var path = require('path');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var configDir = openVeoApi.fileSystem.getConfDir();
@@ -75,7 +75,7 @@ module.exports.update = function(callback) {
             if (media.chapters && media.chapters.length) {
               media.chapters.forEach(function(chapter) {
                 if (!chapter.id) {
-                  chapter.id = shortid.generate();
+                  chapter.id = nanoid();
                   needUpdate = true;
                 }
               });

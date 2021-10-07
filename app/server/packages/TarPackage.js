@@ -17,7 +17,7 @@ var STATES = process.requirePublish('app/server/packages/states.js');
 var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 
 /**
  * Defines a TarPackage to manage publication of a tar file.
@@ -587,7 +587,7 @@ TarPackage.prototype.saveTimecodes = function() {
               var spriteFileName = imageReference.sprite.match(/\/([^/]*)$/)[1];
 
               timecodes.push({
-                id: shortid.generate(),
+                id: nanoid(),
                 timecode: pointOfInterest.timecode,
                 image: {
                   small: {

@@ -7,7 +7,7 @@
 var path = require('path');
 var util = require('util');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
 
@@ -40,7 +40,7 @@ util.inherits(LocalProvider, MediaPlatformProvider);
  */
 LocalProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
-  var mediaId = shortid.generate();
+  var mediaId = nanoid();
 
   var mediaFinalPath = path.join(self.conf.vodFilePath, mediaId, '/video.mp4');
   openVeoApi.fileSystem.copy(mediaFilePath, mediaFinalPath, function(error) {

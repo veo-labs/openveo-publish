@@ -1,7 +1,7 @@
 'use strict';
 
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
@@ -33,7 +33,7 @@ module.exports.update = function(callback) {
             for (var i = 0; i < media.metadata.indexes.length; i++) {
               var timecode = media.metadata.indexes[i];
               media.timecodes.push({
-                id: shortid.generate(),
+                id: nanoid(),
                 timecode: timecode.timecode,
                 image: {
                   small: '/publish/' + media.id + '/' + timecode.data.filename + '?thumb=small',

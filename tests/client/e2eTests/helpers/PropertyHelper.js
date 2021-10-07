@@ -1,7 +1,7 @@
 'use strict';
 
 var util = require('util');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var e2e = require('@openveo/test').e2e;
 var Helper = e2e.helpers.Helper;
 
@@ -69,7 +69,7 @@ PropertyHelper.prototype.addEntitiesAuto = function(name, total, offset) {
  */
 PropertyHelper.prototype.getAddExample = function() {
   return {
-    id: shortid.generate(),
+    id: nanoid(),
     name: 'Property example',
     description: 'Property example description',
     type: 'text'

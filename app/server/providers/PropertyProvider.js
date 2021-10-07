@@ -6,7 +6,7 @@
 
 var util = require('util');
 var async = require('async');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var openVeoApi = require('@openveo/api');
 
 /**
@@ -85,7 +85,7 @@ PropertyProvider.prototype.add = function(customProperties, callback) {
       return this.executeCallback(callback, new TypeError('Invalid property type ' + customProperty.type));
 
     var property = {
-      id: customProperty.id || shortid.generate(),
+      id: customProperty.id || nanoid(),
       name: customProperty.name,
       description: customProperty.description,
       type: customProperty.type

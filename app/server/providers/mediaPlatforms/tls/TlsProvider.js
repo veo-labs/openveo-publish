@@ -6,7 +6,7 @@
 
 var path = require('path');
 var util = require('util');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var async = require('async');
 var openVeoApi = require('@openveo/api');
 var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
@@ -79,7 +79,7 @@ util.inherits(TlsProvider, MediaPlatformProvider);
  */
 TlsProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
-  var mediaId = shortid.generate();
+  var mediaId = nanoid();
   var mediaFileName = 'video.mp4';
   var mediaFinalPath = path.join(this.mediaDirectoryPath, mediaId, mediaFileName);
 

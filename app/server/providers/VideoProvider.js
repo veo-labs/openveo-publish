@@ -8,7 +8,7 @@ var util = require('util');
 var path = require('path');
 var async = require('async');
 var openVeoApi = require('@openveo/api');
-var shortid = require('shortid');
+var nanoid = require('nanoid').nanoid;
 var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var configDir = openVeoApi.fileSystem.getConfDir();
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
@@ -432,7 +432,7 @@ VideoProvider.prototype.add = function(medias, callback) {
     var media = medias[i];
 
     var data = {
-      id: media.id ? String(media.id) : shortid.generate(),
+      id: media.id ? String(media.id) : nanoid(),
       available: media.available,
       title: media.title,
       leadParagraph: media.leadParagraph,
