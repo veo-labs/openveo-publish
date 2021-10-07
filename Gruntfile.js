@@ -50,11 +50,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-mkdocs');
   grunt.loadNpmTasks('grunt-gh-pages');
 
   grunt.registerMultiTask('rename', openVeoApi.grunt.renameTask(grunt));
-  grunt.registerMultiTask('remove', openVeoApi.grunt.removeTask(grunt));
 
   // Build back office client
   grunt.registerTask('build-back-office-client', [
@@ -69,6 +67,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build-front-office-client', ['uglify:front-office', 'concat:front-office-js']);
 
   // Generate documentation
-  grunt.registerTask('doc', ['remove:doc', 'mkdocs', 'yuidoc', 'rename:doc']);
+  grunt.registerTask('doc', ['yuidoc', 'rename:doc']);
 
 };

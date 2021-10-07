@@ -1,7 +1,6 @@
 site_name: Openveo Publish
 repo_url: https://github.com/veo-labs/openveo-publish
 theme: readthedocs
-site_dir: site/version
 markdown_extensions:
   - fenced_code
   - tables
