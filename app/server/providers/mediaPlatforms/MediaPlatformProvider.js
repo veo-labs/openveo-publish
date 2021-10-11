@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/MediaPlatformProvider
  */
 
 var util = require('util');
@@ -20,18 +20,23 @@ var EventEmitter = require('events').EventEmitter;
 function MediaPlatformProvider(providerConf) {
   MediaPlatformProvider.super_.call(this);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * The media platform's configuration.
-     *
-     * @property conf
-     * @type Object
-     * @final
-     */
-    conf: {value: providerConf}
+    /** @lends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider */
+    {
 
-  });
+      /**
+       * The media platform's configuration.
+       *
+       * @type {Object}
+       * @instance
+       * @readonly
+       */
+      conf: {value: providerConf}
+
+    }
+
+  );
 
   if (!this.conf)
     throw new Error('No provider configuration');
@@ -42,10 +47,8 @@ util.inherits(MediaPlatformProvider, EventEmitter);
 
 // Media qualities
 /**
- * @property QUALITIES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Objec}
  */
 MediaPlatformProvider.QUALITIES = {
   MOBILE: 0,
@@ -57,12 +60,9 @@ Object.freeze(MediaPlatformProvider.QUALITIES);
 /**
  * Uploads a media to the platform.
  *
- * @method upload
- * @async
  * @param {String} mediaFilePath The absolute path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id on the platform
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 MediaPlatformProvider.prototype.upload = function() {
   throw new Error('upload method not implemented for this media platform provider');
@@ -71,11 +71,8 @@ MediaPlatformProvider.prototype.upload = function() {
 /**
  * Removes a media from the platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds Platform media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 MediaPlatformProvider.prototype.remove = function() {
   throw new Error('upload method not implemented for this media platform provider');
@@ -87,14 +84,11 @@ MediaPlatformProvider.prototype.remove = function() {
  * Depending on the platform and what is supported on it, some media properties might be updated and others not.
  * If media has several resources on the platform, the same update will be performed on all resources.
  *
- * @method update
- * @async
  * @param {Object} media The media
  * @param {Array} media.mediaId The list of media resource ids
  * @param {Object} data The media datas to update
  * @param {Boolean} force true to force the update even if datas haven't changed, false otherwise
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 MediaPlatformProvider.prototype.update = function(media, data, force, callback) {
   callback();
@@ -103,14 +97,23 @@ MediaPlatformProvider.prototype.update = function(media, data, force, callback) 
 /**
  * Gets information about a media from the platform.
  *
- * @method getMediaInfo
- * @async
  * @param {String} mediaId The platform id of the media
  * @param {String} expectedDefintion The expected media definition
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 MediaPlatformProvider.prototype.getMediaInfo = function() {
   throw new Error('getMediaInfo method not implemented for this media platform provider');
 };
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {String} id The media id on the platform
+ */
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Object} information Information about the media
+ */

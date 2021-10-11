@@ -1,14 +1,13 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/packages/errors
  */
 
 /**
  * Defines the list of package publication errors.
  *
- * @class ERRORS
- * @static
+ * @namespace
  */
 
 var ERRORS = {
@@ -16,130 +15,130 @@ var ERRORS = {
   /**
    * No error.
    *
-   * @property NO_ERROR
-   * @type Number
-   * @default -1
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   NO_ERROR: -1,
 
   /**
    * Error involving a server error.
    *
-   * @property UNKNOWN
-   * @type Number
-   * @default 0
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   UNKNOWN: 0,
 
   /**
    * Package type is not supported.
    *
-   * @property INVALID_PACKAGE_TYPE
-   * @type Number
-   * @default 1
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   INVALID_PACKAGE_TYPE: 1,
 
   /**
    * Package copy failed.
    *
-   * @property COPY
-   * @type Number
-   * @default 2
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   COPY: 2,
 
   /**
    * Removing original package failed.
    *
-   * @property UNLINK
-   * @type Number
-   * @default 3
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   UNLINK: 3,
 
   /**
    * Extracting an archive package failed.
    *
-   * @property EXTRACT
-   * @type Number
-   * @default 4
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   EXTRACT: 4,
 
   /**
    * Package does not respect the expected format for its type.
    *
-   * @property VALIDATION
-   * @type Number
-   * @default 5
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   VALIDATION: 5,
 
   /**
    * Saving package data into database failed.
    *
-   * @property SAVE_PACKAGE_DATA
-   * @type Number
-   * @default 7
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   SAVE_PACKAGE_DATA: 7,
 
   /**
    * Creating synchro.json file failed.
    *
-   * @property SAVE_TIMECODE
-   * @type Number
-   * @default 8
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   SAVE_TIMECODE: 8,
 
   /**
    * Uploading media to media platform failed.
    *
-   * @property MEDIA_UPLOAD
-   * @type Number
-   * @default 9
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MEDIA_UPLOAD: 9,
 
   /**
    * Synchronizing media to the media platform failed.
    *
-   * @property MEDIA_SYNCHRONIZE
-   * @type Number
-   * @default 10
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MEDIA_SYNCHRONIZE: 10,
 
   /**
    * Scanning package temporary directory failed.
    *
-   * @property SCAN_FOR_IMAGES
-   * @type Number
-   * @default 11
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   SCAN_FOR_IMAGES: 11,
 
   /**
    * Cleaning package temporary directory failed.
    *
-   * @property CLEAN_DIRECTORY
-   * @type Number
-   * @default 13
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   CLEAN_DIRECTORY: 13,
 
@@ -148,160 +147,160 @@ var ERRORS = {
    *
    * Package was not found.
    *
-   * @property PACKAGE_NOT_FOUND
-   * @type Number
-   * @default 14
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   PACKAGE_NOT_FOUND: 14,
 
   /**
    * Executing a state machine transition failed.
    *
-   * @property TRANSITION
-   * @type Number
-   * @default 15
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   TRANSITION: 15,
 
   /**
    * Package configuration is not valid when creating a Package.
    *
-   * @property INVALID_CONFIGURATION
-   * @type Number
-   * @default 16
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   INVALID_CONFIGURATION: 16,
 
   /**
    * Generating media thumbnail failed.
    *
-   * @property GENERATE_THUMB
-   * @type Number
-   * @default 17
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   GENERATE_THUMB: 17,
 
   /**
    * Getting media metadata failed.
    *
-   * @property GET_METADATA
-   * @type Number
-   * @default 18
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   GET_METADATA: 18,
 
   /**
    * Copying media thumbnail failed.
    *
-   * @property COPY_THUMB
-   * @type Number
-   * @default 19
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   COPY_THUMB: 19,
 
   /**
    * Defragmentation of the mp4 failed
    *
-   * @property DEFRAGMENTATION
-   * @type Number
-   * @default 20
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   DEFRAGMENTATION: 20,
 
   /**
    * Remove fragmented file
    *
-   * @property UNLINK_FRAGMENTED
-   * @type Number
-   * @default 21
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   UNLINK_FRAGMENTED: 21,
 
   /**
    * Replacing fragmented file
    *
-   * @property
-   * @type Number
-   * @default 22
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   REPLACE_FRAGMENTED: 22,
 
   /**
    * A media with the same file name as already been published.
    *
-   * @property
-   * @type Number
-   * @default 23
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   DUPLICATE_MEDIA: 23,
 
   /**
    * Merging the media failed while changing state.
    *
-   * @property
-   * @type Number
-   * @default 24
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_CHANGE_MEDIA_STATE: 24,
 
   /**
    * Merging the media failed while trying to get a media with the same name.
    *
-   * @property
-   * @type Number
-   * @default 25
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_GET_MEDIA_ERROR: 25,
 
   /**
    * Merging the media failed while waiting for a media with the same name to have a stable state.
    *
-   * @property
-   * @type Number
-   * @default 26
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_WAIT_FOR_MEDIA_ERROR: 26,
 
   /**
    * Merging the media failed while changing state of the other media.
    *
-   * @property
-   * @type Number
-   * @default 27
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_CHANGE_OTHER_MEDIA_STATE: 27,
 
   /**
    * Merging the media failed while merging medias.
    *
-   * @property
-   * @type Number
-   * @default 28
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_MEDIAS: 28,
 
   /**
    * Merging the media failed while removing the not chosen media.
    *
-   * @property
-   * @type Number
-   * @default 29
-   * @final
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
    */
   MERGE_REMOVE_NOT_CHOSEN: 29
 

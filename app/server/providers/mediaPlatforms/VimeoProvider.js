@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/VimeoProvider
  */
 
 var util = require('util');
@@ -14,7 +14,7 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
  * Defines a VimeoProvider class to interact with [vimeo platform](https://vimeo.com/).
  *
  * @class VimeoProvider
- * @extends MediaPlatformProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A vimeo configuration object
  * @param {String} providerConf.clientId Vimeo client id
@@ -24,33 +24,38 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
 function VimeoProvider(providerConf) {
   VimeoProvider.super_.call(this, providerConf);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Vimeo client library.
-     *
-     * @property vimeo
-     * @type Vimeo
-     * @final
-     */
-    vimeo: {value: new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken)},
+    /** @lends module:publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider */
+    {
 
-    /**
-     * List of accepted media qualities.
-     *
-     * @property qualitiesMap
-     * @type Object
-     * @final
-     */
-    qualitiesMap: {
-      value: {
-        sd: MediaPlatformProvider.QUALITIES.SD,
-        mobile: MediaPlatformProvider.QUALITIES.MOBILE,
-        hd: MediaPlatformProvider.QUALITIES.HD
+      /**
+       * Vimeo client library.
+       *
+       * @type {Vimeo}
+       * @instance
+       * @readonly
+       */
+      vimeo: {value: new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken)},
+
+      /**
+       * List of accepted media qualities.
+       *
+       * @type {Object}
+       * @instance
+       * @readonly
+       */
+      qualitiesMap: {
+        value: {
+          sd: MediaPlatformProvider.QUALITIES.SD,
+          mobile: MediaPlatformProvider.QUALITIES.MOBILE,
+          hd: MediaPlatformProvider.QUALITIES.HD
+        }
       }
+
     }
 
-  });
+  );
 }
 
 module.exports = VimeoProvider;
@@ -59,12 +64,9 @@ util.inherits(VimeoProvider, MediaPlatformProvider);
 /**
  * Uploads a media to the Vimeo platform.
  *
- * @method upload
- * @async
  * @param {String} mediaFilePath The absolute system path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id on the Vimeo platform
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
@@ -127,13 +129,10 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
  *
  * Media is considered available if the expected media definition has been transcoded by the media platform.
  *
- * @method getMediaInfo
- * @async
  * @param {String} mediaId The Vimeo id of the media
  * @param {Number} expectedDefintion The expected media definition
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   if (!mediaIds) {
@@ -205,11 +204,8 @@ VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
 /**
  * Removes a media from the Vimeo platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds Vimeo media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 VimeoProvider.prototype.remove = function(mediaIds, callback) {
   if (!mediaIds) {
@@ -245,16 +241,13 @@ VimeoProvider.prototype.remove = function(mediaIds, callback) {
  * If media has several resources on the platform, the same update will be performed for all resources.
  * Actually only the media title is synchronized with Vimeo.
  *
- * @method update
- * @async
  * @param {Object} media The media
  * @param {Array} media.mediaId The list of media resource ids
  * @param {Object} data The datas to update
  * @param {String} [data.title] The media title. Be careful only the first 128 characters will be used. Also HTML tags
  * will be removed
  * @param {Boolean} force true to force the update even if title hasn't changed, false otherwise
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 VimeoProvider.prototype.update = function(media, data, force, callback) {
   if (!data.title || (data.title === media.title && !force)) return callback();

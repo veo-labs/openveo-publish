@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/VideoProvider
  */
 
 var util = require('util');
@@ -22,31 +22,37 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * @extends EntityProvider
  * @constructor
  * @param {Database} database The database to interact with
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityProvider or Database
  */
 function VideoProvider(database) {
   VideoProvider.super_.call(this, database, 'publish_videos');
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * List of pending updates.
-     *
-     * @property updateQueue
-     * @type Array
-     * @final
-     */
-    updateQueue: {value: []},
+    /** @lends module:publish/providers/VideoProvider~VideoProvider*/
+    {
 
-    /**
-     * Indicates if an update is actually running.
-     *
-     * @property pendingUpdate
-     * @type Boolean
-     * @final
-     */
-    pendingUpdate: {value: false, writable: true}
+      /**
+       * List of pending updates.
+       *
+       * @type {Array}
+       * @instance
+       * @readonly
+       */
+      updateQueue: {value: []},
 
-  });
+      /**
+       * Indicates if an update is actually running.
+       *
+       * @type {Boolean}
+       * @instance
+       * @default false
+       */
+      pendingUpdate: {value: false, writable: true}
+
+    }
+
+  );
 
 }
 
@@ -56,12 +62,10 @@ util.inherits(VideoProvider, openVeoApi.providers.EntityProvider);
 /**
  * Removes a list of directories.
  *
- * @method removeDirectories
+ * @memberof module:publish/providers/VideoProvider~VideoProvider
  * @private
- * @async
  * @param {Array} directories The list of directory paths
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 function removeDirectories(directories, callback) {
 
@@ -91,13 +95,11 @@ function removeDirectories(directories, callback) {
 /**
  * Removes all data related to a list of videos.
  *
- * @method removeAllDataRelatedToVideo
+ * @memberof module:publish/providers/VideoProvider~VideoProvider
  * @private
- * @async
  * @param {Array} videosToRemove The list of videos to remove
  * @param {Boolean} keepRemote true to keep the video in the videos platform
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 function removeAllDataRelatedToVideo(videosToRemove, keepRemote, callback) {
   var parallel = [];
@@ -170,13 +172,12 @@ function removeAllDataRelatedToVideo(videosToRemove, keepRemote, callback) {
  * Only one update operation can be performed at a time. Pending operations
  * are added to the queue and executed sequentially.
  *
- * @method updateMedia
+ * @memberof module:publish/providers/VideoProvider~VideoProvider
  * @private
  * @param {String} id The media id
  * @param {Object} modifier Database modifier
- * @param {Function} [callback] Function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updateMediaCallback} [callback] Function to call when
+ * it's done
  */
 function updateMedia(id, modifier, callback) {
   var self = this;
@@ -230,15 +231,13 @@ function updateMedia(id, modifier, callback) {
  *
  * All datas associated to the deleted medias will also be deleted.
  *
- * @method remove
+ * @memberof module:publish/providers/VideoProvider~VideoProvider
  * @private
- * @async
  * @param {ResourceFilter} [filter] Rules to filter medias to remove
  * @param {Boolean} keepRemote true to keep the video on the videos platform, false to also remove the video from the
  * platform
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed medias
+ * @param {module:publish/providers/VideoProvider~VideoProvider~removeMediaCallback} [callback] The function to call
+ * when it's done
  */
 function removeMedia(filter, keepRemote, callback) {
   var self = this;
@@ -309,7 +308,6 @@ function removeMedia(filter, keepRemote, callback) {
 /**
  * Resolves media point of interest file path.
  *
- * @method getPoiFilePath
  * @param {String} mediaId The media id the point of interest belongs to
  * @param {Object} file The file information
  * @param {String} file.mimeType The file MIME type
@@ -330,17 +328,14 @@ VideoProvider.prototype.getPoiFilePath = function(mediaId, file) {
  * If the media point of interest are in percents, needPointsOfInterestUnitConversion property will be added
  * to the media.
  *
- * @method getOne
- * @async
  * @param {ResourceFilter} [filter] Rules to filter medias
  * @param {Object} [fields] Fields to be included or excluded from the response, by default all
  * fields are returned. Only "exclude" or "include" can be specified, not both
  * @param {Array} [fields.include] The list of fields to include in the response, all other fields are excluded
  * @param {Array} [fields.exclude] The list of fields to exclude from response, all other fields are included. Ignored
  * if include is also specified.
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The media
+ * @param {module:publish/providers/VideoProvider~VideoProvider~getOneCallback} callback The function to call when it's
+ * done
  */
 VideoProvider.prototype.getOne = function(filter, fields, callback) {
   VideoProvider.super_.prototype.getOne.call(this, filter, fields, function(getOneError, media) {
@@ -387,42 +382,39 @@ VideoProvider.prototype.getOne = function(filter, fields, callback) {
 /**
  * Adds medias.
  *
- * @method add
- * @async
- * @param {Array} medias The list of medias to store with for each media:
- *   - **String** id The media id
- *   - **Boolean** [available] true if the media is available, false otherwise
- *   - **String** [title] The media title
- *   - **String** [leadParagraph] The media lead paragraph
- *   - **String** [description] The media description
- *   - **Number** [state] The media state (see STATES class from module packages)
- *   - **Date** [date] The media date
- *   - **String** [type] The id of the associated media platform
- *   - **Object** [metadata] Information about the media as a content
- *   - **String** [metadata.user] The id of the user the media belongs to
- *   - **Array** [metadata.groups] The list of groups the media belongs to
- *   - **Number** [errorCode] The media error code (see ERRORS class from module packages)
- *   - **String** [category] The id of the category the media belongs to
- *   - **Array** [properties] The list of properties values for this media
- *   - **String** [packageType] The type of package
- *   - **String** [lastState] The last media state in publication process
- *   - **String** [lastTransition] The last media transition in publication process
- *   - **String** [originalPackagePath] Absolute path of the original package
- *   - **String** [originalFileName] Original package name without the extension
- *   - **Array** [mediaId] The list of medias in the media platform. Could have several media ids if media has
- *     multiple sources
- *   - **Array** [timecodes] The list of media timecodes
- *   - **Array** [chapters] The list of media chapters
- *   - **Array** [tags] The list of media tags
- *   - **Array** [cut] Media begin and end cuts
- *   - **Array** [sources] The list of media sources
- *   - **Number** [views=0] The statistic number of views
- *   - **String** [thumbnail] The media thumbnail URI
- *   - **String** [link] The media link in OpenVeo
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The total amount of medias inserted
- *   - **Array** The list of added medias
+ * @param {Array} medias The list of medias to store
+ * @param {String} medias[].id The media id
+ * @param {Boolean} [medias[].available] true if the media is available, false otherwise
+ * @param {String} [medias[].title] The media title
+ * @param {String} [medias[].leadParagraph] The media lead paragraph
+ * @param {String} [medias[].description] The media description
+ * @param {Number} [medias[].state] The media state (see STATES class from module packages)
+ * @param {Date} [medias[].date] The media date
+ * @param {String} [medias[].type] The id of the associated media platform
+ * @param {Object} [medias[].metadata] Information about the media as a content
+ * @param {String} [medias[].metadata.user] The id of the user the media belongs to
+ * @param {Array} [medias[].metadata.groups] The list of groups the media belongs to
+ * @param {Number} [medias[].errorCode] The media error code (see ERRORS class from module packages)
+ * @param {String} [medias[].category] The id of the category the media belongs to
+ * @param {Array} [medias[].properties] The list of properties values for this media
+ * @param {String} [medias[].packageType] The type of package
+ * @param {String} [medias[].lastState] The last media state in publication process
+ * @param {String} [medias[].lastTransition] The last media transition in publication process
+ * @param {String} [medias[].originalPackagePath] Absolute path of the original package
+ * @param {String} [medias[].originalFileName] Original package name without the extension
+ * @param {Array} [medias[].mediaId] The list of medias in the media platform. Could have several media ids if media has
+ * @param {ltiple sources
+ * @param {Array} [medias[].timecodes] The list of media timecodes
+ * @param {Array} [medias[].chapters] The list of media chapters
+ * @param {Array} [medias[].tags] The list of media tags
+ * @param {Array} [medias[].cut] Media begin and end cuts
+ * @param {Array} [medias[].sources] The list of media sources
+ * @param {Number} [medias[].views=0] The statistic number of views
+ * @param {String} [medias[].thumbnail] The media thumbnail URI
+ * @param {String} [medias[].link] The media link in OpenVeo
+ *
+ * @param {module:publish/providers/VideoProvider~VideoProvider~addCallback} [callback] The function to call when it's
+ * done
  */
 VideoProvider.prototype.add = function(medias, callback) {
   var mediasToAdd = [];
@@ -473,13 +465,10 @@ VideoProvider.prototype.add = function(medias, callback) {
 /**
  * Updates video state.
  *
- * @method updateState
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} state The state of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateState = function(id, state, callback) {
   updateMedia.call(this, id, {state: state}, callback);
@@ -488,13 +477,10 @@ VideoProvider.prototype.updateState = function(id, state, callback) {
 /**
  * Updates last video state.
  *
- * @method updateLastState
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} state The last state of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateLastState = function(id, state, callback) {
   updateMedia.call(this, id, {lastState: state}, callback);
@@ -503,13 +489,10 @@ VideoProvider.prototype.updateLastState = function(id, state, callback) {
 /**
  * Updates last video transition.
  *
- * @method updateLastTransition
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} state The last transition of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateLastTransition = function(id, state, callback) {
   updateMedia.call(this, id, {lastTransition: state}, callback);
@@ -518,13 +501,10 @@ VideoProvider.prototype.updateLastTransition = function(id, state, callback) {
 /**
  * Updates video error code.
  *
- * @method updateErrorCode
- * @async
  * @param {Number} id The id of the video to update
  * @param {Number} errorCode The error code of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateErrorCode = function(id, errorCode, callback) {
   updateMedia.call(this, id, {errorCode: errorCode}, callback);
@@ -533,13 +513,10 @@ VideoProvider.prototype.updateErrorCode = function(id, errorCode, callback) {
 /**
  * Updates video link.
  *
- * @method updateLink
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} link The link of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateLink = function(id, link, callback) {
   updateMedia.call(this, id, {link: link}, callback);
@@ -548,13 +525,10 @@ VideoProvider.prototype.updateLink = function(id, link, callback) {
 /**
  * Updates media id for media platform.
  *
- * @method updateMediaId
- * @async
  * @param {String} id The id of the media to update
  * @param {String} idMediaPlatform The id of the media in the video platform
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
   updateMedia.call(this, id, {mediaId: idMediaPlatform}, callback);
@@ -563,13 +537,10 @@ VideoProvider.prototype.updateMediaId = function(id, idMediaPlatform, callback) 
 /**
  * Updates video metadata for video platform.
  *
- * @method updateMetadata
- * @async
  * @param {Number} id The id of the video to update
  * @param {Object} metadata The metadata of the video in the video platform
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateMetadata = function(id, metadata, callback) {
   updateMedia.call(this, id, {metadata: metadata}, callback);
@@ -578,13 +549,10 @@ VideoProvider.prototype.updateMetadata = function(id, metadata, callback) {
 /**
  * Updates video date timestamp.
  *
- * @method updateDate
- * @async
  * @param {Number} id The id of the video to update
  * @param {Number} date The date of the video
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateDate = function(id, date, callback) {
   updateMedia.call(this, id, {date: date}, callback);
@@ -593,13 +561,10 @@ VideoProvider.prototype.updateDate = function(id, date, callback) {
 /**
  * Updates video category for video platform.
  *
- * @method updateCategory
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} category The category id of the video in the video platform
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateCategory = function(id, categoryId, callback) {
   updateMedia.call(this, id, {category: categoryId}, callback);
@@ -608,13 +573,10 @@ VideoProvider.prototype.updateCategory = function(id, categoryId, callback) {
 /**
  * Updates video platform type.
  *
- * @method updateType
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} type The type of the video platform
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateType = function(id, type, callback) {
   updateMedia.call(this, id, {type: type}, callback);
@@ -623,13 +585,10 @@ VideoProvider.prototype.updateType = function(id, type, callback) {
 /**
  * Updates video thumbnail.
  *
- * @method updateThumbnail
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} path The path of the thumbnail file
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateThumbnail = function(id, path, callback) {
   updateMedia.call(this, id, {thumbnail: path}, callback);
@@ -638,13 +597,10 @@ VideoProvider.prototype.updateThumbnail = function(id, path, callback) {
 /**
  * Updates video title.
  *
- * @method updateTitle
- * @async
  * @param {Number} id The id of the video to update
  * @param {String} title The video title
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
  */
 VideoProvider.prototype.updateTitle = function(id, title, callback) {
   updateMedia.call(this, id, {title: title}, callback);
@@ -655,12 +611,9 @@ VideoProvider.prototype.updateTitle = function(id, title, callback) {
  *
  * All datas associated to the deleted medias will also be deleted.
  *
- * @method remove
- * @async
  * @param {ResourceFilter} [filter] Rules to filter medias to remove
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed medias
+ * @param {module:publish/providers/VideoProvider~VideoProvider~removeCallback} callback The function to call when it's
+ * done
  */
 VideoProvider.prototype.remove = function(filter, callback) {
   removeMedia.call(this, filter, false, callback);
@@ -671,12 +624,9 @@ VideoProvider.prototype.remove = function(filter, callback) {
  *
  * All datas associated to the deleted medias will also be deleted.
  *
- * @method removeLocal
- * @async
  * @param {ResourceFilter} [filter] Rules to filter medias to remove
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed medias
+ * @param {module:publish/providers/VideoProvider~VideoProvider~removeCallback} callback The function to call when it's
+ * done
  */
 VideoProvider.prototype.removeLocal = function(filter, callback) {
   removeMedia.call(this, filter, true, callback);
@@ -685,40 +635,37 @@ VideoProvider.prototype.removeLocal = function(filter, callback) {
 /**
  * Updates a media.
  *
- * @method updateOne
- * @async
  * @param {ResourceFilter} [filter] Rules to filter the media to update
  * @param {Object} data The modifications to perform
- *   - **String** [data.title] The media title
- *   - **Date** [data.date] The media date
- *   - **String** [data.leadParagraph] The media lead paragraph
- *   - **String** [data.description] The media description
- *   - **Array** [data.properties] The list of properties values for this media
- *   - **String** [data.category] The id of the category the media belongs to
- *   - **Array** [data.cut] Media begin and end cuts
- *   - **Array** [data.timecodes] The list of media timecodes
- *   - **Array** [data.chapters] The list of media chapters
- *   - **Array** [data.tags] The list of media tags
- *   - **Number** [data.views=0] The statistic number of views
- *   - **String** [data.thumbnail] The media thumbnail URI
- *   - **Array** [data.sources] The list of media sources
- *   - **Array** [data.groups] The list of groups ids the media belongs to
- *   - **String** [data.user] The user id the media belongs to
- *   - **Boolean** [available] true if the media is available, false otherwise
- *   - **Number** [state] The media state (see STATES class from module packages)
- *   - **Date** [date] The media date
- *   - **String** [type] The id of the associated media platform
- *   - **Object** [metadata] Information about the media as a content
- *   - **Number** [errorCode] The media error code (see ERRORS class from module packages)
- *   - **String** [packageType] The type of package
- *   - **String** [lastState] The last media state in publication process
- *   - **String** [lastTransition] The last media transition in publication process
- *   - **Array** [mediaId] The list of medias in the media platform. Could have several media ids if media has
- *     multiple sources
- *   - **String** [link] The media link in OpenVeo
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
+ * @param {String} [data.title] The media title
+ * @param {Date} [data.date] The media date
+ * @param {String} [data.leadParagraph] The media lead paragraph
+ * @param {String} [data.description] The media description
+ * @param {Array} [data.properties] The list of properties values for this media
+ * @param {String} [data.category] The id of the category the media belongs to
+ * @param {Array} [data.cut] Media begin and end cuts
+ * @param {Array} [data.timecodes] The list of media timecodes
+ * @param {Array} [data.chapters] The list of media chapters
+ * @param {Array} [data.tags] The list of media tags
+ * @param {Number} [data.views=0] The statistic number of views
+ * @param {String} [data.thumbnail] The media thumbnail URI
+ * @param {Array} [data.sources] The list of media sources
+ * @param {Array} [data.groups] The list of groups ids the media belongs to
+ * @param {String} [data.user] The user id the media belongs to
+ * @param {Boolean} [available] true if the media is available, false otherwise
+ * @param {Number} [state] The media state (see STATES class from module packages)
+ * @param {Date} [date] The media date
+ * @param {String} [type] The id of the associated media platform
+ * @param {Object} [metadata] Information about the media as a content
+ * @param {Number} [errorCode] The media error code (see ERRORS class from module packages)
+ * @param {String} [packageType] The type of package
+ * @param {String} [lastState] The last media state in publication process
+ * @param {String} [lastTransition] The last media transition in publication process
+ * @param {Array} [mediaId] The list of medias in the media platform. Could have several media ids if media has
+ * @param {ltiple sources
+ * @param {String} [link] The media link in OpenVeo
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updateOneCallback} [callback] The function to call when
+ * it's done
  */
 VideoProvider.prototype.updateOne = function(filter, data, callback) {
   var self = this;
@@ -766,10 +713,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
 /**
  * Creates videos indexes.
  *
- * @method createIndexes
- * @async
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 VideoProvider.prototype.createIndexes = function(callback) {
   var language = process.api.getCoreApi().getContentLanguage();
@@ -801,11 +745,8 @@ VideoProvider.prototype.createIndexes = function(callback) {
 /**
  * Drops an index from database collection.
  *
- * @method dropIndex
- * @async
  * @param {String} indexName The name of the index to drop
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 VideoProvider.prototype.dropIndex = function(indexName, callback) {
   this.storage.dropIndex(this.location, indexName, function(error, result) {
@@ -815,3 +756,53 @@ VideoProvider.prototype.dropIndex = function(indexName, callback) {
     callback(error);
   });
 };
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~updateMediaCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of updated items
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~removeMediaCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of removed medias
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~getOneCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Object} media The media
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~getOneCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The total amount of medias inserted
+ * @param {Array} medias The list of added medias
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of updated items
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~updateOneCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total 1 if everything went fine
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~addCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The total amount of medias inserted
+ * @param {Array} medias The list of added medias
+ */
+
+/**
+ * @callback module:publish/providers/VideoProvider~VideoProvider~removeCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of removed medias
+ */

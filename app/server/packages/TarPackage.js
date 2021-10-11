@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/packages/TarPackage
  */
 
 var path = require('path');
@@ -28,43 +28,43 @@ var nanoid = require('nanoid').nanoid;
  *  - A .session file describing the package content
  *
  * @example
- *     // tar package object example
- *     {
- *       "id": "13465465", // Id of the package
- *       "type": "vimeo", // Platform type
- *       "title": "2015-03-09_16-53-10_rich-media", // Package title
- *       "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
- *     }
+ * // tar package object example
+ * {
+ *   "id": "13465465", // Id of the package
+ *   "type": "vimeo", // Platform type
+ *   "title": "2015-03-09_16-53-10_rich-media", // Package title
+ *   "originalPackagePath": "/tmp/2015-03-09_16-53-10_rich-media.tar" // Package file
+ * }
  *
  * @example
- *     // ".session" file example contained in a tar package
+ * // ".session" file example contained in a tar package
+ * {
+ *   "date": 1425916390, // Unix epoch time of the video record
+ *   "rich-media": true, // true if package contains presentation images
+ *   "filename": "video.mp4", // The name of the video file in the package
+ *   "duration": 30, // Duration of the video in seconds
+ *   "indexes": [ // The list of indexes in the video
  *     {
- *       "date": 1425916390, // Unix epoch time of the video record
- *       "rich-media": true, // true if package contains presentation images
- *       "filename": "video.mp4", // The name of the video file in the package
- *       "duration": 30, // Duration of the video in seconds
- *       "indexes": [ // The list of indexes in the video
- *         {
- *           "type": "image", // Index type (could be "image" or "tag")
- *           "timecode": 0, // Index time (in ms) from the beginning of the video
- *           "data": { // Index data (only for "image" type)
- *             "filename": "slide_00000.jpeg" // The name of the image file in the tar
- *           }
- *         },
- *         {
- *           "type": "tag", // Index type (could be "image" or "tag")
- *           "timecode": 3208 // Index time (in ms) from the beginning of the video
- *         },
- *         ...
- *       ]
- *     }
+ *       "type": "image", // Index type (could be "image" or "tag")
+ *       "timecode": 0, // Index time (in ms) from the beginning of the video
+ *       "data": { // Index data (only for "image" type)
+ *         "filename": "slide_00000.jpeg" // The name of the image file in the tar
+ *       }
+ *     },
+ *     {
+ *       "type": "tag", // Index type (could be "image" or "tag")
+ *       "timecode": 3208 // Index time (in ms) from the beginning of the video
+ *     },
+ *     ...
+ *   ]
+ * }
  *
  * @class TarPackage
- * @extends Package
+ * @extends module:publish/packages/Package~Package
  * @constructor
  * @param {Object} mediaPackage The media description object
- * @param {VideoProvider} videoProvider A video provider
- * @param {PoiProvider} poiProvider Points of interest provider
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider A video provider
+ * @param {module:publish/providers/PoiProvider~PoiProvider} poiProvider Points of interest provider
  */
 function TarPackage(mediaPackage, videoProvider, poiProvider) {
   TarPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
@@ -82,10 +82,8 @@ util.inherits(TarPackage, VideoPackage);
 /**
  * Process states for tar packages.
  *
- * @property STATES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 TarPackage.STATES = {
   PACKAGE_EXTRACTED: 'packageExtracted',
@@ -97,10 +95,8 @@ Object.freeze(TarPackage.STATES);
 /**
  * Tar package process transitions (from one state to another).
  *
- * @property TRANSITIONS
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 TarPackage.TRANSITIONS = {
   EXTRACT_PACKAGE: 'extractPackage',
@@ -112,10 +108,8 @@ Object.freeze(TarPackage.TRANSITIONS);
 /**
  * Define the order in which transitions will be executed for a TarPackage.
  *
- * @property stateTransitions
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 TarPackage.stateTransitions = [
   Package.TRANSITIONS.INIT,
@@ -138,10 +132,8 @@ Object.freeze(TarPackage.stateTransitions);
 /**
  * Define machine state authorized transitions depending on previous and next states.
  *
- * @property stateMachine
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 TarPackage.stateMachine = VideoPackage.stateMachine.concat([
   {
@@ -184,20 +176,18 @@ Object.freeze(TarPackage.stateMachine);
  * file and a video file.
  *
  * @example
- *     // mediaPackage example
- *     {
- *       "id" : 1422731934859, // Internal video id
- *       "type" : "vimeo", // The video platform to use
- *       "path" : "C:/Temp/", // The path of the hot folder
- *       "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
- *     }
+ * // mediaPackage example
+ * {
+ *   "id" : 1422731934859, // Internal video id
+ *   "type" : "vimeo", // The video platform to use
+ *   "path" : "C:/Temp/", // The path of the hot folder
+ *   "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
+ * }
  *
- * @method validatePackage
- * @async
+ * @memberof module:publish/packages/TarPackage~TarPackage
+ * @this module:publish/packages/TarPackage~TarPackage
  * @private
- * @param {Function} callback The function to call when done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The package information object
+ * @param {module:publish/packages/TarPackage~TarPackage~validatePackageCallack} callback The function to call when done
  */
 function validatePackage(callback) {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
@@ -244,48 +234,47 @@ function validatePackage(callback) {
  *    e.g.
  *
  * @example
- *     // Transform XML timecodes into JSON
- *     // From :
- *     {
- *       "player": {
- *         "synchro":
- *         [
- *           {
- *             "id": ["slide_00000.jpeg"],
- *             "timecode": ["0"]
- *           }, {
- *             "id": ["slide_00001.jpeg"],
- *             "timecode": ["1200"]
- *           }
- *         ]
- *       }
- *     }
- *
- *     // To :
+ * // Transform XML timecodes into JSON
+ * // From :
+ * {
+ *   "player": {
+ *     "synchro":
  *     [
  *       {
- *         "timecode": 0,
- *         "type": "image"
- *         "data": {
- *           "filename": "slide_00000.jpeg"
- *         }
- *       },
- *       {
- *         "timecode": 1200,
- *         "type": "image"
- *         "data": {
- *           "filename": "slide_00001.jpeg"
- *         }
+ *         "id": ["slide_00000.jpeg"],
+ *         "timecode": ["0"]
+ *       }, {
+ *         "id": ["slide_00001.jpeg"],
+ *         "timecode": ["1200"]
  *       }
  *     ]
+ *   }
+ * }
  *
- * @method saveTimecodes
+ * // To :
+ * [
+ *   {
+ *     "timecode": 0,
+ *     "type": "image"
+ *     "data": {
+ *       "filename": "slide_00000.jpeg"
+ *     }
+ *   },
+ *   {
+ *     "timecode": 1200,
+ *     "type": "image"
+ *     "data": {
+ *       "filename": "slide_00001.jpeg"
+ *     }
+ *   }
+ * ]
+ *
+ * @memberof module:publish/packages/TarPackage~TarPackage
+ * @this module:publish/packages/TarPackage~TarPackage
  * @private
- * @async
  * @param {String} xmlTimecodeFilePath The timecode file to save
  * @param {String} destinationFilePath The JSON timecode file path
- * @param {Function} callback The function to call when done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when done
  */
 function saveTimecodes(xmlTimecodeFilePath, callback) {
   var self = this;
@@ -359,7 +348,6 @@ function saveTimecodes(xmlTimecodeFilePath, callback) {
 /**
  * Gets the stack of transitions corresponding to the package.
  *
- * @method getTransitions
  * @return {Array} The stack of transitions
  */
 TarPackage.prototype.getTransitions = function() {
@@ -370,7 +358,6 @@ TarPackage.prototype.getTransitions = function() {
  * Gets the list of transitions states corresponding to the package.
  *
  * @return {Array} The list of states/transitions
- * @method getStateMachine
  */
 TarPackage.prototype.getStateMachine = function() {
   return TarPackage.stateMachine;
@@ -381,7 +368,7 @@ TarPackage.prototype.getStateMachine = function() {
  *
  * This is a transition.
  *
- * @method extractPackage
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.extractPackage = function() {
@@ -411,7 +398,7 @@ TarPackage.prototype.extractPackage = function() {
  *
  * This is a transition.
  *
- * @method validatePackage
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.validatePackage = function() {
@@ -474,6 +461,7 @@ TarPackage.prototype.validatePackage = function() {
  *
  * Instead of defining the points of interest in package metadata, it is possible to define them in a "synchro.xml"
  * file at the root of the package with the following content:
+ * ```html
  * <pre>
  *   <?xml version="1.0"?>
  *   <player>
@@ -482,13 +470,14 @@ TarPackage.prototype.validatePackage = function() {
  *     ...
  *   </player>
  * </pre>
+ * ```
  *
  * However using "synchro.xml" is deprecated and should not be used anymore. Also note that it is not possible to
  * define points of interest of type "tag" using this method.
  *
  * This is a transition.
  *
- * @method saveTimecodes
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 TarPackage.prototype.saveTimecodes = function() {
@@ -648,7 +637,6 @@ TarPackage.prototype.saveTimecodes = function() {
 /**
  * Gets the media file path of the package.
  *
- * @method getMediaFilePath
  * @return {String} System path of the media file
  */
 TarPackage.prototype.getMediaFilePath = function() {
@@ -660,7 +648,6 @@ TarPackage.prototype.getMediaFilePath = function() {
  *
  * Finds which media has the most timecodes / tags.
  *
- * @method selectMultiSourcesMedia
  * @param {Object} media1 A media
  * @param {Object} media2 A media
  * @return {Object} Either media1 or media2
@@ -677,3 +664,10 @@ TarPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
 
   return (media1TotalTimecodes > media2TotalTimecodes) ? media1 : media2;
 };
+
+/**
+ * @callback module:publish/packages/TarPackage~TarPackage~validatePackageCallack
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} package The package information object
+ */
+

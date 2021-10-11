@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module controllers
+ * @module publish/controllers/ConfigurationController
  */
 
 var util = require('util');
@@ -23,6 +23,7 @@ var utilExt = openVeoApi.util;
  * @class ConfigurationController
  * @extends Controller
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about Controller
  */
 function ConfigurationController() {
   ConfigurationController.super_.call(this);
@@ -34,8 +35,6 @@ util.inherits(ConfigurationController, Controller);
 /**
  * Retrieves publish plugin configurations.
  *
- * @method getConfigurationAllAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -137,8 +136,6 @@ ConfigurationController.prototype.getConfigurationAllAction = function(request, 
  * Redirects action that will be called by google when the user associate our application,
  * a code will be in the parameters.
  *
- * @method handleGoogleOAuthCodeAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.query Request's query
  * @param {String} request.query.code Google authentication code
@@ -162,18 +159,15 @@ ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request
  * Saves watcher settings.
  *
  * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "owner": ..., // The id of the owner that will be associated to medias uploaded through the watcher
+ *     "group": ... // The id of the content group that will be associated to medias uploaded through the watcher
+ *   },
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "settings" : {
- *         "owner": ..., // The id of the owner that will be associated to medias uploaded through the watcher
- *         "group": ... // The id of the content group that will be associated to medias uploaded through the watcher
- *       },
- *       "total": 1
- *     }
- *
- * @method saveWatcherSettings
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body Request's body
  * @param {String} request.body.owner The id of the owner for new uploaded medias
@@ -224,17 +218,14 @@ ConfigurationController.prototype.saveWatcherSettings = function(request, respon
  * Saves TLS settings.
  *
  * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "properties": ... // The list of custom property ids
+ *   },
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "settings" : {
- *         "properties": ... // The list of custom property ids
- *       },
- *       "total": 1
- *     }
- *
- * @method saveTlsSettingsAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body Request's body
  * @param {String} request.body.properties The list of custom property ids
@@ -331,17 +322,14 @@ ConfigurationController.prototype.saveTlsSettingsAction = function(request, resp
  * Saves catalog settings.
  *
  * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "refreshInterval": 50 // The refresh interval in seconds
+ *   },
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "settings" : {
- *         "refreshInterval": 50 // The refresh interval in seconds
- *       },
- *       "total": 1
- *     }
- *
- * @method saveCatalogSettingsAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body Request's body
  * @param {Number} request.body.refreshInterval The refresh interval in seconds

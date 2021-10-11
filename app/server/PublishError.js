@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module publish
+ * @module publish/PublishError
  */
 
 var util = require('util');
@@ -18,36 +18,39 @@ var util = require('util');
 function PublishError(message, code) {
   Error.captureStackTrace(this, this.constructor);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * The publish manager error code.
-     *
-     * @property code
-     * @type String
-     * @final
-     */
-    code: {value: code},
+    /** @lends module:publish/PublishError~PublishError */
+    {
 
-    /**
-     * Error message.
-     *
-     * @property message
-     * @type String
-     * @final
-     */
-    message: {value: message, writable: true},
+      /**
+       * The publish manager error code.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      code: {value: code},
 
-    /**
-     * Error name.
-     *
-     * @property name
-     * @type String
-     * @final
-     */
-    name: {value: 'PublishError', writable: true}
+      /**
+       * Error message.
+       *
+       * @type {String}
+       * @instance
+       */
+      message: {value: message, writable: true},
 
-  });
+      /**
+       * Error name.
+       *
+       * @type {String}
+       * @instance
+       */
+      name: {value: 'PublishError', writable: true}
+
+    }
+
+  );
 }
 
 module.exports = PublishError;

@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @module publish/PublishPlugin
+ */
+
 var path = require('path');
 var util = require('util');
 
@@ -23,54 +27,58 @@ var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 /**
  * Defines the Publish Plugin that will be loaded by the core application.
  *
- * @module publish
- * @main publish
  * @class PublishPlugin
  * @extends Plugin
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about Plugin
  */
 function PublishPlugin() {
   PublishPlugin.super_.call(this);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Publish public router.
-     *
-     * @property router
-     * @type Router
-     * @final
-     */
-    router: {value: express.Router()},
+    /** @lends module:publish/PublishPlugin~PublishPlugin */
+    {
 
-    /**
-     * Publish private router.
-     *
-     * @property router
-     * @type Router
-     * @final
-     */
-    privateRouter: {value: express.Router()},
+      /**
+       * Publish public router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      router: {value: express.Router()},
 
-    /**
-     * Publish web service router.
-     *
-     * @property router
-     * @type Router
-     * @final
-     */
-    webServiceRouter: {value: express.Router()},
+      /**
+       * Publish private router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      privateRouter: {value: express.Router()},
 
-    /**
-     * Publish APIs.
-     *
-     * @property api
-     * @type PluginApi
-     * @final
-     */
-    api: {value: new PublishPluginApi()}
+      /**
+       * Publish web service router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      webServiceRouter: {value: express.Router()},
 
-  });
+      /**
+       * Publish APIs.
+       *
+       * @type {module:publish/PublishPluginApi~PublishPluginApi}
+       * @instance
+       * @readonly
+       */
+      api: {value: new PublishPluginApi()}
+
+    }
+
+  );
 }
 
 module.exports = PublishPlugin;
@@ -79,7 +87,8 @@ util.inherits(PublishPlugin, openVeoApi.plugin.Plugin);
 /**
  * Sets listeners on events.
  *
- * @method setListeners
+ * @memberof module:publish/PublishPlugin~PublishPlugin
+ * @this module:publish/PublishPlugin~PublishPlugin
  * @private
  */
 function setListeners() {
@@ -97,10 +106,7 @@ function setListeners() {
  *
  * This is automatically called by core application after plugin is loaded.
  *
- * @method init
- * @async
- * @param {Function} callback Function to call when it's done with :
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PublishPlugin.prototype.init = function(callback) {
   var coreApi = process.api.getCoreApi();
@@ -134,10 +140,7 @@ PublishPlugin.prototype.init = function(callback) {
  *
  * TODO: When a cache mechanism will be implemented, Publish settings will have to be pulled from cache.
  *
- * @method start
- * @async
- * @param {Function} callback Function to call when it's done with :
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PublishPlugin.prototype.start = function(callback) {
   var coreApi = process.api.getCoreApi();

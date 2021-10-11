@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Defines components responsible of the publish plugin back office pages.
+ *
+ * @module ov.publish
+ */
 (function(angular) {
 
   var app = angular.module('ov.publish', [

@@ -4,6 +4,11 @@
 
   /**
    * Defines the categories controller for the categories page.
+   *
+   * @class EditorController
+   * @memberof module:ov.publish
+   * @inner
+   * @ignore
    */
   function EditorController(
     $window,
@@ -23,6 +28,10 @@
 
     /**
      * Reconstructs ranges with chapters and cut array.
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function updateRange() {
       $scope.ranges = ($scope.media[$scope.selectedData.value] || []).concat($scope.media.cut || []);
@@ -35,6 +44,10 @@
 
     /**
      * Initializes chapters and start / end cuts.
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function init() {
 
@@ -69,6 +82,9 @@
     /**
      * Executes, safely, the given function in AngularJS process.
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param {Function} functionToExecute The function to execute as part of
      * the angular digest process.
      */
@@ -90,6 +106,9 @@
     /**
      * Gathers some parameters before calling init.
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param {Number} duration Media duration
      */
     function preinit(duration) {
@@ -122,6 +141,9 @@
     /**
      * Abort upload and delete file
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function deleteUpload() {
       if ($scope.upload) {
@@ -133,6 +155,10 @@
 
     /**
      * Clean object to save deleting all unecessary data
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param  {String} collectionName object key of the properties to clean
      * @param  {Bool} cleanAll condition if all Object has to be cleaned
      * @return {Object} clean Object
@@ -165,6 +191,10 @@
 
     /**
      * Retreive element position in array by its id
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param  {String} id The element id to search
      * @return {Number} The position of this element, -1 otherwise
      */
@@ -178,6 +208,10 @@
 
     /**
      * Save chapter error callback
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function saveChapterErrorCb(resp) {
       var fileError;
@@ -201,6 +235,10 @@
 
     /**
      * Save chapter success callback
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function saveChapterSuccessCb(resp) {
       $scope.file = null;
@@ -225,6 +263,10 @@
 
     /**
      * Save chapter
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function saveChapter() {
       var objToSave = cleanObjectToSave($scope.selectedData.value, true);
@@ -251,6 +293,9 @@
     /**
      * Selects and unselect a provided cut.
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param {Object} cut The cut to toggle
      * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
@@ -270,6 +315,9 @@
     /**
      * Selects or unselect the begin cut.
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
     function toggleBegin(addOrRemove) {
@@ -279,6 +327,9 @@
     /**
      * Selects or unselect the ending cut.
      *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      * @param {Boolean} addOrRemove Forces the addition or removal of the cut
      */
     function toggleEnd(addOrRemove) {
@@ -287,6 +338,10 @@
 
     /**
      * Save chapter and cut
+     *
+     * @memberof module:ov.publish~EditorController
+     * @instance
+     * @private
      */
     function saveCut() {
 

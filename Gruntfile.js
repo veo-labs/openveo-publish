@@ -3,7 +3,6 @@
 /* eslint no-sync: 0 */
 var path = require('path');
 var fs = require('fs');
-var openVeoApi = require('@openveo/api');
 
 process.rootPublish = __dirname;
 process.requirePublish = function(filePath) {
@@ -47,12 +46,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-gh-pages');
-
-  grunt.registerMultiTask('rename', openVeoApi.grunt.renameTask(grunt));
 
   // Build back office client
   grunt.registerTask('build-back-office-client', [
@@ -65,8 +61,5 @@ module.exports = function(grunt) {
 
   // Build front office client
   grunt.registerTask('build-front-office-client', ['uglify:front-office', 'concat:front-office-js']);
-
-  // Generate documentation
-  grunt.registerTask('doc', ['yuidoc', 'rename:doc']);
 
 };

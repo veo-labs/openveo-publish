@@ -11,8 +11,9 @@
    *
    * The attribute milliseconds-max must be set to validate the value range.
    *
-   * @module ov.publish
    * @class ovpTime
+   * @memberof module:ov.publish
+   * @inner
    */
   function ovpTime($filter) {
     return {

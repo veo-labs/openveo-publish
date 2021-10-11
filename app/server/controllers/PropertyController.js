@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module controllers
+ * @module publish/controllers/PropertyController
  */
 
 var util = require('util');
@@ -17,6 +17,7 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * @class PropertyController
  * @extends EntityController
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityController
  */
 function PropertyController() {
   PropertyController.super_.call(this);
@@ -28,8 +29,6 @@ util.inherits(PropertyController, EntityController);
 /**
  * Gets the list of custom property types.
  *
- * @method getPropertyTypesAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -44,23 +43,20 @@ PropertyController.prototype.getPropertyTypesAction = function(request, response
  * Gets custom properties.
  *
  * @example
+ * // Response example
+ * {
+ *   "entities" : [ ... ],
+ *   "pagination" : {
+ *     "limit": ..., // The limit number of custom properties by page
+ *     "page": ..., // The actual page
+ *     "pages": ..., // The total number of pages
+ *     "size": ... // The total number of custom properties
+ * }
  *
- *     // Response example
- *     {
- *       "entities" : [ ... ],
- *       "pagination" : {
- *         "limit": ..., // The limit number of custom properties by page
- *         "page": ..., // The actual page
- *         "pages": ..., // The total number of pages
- *         "size": ... // The total number of custom properties
- *     }
- *
- * @method getEntitiesAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} [request.query] Request's query
- * @param {String|Array} [request.query.include] The list of fields to include from returned properties
- * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned properties. Ignored if
+ * @param {(String|Array)} [request.query.include] The list of fields to include from returned properties
+ * @param {(String|Array)} [request.query.exclude] The list of fields to exclude from returned properties. Ignored if
  * include is also specified.
  * @param {String} [request.query.query] Search query to search on both name and description
  * @param {Number} [request.query.useSmartSearch=1] 1 to use a more advanced search mechanism, 0 to use a simple search
@@ -141,8 +137,7 @@ PropertyController.prototype.getEntitiesAction = function(request, response, nex
 /**
  * Gets associated provider.
  *
- * @method getProvider
- * @return {PropertyProvider} The provider associated to the controller
+ * @return {module:publish/providers/PropertyProvider~PropertyProvider} The provider associated to the controller
  */
 PropertyController.prototype.getProvider = function(request) {
   return new PropertyProvider(process.api.getCoreApi().getDatabase());

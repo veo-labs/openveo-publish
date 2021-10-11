@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module controllers
+ * @module publish/controllers/httpErrors
  */
 
 /**
@@ -10,11 +10,10 @@
  * HTTP errors are sent by controllers.
  *
  * @example
- *     var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
- *     console.log(HTTP_ERRORS.UNKNOWN_ERROR);
+ * var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+ * console.log(HTTP_ERRORS.UNKNOWN_ERROR);
  *
- * @class HTTP_ERRORS
- * @static
+ * @namespace
  */
 
 var HTTP_ERRORS = {
@@ -24,10 +23,10 @@ var HTTP_ERRORS = {
   /**
    * Unidentified error.
    *
-   * @property UNKNOWN_ERROR
-   * @type Object
-   * @final
-   * @default 0
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNKNOWN_ERROR: {
     code: 0x000,
@@ -38,10 +37,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready video failed.
    *
-   * @property GET_VIDEO_READY_ERROR
-   * @type Object
-   * @final
-   * @default 1
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_ERROR: {
     code: 0x001,
@@ -52,10 +51,10 @@ var HTTP_ERRORS = {
   /**
    * Publishing a video failed.
    *
-   * @property PUBLISH_VIDEOS_ERROR
-   * @type Object
-   * @final
-   * @default 2
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   PUBLISH_VIDEOS_ERROR: {
     code: 0x002,
@@ -66,10 +65,10 @@ var HTTP_ERRORS = {
   /**
    * Unpublishing a video failed.
    *
-   * @property UNPUBLISH_VIDEOS_ERROR
-   * @type Object
-   * @final
-   * @default 3
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNPUBLISH_VIDEOS_ERROR: {
     code: 0x003,
@@ -80,10 +79,10 @@ var HTTP_ERRORS = {
   /**
    * Getting Publish plugin configuration failed.
    *
-   * @property GET_CONFIGURATION_ERROR
-   * @type Object
-   * @final
-   * @default 4
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_CONFIGURATION_ERROR: {
     code: 0x004,
@@ -94,10 +93,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of custom properties failed.
    *
-   * @property GET_PROPERTIES_ERROR
-   * @type Object
-   * @final
-   * @default 5
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_PROPERTIES_ERROR: {
     code: 0x005,
@@ -108,10 +107,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of videos failed.
    *
-   * @property GET_VIDEOS_ERROR
-   * @type Object
-   * @final
-   * @default 6
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_ERROR: {
     code: 0x006,
@@ -122,10 +121,10 @@ var HTTP_ERRORS = {
   /**
    * Updating an entity statistics failed.
    *
-   * @property STATISTICS_UPDATE_ERROR
-   * @type Object
-   * @final
-   * @default 7
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_UPDATE_ERROR: {
     code: 0x007,
@@ -137,10 +136,10 @@ var HTTP_ERRORS = {
   /**
    * Saving watcher settings failed.
    *
-   * @property SAVE_WATCHER_SETTINGS_ERROR
-   * @type Object
-   * @final
-   * @default 8
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_WATCHER_SETTINGS_ERROR: {
     code: 0x008,
@@ -151,10 +150,10 @@ var HTTP_ERRORS = {
   /**
    * Attaching a file to a point of interest failed.
    *
-   * @property UPDATE_POI_UPLOAD_ERROR
-   * @type Object
-   * @final
-   * @default 9
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_UPLOAD_ERROR: {
     code: 0x009,
@@ -165,10 +164,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of groups, when adding a media, failed.
    *
-   * @property ADD_MEDIA_GROUPS_ERROR
-   * @type Object
-   * @final
-   * @default 10
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_GROUPS_ERROR: {
     code: 0x00a,
@@ -179,10 +178,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of custom properties, when adding a media, failed.
    *
-   * @property ADD_MEDIA_CUSTOM_PROPERTIES_ERROR
-   * @type Object
-   * @final
-   * @default 11
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_CUSTOM_PROPERTIES_ERROR: {
     code: 0x00b,
@@ -193,10 +192,10 @@ var HTTP_ERRORS = {
   /**
    * Parsing multipart body, when adding a media, failed.
    *
-   * @property ADD_MEDIA_PARSE_ERROR
-   * @type Object
-   * @default 12
-   * @final
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_PARSE_ERROR: {
     code: 0x00c,
@@ -207,10 +206,10 @@ var HTTP_ERRORS = {
   /**
    * Checking that media does not already exists in database, when adding a media, failed.
    *
-   * @property ADD_MEDIA_CHECK_DUPLICATE_ERROR
-   * @type Object
-   * @final
-   * @default 13
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_CHECK_DUPLICATE_ERROR: {
     code: 0x00d,
@@ -221,10 +220,10 @@ var HTTP_ERRORS = {
   /**
    * Removing temporary media file, when adding a media, failed.
    *
-   * @property ADD_MEDIA_REMOVE_FILE_ERROR
-   * @type Object
-   * @final
-   * @default 14
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_REMOVE_FILE_ERROR: {
     code: 0x00e,
@@ -235,10 +234,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready media failed, media is not ready.
    *
-   * @property GET_VIDEO_READY_NOT_READY_ERROR
-   * @type Object
-   * @final
-   * @default 15
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_NOT_READY_ERROR: {
     code: 0x00f,
@@ -249,10 +248,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready media failed when getting video platform information.
    *
-   * @property GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR
-   * @type Object
-   * @final
-   * @default 16
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR: {
     code: 0x010,
@@ -263,10 +262,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media failed when getting the media.
    *
-   * @property UPDATE_MEDIA_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 17
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_GET_ONE_ERROR: {
     code: 0x011,
@@ -277,10 +276,10 @@ var HTTP_ERRORS = {
   /**
    * Getting medias failed when getting custom properties.
    *
-   * @property GET_VIDEOS_GET_PROPERTIES_ERROR
-   * @type Object
-   * @final
-   * @default 18
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_GET_PROPERTIES_ERROR: {
     code: 0x012,
@@ -291,10 +290,10 @@ var HTTP_ERRORS = {
   /**
    * Publishing medias failed when getting medias.
    *
-   * @property PUBLISH_VIDEOS_GET_VIDEOS_ERROR
-   * @type Object
-   * @final
-   * @default 19
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   PUBLISH_VIDEOS_GET_VIDEOS_ERROR: {
     code: 0x013,
@@ -305,10 +304,10 @@ var HTTP_ERRORS = {
   /**
    * Unpublishing medias failed when getting medias.
    *
-   * @property UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR
-   * @type Object
-   * @final
-   * @default 20
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNPUBLISH_VIDEOS_GET_VIDEOS_ERROR: {
     code: 0x014,
@@ -319,10 +318,10 @@ var HTTP_ERRORS = {
   /**
    * Updating point of interest failed when getting the media.
    *
-   * @property UPDATE_POI_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 21
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_GET_ONE_ERROR: {
     code: 0x015,
@@ -333,10 +332,10 @@ var HTTP_ERRORS = {
   /**
    * Updating point of interest failed.
    *
-   * @property UPDATE_POI_UPDATE_ERROR
-   * @type Object
-   * @final
-   * @default 23
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_UPDATE_ERROR: {
     code: 0x017,
@@ -347,10 +346,10 @@ var HTTP_ERRORS = {
   /**
    * Removing media points of interest failed when getting the media.
    *
-   * @property REMOVE_POIS_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 25
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_GET_ONE_ERROR: {
     code: 0x019,
@@ -361,10 +360,10 @@ var HTTP_ERRORS = {
   /**
    * Removing points of interest failed.
    *
-   * @property REMOVE_POIS_REMOVE_ERROR
-   * @type Object
-   * @final
-   * @default 26
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_REMOVE_ERROR: {
     code: 0x01a,
@@ -375,10 +374,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed when getting media.
    *
-   * @property CONVERT_POIS_GET_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 29
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_GET_MEDIA_ERROR: {
     code: 0x01d,
@@ -389,10 +388,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, media is not ready.
    *
-   * @property CONVERT_POIS_MEDIA_NOT_READY_ERROR
-   * @type Object
-   * @final
-   * @default 30
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_MEDIA_NOT_READY_ERROR: {
     code: 0x01e,
@@ -403,10 +402,10 @@ var HTTP_ERRORS = {
   /**
    * Updating media statistics failed when getting media.
    *
-   * @property STATISTICS_GET_ONE_ERROR
-   * @type Object
-   * @final
-   * @default 31
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_GET_ONE_ERROR: {
     code: 0x01f,
@@ -417,10 +416,10 @@ var HTTP_ERRORS = {
   /**
    * Convert points of interest failed when updating the media.
    *
-   * @property CONVERT_POIS_UPDATE_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 32
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_UPDATE_MEDIA_ERROR: {
     code: 0x020,
@@ -431,10 +430,10 @@ var HTTP_ERRORS = {
   /**
    * Invalid video thumbnail.
    *
-   * @property INVALID_VIDEO_THUMBNAIL
-   * @type Object
-   * @final
-   * @default 33
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   INVALID_VIDEO_THUMBNAIL: {
     code: 0x021,
@@ -445,10 +444,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media failed when parsing body.
    *
-   * @property UPDATE_MEDIA_PARSE_ERROR
-   * @type Object
-   * @final
-   * @default 34
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_PARSE_ERROR: {
     code: 0x022,
@@ -459,10 +458,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media failed.
    *
-   * @property UPDATE_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 35
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_ERROR: {
     code: 0x023,
@@ -473,10 +472,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed.
    *
-   * @property GET_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 36
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_ERROR: {
     code: 0x024,
@@ -487,10 +486,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed when getting video platform information.
    *
-   * @property GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR
-   * @type Object
-   * @final
-   * @default 37
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_UPDATE_MEDIA_WITH_PLATFORM_INFO_ERROR: {
     code: 0x025,
@@ -501,10 +500,10 @@ var HTTP_ERRORS = {
   /**
    * Getting custom properties failed while saving TLS settings.
    *
-   * @property SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR
-   * @type Object
-   * @final
-   * @default 38
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR: {
     code: 0x026,
@@ -515,10 +514,10 @@ var HTTP_ERRORS = {
   /**
    * Saving TLS settings failed.
    *
-   * @property SAVE_TLS_SETTINGS_ERROR
-   * @type Object
-   * @final
-   * @default 39
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_TLS_SETTINGS_ERROR: {
     code: 0x027,
@@ -529,10 +528,10 @@ var HTTP_ERRORS = {
   /**
    * Synchronizing media with media platform failed while updating media.
    *
-   * @property UPDATE_MEDIA_SYNCHRONIZE_ERROR
-   * @type Object
-   * @final
-   * @default 40
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_SYNCHRONIZE_ERROR: {
     code: 0x028,
@@ -543,10 +542,10 @@ var HTTP_ERRORS = {
   /**
    * Removing medias failed, a media is not in a stable state.
    *
-   * @property REMOVE_MEDIAS_STATE_ERROR
-   * @type Object
-   * @final
-   * @default 41
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_MEDIAS_STATE_ERROR: {
     code: 0x029,
@@ -557,10 +556,10 @@ var HTTP_ERRORS = {
   /**
    * Removing medias failed.
    *
-   * @property REMOVE_MEDIAS_ERROR
-   * @type Object
-   * @final
-   * @default 42
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_MEDIAS_ERROR: {
     code: 0x02a,
@@ -571,10 +570,10 @@ var HTTP_ERRORS = {
   /**
    * Removing medias failed when getting the list of medias.
    *
-   * @property REMOVE_MEDIAS_GET_MEDIAS_ERROR
-   * @type Object
-   * @final
-   * @default 43
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_MEDIAS_GET_MEDIAS_ERROR: {
     code: 0x02b,
@@ -585,10 +584,10 @@ var HTTP_ERRORS = {
   /**
    * Getting medias failed when getting the list of categories.
    *
-   * @property GET_VIDEOS_GET_CATEGORIES_ERROR
-   * @type Object
-   * @final
-   * @default 44
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_GET_CATEGORIES_ERROR: {
     code: 0x02c,
@@ -599,10 +598,10 @@ var HTTP_ERRORS = {
   /**
    * Saving catalog settings failed.
    *
-   * @property SAVE_CATALOG_SETTINGS_ERROR
-   * @type Object
-   * @final
-   * @default 45
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_CATALOG_SETTINGS_ERROR: {
     code: 0x02d,
@@ -613,10 +612,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed when verifying the owner.
    *
-   * @property ADD_MEDIA_VERIFY_OWNER_ERROR
-   * @type Object
-   * @final
-   * @default 46
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_VERIFY_OWNER_ERROR: {
     code: 0x02e,
@@ -627,10 +626,10 @@ var HTTP_ERRORS = {
   /**
    * Creating point of interest failed.
    *
-   * @property UPDATE_POI_CREATE_ERROR
-   * @type Object
-   * @final
-   * @default 47
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_CREATE_ERROR: {
     code: 0x02f,
@@ -641,10 +640,10 @@ var HTTP_ERRORS = {
   /**
    * Updating point of interest of a media failed.
    *
-   * @property UPDATE_POI_UPDATE_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 48
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_UPDATE_MEDIA_ERROR: {
     code: 0x030,
@@ -655,10 +654,10 @@ var HTTP_ERRORS = {
   /**
    * Removing points of interest when updating the media.
    *
-   * @property REMOVE_POIS_UPDATE_MEDIA_ERROR
-   * @type Object
-   * @final
-   * @default 49
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_UPDATE_MEDIA_ERROR: {
     code: 0x031,
@@ -669,10 +668,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready video failed when getting points of interest.
    *
-   * @property GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR
-   * @type Object
-   * @final
-   * @default 50
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_POPULATE_WITH_POIS_ERROR: {
     code: 0x032,
@@ -683,10 +682,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed when populating with points of interest.
    *
-   * @property GET_MEDIA_POPULATE_WITH_POIS_ERROR
-   * @type Object
-   * @final
-   * @default 51
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_POPULATE_WITH_POIS_ERROR: {
     code: 0x033,
@@ -697,10 +696,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed when getting points of interest.
    *
-   * @property CONVERT_POIS_GET_POIS_ERROR
-   * @type Object
-   * @final
-   * @default 52
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_GET_POIS_ERROR: {
     code: 0x034,
@@ -711,10 +710,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed when updating a point of interest.
    *
-   * @property CONVERT_POIS_UPDATE_POI_ERROR
-   * @type Object
-   * @final
-   * @default 53
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_UPDATE_POI_ERROR: {
     code: 0x035,
@@ -725,10 +724,10 @@ var HTTP_ERRORS = {
   /**
    * Getting medias failed when getting the list of categories.
    *
-   * @property GET_VIDEOS_POPULATE_WITH_POIS_ERROR
-   * @type Object
-   * @final
-   * @default 54
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_POPULATE_WITH_POIS_ERROR: {
     code: 0x036,
@@ -739,10 +738,10 @@ var HTTP_ERRORS = {
   /**
    * Getting medias failed when searching in points of interest.
    *
-   * @property GET_VIDEOS_SEARCH_IN_POIS_ERROR
-   * @type Object
-   * @final
-   * @default 55
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_SEARCH_IN_POIS_ERROR: {
     code: 0x037,
@@ -755,10 +754,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready video failed, user doesn't have enough privilege.
    *
-   * @property GET_VIDEO_READY_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 256
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_FORBIDDEN: {
     code: 0x100,
@@ -769,10 +768,10 @@ var HTTP_ERRORS = {
   /**
    * Publishing a video failed, user doesn't have enough privilege.
    *
-   * @property PUBLISH_VIDEOS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 257
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   PUBLISH_VIDEOS_FORBIDDEN: {
     code: 0x101,
@@ -783,10 +782,10 @@ var HTTP_ERRORS = {
   /**
    * Unpublishing a video failed, user doesn't have enough privilege.
    *
-   * @property UNPUBLISH_VIDEOS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 258
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNPUBLISH_VIDEOS_FORBIDDEN: {
     code: 0x102,
@@ -797,10 +796,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media point of interest failed, user doesn't have enough privilege.
    *
-   * @property UPDATE_POI_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 259
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_FORBIDDEN: {
     code: 0x103,
@@ -811,10 +810,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media failed, user doesn't have enough privilege.
    *
-   * @property UPDATE_MEDIA_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 260
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_FORBIDDEN: {
     code: 0x104,
@@ -825,10 +824,10 @@ var HTTP_ERRORS = {
   /**
    * Removing media points of interest failed, user doesn't have enough privilege.
    *
-   * @property REMOVE_POIS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 262
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_FORBIDDEN: {
     code: 0x106,
@@ -839,10 +838,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, user doesn't have enough privilege.
    *
-   * @property CONVERT_POIS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 264
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_FORBIDDEN: {
     code: 0x108,
@@ -853,10 +852,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed, user doesn't have enough privilege.
    *
-   * @property GET_MEDIA_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 265
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_FORBIDDEN: {
     code: 0x109,
@@ -867,10 +866,10 @@ var HTTP_ERRORS = {
   /**
    * Removing medias failed, user doesn't have enough privilege.
    *
-   * @property REMOVE_MEDIAS_FORBIDDEN
-   * @type Object
-   * @final
-   * @default 266
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_MEDIAS_FORBIDDEN: {
     code: 0x10a,
@@ -883,10 +882,10 @@ var HTTP_ERRORS = {
   /**
    * Getting a ready video failed, missing parameters.
    *
-   * @property GET_VIDEO_READY_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 512
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_MISSING_PARAMETERS: {
     code: 0x200,
@@ -897,10 +896,10 @@ var HTTP_ERRORS = {
   /**
    * Publishing a video failed, missing parameters.
    *
-   * @property PUBLISH_VIDEOS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 513
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   PUBLISH_VIDEOS_MISSING_PARAMETERS: {
     code: 0x201,
@@ -911,10 +910,10 @@ var HTTP_ERRORS = {
   /**
    * Unpublishing a video failed, missing parameters.
    *
-   * @property UNPUBLISH_VIDEOS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 514
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNPUBLISH_VIDEOS_MISSING_PARAMETERS: {
     code: 0x202,
@@ -925,10 +924,10 @@ var HTTP_ERRORS = {
   /**
    * Retrying video processing failed, missing parameters.
    *
-   * @property RETRY_VIDEOS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 515
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   RETRY_VIDEOS_MISSING_PARAMETERS: {
     code: 0x203,
@@ -939,10 +938,10 @@ var HTTP_ERRORS = {
   /**
    * Starting a video upload failed, missing parameters.
    *
-   * @property START_UPLOAD_VIDEOS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 516
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   START_UPLOAD_VIDEOS_MISSING_PARAMETERS: {
     code: 0x204,
@@ -953,10 +952,10 @@ var HTTP_ERRORS = {
   /**
    * Setting statistics about an entity failed, missing the id parameter.
    *
-   * @property STATISTICS_MISSING_ID_PARAMETERS
-   * @type Object
-   * @final
-   * @default 517
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_MISSING_ID_PARAMETERS: {
     code: 0x205,
@@ -968,10 +967,10 @@ var HTTP_ERRORS = {
   /**
    * Setting statistics about an entity failed, unknown statistic property.
    *
-   * @property STATISTICS_PROPERTY_UNKNOWN
-   * @type Object
-   * @final
-   * @default 518
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_PROPERTY_UNKNOWN: {
     code: 0x206,
@@ -983,10 +982,10 @@ var HTTP_ERRORS = {
   /**
    * Setting statistics about an entity failed, unknown entity.
    *
-   * @property STATISTICS_ENTITY_UNKNOWN
-   * @type Object
-   * @final
-   * @default 519
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_ENTITY_UNKNOWN: {
     code: 0x207,
@@ -998,10 +997,10 @@ var HTTP_ERRORS = {
   /**
    * Setting statistics about an entity failed, missing the count parameter.
    *
-   * @property STATISTICS_MISSING_COUNT_PARAMETERS
-   * @type Object
-   * @final
-   * @default 520
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   STATISTICS_MISSING_COUNT_PARAMETERS: {
     code: 0x208,
@@ -1013,10 +1012,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of videos failed, wrong parameters.
    *
-   * @property GET_VIDEOS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 521
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_WRONG_PARAMETERS: {
     code: 0x209,
@@ -1027,10 +1026,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media point of interest failed, missing parameters.
    *
-   * @property UPDATE_POI_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 522
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_MISSING_PARAMETERS: {
     code: 0x20a,
@@ -1041,10 +1040,10 @@ var HTTP_ERRORS = {
   /**
    * Removing media points of interest failed, missing parameters.
    *
-   * @property REMOVE_POIS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 523
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_MISSING_PARAMETERS: {
     code: 0x20b,
@@ -1055,10 +1054,10 @@ var HTTP_ERRORS = {
   /**
    * Adding a media failed, wrong parameters.
    *
-   * @property ADD_MEDIA_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 524
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_MISSING_PARAMETERS: {
     code: 0x20c,
@@ -1069,10 +1068,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, missing the body.
    *
-   * @property ADD_MEDIA_MISSING_INFO_PARAMETERS
-   * @type Object
-   * @final
-   * @default 525
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_MISSING_INFO_PARAMETERS: {
     code: 0x20d,
@@ -1083,10 +1082,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, wrong file parameter.
    *
-   * @property ADD_MEDIA_WRONG_FILE_PARAMETER
-   * @type Object
-   * @final
-   * @default 526
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_WRONG_FILE_PARAMETER: {
     code: 0x20e,
@@ -1098,10 +1097,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, wrong parameters.
    *
-   * @property ADD_MEDIA_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 527
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_WRONG_PARAMETERS: {
     code: 0x20f,
@@ -1112,10 +1111,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, wrong properties parameter.
    *
-   * @property ADD_MEDIA_WRONG_PROPERTIES_PARAMETER
-   * @type Object
-   * @final
-   * @default 528
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_WRONG_PROPERTIES_PARAMETER: {
     code: 0x210,
@@ -1126,10 +1125,10 @@ var HTTP_ERRORS = {
   /**
    * Saving watcher settings failed, missing parameters.
    *
-   * @property SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 529
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS: {
     code: 0x211,
@@ -1140,10 +1139,10 @@ var HTTP_ERRORS = {
   /**
    * Saving watcher settings failed, wrong parameters.
    *
-   * @property SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 530
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS: {
     code: 0x212,
@@ -1154,10 +1153,10 @@ var HTTP_ERRORS = {
   /**
    * Getting video ready failed, wrong parameters.
    *
-   * @property GET_VIDEO_READY_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 531
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_WRONG_PARAMETERS: {
     code: 0x213,
@@ -1168,10 +1167,10 @@ var HTTP_ERRORS = {
   /**
    * Publishing videos failed, wrong parameters.
    *
-   * @property PUBLISH_VIDEOS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 532
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   PUBLISH_VIDEOS_WRONG_PARAMETERS: {
     code: 0x214,
@@ -1182,10 +1181,10 @@ var HTTP_ERRORS = {
   /**
    * Unpublishing videos failed, wrong parameters.
    *
-   * @property UNPUBLISH_VIDEOS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 533
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UNPUBLISH_VIDEOS_WRONG_PARAMETERS: {
     code: 0x215,
@@ -1196,10 +1195,10 @@ var HTTP_ERRORS = {
   /**
    * Starting videos upload failed, wrong parameters.
    *
-   * @property START_UPLOAD_VIDEOS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 534
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   START_UPLOAD_VIDEOS_WRONG_PARAMETERS: {
     code: 0x216,
@@ -1210,10 +1209,10 @@ var HTTP_ERRORS = {
   /**
    * Updating a media point of interest failed, wrong parameters.
    *
-   * @property UPDATE_POI_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 535
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_POI_WRONG_PARAMETERS: {
     code: 0x217,
@@ -1224,10 +1223,10 @@ var HTTP_ERRORS = {
   /**
    * Removing media points of interest failed, wrong parameters.
    *
-   * @property REMOVE_POIS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 538
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_POIS_WRONG_PARAMETERS: {
     code: 0x21a,
@@ -1238,10 +1237,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, missing parameters.
    *
-   * @property CONVERT_POIS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 541
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_MISSING_PARAMETERS: {
     code: 0x21d,
@@ -1252,10 +1251,10 @@ var HTTP_ERRORS = {
   /**
    * Converting points of interest failed, wrong parameters.
    *
-   * @property CONVERT_POIS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 542
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   CONVERT_POIS_WRONG_PARAMETERS: {
     code: 0x21e,
@@ -1266,10 +1265,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed, wrong parameters.
    *
-   * @property GET_MEDIA_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 543
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_WRONG_PARAMETERS: {
     code: 0x21f,
@@ -1280,10 +1279,10 @@ var HTTP_ERRORS = {
   /**
    * Getting media failed, missing parameters.
    *
-   * @property GET_MEDIA_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 544
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_MISSING_PARAMETERS: {
     code: 0x220,
@@ -1294,10 +1293,10 @@ var HTTP_ERRORS = {
   /**
    * Retrying video processing failed, wrong parameters.
    *
-   * @property RETRY_VIDEOS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 545
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   RETRY_VIDEOS_WRONG_PARAMETERS: {
     code: 0x221,
@@ -1308,10 +1307,10 @@ var HTTP_ERRORS = {
   /**
    * Getting the list of videos failed, wrong custom properties values.
    *
-   * @property GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 546
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEOS_CUSTOM_PROPERTIES_WRONG_PARAMETERS: {
     code: 0x222,
@@ -1322,10 +1321,10 @@ var HTTP_ERRORS = {
   /**
    * Saving TLS settings failed, wrong parameters.
    *
-   * @property SAVE_TLS_SETTINGS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 547
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_TLS_SETTINGS_WRONG_PARAMETERS: {
     code: 0x223,
@@ -1336,10 +1335,10 @@ var HTTP_ERRORS = {
   /**
    * Saving TLS settings failed, one or more custom properties do not exist.
    *
-   * @property SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER
-   * @type Object
-   * @final
-   * @default 548
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER: {
     code: 0x224,
@@ -1350,10 +1349,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, missing the media file.
    *
-   * @property ADD_MEDIA_MISSING_FILE_PARAMETER
-   * @type Object
-   * @final
-   * @default 549
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_MISSING_FILE_PARAMETER: {
     code: 0x225,
@@ -1364,10 +1363,10 @@ var HTTP_ERRORS = {
   /**
    * Removing medias failed, missing the media ids.
    *
-   * @property REMOVE_MEDIAS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 550
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   REMOVE_MEDIAS_MISSING_PARAMETERS: {
     code: 0x226,
@@ -1378,10 +1377,10 @@ var HTTP_ERRORS = {
   /**
    * Saving catalog settings failed, wrong parameters.
    *
-   * @property SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS
-   * @type Object
-   * @final
-   * @default 551
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS: {
     code: 0x227,
@@ -1392,10 +1391,10 @@ var HTTP_ERRORS = {
   /**
    * Saving catalog settings failed, missing parameters.
    *
-   * @property SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS
-   * @type Object
-   * @final
-   * @default 552
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS: {
     code: 0x228,
@@ -1406,10 +1405,10 @@ var HTTP_ERRORS = {
   /**
    * Adding media failed, specified user does not exist.
    *
-   * @property ADD_MEDIA_WRONG_USER_PARAMETER
-   * @type Object
-   * @final
-   * @default 553
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   ADD_MEDIA_WRONG_USER_PARAMETER: {
     code: 0x229,
@@ -1422,10 +1421,10 @@ var HTTP_ERRORS = {
   /**
    * Ready video was not found.
    *
-   * @property GET_VIDEO_READY_NOT_FOUND
-   * @type Object
-   * @final
-   * @default 768
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_VIDEO_READY_NOT_FOUND: {
     code: 0x300,
@@ -1436,10 +1435,10 @@ var HTTP_ERRORS = {
   /**
    * Media was not found.
    *
-   * @property GET_MEDIA_NOT_FOUND
-   * @type Object
-   * @final
-   * @default 769
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   GET_MEDIA_NOT_FOUND: {
     code: 0x301,
@@ -1450,10 +1449,10 @@ var HTTP_ERRORS = {
   /**
    * Media was not found when trying to update it.
    *
-   * @property UPDATE_MEDIA_NOT_FOUND_ERROR
-   * @type Object
-   * @final
-   * @default 770
+   * @const
+   * @type {Object}
+   * @default
+   * @inner
    */
   UPDATE_MEDIA_NOT_FOUND_ERROR: {
     code: 0x302,

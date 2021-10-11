@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module publish
+ * @module module:publish/PublishManager
  */
 
 var util = require('util');
@@ -21,36 +21,36 @@ var publishManager;
 /**
  * Fired when an error occurred while processing a package.
  *
- * @event error
- * @param {Error} The error
+ * @event module:publish/PublishManager~PublishManager#error
+ * @property {Error} error The error
  */
 
 /**
  * Fired when a package process has succeed.
  *
- * @event complete
- * @param {Object} The processed package
+ * @event module:publish/PublishManager~PublishManager#complete
+ * @property {Object} package The processed package
  */
 
 /**
  * Fired when a media in error restarts.
  *
- * @event retry
- * @param {Object} The media
+ * @event module:publish/PublishManager~PublishManager#retry
+ * @property {Object} media The media
  */
 
 /**
  * Fired when a media stuck in "waiting for upload" state starts uploading.
  *
- * @event upload
- * @param {Object} The media
+ * @event module:publish/PublishManager~PublishManager#upload
+ * @property {Object} media The media
  */
 
 /**
  * Fired when media state has changed.
  *
- * @event stateChanged
- * @param {Object} The media
+ * @event module:publish/PublishManager~PublishManager#stateChanged
+ * @property {Object} media The media
  */
 
 /**
@@ -60,86 +60,91 @@ var publishManager;
  * different regarding the type of the media.
  *
  * @example
- *     var coreApi = process.api.getCoreApi();
- *     var database = coreApi.getDatabase();
- *     var PublishManager = process.requirePublish('app/server/PublishManager.js');
- *     var videoProvider = new VideoProvider(database);
- *     var publishManager = new PublishManager(videoProvider, 5);
+ * var coreApi = process.api.getCoreApi();
+ * var database = coreApi.getDatabase();
+ * var PublishManager = process.requirePublish('app/server/PublishManager.js');
+ * var videoProvider = new VideoProvider(database);
+ * var publishManager = new PublishManager(videoProvider, 5);
  *
- *     // Listen publish manager's errors
- *     publishManager.on('error', function(error) {
- *       // Do something
- *     });
+ * // Listen publish manager's errors
+ * publishManager.on('error', function(error) {
+ *   // Do something
+ * });
  *
- *     // Listen to publish manager's end of processing for a media
- *     publishManager.on('complete', function(mediaPackage){
- *       // Do something
- *     });
+ * // Listen to publish manager's end of processing for a media
+ * publishManager.on('complete', function(mediaPackage){
+ *   // Do something
+ * });
  *
- *     // Listen to publish manager's event informing that a media processing is retrying
- *     publishManager.on('retry', function(mediaPackage) {
- *       // Do something
- *     });
+ * // Listen to publish manager's event informing that a media processing is retrying
+ * publishManager.on('retry', function(mediaPackage) {
+ *   // Do something
+ * });
  *
- *     // Listen to publish manager's event informing that a media, waiting for upload, starts uploading
- *     publishManager.on('upload', function(mediaPackage) {
- *       // Do something
- *     });
+ * // Listen to publish manager's event informing that a media, waiting for upload, starts uploading
+ * publishManager.on('upload', function(mediaPackage) {
+ *   // Do something
+ * });
  *
- *     publishManager.publish({
- *       type: 'youtube', // The media platform to use for this media
- *       originalPackagePath: '/home/openveo/medias/media-package.tar', // Path of the media package
- *       originalFileName: 'media-package' // File name without extension
- *     });
+ * publishManager.publish({
+ *   type: 'youtube', // The media platform to use for this media
+ *   originalPackagePath: '/home/openveo/medias/media-package.tar', // Path of the media package
+ *   originalFileName: 'media-package' // File name without extension
+ * });
  *
  * @class PublishManager
  * @constructor
- * @param {VideoProvider} videoProvider The media provider
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider The media provider
  * @param {Number} [maxConcurrentPackage=3] The maximum number of medias to treat in parallel
  */
 function PublishManager(videoProvider, maxConcurrentPackage) {
   if (publishManager)
     throw new Error('PublishManager already instanciated, use get method instead');
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Medias waiting to be processed.
-     *
-     * @property queue
-     * @type Array
-     * @final
-     */
-    queue: {value: []},
+    /** @lends module:publish/PublishManager~PublishManger */
+    {
 
-    /**
-     * Medias being processed.
-     *
-     * @property pendingPackages
-     * @type Array
-     * @final
-     */
-    pendingPackages: {value: []},
+      /**
+       * Medias waiting to be processed.
+       *
+       * @type {Array}
+       * @instance
+       * @readonly
+       */
+      queue: {value: []},
 
-    /**
-     * Media provider.
-     *
-     * @property videoProvider
-     * @type VideoProvider
-     * @final
-     */
-    videoProvider: {value: videoProvider},
+      /**
+       * Medias being processed.
+       *
+       * @type {Array}
+       * @instance
+       * @readonly
+       */
+      pendingPackages: {value: []},
 
-    /**
-     * Maximum number of medias to treat in parallel.
-     *
-     * @property maxConcurrentPackage
-     * @type Number
-     * @final
-     */
-    maxConcurrentPackage: {value: maxConcurrentPackage || 3}
+      /**
+       * Media provider.
+       *
+       * @type {module:publish/providers/VideoProvider~VideoProvider}
+       * @instance
+       * @readonly
+       */
+      videoProvider: {value: videoProvider},
 
-  });
+      /**
+       * Maximum number of medias to treat in parallel.
+       *
+       * @type {Number}
+       * @instance
+       * @readonly
+       */
+      maxConcurrentPackage: {value: maxConcurrentPackage || 3}
+
+    }
+
+  );
 }
 
 util.inherits(PublishManager, events.EventEmitter);
@@ -148,7 +153,8 @@ module.exports = PublishManager;
 /**
  * Removes a media from pending medias.
  *
- * @method removeFromPending
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
  * @private
  * @param {Object} mediaPackage The media package to remove
  */
@@ -172,7 +178,8 @@ function removeFromPending(mediaPackage) {
 /**
  * Handles media error event.
  *
- * @method onError
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
  * @private
  * @param {Error} error The error
  * @param {Object} mediaPackage The media on error
@@ -196,7 +203,8 @@ function onError(error, mediaPackage) {
 /**
  * Handles media complete event.
  *
- * @method onComplete
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
  * @private
  * @param {Object} mediaPackage The package on error
  */
@@ -215,7 +223,8 @@ function onComplete(mediaPackage) {
 /**
  * Creates a media package manager corresponding to the media type.
  *
- * @method createMediaPackageManager
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
  * @private
  * @param {Object} mediaPackage The media to manage
  * @return {Package} A media package manager
@@ -245,7 +254,8 @@ function createMediaPackageManager(mediaPackage) {
 /**
  * Adds media package to the list of pending packages.
  *
- * @method addPackage
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
  * @private
  * @param {Object} mediaPackage The media package to add to pending packages
  * @return {Boolean} true if the media package is successfully added to pending packages
@@ -279,11 +289,9 @@ function addPackage(mediaPackage) {
 /**
  * Gets an instance of the PublishManager.
  *
- * @method get
- * @static
- * @param {VideoProvider} videoProvider The media provider
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider The media provider
  * @param {Number} [maxConcurrentPackage] The maximum number of medias to treat in parallel
- * @return {PublishManager} The PublishManager singleton instance
+ * @return {module:publish/PublishManager~PublishManager} The PublishManager singleton instance
  */
 PublishManager.get = function(videoProvider, maxConcurrentPackage) {
   if (!publishManager)
@@ -297,7 +305,6 @@ PublishManager.get = function(videoProvider, maxConcurrentPackage) {
  *
  * Media package must be of one of the supported type.
  *
- * @method publish
  * @param {Object} mediaPackage Media to publish
  * @param {String} mediaPackage.originalPackagePath Package absolute path
  * @param {String} mediaPackage.packageType The package type
@@ -359,7 +366,6 @@ PublishManager.prototype.publish = function(mediaPackage) {
 /**
  * Retries publishing a media package which is on error.
  *
- * @method retry
  * @param {String} packageId The id of the package on error
  * @param {Boolean} forceRetry Force retrying a package no matter its state
  */
@@ -422,8 +428,6 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
  * - STATES.WAITING_FOR_UPLOAD
  * - STATES.READY
  * - STATES.PUBLISHED
- *
- * @method retryAll
  */
 PublishManager.prototype.retryAll = function() {
   var self = this;
@@ -465,7 +469,6 @@ PublishManager.prototype.retryAll = function() {
 /**
  * Uploads a media blocked in "waiting to upload" state.
  *
- * @method upload
  * @param {String} packageId The id of the package waiting to be uploaded
  * @param {String} platform The type of the video platform to upload to
  */

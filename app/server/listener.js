@@ -1,7 +1,9 @@
 'use strict';
 
 /**
- * @module publish
+ * Sets event listeners on core and plugins.
+ *
+ * @module publish/listener
  */
 
 var async = require('async');
@@ -11,24 +13,14 @@ var PoiProvider = process.requirePublish('app/server/providers/PoiProvider.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
- * Sets event listeners on core and plugins.
- *
- * @class listener
- * @static
- */
-
-/**
  * Handles event when users have been deleted.
  *
  * Videos belonging to these users have to be anonymized.
  * If one of the removed users is the one choosed as the default user for the watcher,
  * it must be reset to the anonymous user.
  *
- * @method onUsersDeleted
- * @static
  * @param {Array} The list of deleted user ids
- * @param {Function} callback Function to call when it's done
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 module.exports.onUsersDeleted = function(ids, callback) {
   var coreApi = process.api.getCoreApi();
@@ -102,12 +94,8 @@ module.exports.onUsersDeleted = function(ids, callback) {
  *
  * Remove custom properties referenced in videos.
  *
- * @method onPropertiesDeleted
- * @static
  * @param {Array} ids The list of deleted properties ids
- * @param {Function} callback Function to call when it's done
- *  - **Error** An error if something went wrong, null otherwise
- *  - **Number** The number of updated medias
+ * @param {module:publish/listener~onPropertiesDeletedCallback} callback Function to call when it's done
  */
 module.exports.onPropertiesDeleted = function(ids, callback) {
   var asyncFunctions = [];
@@ -128,11 +116,8 @@ module.exports.onPropertiesDeleted = function(ids, callback) {
  * If one of the removed groups is the one choosed as the default group for the watcher,
  * it must be reset.
  *
- * @method onGroupsDeleted
- * @static
  * @param {Array} The list of deleted groups ids
- * @param {Function} callback Function to call when it's done
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 module.exports.onGroupsDeleted = function(ids, callback) {
   var settingProvider = process.api.getCoreApi().settingProvider;
@@ -165,11 +150,8 @@ module.exports.onGroupsDeleted = function(ids, callback) {
  *
  * Remove points of interest related to the media.
  *
- * @method onMediasDeleted
- * @static
  * @param {Array} medias The list of deleted medias
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 module.exports.onMediasDeleted = function(medias, callback) {
   var poiProvider = new PoiProvider(process.api.getCoreApi().getDatabase());
@@ -183,3 +165,9 @@ module.exports.onMediasDeleted = function(medias, callback) {
 
   poiProvider.remove(new ResourceFilter().in('id', poiIds), callback);
 };
+
+/**
+ * @callback module:publish/listener~onPropertiesDeletedCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The number of updated medias
+ */

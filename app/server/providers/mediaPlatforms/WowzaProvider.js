@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/WowzaProvider
  */
 
 var path = require('path');
@@ -15,7 +15,7 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
  * Defines a WowzaProvider class to interact with [wowza platform](https://wowza.com/).
  *
  * @class WowzaProvider
- * @extends MediaPlatformProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A wowza configuration object
  * @param {String} providerConf.host Server host
@@ -27,39 +27,44 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
 function WowzaProvider(providerConf) {
   WowzaProvider.super_.call(this, providerConf);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * FTPS client.
-     *
-     * @property ftps
-     * @type FTPS
-     * @final
-     */
-    ftps: {
-      value: new FTPS({
-        host: this.conf.host,
-        username: this.conf.user,
-        password: this.conf.pwd,
-        protocol: this.conf.protocol,
-        port: this.conf.port,
+    /** @lends module:publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider */
+    {
 
-        // Optional, used for escaping shell characters (space, $, etc.), default: true
-        escape: true,
+      /**
+       * FTPS client.
+       *
+       * @type {FTPS}
+       * @instance
+       * @readonly
+       */
+      ftps: {
+        value: new FTPS({
+          host: this.conf.host,
+          username: this.conf.user,
+          password: this.conf.pwd,
+          protocol: this.conf.protocol,
+          port: this.conf.port,
 
-        // Optional, defaults to 1 (1 = no retries, 0 = unlimited retries)
-        retries: 2,
-        timeout: 10,
+          // Optional, used for escaping shell characters (space, $, etc.), default: true
+          escape: true,
 
-        // Optional, defaults to true
-        requiresPassword: true,
+          // Optional, defaults to 1 (1 = no retries, 0 = unlimited retries)
+          retries: 2,
+          timeout: 10,
 
-        // Optional, is used to auto confirm SSL questions on sftp or fish protocols, defaults to false
-        autoConfirm: false
-      })
+          // Optional, defaults to true
+          requiresPassword: true,
+
+          // Optional, is used to auto confirm SSL questions on sftp or fish protocols, defaults to false
+          autoConfirm: false
+        })
+      }
+
     }
 
-  });
+  );
 }
 
 module.exports = WowzaProvider;
@@ -68,12 +73,9 @@ util.inherits(WowzaProvider, MediaPlatformProvider);
 /**
  * Uploads a media to the Wowza platform.
  *
- * @method upload
- * @async
- * @param {String} mediaFilePath THe absolute system path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id on the Vimeo platform
+ * @param {String} mediaFilePath The absolute system path of the media to upload
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
@@ -100,13 +102,10 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Gets information about a media hosted by Wowza.
  *
- * @method getMediaInfo
- * @async
  * @param {String} mediaId The Wowza id of the media
  * @param {String} expectedDefintion The expected media definition, not used for this provider
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   if (!mediaIds) {
@@ -140,11 +139,8 @@ WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
 /**
  * Removes a media from the Wowza platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds Wowza media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 WowzaProvider.prototype.remove = function(mediaIds, callback) {
   if (!mediaIds) {

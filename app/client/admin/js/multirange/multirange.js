@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @module ov.publish/multirange
+ */
+
 angular.module('ov.multirange', ['ov.multirange.lite', 'ov.utils'])
   .directive('ovMultirange', ['ovMultirangeViews', function(ovMultirangeViews) {
     return {

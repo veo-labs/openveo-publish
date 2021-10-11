@@ -5,8 +5,9 @@
   /**
    * Defines a publish service to manage medias, categories and properties.
    *
-   * @module ov.publish
-   * @class publishService
+   * @class PublishService
+   * @memberof module:ov.publish
+   * @inner
    */
   function PublishService($http, $q, entityService, publishName, Upload) {
     var basePath = '/be/';
@@ -22,9 +23,11 @@
      *
      * If a media is on error, the upload / publication process has stopped and can be retried.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The id of the media to retry
      * @return {Promise} The HTTP promise
-     * @method retryMedia
      */
     function retryMedia(id) {
       entityService.deleteCache('videos', publishName);
@@ -34,9 +37,11 @@
     /**
      * Publishes the given media.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The id of the media to publish
      * @return {Promise} The HTTP promise
-     * @method publishMedia
      */
     function publishMedia(id) {
       entityService.deleteCache('videos', publishName);
@@ -46,9 +51,11 @@
     /**
      * Unpublishes the given media.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The id of the media to unpublish
      * @return {Promise} The HTTP promise
-     * @method unpublishMedia
      */
     function unpublishMedia(id) {
       entityService.deleteCache('videos', publishName);
@@ -58,8 +65,10 @@
     /**
      * Loads all properties from server.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @return {Promise} The HTTP promise
-     * @method loadProperties
      */
     function loadProperties() {
       if (!properties) {
@@ -79,8 +88,10 @@
     /**
      * Gets list of properties.
      *
-     * @return {Promise} The HTTP promise
-     * @method getProperties
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
+     * @return {Array} The list of properties
      */
     function getProperties() {
       return properties;
@@ -89,8 +100,10 @@
     /**
      * Loads the list of available media platforms from server.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @return {Promise} The promise used to retrieve platforms from server
-     * @method loadPlatforms
      */
     function loadPlatforms() {
       if (!platforms) {
@@ -110,8 +123,10 @@
     /**
      * Gets the list of available platforms.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @return {Promise} The HTTP promise
-     * @method getPlatforms
      */
     function getPlatforms() {
       return platforms;
@@ -120,10 +135,12 @@
     /**
      * Asks server to start uploading a media waiting for manual upload.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The id of the media to start uploading
      * @param {String} platform The media platform to upload to
      * @return {Promise} The HTTP promise
-     * @method startMediaUpload
      */
     function startMediaUpload(id, platform) {
       entityService.deleteCache('videos', publishName);
@@ -133,8 +150,10 @@
     /**
      * Loads taxonomy "categories".
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @return {Promise} The HTTP promise
-     * @method loadTaxonomyCategory
      */
     function loadTaxonomyCategory() {
       if (!taxonomyCategory) {
@@ -183,8 +202,9 @@
     /**
      * Gets the taxonomy "categories".
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
      * @return {Object} The taxonomy
-     * @method getTaxonomyCategory
      */
     function getTaxonomyCategory() {
       return taxonomyCategory;
@@ -193,8 +213,9 @@
     /**
      * Gets the list of categories formatted for an HTMLSelect element.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
      * @return {Array} The list of categories
-     * @method getCategoriesOptions
      */
     function getCategoriesOptions() {
       return categoriesOptions;
@@ -203,8 +224,9 @@
     /**
      * Gets list of categories indexed by keys.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
      * @return {Object} The list of categories
-     * @method getCategoriesByKey
      */
     function getCategoriesByKey() {
       return categoriesByKey;
@@ -213,9 +235,10 @@
     /**
      * Loads a media by its id.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
      * @param {String} id The media id
      * @return {Promise} The HTTP promise
-     * @method loadMedia
      */
     function loadMedia(id) {
       if (!mediaChapter[id]) {
@@ -234,7 +257,9 @@
     /**
      * Saves watcher settings.
      *
-     * @method saveWatcherSettings
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {Object} data The watcher settings
      * @return {HttpPromise} The HTTP promise
      */
@@ -245,7 +270,9 @@
     /**
      * Saves TLS settings.
      *
-     * @method saveTlsSettings
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {Object} data The TLS settings
      * @return {HttpPromise} The HTTP promise
      */
@@ -256,7 +283,9 @@
     /**
      * Saves catalog settings.
      *
-     * @method saveCatalogSettings
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {Object} data The catalog settings
      * @return {HttpPromise} The HTTP promise
      */
@@ -267,7 +296,9 @@
     /**
      * Updates a chapter associated to the specified media.
      *
-     * @method updateChapter
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The media id
      * @param {Object} chapter Information about the chapter
      * @param {String} [chapter.id] The chapter id
@@ -288,7 +319,9 @@
     /**
      * Updates a tag associated to the specified media.
      *
-     * @method updateTag
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The media id
      * @param {Object} file The file to upload
      * @param {Object} tag Information about the tag
@@ -308,7 +341,9 @@
     /**
      * Remove tags from media.
      *
-     * @method removeTags
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The media id
      * @param {Array} tagIds The list of tag ids to remove
      * @return {Promise} The HTTP promise
@@ -320,7 +355,9 @@
     /**
      * Removes chapters from media.
      *
-     * @method removeChapters
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @param {String} id The media id
      * @param {Array} chapterIds The list of chapter ids to remove
      * @return {HttpPromise} The HTTP promise
@@ -332,9 +369,10 @@
     /**
      * Clears a publish service cache.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
      * @param {String} [type] The cache element to clear (**properties**, **categories** or **editor**), null to
      * clear all caches
-     * @method cacheClear
      */
     function cacheClear(type) {
       if (!type) {
@@ -361,8 +399,10 @@
     /**
      * Retrieves publish plugin configuration.
      *
+     * @memberof module:ov.publish~PublishService
+     * @instance
+     * @async
      * @return {Promise} The HTTP promise
-     * @method getConfiguration
      */
     function getConfiguration() {
       return $http.get(basePath + 'publish/configuration/all');
@@ -371,9 +411,11 @@
     /**
      * Adds a media.
      *
+     * @instance
+     * @async
+     * @return {Promise} The HTTP promise
      * @param {Object} Information about the media
      * @return {Promise} An HTTP promise resolving when media has been added
-     * @method addMedia
      */
     function addMedia(data) {
       var file = data.file;
@@ -390,9 +432,11 @@
     /**
      * Update a media
      *
+     * @instance
+     * @async
+     * @return {Promise} The HTTP promise
      * @param {Object} Information about the media
      * @return {Promise} An HTTP promise resolving when media has been updated
-     * @method updateMedia
      */
     function updateMedia(id, data) {
       var thumbnail = data.thumbnail;

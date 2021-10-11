@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module controllers
+ * @module publish/controllers/VideoController
  */
 
 var util = require('util');
@@ -35,6 +35,7 @@ var env = (process.env.NODE_ENV === 'production') ? 'prod' : 'dev';
  * @class VideoController
  * @extends ContentController
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about ContentController
  */
 function VideoController() {
   VideoController.super_.call(this);
@@ -50,6 +51,9 @@ util.inherits(VideoController, ContentController);
  * so on. These resources must be accessible through an url. As all resources must, in the future, reside in
  * a CDN, resolveResourcesUrls transforms all resources URIs to URLs based on CDN.
  *
+ * @static
+ * @private
+ * @memberof module:publish/controllers/VideoController~VideoController
  * @param {Array} medias The list of medias
  */
 function resolveResourcesUrls(medias) {
@@ -120,16 +124,15 @@ function resolveResourcesUrls(medias) {
  * If point of interest does not exist it is created.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1,
+ *   "poi": ...
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1,
- *       "poi": ...
- *     }
- *
- * @method updatePoiAction
+ * @memberof module:publish/controllers/VideoController~VideoController
+ * @this module:publish/controllers/VideoController~VideoController
  * @private
- * @async
  * @param {String} type The type of point of interest (either 'tags' or 'chapters')
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} [request.body] Request multipart body
@@ -308,8 +311,8 @@ function updatePoiAction(type, request, response, next) {
  *       "total": 1
  *     }
  *
- * @method removePoisAction
- * @async
+ * @memberof module:publish/controllers/VideoController~VideoController
+ * @this module:publish/controllers/VideoController~VideoController
  * @private
  * @param {String} type The type of points of interest (either 'tags' or 'chapters')
  * @param {Request} request ExpressJS HTTP Request
@@ -404,8 +407,8 @@ function removePoisAction(type, request, response, next) {
 /**
  * Replaces media chapters ids and tags ids by detailed points of interest.
  *
- * @method populateMediaWithPois
- * @async
+ * @memberof module:publish/controllers/VideoController~VideoController
+ * @this module:publish/controllers/VideoController~VideoController
  * @private
  * @param {Object} media The media to populate
  * @param {Array} media.chapters The media chapters
@@ -456,8 +459,8 @@ function populateMediaWithPois(media, callback) {
  *
  * If information from the video platform have already been fetched for this media this does nothing.
  *
- * @method updateMediaWithPlatformInfo
- * @async
+ * @memberof module:publish/controllers/VideoController~VideoController
+ * @this module:publish/controllers/VideoController~VideoController
  * @private
  * @param {Object} media The media to update
  * @param {String} media.id The media id
@@ -511,8 +514,6 @@ function updateMediaWithPlatformInfo(media, callback) {
  * Checks first if the video id is valid and if the video is published
  * before returning the template.
  *
- * @method displayVideoAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -567,14 +568,12 @@ VideoController.prototype.displayVideoAction = function(request, response, next)
  * Gets all media platforms available.
  *
  * @example
- *     {
- *       "platforms" : [
- *         ...
- *       ]
- *     }
+ * {
+ *   "platforms" : [
+ *     ...
+ *   ]
+ * }
  *
- * @method getPlatformsAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -594,33 +593,30 @@ VideoController.prototype.getPlatformsAction = function(request, response) {
  * Connected users may have access to ready medias but unconnected users can only access published medias.
  *
  * @example
+ * // Response example
+ * {
+ *   "entity" : {
+ *     "id": ..., // The media id
+ *     "state": ..., // The media state
+ *     "date": ..., // The media published date as a timestamp
+ *     "type": ..., // The video associated platform
+ *     "errorCode": ..., // The media error code or -1 if no error
+ *     "category": ..., // The media category
+ *     "properties": {...}, // The media custom properties
+ *     "link": ..., // The media URL
+ *     "mediaId": [...], // The media id on the video platform
+ *     "available": ..., // The media availability on the video platform
+ *     "thumbnail": ..., // The media thumbnail URL
+ *     "title": ..., // The media title
+ *     "leadParagraph": ..., // The media lead paragraph
+ *     "description": ..., // The media description
+ *     "chapters": [...], // The media chapters
+ *     "tags": [...], // The media tags
+ *     "cut": [...], // The media begin and end cuts
+ *     "timecodes": [...], // The media associated images
+ *   }
+ * }
  *
- *     // Response example
- *     {
- *       "entity" : {
- *         "id": ..., // The media id
- *         "state": ..., // The media state
- *         "date": ..., // The media published date as a timestamp
- *         "type": ..., // The video associated platform
- *         "errorCode": ..., // The media error code or -1 if no error
- *         "category": ..., // The media category
- *         "properties": {...}, // The media custom properties
- *         "link": ..., // The media URL
- *         "mediaId": [...], // The media id on the video platform
- *         "available": ..., // The media availability on the video platform
- *         "thumbnail": ..., // The media thumbnail URL
- *         "title": ..., // The media title
- *         "leadParagraph": ..., // The media lead paragraph
- *         "description": ..., // The media description
- *         "chapters": [...], // The media chapters
- *         "tags": [...], // The media tags
- *         "cut": [...], // The media begin and end cuts
- *         "timecodes": [...], // The media associated images
- *       }
- *     }
- *
- * @method getVideoReadyAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.id The media id
@@ -716,39 +712,36 @@ VideoController.prototype.getVideoReadyAction = function(request, response, next
  * Gets a media.
  *
  * @example
+ * // Response example
+ * {
+ *   "entity" : {
+ *     "id": ..., // The media id
+ *     "state": ..., // The media state
+ *     "date": ..., // The media published date as a timestamp
+ *     "type": ..., // The video associated platform
+ *     "errorCode": ..., // The media error code or -1 if no error
+ *     "category": ..., // The media category
+ *     "properties": {...}, // The media custom properties
+ *     "link": ..., // The media URL
+ *     "mediaId": [...], // The media id on the video platform
+ *     "available": ..., // The media availability on the video platform
+ *     "thumbnail": ..., // The media thumbnail URL
+ *     "title": ..., // The media title
+ *     "leadParagraph": ..., // The media lead paragraph
+ *     "description": ..., // The media description
+ *     "chapters": [...], // The media chapters
+ *     "tags": [...], // The media tags
+ *     "cut": [...], // The media begin and end cuts
+ *     "timecodes": [...], // The media associated images
+ *   }
+ * }
  *
- *     // Response example
- *     {
- *       "entity" : {
- *         "id": ..., // The media id
- *         "state": ..., // The media state
- *         "date": ..., // The media published date as a timestamp
- *         "type": ..., // The video associated platform
- *         "errorCode": ..., // The media error code or -1 if no error
- *         "category": ..., // The media category
- *         "properties": {...}, // The media custom properties
- *         "link": ..., // The media URL
- *         "mediaId": [...], // The media id on the video platform
- *         "available": ..., // The media availability on the video platform
- *         "thumbnail": ..., // The media thumbnail URL
- *         "title": ..., // The media title
- *         "leadParagraph": ..., // The media lead paragraph
- *         "description": ..., // The media description
- *         "chapters": [...], // The media chapters
- *         "tags": [...], // The media tags
- *         "cut": [...], // The media begin and end cuts
- *         "timecodes": [...], // The media associated images
- *       }
- *     }
- *
- * @method getEntityAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The id of the media to retrieve
  * @param {Object} request.query Request query
- * @param {String|Array} [request.query.include] The list of fields to include from returned media
- * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned media. Ignored if
+ * @param {(String|Array)} [request.query.include] The list of fields to include from returned media
+ * @param {(String|Array)} [request.query.exclude] The list of fields to exclude from returned media. Ignored if
  * include is also specified.
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -845,8 +838,6 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
 /**
  * Adds a media.
  *
- * @method addEntityAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.body The media information as multipart body
  * @param {Object} [request.body.file] The media file as multipart data
@@ -855,7 +846,7 @@ VideoController.prototype.getEntityAction = function(request, response, next) {
  * @param {String} request.body.info.title The media title
  * @param {Object} [request.body.info.properties] The media custom properties values with property id as keys
  * @param {String} [request.body.info.category] The media category id it belongs to
- * @param {Date|Number|String} [request.body.info.date] The media date
+ * @param {(Date|Number|String)} [request.body.info.date] The media date
  * @param {String} [request.body.info.leadParagraph] The media lead paragraph
  * @param {String} [request.body.info.description] The media description
  * @param {Array} [request.body.info.groups] The media content groups it belongs to
@@ -1122,14 +1113,11 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
  * Updates a media.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1
- *     }
- *
- * @method updateEntityAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {String} request.params.id Id of the media to update
  * @param {Object} request.body The media information as multipart body
@@ -1138,7 +1126,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
  * @param {String} [request.body.info.title] The media title
  * @param {Object} [request.body.info.properties] The media custom properties values with property id as keys
  * @param {String} [request.body.info.category] The media category id it belongs to
- * @param {Date|Number|String} [request.body.info.date] The media date
+ * @param {(Date|Number|String)} [request.body.info.date] The media date
  * @param {String} [request.body.info.leadParagraph] The media lead paragraph
  * @param {String} [request.body.info.description] The media description
  * @param {Array} [request.body.info.groups] The media content groups it belongs to
@@ -1306,19 +1294,16 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
  * Gets medias.
  *
  * @example
+ * // Response example
+ * {
+ *   "entities" : [ ... ],
+ *   "pagination" : {
+ *     "limit": ..., // The limit number of medias by page
+ *     "page": ..., // The actual page
+ *     "pages": ..., // The total number of pages
+ *     "size": ... // The total number of medias
+ * }
  *
- *     // Response example
- *     {
- *       "entities" : [ ... ],
- *       "pagination" : {
- *         "limit": ..., // The limit number of medias by page
- *         "page": ..., // The actual page
- *         "pages": ..., // The total number of pages
- *         "size": ... // The total number of medias
- *     }
- *
- * @method getEntitiesAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.query Request's query parameters
  * @param {String} [request.query.query] To search on both medias title and description
@@ -1326,15 +1311,15 @@ VideoController.prototype.updateEntityAction = function(request, response, next)
  * based on a regular expression
  * @param {Number} [request.query.searchInPois=0] 1 to also search in points of interest (tags / chapters) titles and
  * descriptions when useSmartSearch is set to 1
- * @param {String|Array} [request.query.include] The list of fields to include from returned medias
- * @param {String|Array} [request.query.exclude] The list of fields to exclude from returned medias. Ignored if
+ * @param {(String|Array)} [request.query.include] The list of fields to include from returned medias
+ * @param {(String|Array)} [request.query.exclude] The list of fields to exclude from returned medias. Ignored if
  * include is also specified.
- * @param {String|Array} [request.query.states] To filter medias by state
+ * @param {(String|Array)} [request.query.states] To filter medias by state
  * @param {String} [request.query.dateStart] To filter medias after or equal to a date (in format mm/dd/yyyy)
  * @param {String} [request.query.dateEnd] To get medias before a date (in format mm/dd/yyyy)
- * @param {String|Array} [request.query.categories] To filter medias by category
- * @param {String|Array} [request.query.groups] To filter medias by group
- * @param {String|Array} [request.query.user] To filter medias by user
+ * @param {(String|Array)} [request.query.categories] To filter medias by category
+ * @param {(String|Array)} [request.query.groups] To filter medias by group
+ * @param {(String|Array)} [request.query.user] To filter medias by user
  * @param {String} [request.query.sortBy="date"] To sort medias by either **title**, **description**, **date**,
  * **state**, **views** or **category**
  * @param {String} [request.query.sortOrder="desc"] Sort order (either **asc** or **desc**)
@@ -1633,14 +1618,11 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
  * Change the state of medias to published.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 42
+ * }
  *
- *     // Response example
- *     {
- *       "total": 42
- *     }
- *
- * @method publishVideosAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.ids A comma separated list of media ids
@@ -1718,14 +1700,11 @@ VideoController.prototype.publishVideosAction = function(request, response, next
  * Change the state of medias to unpublished.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 42
+ * }
  *
- *     // Response example
- *     {
- *       "total": 42
- *     }
- *
- * @method unpublishVideosAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.ids A comma separated list of media ids
@@ -1800,8 +1779,6 @@ VideoController.prototype.unpublishVideosAction = function(request, response, ne
 /**
  * Retries to publish videos on error.
  *
- * @method retryVideosAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.ids Comma separated list of media ids
@@ -1843,8 +1820,6 @@ VideoController.prototype.retryVideosAction = function(request, response, next) 
 /**
  * Starts uploading videos to the media platform.
  *
- * @method startUploadAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.ids Comma separated list of media ids
@@ -1888,8 +1863,7 @@ VideoController.prototype.startUploadAction = function(request, response, next) 
 /**
  * Gets an instance of the controller associated provider.
  *
- * @method getProvider
- * @return {VideoProvider} The provider
+ * @return {module:publish/providers/VideoProvider~VideoProvider} The provider
  */
 VideoController.prototype.getProvider = function() {
   return new VideoProvider(coreApi.getDatabase());
@@ -1898,8 +1872,7 @@ VideoController.prototype.getProvider = function() {
 /**
  * Gets PublishManager singleton.
  *
- * @method getPublishManager
- * @return {PublishManager} The PublishManager singleton
+ * @return {module:publish/PublishManager~PublishManager} The PublishManager singleton
  */
 VideoController.prototype.getPublishManager = function() {
   return PublishManager.get();
@@ -1911,15 +1884,12 @@ VideoController.prototype.getPublishManager = function() {
  * If tag does not exist it is created.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1,
+ *   "poi": ...
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1,
- *       "poi": ...
- *     }
- *
- * @method updateTagAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} [request.body] Request multipart body
  * @param {Object} [request.body.info] Modifications to perform on the tag
@@ -1943,15 +1913,12 @@ VideoController.prototype.updateTagAction = function(request, response, next) {
  * If chapter does not exist it is created.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1,
+ *   "poi": ...
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1,
- *       "poi": ...
- *     }
- *
- * @method updateChapterAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} [request.body] Request body
  * @param {Object} [request.body.info] Modifications to perform on the chapter
@@ -1972,14 +1939,11 @@ VideoController.prototype.updateChapterAction = function(request, response, next
  * Removes tags from a media.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1
- *     }
- *
- * @method removeTagsAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
@@ -1995,14 +1959,11 @@ VideoController.prototype.removeTagsAction = function(request, response, next) {
  * Removes chapters from a media.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 1
+ * }
  *
- *     // Response example
- *     {
- *       "total": 1
- *     }
- *
- * @method removeChaptersAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
@@ -2020,14 +1981,11 @@ VideoController.prototype.removeChaptersAction = function(request, response, nex
  * duration).
  *
  * @example
+ * // Response example
+ * {
+ *   "entity": ...
+ * }
  *
- *     // Response example
- *     {
- *       "entity": ...
- *     }
- *
- * @method convertPoiAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id The media id
@@ -2194,7 +2152,6 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
 /**
  * Gets the id of the super administrator.
  *
- * @method getSuperAdminId
  * @return {String} The id of the super admin
  */
 VideoController.prototype.getSuperAdminId = function() {
@@ -2204,7 +2161,6 @@ VideoController.prototype.getSuperAdminId = function() {
 /**
  * Gets the id of the anonymous user.
  *
- * @method getAnonymousId
  * @return {String} The id of the anonymous user
  */
 VideoController.prototype.getAnonymousId = function() {
@@ -2216,7 +2172,6 @@ VideoController.prototype.getAnonymousId = function() {
  *
  * A contents manager can perform CRUD operations on medias.
  *
- * @method isUserManager
  * @param {Object} user The user to test
  * @param {Array} user.permissions The user's permissions
  * @return {Boolean} true if the user has permission to manage medias, false otherwise
@@ -2235,8 +2190,6 @@ VideoController.prototype.isUserManager = function(user) {
  *
  * It is not possible to add several medias at a time.
  *
- * @method addEntitiesAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Response} response ExpressJS HTTP Response
  * @param {Function} next Function to defer execution to the next registered middleware
@@ -2254,14 +2207,11 @@ VideoController.prototype.addEntitiesAction = function(request, response, next) 
  * Only medias in a stable state can be removed.
  *
  * @example
+ * // Response example
+ * {
+ *   "total": 42
+ * }
  *
- *     // Response example
- *     {
- *       "total": 42
- *     }
- *
- * @method removeEntitiesAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request parameters
  * @param {String} request.params.id A comma separated list of media ids to remove

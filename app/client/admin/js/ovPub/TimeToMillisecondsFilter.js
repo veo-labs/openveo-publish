@@ -5,10 +5,16 @@
   /**
    * Convert time string (hh:mm:ss) into milliseconds
    *
-   * @module ov.publish
-   * @class timeToMilliseconds
+   * @class TimeToMilliseconds
+   * @memberof module:ov.publish
+   * @inner
    */
   function TimeToMilliseconds() {
+
+    /**
+     * @method timeToMilliseconds
+     * @memberof module:ov.publish~TimeToMilliseconds
+     */
     return function(value) {
       if (typeof value !== 'string') {
         return undefined;
@@ -26,6 +32,7 @@
 
       return ((hours * 60 + minutes) * 60 + seconds) * 1000;
     };
+
   }
 
   app.filter('timeToMilliseconds', TimeToMilliseconds);

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/providers/VideoPackage
  */
 
 var util = require('util');
@@ -27,11 +27,11 @@ var acceptedImagesExtensions = [
  * Defines a VideoPackage to manage publication of a video file.
  *
  * @class VideoPackage
- * @extends Package
+ * @extends module:publish/packages/Package~Package
  * @constructor
  * @param {Object} mediaPackage Information about the video
- * @param {VideoProvider} videoProvider A video provider
- * @param {PoiProvider} poiProvider Points of interest provider
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider A video provider
+ * @param {module:publish/providers/PoiProvider~PoiProvider} poiProvider Points of interest provider
  */
 function VideoPackage(mediaPackage, videoProvider, poiProvider) {
   VideoPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
@@ -43,10 +43,8 @@ util.inherits(VideoPackage, Package);
 /**
  * Process states for video packages.
  *
- * @property STATES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 VideoPackage.STATES = {
   MP4_DEFRAGMENTED: 'mp4Defragmented',
@@ -60,10 +58,8 @@ Object.freeze(VideoPackage.STATES);
 /**
  * Video package process transitions (from one state to another).
  *
- * @property TRANSITIONS
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 VideoPackage.TRANSITIONS = {
   DEFRAGMENT_MP4: 'defragmentMp4',
@@ -77,10 +73,8 @@ Object.freeze(VideoPackage.TRANSITIONS);
 /**
  * Define the order in which transitions will be executed for a video Package.
  *
- * @property stateTransitions
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 VideoPackage.stateTransitions = [
   Package.TRANSITIONS.INIT,
@@ -100,10 +94,8 @@ Object.freeze(VideoPackage.stateTransitions);
 /**
  * Define machine state authorized transitions depending on previous and next states.
  *
- * @property stateMachine
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 VideoPackage.stateMachine = Package.stateMachine.concat([
   {
@@ -149,15 +141,14 @@ Object.freeze(VideoPackage.stateMachine);
  *
  * Waiting time is 1 second.
  *
- * @method waitForMediaState
- * @async
+ * @memberof module:publish/packages/VideoPackage~VideoPackage
+ * @this module:publish/packages/VideoPackage~VideoPackage
  * @private
  * @param {Object} media The media
  * @param {Object} media.id The media id
  * @param {Array} states The authorized states
- * @param {Function} callback The function to call when done with:
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The media with all properties
+ * @param {module:publish/packages/VideoPackage~VideoPackage~waitForMediaStateCallback} callback The function to call
+ * when done
  */
 function waitForMediaState(media, states, callback) {
   var self = this;
@@ -184,7 +175,7 @@ function waitForMediaState(media, states, callback) {
  * the MP4. The fragmentation detection of the file is based on an un-
  * known "nb_frames" property in ffprobe output metadata.
  *
- * @method defragmentMp4
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.defragmentMp4 = function() {
@@ -258,7 +249,7 @@ VideoPackage.prototype.defragmentMp4 = function() {
  *
  * This is a transition.
  *
- * @method generateThumb
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.generateThumb = function() {
@@ -331,7 +322,7 @@ VideoPackage.prototype.generateThumb = function() {
  *
  * This is a transition.
  *
- * @method getMetadata
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.getMetadata = function() {
@@ -373,7 +364,7 @@ VideoPackage.prototype.getMetadata = function() {
  *
  * This is a transition.
  *
- * @method copyImages
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.copyImages = function() {
@@ -466,7 +457,7 @@ VideoPackage.prototype.copyImages = function() {
  *
  * This is a transition.
  *
- * @method merge
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 VideoPackage.prototype.merge = function() {
@@ -576,7 +567,6 @@ VideoPackage.prototype.merge = function() {
 /**
  * Selects the media to use as the base media in multi-sources scenario.
  *
- * @method selectMultiSourcesMedia
  * @param {Object} media1 A media
  * @param {Object} media2 A media
  * @return {Object} Either media1 or media2
@@ -591,7 +581,6 @@ VideoPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
  * Each package has its own way to be published, thus transitions stack
  * is different by package.
  *
- * @method getTransitions
  * @return {Array} The stack of transitions
  */
 VideoPackage.prototype.getTransitions = function() {
@@ -601,9 +590,14 @@ VideoPackage.prototype.getTransitions = function() {
 /**
  * Gets the list of transitions states corresponding to the package.
  *
- * @method getStateMachine
  * @return {Array} The list of states/transitions
  */
 VideoPackage.prototype.getStateMachine = function() {
   return VideoPackage.stateMachine;
 };
+
+/**
+ * @callback module:publish/packages/VideoPackage~VideoPackage~waitForMediaStateCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} media The media with all properties
+ */

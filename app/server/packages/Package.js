@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/packages/Package
  */
 
 var util = require('util');
@@ -23,22 +23,22 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
 /**
  * Fired when an error occurred while processing the package.
  *
- * @event error
- * @param {Error} The error
+ * @event module:publish/packages/Package~Package#error
+ * @property {Error} error The error
  */
 
 /**
  * Fired when package processing has succeed.
  *
- * @event complete
- * @param {Object} The processed package
+ * @event module:publish/packages/Package~Package#complete
+ * @property {Object} package The processed package
  */
 
 /**
  * Fired when package state has changed.
  *
- * @event stateChanged
- * @param {Object} The processed package
+ * @event module:publish/packages/Package~Package#stateChanged
+ * @property {Object} package The processed package
  */
 
 /**
@@ -47,58 +47,62 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * @class Package
  * @constructor
  * @param {Object} mediaPackage Information about the media
- * @param {VideoProvider} videoProvider Media provider
- * @param {PoiProvider} poiProvider Points of interest provider
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider Media provider
+ * @param {module:publish/providers/PoiProvider~PoiProvider} poiProvider Points of interest provider
  */
 function Package(mediaPackage, videoProvider, poiProvider) {
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Publish configuration.
-     *
-     * @property publishConf
-     * @type Object
-     * @final
-     */
-    publishConf: {value: publishConf},
+    /** @lends module:publish/packages/Package~Package */
+    {
 
-    /**
-     * Media provider.
-     *
-     * @property videoProvider
-     * @type VideoProvider
-     * @final
-     */
-    videoProvider: {value: videoProvider},
+      /**
+       * Publish configuration.
+       *
+       * @type {Object}
+       * @instance
+       * @readonly
+       */
+      publishConf: {value: publishConf},
 
-    /**
-     * Points of interest provider.
-     *
-     * @property poiProvider
-     * @type PoiProvider
-     * @final
-     */
-    poiProvider: {value: poiProvider},
+      /**
+       * Media provider.
+       *
+       * @type {module:publish/providers/VideoProvider~VideoProvider}
+       * @instance
+       * @readonly
+       */
+      videoProvider: {value: videoProvider},
 
-    /**
-     * Media package description object.
-     *
-     * @property mediaPackage
-     * @type Object
-     */
-    mediaPackage: {value: mediaPackage, writable: true},
+      /**
+       * Points of interest provider.
+       *
+       * @type {module:publish/providers/PoiProvider~PoiProvider}
+       * @instance
+       * @readonly
+       */
+      poiProvider: {value: poiProvider},
 
-    /**
-     * Video platforms configuration object from videoPlatformConf.json file.
-     *
-     * @property videoPlatformConf
-     * @type Object
-     * @final
-     */
-    videoPlatformConf: {value: videoPlatformConf}
+      /**
+       * Media package description object.
+       *
+       * @type {Object}
+       * @instance
+       */
+      mediaPackage: {value: mediaPackage, writable: true},
 
-  });
+      /**
+       * Video platforms configuration object from videoPlatformConf.json file.
+       *
+       * @type {Object}
+       * @instance
+       */
+      videoPlatformConf: {value: videoPlatformConf}
+
+    }
+
+  );
 
   // Validate temporary directory
   if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
@@ -112,10 +116,8 @@ module.exports = Package;
 /**
  * Package states.
  *
- * @property STATES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 Package.STATES = {
   PACKAGE_SUBMITTED: 'packageSubmitted',
@@ -131,10 +133,8 @@ Object.freeze(Package.STATES);
 /**
  * Package transitions (from one state to another).
  *
- * @property TRANSITIONS
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 Package.TRANSITIONS = {
   INIT: 'initPackage',
@@ -149,10 +149,8 @@ Object.freeze(Package.TRANSITIONS);
 /**
  * Define the order in which transitions will be executed for a Package.
  *
- * @property stateTransitions
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 Package.stateTransitions = [
   Package.TRANSITIONS.INIT,
@@ -167,10 +165,8 @@ Object.freeze(Package.stateTransitions);
 /**
  * Define machine state authorized transitions depending on previous and next states.
  *
- * @property stateMachine
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 Package.stateMachine = [
   {
@@ -209,7 +205,6 @@ Object.freeze(Package.stateMachine);
 /**
  * Creates a state machine to publish the package.
  *
- * @method init
  * @param {String} initialState Initial machine state
  * @param {String} initialTransition Initial machine transition
  */
@@ -254,13 +249,9 @@ Package.prototype.init = function(initialState, initialTransition) {
 /**
  * Updates media state and sends an event to inform about state changed.
  *
- * @method updateState
- * @async
  * @param {Number} id The id of the media to update
  * @param {String} state The state of the media
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of updated items
+ * @param {module:publish/packages/Package~Package~udapteStateCallback} callback The function to call when it's done
  */
 Package.prototype.updateState = function(id, state, callback) {
   var self = this;
@@ -276,7 +267,6 @@ Package.prototype.updateState = function(id, state, callback) {
  *
  * The rest of the transitions stack will be executed.
  *
- * @method executeTransition
  * @param {String} transition The transition to launch
  */
 Package.prototype.executeTransition = function(transition) {
@@ -330,7 +320,7 @@ Package.prototype.executeTransition = function(transition) {
  *
  * This is a transition.
  *
- * @method initPackage
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.initPackage = function() {
@@ -364,7 +354,7 @@ Package.prototype.initPackage = function() {
  *
  * This is a transition.
  *
- * @method copyPackage
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.copyPackage = function() {
@@ -394,7 +384,7 @@ Package.prototype.copyPackage = function() {
  *
  * This is a transition.
  *
- * @method removeOriginalPackage
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.removeOriginalPackage = function() {
@@ -425,7 +415,7 @@ Package.prototype.removeOriginalPackage = function() {
  *
  * This is a transition.
  *
- * @method uploadMedia
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.uploadMedia = function() {
@@ -470,7 +460,7 @@ Package.prototype.uploadMedia = function() {
  *
  * This is a transition.
  *
- * @method synchronizeMedia
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.synchronizeMedia = function() {
@@ -500,7 +490,7 @@ Package.prototype.synchronizeMedia = function() {
  *
  * This is a transition.
  *
- * @method cleanDirectory
+ * @async
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.cleanDirectory = function() {
@@ -524,7 +514,6 @@ Package.prototype.cleanDirectory = function() {
  * Each package has its own way to be published, thus transitions stack
  * is different by package.
  *
- * @method getTransitions
  * @return {Array} The stack of transitions
  */
 Package.prototype.getTransitions = function() {
@@ -534,7 +523,6 @@ Package.prototype.getTransitions = function() {
 /**
  * Gets the list of transitions states corresponding to the package.
  *
- * @method getStateMachine
  * @return {Array} The list of states/transitions
  */
 Package.prototype.getStateMachine = function() {
@@ -544,7 +532,6 @@ Package.prototype.getStateMachine = function() {
 /**
  * Gets the media file path of the package.
  *
- * @method getMediaFilePath
  * @return {String} System path of the media file
  */
 Package.prototype.getMediaFilePath = function() {
@@ -557,8 +544,7 @@ Package.prototype.getMediaFilePath = function() {
 /**
  * Sets a package as in error.
  *
- * @method setError
- * @param {PublishError} error The package error
+ * @param {module:publish/PublishError~PublishError} error The package error
  * @param {boolean} doNotUpdateMedia true to simply emit the error without updating the media
  */
 Package.prototype.setError = function(error, doNotUpdateMedia) {
@@ -582,3 +568,9 @@ Package.prototype.setError = function(error, doNotUpdateMedia) {
 
   }
 };
+
+/**
+ * @callback module:publish/packages/Package~Package~udapteStateCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The number of udpdated items
+ */

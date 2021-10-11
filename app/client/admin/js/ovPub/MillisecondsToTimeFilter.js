@@ -5,10 +5,16 @@
   /**
    * Convert time in milliseconds into time string (hh:mm:ss)
    *
-   * @module ov.publish
-   * @class millisecondsToTime
+   * @class MillisecondsToTime
+   * @memberof module:ov.publish
+   * @inner
    */
   function MillisecondsToTime() {
+
+    /**
+     * @method millisecondsToTime
+     * @memberof module:ov.publish~MillisecondsToTime
+     */
     return function(value) {
       var ms = parseInt(value);
 
@@ -25,6 +31,7 @@
 
       return pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
     };
+
   }
 
   app.filter('millisecondsToTime', MillisecondsToTime);

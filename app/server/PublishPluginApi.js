@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module publish
+ * @module publish/PublishPluginApi
  */
 
 var util = require('util');
@@ -14,6 +14,7 @@ var PUBLISH_HOOKS = process.requirePublish('app/server/hooks.js');
  * @class PublishPluginApi
  * @extends PluginApi
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about PluginApi
  */
 function PublishPluginApi() {
   PublishPluginApi.super_.call(this);
@@ -25,7 +26,6 @@ util.inherits(PublishPluginApi, openVeoApi.plugin.PluginApi);
 /**
  * Gets publish hooks.
  *
- * @method getHooks
  * @return {Object} The publish hooks
  */
 PublishPluginApi.prototype.getHooks = function() {

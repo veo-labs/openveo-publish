@@ -1,27 +1,21 @@
 'use strict';
 
 /**
- * @module providers
+ * Defines a factory to create media platforms' providers.
+ *
+ * @module publish/providers/mediaPlatforms/factory
  */
 
 var TYPES = process.requirePublish('app/server/providers/mediaPlatforms/types.js');
 
 /**
- * Defines a factory to create media platforms' providers.
- *
- * @class mediaPlatformFactory
- * @static
- */
-
-/**
  * Gets an instance of a MediaPlatformProvider giving a type and a configuration object.
  *
- * @method get
- * @static
  * @param {String} type The type of the provider platform to instanciate
  * @param {Object} providerConf A media platform configuration object, it's structure depend on the provider's type,
  * see extended objects for more information
- * @return {MediaPlatformProvider} An instance of a MediaPlatformProvider sub class
+ * @return {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider} An instance of a
+ * MediaPlatformProvider sub class
  * @throws {Error} The configuration doesn't satisfy the provider or given type is not available
  */
 module.exports.get = function(type, providerConf) {

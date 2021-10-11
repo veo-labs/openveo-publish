@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/youtube/YoutubeProvider
  */
 
 var fs = require('fs');
@@ -18,10 +18,10 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
 /**
  * Available upload methods.
  *
- * @property UPLOAD_METHODS
- * @type Array
+ * @memberof module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider
+ * @const
+ * @type {Array}
  * @private
- * @final
  */
 var UPLOAD_METHODS = ['uploadClassic', 'uploadResumable'];
 Object.freeze(UPLOAD_METHODS);
@@ -29,10 +29,9 @@ Object.freeze(UPLOAD_METHODS);
 /**
  * Available privacy statuses.
  *
- * @property PRIVACY_STATUSES
- * @type Array
- * @private
- * @final
+ * @memberof module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider
+ * @const
+ * @type {Array}
  */
 var PRIVACY_STATUSES = ['public', 'private', 'unlisted'];
 Object.freeze(PRIVACY_STATUSES);
@@ -41,47 +40,56 @@ Object.freeze(PRIVACY_STATUSES);
  * Defines a YoutubeProvider class to interact with [youtube platform](https://youtube.com/).
  *
  * @class YoutubeProvider
- * @extends MediaPlatformProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf A youtube configuration object
  * @param {String} providerConf.uploadMethod The upload method to use (see UPLOAD_METHODS)
  * @param {String} providerConf.privacy The media privacy on Youtube (see PRIVACY_STATUSES)
- * @param {GoogleOAuthHelper} googleOAuthHelper The Google OAuth helper
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper} googleOAuthHelper The
+ * Google OAuth helper
  */
 function YoutubeProvider(providerConf, googleOAuthHelper) {
   YoutubeProvider.super_.call(this, providerConf);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Youtube upload method, uploadClassic or uploadResumable.
-     *
-     * @property uploadMethod
-     * @type String
-     */
-    uploadMethod: {
-      value: UPLOAD_METHODS.indexOf(this.conf.uploadMethod) > -1 ? this.conf.uploadMethod : 'uploadClassic'
-    },
+    /** @lends module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider */
+    {
 
-    /**
-     * Privacy to apply to uploaded medias either public, private or unlisted.
-     *
-     * @property privacy
-     * @type String
-     */
-    privacy: {
-      value: PRIVACY_STATUSES.indexOf(this.conf['privacy']) > -1 ? this.conf['privacy'] : 'public'
-    },
+      /**
+       * Youtube upload method, uploadClassic or uploadResumable.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      uploadMethod: {
+        value: UPLOAD_METHODS.indexOf(this.conf.uploadMethod) > -1 ? this.conf.uploadMethod : 'uploadClassic'
+      },
 
-    /**
-     * The Google OAuth Helper to use to connect to Google APIs.
-     *
-     * @property googleOAuthHelper
-     * @type GoogleOAuthHelper
-     */
-    googleOAuthHelper: {value: googleOAuthHelper}
+      /**
+       * Privacy to apply to uploaded medias either public, private or unlisted.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      privacy: {
+        value: PRIVACY_STATUSES.indexOf(this.conf['privacy']) > -1 ? this.conf['privacy'] : 'public'
+      },
 
-  });
+      /**
+       * The Google OAuth Helper to use to connect to Google APIs.
+       *
+       * @type {GoogleOAuthHelper}
+       * @instance
+       * @readonly
+       */
+      googleOAuthHelper: {value: googleOAuthHelper}
+
+    }
+
+  );
 }
 
 module.exports = YoutubeProvider;
@@ -90,10 +98,8 @@ util.inherits(YoutubeProvider, MediaPlatformProvider);
 /**
  * Youtube category ids.
  *
- * @property CATEGORIES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 YoutubeProvider.CATEGORIES = {
   EDUCATION: 27
@@ -103,12 +109,9 @@ Object.freeze(YoutubeProvider.CATEGORIES);
 /**
  * Uploads a media to the Youtube platform.
  *
- * @method upload
- * @async
  * @param {String} mediaFilePath The absolute path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id on the Youtube platform
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
   var uploadParams = {
@@ -130,13 +133,10 @@ YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Uploads to Youtube in the classic way, using Youtube API.
  *
- * @method uploadClassic
- * @async
  * @param {String} mediaFilePath The absolute path to the media to upload
  * @param {Object} uploadParams Parameters to send to Youtube when calling the API
- * @param {Function} callback callback function with:
- *  - **Error** The error if an error occurred, null otherwise
- *  - **String** The media id on the Youtube platform
+ * @param {module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadClassicCallback}
+ * callback callback The function to call when its done
  */
 YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, callback) {
   var self = this;
@@ -186,13 +186,10 @@ YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, 
  * The upload can fail 3 times before failing globally, each times it fails it perform an upload again starting where
  * it previously failed (ie: not re-uploading all the media)
  *
- * @method uploadResumable
- * @async
  * @param {String} mediaFilePath The absolute path to the media to upload
  * @param {Object} uploadParams Parameters to send to Youtube when calling the API
- * @param {Function} callback callback function with:
- *  - **Error** The error if an error occurred, null otherwise
- *  - **String** The uploaded media id
+ * @param {module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadResumableCallback}
+ * callback The function to call when its done
  */
 YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams, callback) {
   var self = this;
@@ -262,12 +259,9 @@ YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams
 /**
  * Gets information about a media hosted by Youtube.
  *
- * @method getMediaInfo
- * @async
  * @param {String} mediaId The Youtube id of the media
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 YoutubeProvider.prototype.getMediaInfo = function(mediaId, definition, callback) {
   if (!mediaId) {
@@ -282,11 +276,8 @@ YoutubeProvider.prototype.getMediaInfo = function(mediaId, definition, callback)
 /**
  * Removes a media from the Youtube platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds Youtube media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 YoutubeProvider.prototype.remove = function(mediaIds, callback) {
   var self = this;
@@ -334,16 +325,13 @@ YoutubeProvider.prototype.remove = function(mediaIds, callback) {
  * If media has several resources on the platform, the same update will be performed for all resources.
  * Actually only the media title is synchronized with Youtube.
  *
- * @method update
- * @async
  * @param {Object} media The media
  * @param {Array} media.mediaId The list of media resource ids
  * @param {Object} data The datas to update
  * @param {String} [data.title] The media title. Be careful only the first 100 characters will be used, also
  * "less than" and "greater than" characters will be removed
  * @param {Boolean} force true to force the update even if title hasn't changed, false otherwise
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 YoutubeProvider.prototype.update = function(media, data, force, callback) {
   if (!data.title || (data.title === media.title && !force)) return callback();
@@ -380,3 +368,15 @@ YoutubeProvider.prototype.update = function(media, data, force, callback) {
     callback(error);
   });
 };
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadClassicCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} id The media id on the Youtube platform
+ */
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadResumableCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} id The media id on the Youtube platform
+ */

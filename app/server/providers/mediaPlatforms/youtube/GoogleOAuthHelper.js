@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper
  */
 
 var google = require('googleapis').google;
@@ -27,30 +27,33 @@ function GoogleOAuthHelper() {
   if (!config)
     throw new TypeError('A GoogleOAuthHelper needs a configuration');
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * Google oauth client library.
-     *
-     * @property oauth2Client
-     * @type OAuth2
-     * @final
-     */
-    oauth2Client: {
-      value: new OAuth2(config.clientId, config.clientSecret, config.redirectUrl)
+    /** @lends module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoohleOAuthHelper */
+    {
+
+      /**
+       * Google oauth client library.
+       *
+       * @type {OAuth2}
+       * @instance
+       * @readonly
+       */
+      oauth2Client: {
+        value: new OAuth2(config.clientId, config.clientSecret, config.redirectUrl)
+      }
+
     }
 
-  });
+  );
 }
 
 /**
  * Persists the tokens retrieved from Google.
  *
- * @method saveToken
  * @param {Object} tokens The tokens retrieved from Google
- * @param {Function} [callback] Callback function with:
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The saved token object
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~saveTokenCallback}
+ * [callback] The function to call when its done
  */
 GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
   var settingProvider = process.api.getCoreApi().settingProvider;
@@ -72,10 +75,9 @@ GoogleOAuthHelper.prototype.saveToken = function(tokens, callback) {
 /**
  * Retrieves the current token or null if it was not persisted earlier.
  *
- * @method fetchToken
- * @param {Function} callback Callback function with :
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The token object
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~fetchTokenCallback}
+ * [callback] The function to
+ * call when its done
  */
 GoogleOAuthHelper.prototype.fetchToken = function(callback) {
   var settingProvider = process.api.getCoreApi().settingProvider;
@@ -93,7 +95,6 @@ GoogleOAuthHelper.prototype.fetchToken = function(callback) {
 /**
  * Builds the url that will permit to access google association page on the client's browser.
  *
- * @method getAuthUrl
  * @param {Object} options Options to build the url, 'scope' is mandatory
  * @return {String} The url to the google association page
  */
@@ -115,11 +116,10 @@ GoogleOAuthHelper.prototype.getAuthUrl = function(options) {
  * Retrieves a token from google with an authorization code, this token is then saved for later use and can be
  * retrieved with @see this.fetchToken.
  *
- * @method persistTokenWithCode
  * @param {String} code The authorization code
- * @param {Function} callback Callback function with :
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The token object
+ * @param
+ * {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~persistTokenWithCodeCallback}
+ * [callback] The function to call when its done
  */
 GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
   var self = this;
@@ -137,10 +137,8 @@ GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
 /**
  * Checks whether or not a previous token has been retrieved.
  *
- * @method hasToken
- * @param {Function} callback Callback function with :
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Boolean** true a token exists, false otherwise
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~hasTokenCallback}
+ * [callback] The function to call when its done
  */
 GoogleOAuthHelper.prototype.hasToken = function(callback) {
   this.fetchToken(function(error, token) {
@@ -153,10 +151,8 @@ GoogleOAuthHelper.prototype.hasToken = function(callback) {
  * token is not valid anymore a new token is retrieved.
  * This function should be used after a previous successfull google association.
  *
- * @method getFreshToken
- * @param {Function} callback Callback function with :
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** The token object
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~getFreshTokenCallback}
+ * [callback] The function to call when its done
  */
 GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
   var self = this;
@@ -185,3 +181,35 @@ GoogleOAuthHelper.prototype.getFreshToken = function(callback) {
 };
 
 module.exports = GoogleOAuthHelper;
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~saveTokenCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} token The saved token object
+ */
+
+/**
+ * @callback
+ * module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~fetchTokenCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} token The token object
+ */
+
+/**
+ * @callback
+ * module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~persistTokenWithCodeCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} token The token object
+ */
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~hasTokenCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Boolean} doesExist true a token exists, false otherwise
+ */
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper~getFreshTokenCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} token The token object
+ */

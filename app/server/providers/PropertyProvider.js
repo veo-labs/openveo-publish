@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/PropertyProvider
  */
 
 var util = require('util');
@@ -16,6 +16,7 @@ var openVeoApi = require('@openveo/api');
  * @extends EntityProvider
  * @constructor
  * @param {Database} database The database to interact with
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityProvider or Database
  */
 function PropertyProvider(database) {
   PropertyProvider.super_.call(this, database, 'publish_properties');
@@ -27,10 +28,8 @@ util.inherits(PropertyProvider, openVeoApi.providers.EntityProvider);
 /**
  * Property types.
  *
- * @property TYPES
- * @type Object
- * @static
- * @final
+ * @const
+ * @type {Object}
  */
 PropertyProvider.TYPES = {
   TEXT: 'text',
@@ -43,10 +42,8 @@ Object.freeze(PropertyProvider.TYPES);
 /**
  * The list of available property types.
  *
- * @property availableTypes
- * @type Array
- * @static
- * @final
+ * @const
+ * @type {Array}
  */
 PropertyProvider.availableTypes = [
   PropertyProvider.TYPES.TEXT,
@@ -59,18 +56,14 @@ Object.freeze(PropertyProvider.availableTypes);
 /**
  * Adds custom properties.
  *
- * @method add
- * @async
  * @param {Array} customProperties The list of custom properties to store with for each custom property:
- *   - **String** name The property name
- *   - **String** description The property description
- *   - **String** type The property type (see PropertyProvider.availableTypes)
- *   - **String** [id] The property id, generated if not specified
- *   - **Array** [values] The list of values if type is PropertyProvider.TYPES.LIST
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The total amount of properties inserted
- *   - **Array** The list of added properties
+ * @param {String} customProperties.name The property name
+ * @param {String} customProperties.description The property description
+ * @param {String} customProperties.type The property type (see PropertyProvider.availableTypes)
+ * @param {String} [customProperties.id] The property id, generated if not specified
+ * @param {Array} [customProperties.values] The list of values if type is PropertyProvider.TYPES.LIST
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~addCallback} [callback] The function to call when
+ * it's done
  */
 PropertyProvider.prototype.add = function(customProperties, callback) {
   var customPropertiesToAdd = [];
@@ -103,8 +96,6 @@ PropertyProvider.prototype.add = function(customProperties, callback) {
 /**
  * Updates a custom property.
  *
- * @method updateOne
- * @async
  * @param {ResourceFilter} [filter] Rules to filter property to update
  * @param {Object} data The modifications to perform
  * @param {String} [data.name] The property name
@@ -112,9 +103,8 @@ PropertyProvider.prototype.add = function(customProperties, callback) {
  * @param {String} [data.type] The property type (see PropertyProvider.availableTypes)
  * @param {String} [data.id] The property id, generated if not specified
  * @param {Array} [data.values] The list of values if type is PropertyProvider.TYPES.LIST
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~updateOneCallback} [callback] The function to
+ * call when it's done
  */
 PropertyProvider.prototype.updateOne = function(filter, data, callback) {
   var modifications = {};
@@ -135,12 +125,9 @@ PropertyProvider.prototype.updateOne = function(filter, data, callback) {
  * This will execute publish hook "PROPERTIES_DELETED" after removing custom properties with:
  * - **Array** The list of removed properties
  *
- * @method remove
- * @async
  * @param {ResourceFilter} [filter] Rules to filter properties to remove
- * @param {Function} [callback] The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed properties
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~removeCallback} [callback] The function to call
+ * when it's done
  */
 PropertyProvider.prototype.remove = function(filter, callback) {
   var self = this;
@@ -205,10 +192,7 @@ PropertyProvider.prototype.remove = function(filter, callback) {
 /**
  * Creates properties indexes.
  *
- * @method createIndexes
- * @async
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PropertyProvider.prototype.createIndexes = function(callback) {
   var language = process.api.getCoreApi().getContentLanguage();
@@ -229,11 +213,8 @@ PropertyProvider.prototype.createIndexes = function(callback) {
 /**
  * Drops an index from database collection.
  *
- * @method dropIndex
- * @async
  * @param {String} indexName The name of the index to drop
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PropertyProvider.prototype.dropIndex = function(indexName, callback) {
   this.storage.dropIndex(this.location, indexName, function(error, result) {
@@ -243,3 +224,22 @@ PropertyProvider.prototype.dropIndex = function(indexName, callback) {
     callback(error);
   });
 };
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~addCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The total amount of properties inserted
+ * @param {Array} properties The list of added properties
+ */
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~updateOneCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total 1 if everything went fine
+ */
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~removeCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The number of removed properties
+ */

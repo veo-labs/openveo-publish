@@ -4,6 +4,11 @@
 
   /**
    * Defines the configuration controller for the configuration page.
+   *
+   * @class ConfigurationController
+   * @memberof module:ov.publish
+   * @inner
+   * @ignore
    */
   function ConfigurationController(
     $scope,

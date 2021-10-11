@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module controllers
+ * @module publish/controllers/StatisticsController
  */
 
 var util = require('util');
@@ -17,6 +17,7 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * @class StatisticsController
  * @extends Controller
  * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about Controller
  */
 function StatisticsController() {
   StatisticsController.super_.call(this);
@@ -31,8 +32,6 @@ util.inherits(StatisticsController, Controller);
  * Check if stats ar available
  * before executing the stat function.
  *
- * @method statisticsAction
- * @async
  * @param {Request} request ExpressJS HTTP Request
  * @param {Object} request.params Request's parameters
  * @param {String} request.params.entity The entity type to work on ("video")

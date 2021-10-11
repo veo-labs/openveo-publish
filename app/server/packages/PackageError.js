@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/packages/PackageError
  */
 
 var util = require('util');
@@ -18,36 +18,41 @@ var util = require('util');
 function PackageError(message, code) {
   Error.captureStackTrace(this, this.constructor);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * The package's error code.
-     *
-     * @property code
-     * @type String
-     * @final
-     */
-    code: {value: code},
+    /** @lends module:publish/packages/PackageError~PackageError */
+    {
 
-    /**
-     * Error message.
-     *
-     * @property message
-     * @type String
-     * @final
-     */
-    message: {value: message, writable: true},
+      /**
+       * The package's error code.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      code: {value: code},
 
-    /**
-     * Error name.
-     *
-     * @property name
-     * @type String
-     * @final
-     */
-    name: {value: 'PackageError', writable: true}
+      /**
+       * Error message.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      message: {value: message, writable: true},
 
-  });
+      /**
+       * Error name.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      name: {value: 'PackageError', writable: true}
+
+    }
+
+  );
 }
 
 module.exports = PackageError;

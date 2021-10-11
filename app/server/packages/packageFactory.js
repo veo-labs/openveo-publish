@@ -1,14 +1,9 @@
 'use strict';
 
 /**
- * @module packages
- */
-
-/**
  * Defines the package factory.
  *
- * @class factory
- * @static
+ * @module publish/packages/packageFactory
  */
 
 var openVeoApi = require('@openveo/api');
@@ -19,11 +14,9 @@ var fileSystem = openVeoApi.fileSystem;
 /**
  * Gets an instance of a Package depending on package file type (factory).
  *
- * @method get
- * @static
  * @param {String} type The type of the package platform to instanciate
  * @param {Object} mediaPackage Information about the media
- * @return {Package} An instance of a Package sub class
+ * @return {module:publish/packages/Package~Package} An instance of a Package sub class
  */
 module.exports.get = function(type, mediaPackage) {
   if (type) {

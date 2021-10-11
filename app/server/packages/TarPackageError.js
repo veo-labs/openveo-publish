@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module packages
+ * @module publish/packages/TarPackageError
  */
 
 var util = require('util');
@@ -11,7 +11,7 @@ var PackageError = process.requirePublish('app/server/packages/PackageError.js')
  * Defines an error occurring in a tar package's processing.
  *
  * @class TarPackageError
- * @extends PackageError
+ * @extends module:publish/packages/PackageError~PackageError
  * @constructor
  * @param {String} message The error message
  * @param {String} code The error code

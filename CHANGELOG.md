@@ -6,6 +6,10 @@
 - Drop support for OpenVeo Core &lt; 10.0.0
 - Remove continuous integration with Travis
 
+## NEW FEATURES
+
+- Improve code documentation by replacing Yuidoc by JSDoc
+
 ## BUG FIXES
 
 - Fix video loading for Wowza and local providers which wasn't always loading the second time
@@ -27,6 +31,7 @@
 - **tinymce** has been upgraded from 5.2.1 to **5.9.1**
 - **video.js** has been upgraded from 7.7.5 to **7.15.4**
 - **videojs-contrib-dash** has been upgraded from 2.11.0 to **5.1.0**
+- **yuidoc** has been replaced by **JSDoc**
 
 # 11.1.1 / 2021-03-03
 

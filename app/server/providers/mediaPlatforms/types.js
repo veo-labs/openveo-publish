@@ -1,14 +1,13 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/types
  */
 
 /**
  * Defines the list of media platforms types.
  *
- * @class TYPES
- * @static
+ * @namespace
  */
 
 var TYPES = {
@@ -16,50 +15,50 @@ var TYPES = {
   /**
    * Vimeo provider.
    *
-   * @property VIMEO
-   * @type String
-   * @default 'vimeo'
-   * @final
+   * @const
+   * @type {String}
+   * @default
+   * @inner
    */
   VIMEO: 'vimeo',
 
   /**
    * Youtube provider.
    *
-   * @property YOUTUBE
-   * @type String
-   * @default 'youtube'
-   * @final
+   * @const
+   * @type {String}
+   * @default
+   * @inner
    */
   YOUTUBE: 'youtube',
 
   /**
    * Wowza provider.
    *
-   * @property WOWZA
-   * @type String
-   * @default 'wowza'
-   * @final
+   * @const
+   * @type {String}
+   * @default
+   * @inner
    */
   WOWZA: 'wowza',
 
   /**
    * Local provider.
    *
-   * @property LOCAL
-   * @type String
-   * @default 'local'
-   * @final
+   * @const
+   * @type {String}
+   * @default
+   * @inner
    */
   LOCAL: 'local',
 
   /**
    * TLS provider.
    *
-   * @property TLS
-   * @type String
-   * @default 'tls'
-   * @final
+   * @const
+   * @type {String}
+   * @default
+   * @inner
    */
   TLS: 'tls'
 

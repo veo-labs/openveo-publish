@@ -4,6 +4,11 @@
 
   /**
    * Defines the categories controller for the categories page.
+   *
+   * @class CategoriesController
+   * @memberof module:ov.publish
+   * @inner
+   * @ignore
    */
   function CategoriesController($scope, $filter, entityService, categories, publishName, publishService) {
     var entityType = 'categories';
@@ -11,6 +16,10 @@
 
     /**
      * Handles success when a category is added or updated.
+     *
+     * @memberof module:ov.publish~CategoriesController
+     * @instance
+     * @private
      */
     function successCb(taxonomy) {
       $scope.categoryTaxonomy.id = taxonomy.id;
@@ -22,6 +31,10 @@
 
     /**
      * Handles error when a category is added or updated.
+     *
+     * @memberof module:ov.publish~CategoriesController
+     * @instance
+     * @private
      */
     function errorCb() {
       $scope.saveIsDisabled = $scope.list.length == 0;
@@ -29,6 +42,10 @@
 
     /**
      * Checks that category name field is not empty.
+     *
+     * @memberof module:ov.publish~CategoriesController
+     * @instance
+     * @private
      */
     function isAddFieldEmpty() {
       if ($scope.newitem.title == undefined) {
@@ -99,11 +116,6 @@
       }
     };
 
-    /*
-     *
-     * Rights
-     *
-     */
     $scope.rights = {};
     $scope.rights.add = $scope.checkAccess('core-add-taxonomies') && !$scope.categoryTaxonomy.id;
     $scope.rights.edit = (

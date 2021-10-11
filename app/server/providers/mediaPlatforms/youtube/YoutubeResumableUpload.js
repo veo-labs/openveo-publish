@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload
  */
 
 var fs = require('fs');
@@ -17,80 +17,83 @@ var util = require('util');
  * @constructor
  */
 function ResumableUpload() {
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * TODO
-     *
-     * @property byteCount
-     * @type Number
-     */
-    byteCount: {value: 0, writable: true},
+    /** @lends module:publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload  */
+    {
 
-    /**
-     * TODO
-     *
-     * @property tokens
-     * @type Object
-     */
-    tokens: {value: {}, writable: true},
+      /**
+       * TODO
+       *
+       * @type {Number}
+       * @instance
+       */
+      byteCount: {value: 0, writable: true},
 
-    /**
-     * TODO
-     *
-     * @property filepath
-     * @type String
-     */
-    filepath: {value: '', writable: true},
+      /**
+       * TODO
+       *
+       * @type {Object}
+       * @instance
+       */
+      tokens: {value: {}, writable: true},
 
-    /**
-     * TODO
-     *
-     * @property metadata
-     * @type Object
-     */
-    metadata: {value: {}, writable: true},
+      /**
+       * TODO
+       *
+       * @type {String}
+       * @instance
+       */
+      filepath: {value: '', writable: true},
 
-    /**
-     * TODO
-     *
-     * @property retry
-     * @type Number
-     */
-    retry: {value: -1, writable: true},
+      /**
+       * TODO
+       *
+       * @type {Object}
+       * @instance
+       */
+      metadata: {value: {}, writable: true},
 
-    /**
-     * TODO
-     *
-     * @property host
-     * @type String
-     */
-    host: {value: 'www.googleapis.com'},
+      /**
+       * TODO
+       *
+       * @type {Number}
+       * @instance
+       */
+      retry: {value: -1, writable: true},
 
-    /**
-     * TODO
-     *
-     * @property api
-     * @type String
-     */
-    api: {value: '/upload/youtube/v3/videos'},
+      /**
+       * TODO
+       *
+       * @type {String}
+       * @instance
+       */
+      host: {value: 'www.googleapis.com'},
 
-    /**
-     * TODO
-     *
-     * @property stats
-     * @type Object
-     */
-    stats: {value: {}, writable: true}
-  });
+      /**
+       * TODO
+       *
+       * @type {String}
+       * @instance
+       */
+      api: {value: '/upload/youtube/v3/videos'},
+
+      /**
+       * TODO
+       *
+       * @type {Object}
+       * @instance
+       */
+      stats: {value: {}, writable: true}
+    }
+
+  );
 }
 
 util.inherits(ResumableUpload, EventEmitter);
 
 /**
  * Inits the upload by POSTing google for an upload URL (saved to self.location).
- *
- * @method upload
  */
 ResumableUpload.prototype.upload = function() {
   var self = this;
@@ -141,8 +144,6 @@ ResumableUpload.prototype.upload = function() {
 
 /**
  * Pipes uploadPipe to self.location (Google's Location header).
- *
- * @method send
  */
 ResumableUpload.prototype.send = function() {
   var self = this;
@@ -201,7 +202,6 @@ ResumableUpload.prototype.send = function() {
 /**
  * TODO.
  *
- * @method getProgress
  * @param {} handler TODO
  */
 ResumableUpload.prototype.getProgress = function(handler) {

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/PoiProvider
  */
 
 var util = require('util');
@@ -18,6 +18,7 @@ var NotFoundError = openVeoApi.errors.NotFoundError;
  * @extends EntityProvider
  * @constructor
  * @param {Database} database The database to interact with
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityProvider or Database
  */
 function PoiProvider(database) {
   PoiProvider.super_.call(this, database, 'publish_poi');
@@ -29,23 +30,18 @@ util.inherits(PoiProvider, openVeoApi.providers.EntityProvider);
 /**
  * Adds points of interest.
  *
- * @method add
- * @async
- * @param {Array} pois The list of points of interest to store with for each point of interest:
- *   - **String** name The point of interest name
- *   - **Number** value The point of interest time in milliseconds
- *   - **String** [description] The point of interest description
- *   - **Object** [poi.file] The file to associate to the point of interest
- *     - **String** poi.file.originalName The file original name
- *     - **String** poi.file.mimeType The file MIME type
- *     - **String** poi.file.fileName The file name
- *     - **Number** poi.file.size The file size in Bytes
- *     - **String** poi.file.url The file URL
- *     - **String** poi.file.path The file path on the file system
- * @param {Function} [callback] The function to call when it's done with:
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The total amount of points of interest inserted
- *   - **Array** The list of added points of interest
+ * @param {Array} pois The list of points of interest to store
+ * @param {String} pois[].name The point of interest name
+ * @param {Number} pois[].value The point of interest time in milliseconds
+ * @param {String} [pois[].description] The point of interest description
+ * @param {Object} [pois[].poi.file] The file to associate to the point of interest
+ * @param {String} pois[].poi.file.originalName The file original name
+ * @param {String} pois[].poi.file.mimeType The file MIME type
+ * @param {String} pois[].poi.file.fileName The file name
+ * @param {Number} pois[].poi.file.size The file size in Bytes
+ * @param {String} pois[].poi.file.url The file URL
+ * @param {String} pois[].poi.file.path The file path on the file system
+ * @param {module:publish/providers/PoiProvider~PoiProvider~addCallback} [callback] The function to call when it's done
  */
 PoiProvider.prototype.add = function(pois, callback) {
   var poisToAdd = [];
@@ -85,8 +81,6 @@ PoiProvider.prototype.add = function(pois, callback) {
 /**
  * Updates a point of interest.
  *
- * @method updateOne
- * @async
  * @param {ResourceFilter} [filter] Rules to filter the point of interest to update
  * @param {Object} poi The point of interest description object
  * @param {Number} [poi.value] The point of interest time in milliseconds
@@ -100,9 +94,8 @@ PoiProvider.prototype.add = function(pois, callback) {
  * @param {String} [poi.file.size] The file size in Bytes
  * @param {String} [poi.file.url] The file URL
  * @param {String} [poi.file.path] The file path on the file system
- * @param {Function} [callback] The function to call when it's done with:
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** 1 if everything went fine
+ * @param {module:publish/providers/PoiProvider~PoiProvider~updateOneCallback} [callback] The function to call when
+ * it's done
  */
 PoiProvider.prototype.updateOne = function(filter, poi, callback) {
   var self = this;
@@ -190,12 +183,9 @@ PoiProvider.prototype.updateOne = function(filter, poi, callback) {
  *
  * File associated to the points of interest will be removed as well.
  *
- * @method remove
- * @async
  * @param {ResourceFilter} [filter] Rules to filter points of interest to remove
- * @param {Function} [callback] The function to call when it's done with:
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Number** The number of removed points of interest
+ * @param {module:publish/providers/PoiProvider~PoiProvider~removeCallback} [callback] The function to call when it's
+ * done
  */
 PoiProvider.prototype.remove = function(filter, callback) {
   var self = this;
@@ -265,10 +255,7 @@ PoiProvider.prototype.remove = function(filter, callback) {
 /**
  * Creates points of interest indexes.
  *
- * @method createIndexes
- * @async
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PoiProvider.prototype.createIndexes = function(callback) {
   var language = process.api.getCoreApi().getContentLanguage();
@@ -289,11 +276,8 @@ PoiProvider.prototype.createIndexes = function(callback) {
 /**
  * Drops an index from database collection.
  *
- * @method dropIndex
- * @async
  * @param {String} indexName The name of the index to drop
- * @param {Function} callback Function to call when it's done with:
- *  - **Error** An error if something went wrong, null otherwise
+ * @param {callback} callback Function to call when it's done
  */
 PoiProvider.prototype.dropIndex = function(indexName, callback) {
   this.storage.dropIndex(this.location, indexName, function(error, result) {
@@ -303,3 +287,22 @@ PoiProvider.prototype.dropIndex = function(indexName, callback) {
     callback(error);
   });
 };
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~addCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The total amount of points of interest inserted
+ * @param {Array} pois The list of added points of interest
+ */
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~updateOneCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total 1 if everything went fine
+ */
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~removeCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of removed points of interest
+ */

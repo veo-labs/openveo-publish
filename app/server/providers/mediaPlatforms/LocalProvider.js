@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/LocalProvider
  */
 
 var path = require('path');
@@ -15,7 +15,7 @@ var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPl
  * Defines a LocalProvider class to interact with local platform.
  *
  * @class LocalProvider
- * @extends MediaPlatformProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf Local configuration
  * @param {String} providerConf.vodFilePath The absolute directory path where to store medias
@@ -31,12 +31,9 @@ util.inherits(LocalProvider, MediaPlatformProvider);
 /**
  * Uploads a media to the Local platform.
  *
- * @method upload
- * @async
  * @param {String} mediaFilePath The absolute system path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id on the Local platform
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 LocalProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
@@ -60,13 +57,10 @@ LocalProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Gets information about a media hosted by Local.
  *
- * @method getMediaInfo
- * @async
  * @param {String} mediaId The local id of the media
  * @param {String} expectedDefintion The expected media definition, not used for this provider
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 LocalProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   var self = this;
@@ -93,11 +87,8 @@ LocalProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
 /**
  * Removes a media from the Local platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds Local media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 LocalProvider.prototype.remove = function(mediaIds, callback) {
   if (!mediaIds) {

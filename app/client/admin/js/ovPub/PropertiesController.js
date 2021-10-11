@@ -4,6 +4,11 @@
 
   /**
    * Defines the properties controller for the properties page.
+   *
+   * @class PropertiesController
+   * @memberof module:ov.publish
+   * @inner
+   * @ignore
    */
   function PropertiesController($scope, $filter, entityService, publishService, publishName) {
     var entityType = 'properties';
@@ -33,6 +38,9 @@
     /**
      * Removes a list of properties.
      *
+     * @memberof module:ov.publish~PropertiesController
+     * @instance
+     * @private
      * @param {Array} selected The list of property ids to remove
      * @param {Function} reload The reload Function to force reloading the table
      */
@@ -48,6 +56,9 @@
     /**
      * Adds a property.
      *
+     * @memberof module:ov.publish~PropertiesController
+     * @instance
+     * @private
      * @param {Object} property Property data
      */
     function addProperty(property) {
@@ -60,6 +71,9 @@
     /**
      * Saves property.
      *
+     * @memberof module:ov.publish~PropertiesController
+     * @instance
+     * @private
      * @param {Object} property Property data
      */
     function saveProperty(property) {
@@ -78,11 +92,6 @@
       });
     }
 
-    /*
-     *
-     * RIGHTS
-     *
-     */
     $scope.rights = {};
     $scope.rights.add = $scope.checkAccess('publish-add-' + entityType);
     $scope.rights.edit = $scope.checkAccess('publish-update-' + entityType);

@@ -4,6 +4,11 @@
 
   /**
    * Defines the media controller for the medias page.
+   *
+   * @class MediaController
+   * @memberof module:ov.publish
+   * @inner
+   * @ignore
    */
   function MediaController(
     $scope,
@@ -103,6 +108,9 @@
     /**
      * Gets all categories and add a value for "none".
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {String} label The label for "no categories"
      * @return {Array} The list of categories
      */
@@ -116,6 +124,9 @@
     /**
      * Opens a link in a new tab.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {String} link Destination url
      */
     function goToPath(link) {
@@ -125,6 +136,9 @@
     /**
      * Opens an alert to display HTML code to share the media.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Object} media The media to share
      */
     function shareCode(media) {
@@ -156,6 +170,9 @@
     /**
      * Retries a media which is on error.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Array} medias The list of medias to work on
      * @param {Function} reload Function to reload the datatable
      */
@@ -170,6 +187,9 @@
     /**
      * Asks server to start uploading the media to the chosen platform.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Array} medias The list of medias to work on
      * @param {String} platformName The name of platform to upload to
      * @param {Function} reload Function to reload the datatable
@@ -185,6 +205,9 @@
     /**
      * Publishes a list of medias.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Array} medias The list of media ids to publish
      * @param {Function} reload Function to reload the datatable
      */
@@ -199,6 +222,9 @@
     /**
      * Unpublishes a list of medias.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Array} medias The list of media ids to unpublish
      * @param {Function} reload Function to reload the datatable
      */
@@ -213,6 +239,9 @@
     /**
      * Removes a list of medias.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Array} selected The list of media ids to remove
      * @param {Function} reload Function to reload the datatable
      */
@@ -227,6 +256,9 @@
     /**
      * Saves media information.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Object} media Media data
      */
     function saveMedia(media) {
@@ -255,6 +287,9 @@
     /**
      * Routes to media editor.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Object} media The media to edit
      */
     function mediaEditor(media) {
@@ -264,6 +299,9 @@
     /**
      * Builds custom properties fields descriptors for formly.
      *
+     * @memberof module:ov.publish~MediaController
+     * @instance
+     * @private
      * @param {Object} [model] Model where to find default values
      * @param {Boolean} [inlineEditable] true to generate an inline editable field instead of a simple editable field
      * @return {Array} The list of formly fields descriptors

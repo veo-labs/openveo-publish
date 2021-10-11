@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module providers
+ * @module publish/providers/mediaPlatforms/tls/TlsProvider
  */
 
 var path = require('path');
@@ -18,7 +18,7 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  * Defines a TlsProvider to interact with TLS platform.
  *
  * @class TlsProvider
- * @extends MediaPlatformProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
  * @constructor
  * @param {Object} providerConf TLS configuration
  * @param {String} providerConf.nfsPath The absolute path of the NFS directory shared with TLS
@@ -35,31 +35,36 @@ function TlsProvider(providerConf) {
   if (!providerConf.nfsPath || typeof providerConf.nfsPath !== 'string')
     throw new TypeError('Invalid NFS path: ' + providerConf.nfsPath);
 
-  Object.defineProperties(this, {
+  Object.defineProperties(this,
 
-    /**
-     * The TLS client to interact with TLS web service.
-     *
-     * @property client
-     * @type TlsClient
-     * @final
-     */
-    client: {
-      value: new TlsClient(providerConf.url, providerConf.accessToken, providerConf.certificate)
-    },
+    /** @lends module:publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider */
+    {
 
-    /**
-     * The absolute path to the directory containing medias.
-     *
-     * @property mediaDirectoryPath
-     * @type String
-     * @final
-     */
-    mediaDirectoryPath: {
-      value: path.join(providerConf.nfsPath, providerConf.mediaDirectoryPath || '')
+      /**
+       * The TLS client to interact with TLS web service.
+       *
+       * @type {module:publish/providers/mediaPlatforms/tls/TlsClient~TlsClient}
+       * @instance
+       * @readonly
+       */
+      client: {
+        value: new TlsClient(providerConf.url, providerConf.accessToken, providerConf.certificate)
+      },
+
+      /**
+       * The absolute path to the directory containing medias.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      mediaDirectoryPath: {
+        value: path.join(providerConf.nfsPath, providerConf.mediaDirectoryPath || '')
+      }
+
     }
 
-  });
+  );
 }
 
 module.exports = TlsProvider;
@@ -70,12 +75,9 @@ util.inherits(TlsProvider, MediaPlatformProvider);
  *
  * Media is uploaded on a local directory as OpenVeo and TLS share a common directory through NFS.
  *
- * @method upload
- * @async
  * @param {String} mediaFilePath The absolute path of the media to upload
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **String** The media id
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
  */
 TlsProvider.prototype.upload = function(mediaFilePath, callback) {
   var self = this;
@@ -106,14 +108,11 @@ TlsProvider.prototype.upload = function(mediaFilePath, callback) {
 /**
  * Gets information about a media hosted by TLS.
  *
- * @method getMediaInfo
- * @async
  * @param {Array} mediaIds The list of media ids
  * @param {String} expectedDefintion The expected media definition. This is not use for TLS provider as TLS
  * doesn't transcode medias
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
- *   - **Object** Information about the media and its resources
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
  */
 TlsProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
   var self = this;
@@ -150,11 +149,8 @@ TlsProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, call
 /**
  * Removes medias from TLS platform.
  *
- * @method remove
- * @async
  * @param {Array} mediaIds TLS media ids to remove
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 TlsProvider.prototype.remove = function(mediaIds, callback) {
   var self = this;
@@ -185,8 +181,6 @@ TlsProvider.prototype.remove = function(mediaIds, callback) {
  * If media has several resources on the platform, the same update will be performed for all resources.
  * Actually only the media title and media custom properties are synchronized with TLS.
  *
- * @method update
- * @async
  * @param {Object} media The media
  * @param {Array} media.mediaId The list of media resource ids
  * @param {Object} data The datas to update
@@ -194,8 +188,7 @@ TlsProvider.prototype.remove = function(mediaIds, callback) {
  * @param {Object} [data.properties] The media custom properties with id / value pairs, custom properties corresponding
  * to the one in TLS configuration will be updated, others won't
  * @param {Boolean} force true to force the update even if title and properties haven't changed, false otherwise
- * @param {Function} callback The function to call when it's done
- *   - **Error** The error if an error occurred, null otherwise
+ * @param {callback} callback The function to call when it's done
  */
 TlsProvider.prototype.update = function(media, data, force, callback) {
   if (!data.title && (!data.properties || !Object.keys(data.properties).length)) return callback();
