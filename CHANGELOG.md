@@ -21,6 +21,7 @@
 - **dashjs** has been upgraded from 3.0.3 to **4.1.0**
 - **flightplan** has been removed
 - **googleapis** has been upgraded from 48.0.0 to **88.2.0**
+- **grunt-gh-pages** has been removed
 - **grunt-karma** has been removed
 - **grunt-mkdocs** has been removed
 - **grunt-mocha-test** has been removed

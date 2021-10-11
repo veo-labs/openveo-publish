@@ -47,7 +47,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-gh-pages');
 
   // Build back office client
   grunt.registerTask('build-back-office-client', [
