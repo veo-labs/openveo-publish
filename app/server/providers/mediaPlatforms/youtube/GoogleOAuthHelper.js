@@ -126,7 +126,7 @@ GoogleOAuthHelper.prototype.persistTokenWithCode = function(code, callback) {
   self.oauth2Client.getToken(code, function(error, token, response) {
     if (error) return callback(error);
     else if (token && Object.keys(token).length > 0) {
-      process.logger.debug('Token as been retrieved sucessfully', token);
+      process.logger.debug('Token has been retrieved sucessfully', token);
       self.saveToken(token, callback);
     } else if (callback) {
       callback();
