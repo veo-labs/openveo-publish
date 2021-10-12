@@ -57,7 +57,6 @@
     "grunt-contrib-compass": "^1.1.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-uglify": "^4.0.1",
-    "grunt-contrib-watch": "^1.1.0",
     "karma": "^6.3.4",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
@@ -85,9 +84,8 @@
     "test": "npm run test:client && npm run test:server",
     "test:client": "npx karma start ./tests/client/karmaConf.js",
     "test:server": "npx mocha --config tests/server/.mocharc.json",
-    "watch": "npx grunt watch",
-    "watch:back-office-client": "npx grunt watch:back-office",
-    "watch:front-office-client": "npx grunt watch:front-office"
+    "watch:back-office-client": "npm run build:back-office-client ; npx ovWatch -d ./app/client/admin -d ./assets/be/views -c build:back-office-client",
+    "watch:front-office-client": "npm run build:front-office-client ; npx ovWatch -d ./app/client/front -c build:front-office-client"
   },
   "precommit": [
     "lint",

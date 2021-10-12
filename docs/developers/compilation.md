@@ -1,6 +1,6 @@
 # Introduction
 
-OpenVeo back end is written using AngularJS and SASS / Compass. SASS files need to be compiled to generate the CSS and JavaScript files can be minified and aggregated for better performance.
+OpenVeo back office is written using AngularJS and SASS / Compass. SASS files need to be compiled to generate the CSS and JavaScript files can be minified and aggregated for better performance.
 
 OpenVeo does not automatically compile SASS and JavaScript files for his plugins. Thus OpenVeo Publish have to compile his own SASS and JavaScript files.
 
@@ -9,10 +9,6 @@ OpenVeo does not automatically compile SASS and JavaScript files for his plugins
 To compile both OpenVeo Publish back office and front office use:
 
     npm run build
-
-To compile OpenVeo Publish back office and front office when a file is modified use:
-
-    npm run watch
 
 # Compiling OpenVeo Publish back office client
 
