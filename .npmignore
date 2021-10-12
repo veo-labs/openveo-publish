@@ -42,11 +42,6 @@ ehthumbs.db
 /DOC-*.md
 /jsdoc*.js
 
-# Grunt files
-/Gruntfile.js
-/tasks
-/.grunt
-
 # Published video packages
 /assets/player/videos
 

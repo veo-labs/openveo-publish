@@ -36,8 +36,5 @@ nbproject
 # Documentation
 /site
 
-# Grunt
-/.grunt
-
 # Images processing cache directories
 .cache
