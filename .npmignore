@@ -26,6 +26,7 @@ ehthumbs.db
 
 # Sass
 /.sass-cache
+/compass.rb
 
 # Unit tests
 /tests
