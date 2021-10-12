@@ -79,7 +79,6 @@
     "doc:deploy": "npx ovDeployGithubPages \"site/$(echo $npm_package_version)\"",
     "doc:publish": "mkdocs build -c -d \"./site/$(echo $npm_package_version)\"",
     "doc:server": "npx jsdoc -c jsdoc-server.js -d \"./site/$(echo $npm_package_version)/api/server\" -p -r",
-    "e2e": "npx grunt test-e2e",
     "lint": "npx eslint \"*.js\" \"app/**/*.js\" \"migrations/**/*.js\" \"tasks/**/*.js\" \"tests/**/*.js\"",
     "postinstall": "node install.js",
     "postpublish": "npm run doc && npm run doc:deploy",
