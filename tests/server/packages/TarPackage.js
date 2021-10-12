@@ -87,8 +87,8 @@ describe('TarPackage', function() {
     };
 
     fs = {
-      exists: chai.spy(function(resourcePath, callback) {
-        callback(true);
+      access: chai.spy(function(resourcePath, callback) {
+        callback();
       }),
       readFile: chai.spy(function(filePath, callback) {
         callback();

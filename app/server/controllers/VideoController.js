@@ -59,7 +59,7 @@ util.inherits(VideoController, ContentController);
 function resolveResourcesUrls(medias) {
   var cdnUrl = coreApi.getCdnUrl();
   var wowzaStreamPath = platforms[TYPES.WOWZA] && platforms[TYPES.WOWZA].streamPath &&
-      url.format(url.parse(platforms[TYPES.WOWZA].streamPath));
+      (new url.URL(platforms[TYPES.WOWZA].streamPath)).href;
   var removeFirstSlashRegExp = new RegExp(/^\//);
 
   if (medias && medias.length) {

@@ -1,6 +1,6 @@
 'use strict';
 
-/* eslint no-sync: 0 */
+/* eslint node/no-sync: 0 */
 var path = require('path');
 var fs = require('fs');
 
@@ -46,7 +46,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-eslint');
 
   // Build back office client
   grunt.registerTask('build-back-office-client', [

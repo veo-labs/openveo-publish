@@ -96,8 +96,8 @@ function createHotFolder(callback) {
 function createConf(callback) {
   var confFile = path.join(confDir, 'publishConf.json');
 
-  fs.exists(confFile, function(exists) {
-    if (exists) {
+  fs.access(confFile, function(error) {
+    if (!error) {
       process.stdout.write(confFile + ' already exists\n');
       callback();
     } else {
@@ -128,8 +128,8 @@ function createVideoPlatformConf(callback) {
 
   async.series([
     function(callback) {
-      fs.exists(confFile, function(exists) {
-        if (exists)
+      fs.access(confFile, function(error) {
+        if (!error)
           callback(new Error(confFile + ' already exists\n'));
         else
           callback();
@@ -394,8 +394,8 @@ function createWatcherConf(callback) {
 
   async.series([
     function(callback) {
-      fs.exists(confFile, function(exists) {
-        if (exists)
+      fs.access(confFile, function(error) {
+        if (!error)
           callback(new Error(confFile + ' already exists\n'));
         else
           callback();

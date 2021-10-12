@@ -57,7 +57,7 @@ ehthumbs.db
 .gitattributes
 
 # Eslint
-.eslintrc
+.eslintrc.json
 
 # Images processing cache directories
 .cache

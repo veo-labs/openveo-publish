@@ -9,10 +9,10 @@
   "globals": {
 
     // Add angular to environment globals but do not authorize to overwrite it
-    angular: false,
+    "angular": false,
 
     // Add openVeoSettings environment global but do not authorize to overwrite it
-    openVeoSettings: true
+    "openVeoSettings": true
 
   }
 

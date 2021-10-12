@@ -9,9 +9,9 @@
   "globals": {
 
     // Add chai to environment globals but do not authorize to overwrite it
-    chai: false,
-    assert: false,
-    Promise: false
+    "chai": false,
+    "assert": false,
+    "Promise": false
 
   },
   "rules": {

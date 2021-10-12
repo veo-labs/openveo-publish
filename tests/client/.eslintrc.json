@@ -15,12 +15,12 @@
   "globals": {
 
     // Add angular to environment globals but do not authorize to overwrite it
-    angular: false,
-    inject: false,
+    "angular": false,
+    "inject": false,
 
     // Add chai to environment globals but do not authorize to overwrite it
-    chai: false,
-    assert: false,
+    "chai": false,
+    "assert": false,
 
     // Add protractor environment globals but do not authorize to overwrite it
     "element": true,
@@ -29,7 +29,7 @@
     "browser": true,
 
     // Add openVeoSettings environment global but do not authorize to overwrite it
-    openVeoSettings: true
+    "openVeoSettings": true
 
   },
   "rules": {
@@ -41,7 +41,7 @@
     "strict": 0,
 
     // Google Youtube API uses non camelcase properties
-    "camelcase": 0,
+    "camelcase": 0
 
   }
 

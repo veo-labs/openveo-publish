@@ -203,9 +203,9 @@ function validatePackage(callback) {
 
         // Got the name of the video file
         // Test if video file really exists in package
-        fs.exists(path.join(extractDirectory, packageInformation.filename), function(exists) {
+        fs.access(path.join(extractDirectory, packageInformation.filename), function(error) {
 
-          if (exists)
+          if (!error)
             callback(null, packageInformation);
           else
             callback(new Error('Missing file ' + packageInformation.filename));
@@ -283,9 +283,9 @@ function saveTimecodes(xmlTimecodeFilePath, callback) {
     function(callback) {
 
       // Check if XML file exists
-      fs.exists(xmlTimecodeFilePath, function(exists) {
+      fs.access(xmlTimecodeFilePath, function(error) {
 
-        if (exists)
+        if (!error)
           callback();
         else
           callback(new Error('Missing timecode file ' + xmlTimecodeFilePath));
