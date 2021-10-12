@@ -243,8 +243,7 @@
 
     // Allow to require @openveo/api even if it is not in the list of dependencies
     "node/no-missing-require": 0,
-    "node/no-extraneous-require": 0,
-    "node/no-unpublished-require": 0
+    "node/no-extraneous-require": 0
 
   }
 }
