@@ -5,10 +5,11 @@
  */
 
 var fs = require('fs');
-var request = require('request');
+var https = require('https');
+var util = require('util');
+
 var EventEmitter = require('events').EventEmitter;
 var mime = require('mime');
-var util = require('util');
 
 /**
  * TODO
@@ -98,48 +99,65 @@ util.inherits(ResumableUpload, EventEmitter);
 ResumableUpload.prototype.upload = function() {
   var self = this;
   var options = {
-    url: 'https://' + self.host + self.api + '?uploadType=resumable&part=snippet,status,contentDetails',
+    hostname: self.host,
+    path: self.api + '?uploadType=resumable&part=snippet,status,contentDetails',
+    port: 443,
+    method: 'POST',
     headers: {
       Host: self.host,
-      Authorization: 'Bearer ' + self.tokens.access_token
-    },
-    body: JSON.stringify(self.metadata)
+      Authorization: 'Bearer ' + self.tokens.access_token,
+      'Content-Length': Buffer.from(JSON.stringify(self.metadata)).length,
+      'Content-Type': 'application/json',
+      'X-Upload-Content-Length': self.stats.size,
+      'X-Upload-Content-Type': mime.getType(self.filepath)
+    }
   };
-  options.headers['Content-Length'] = Buffer.from(JSON.stringify(self.metadata)).length;
-  options.headers['Content-Type'] = 'application/json';
-  options.headers['X-Upload-Content-Length'] = self.stats.size;
-  options.headers['X-Upload-Content-Type'] = mime.getType(self.filepath);
 
-  // Send request and start upload if success
-  request.post(options, function(err, res, body) {
-    if (body) {
-      body = JSON.parse(body);
-
-      if (body.error) {
-        self.retry = 0;
-        self.emit('error', new Error(body.error.message));
-        return;
-      }
-    }
-
-    if (err || !res.headers.location) {
-      self.emit('error', err);
-      if ((self.retry > 0) || (self.retry <= -1)) {
-        self.emit('progress', 'Retrying ...');
-        self.retry--;
-        self.upload();// retry
-      } else {
-        if (err)
-          self.emit('error', err);
-        else
-          self.emit('error', new Error('max try reached'));
-        return;
-      }
+  var handleError = function(error) {
+    if ((self.retry > 0) || (self.retry <= -1)) {
+      self.emit('progress', 'Retrying ...');
+      self.retry--;
+      self.upload();
     } else {
-      self.location = res.headers.location;
-      self.send();
+      self.emit('error', new Error('max try reached with last error: "' + error.message + '"'));
     }
+  };
+
+  var request = https.request(options, function(response) {
+    let result = '';
+
+    response.setEncoding('utf8');
+    response.on('error', handleError);
+    response.on('data', function(chunk) {
+      result += chunk;
+    });
+    response.on('end', function() {
+      var body;
+      if (result) {
+        try {
+          body = JSON.parse(result);
+        } catch (error) {
+          return handleError(new Error('Server error, response is not valid JSON'));
+        }
+
+        if (body.error) {
+          self.retry = 0;
+          return handleError(new Error(body.error.message));
+        }
+      }
+
+      if (!response.headers.location)
+        return handleError(new Error('Location not specified'));
+
+      self.location = response.headers.location;
+      self.send();
+    });
   });
+
+  request.on('error', handleError);
+
+  request.write(JSON.stringify(self.metadata));
+  return request.end();
 };
 
 /**
@@ -147,17 +165,32 @@ ResumableUpload.prototype.upload = function() {
  */
 ResumableUpload.prototype.send = function() {
   var self = this;
+  var health;
   var uploadPipe;
-
-  // self.location becomes the Google-provided URL to PUT to
   var options = {
-    url: self.location,
+    method: 'PUT',
     headers: {
-      Authorization: 'Bearer ' + self.tokens.access_token
+      Authorization: 'Bearer ' + self.tokens.access_token,
+      'Content-Length': self.stats.size - self.byteCount,
+      'Content-Type': mime.getType(self.filepath)
     }
   };
-  options.headers['Content-Length'] = self.stats.size - self.byteCount;
-  options.headers['Content-Type'] = mime.getType(self.filepath);
+  var handleError = function(error) {
+    clearInterval(health);
+    self.emit('error', error);
+
+    if ((self.retry > 0) || (self.retry <= -1)) {
+      self.retry--;
+      self.getProgress(function(getProgressError, response, body) {
+        if (response && response.headers && typeof response.headers.range !== 'undefined') {
+          self.byteCount = response.headers.range.substring(8); // parse response
+        } else {
+          self.byteCount = 0;
+        }
+        self.send();
+      });
+    }
+  };
 
   try {
     // creates file stream, pipes it to self.location
@@ -170,7 +203,7 @@ ResumableUpload.prototype.send = function() {
     return;
   }
 
-  var health = setInterval(function() {
+  health = setInterval(function() {
     self.getProgress(function(err, res, body) {
       if (!err && typeof res.headers.range !== 'undefined') {
         self.emit('progress', res.headers.range.substring(8));
@@ -178,25 +211,23 @@ ResumableUpload.prototype.send = function() {
     });
   }, 5000);
 
-  uploadPipe.pipe(request.put(options, function(error, response, body) {
-    clearInterval(health);
-    if (!error) {
-      self.emit('success', body);
-      return;
-    }
-    self.emit('error', new Error(error));
-    if ((self.retry > 0) || (self.retry <= -1)) {
-      self.retry--;
-      self.getProgress(function(err, res, b) {
-        if (res && res.headers && typeof res.headers.range !== 'undefined') {
-          self.byteCount = res.headers.range.substring(8); // parse response
-        } else {
-          self.byteCount = 0;
-        }
-        self.send();
-      });
-    }
-  }));
+  // self.location becomes the Google-provided URL to PUT to
+  var request = https.request(self.location, options, function(response) {
+    var result = '';
+
+    response.setEncoding('utf8');
+    response.on('error', handleError);
+    response.on('data', function(chunk) {
+      result += chunk;
+    });
+    response.on('end', function() {
+      clearInterval(health);
+      self.emit('success', result);
+    });
+  });
+
+  request.on('error', handleError);
+  uploadPipe.pipe(request);
 };
 
 /**
@@ -207,14 +238,28 @@ ResumableUpload.prototype.send = function() {
 ResumableUpload.prototype.getProgress = function(handler) {
   var self = this;
   var options = {
-    url: self.location,
+    method: 'PUT',
     headers: {
-      Authorization: 'Bearer ' + self.tokens.access_token
+      Authorization: 'Bearer ' + self.tokens.access_token,
+      'Content-Length': 0,
+      'Content-Range': 'bytes */' + self.stats.size
     }
   };
-  options.headers['Content-Length'] = 0;
-  options.headers['Content-Range'] = 'bytes */' + self.stats.size;
-  request.put(options, handler);
+
+  var request = https.request(self.location, options, function(response) {
+    var result = '';
+
+    response.setEncoding('utf8');
+    response.on('error', handler);
+    response.on('data', function(chunk) {
+      result += chunk;
+    });
+    response.on('end', function() {
+      handler(null, response, result);
+    });
+  });
+
+  request.on('error', handler);
 };
 
 module.exports = ResumableUpload;
