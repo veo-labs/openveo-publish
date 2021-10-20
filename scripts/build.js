@@ -30,8 +30,13 @@
 
 const {exec} = require('child_process');
 const path = require('path');
+const util = require('util');
+
+const openVeoApi = require('@openveo/api');
 
 const applicationConf = require('../conf.js');
+
+const ACTIONS = openVeoApi.fileSystem.ACTIONS;
 
 /**
  * Logs given message to stdout with a prefix.
@@ -138,46 +143,72 @@ function resolveFilesPaths(filesPaths, prefix) {
  */
 async function main() {
   const args = getArguments();
-  const assetsPath = './assets';
-  const clientPath = './app/client';
+  const rootPath = path.join(__dirname, '../');
+  const assetsPath = path.join(rootPath, 'assets');
+  const backAssetsPath = path.join(assetsPath, 'be');
+  const baseSourcesPath = path.join(rootPath, 'app/client');
+  const buildPath = path.join(rootPath, 'build');
+  const frontSourcesPath = path.join(baseSourcesPath, 'front');
+  const frontJsPath = path.join(frontSourcesPath, 'js');
+  const backSourcesPath = path.join(baseSourcesPath, 'admin');
+  const backCssDistPath = path.join(backAssetsPath, 'css');
+  const backBuildPath = path.join(buildPath, 'admin');
+  const backJsPath = path.join(backSourcesPath, 'js');
+  const backScssPath = path.join(backSourcesPath, 'compass/sass');
+  const backScssBuildPath = path.join(backBuildPath, 'scss');
+  const backCssPlayerBuildPath = path.join(backScssBuildPath, 'player_page.css');
+  const backCssPlayerDistPath = path.join(backCssDistPath, 'player_page.css');
+  const backCssMainBuildPath = path.join(backScssBuildPath, 'publish.css');
+  const backCssMainDistPath = path.join(backCssDistPath, 'publish.css');
 
   if (args.back) {
-    const backOfficeClientScssPath = path.join(clientPath, 'admin/compass/sass');
-    const backOfficeClientCssPath = path.join(assetsPath, 'be/css');
+    log(`Copy back office SCSS files to ${backScssBuildPath}`);
+    await util.promisify(openVeoApi.fileSystem.copy.bind(openVeoApi.fileSystem))(
+      backScssPath,
+      backScssBuildPath
+    );
 
-    log(`Compile back office client SCSS files into ${backOfficeClientCssPath}`);
-    await compileScssFiles(backOfficeClientScssPath, backOfficeClientCssPath, args.production);
+    log(`Compile back office client SCSS files into ${backScssBuildPath}`);
+    await compileScssFiles(backScssBuildPath, backScssBuildPath, args.production);
+
+    if (!args.production) {
+      log(`Copy back office CSS and SCSS files to ${backCssDistPath}`);
+      await util.promisify(openVeoApi.fileSystem.copy.bind(openVeoApi.fileSystem))(
+        backScssBuildPath,
+        backCssDistPath
+      );
+    } else {
+      log(`Copy back office CSS files to ${backCssDistPath}`);
+      await util.promisify(openVeoApi.fileSystem.performActions.bind(openVeoApi.fileSystem))([
+        {type: ACTIONS.COPY, sourcePath: backCssPlayerBuildPath, destinationPath: backCssPlayerDistPath},
+        {type: ACTIONS.COPY, sourcePath: backCssMainBuildPath, destinationPath: backCssMainDistPath}
+      ]);
+
+      const backLibraryDistPath = path.join(assetsPath, applicationConf.backOffice.scriptLibFiles.prod[0]);
+      const backDistPath = path.join(assetsPath, applicationConf.backOffice.scriptFiles.prod[0]);
+
+      log(`Compile back office client library to ${backLibraryDistPath}`);
+      await compileJavaScriptFiles(
+        resolveFilesPaths(applicationConf.backOffice.scriptLibFiles.dev, backJsPath),
+        backLibraryDistPath
+      );
+
+      log(`Compile back office client to ${backDistPath}`);
+      await compileJavaScriptFiles(
+        resolveFilesPaths(applicationConf.backOffice.scriptFiles.dev, backJsPath),
+        backDistPath
+      );
+    }
   }
 
-  if (args.production) {
-    if (args.back) {
-      const backOfficeClientJavaScriptPath = path.join(clientPath, 'admin/js');
-      const backOfficeClientLibraryDistPath = path.join(assetsPath, applicationConf.backOffice.scriptLibFiles.prod[0]);
-      const backOfficeClientDistPath = path.join(assetsPath, applicationConf.backOffice.scriptFiles.prod[0]);
+  if (args.front && args.production) {
+    const frontOfficeClientDistPath = path.join(assetsPath, applicationConf.custom.scriptFiles.publishPlayer.prod[0]);
 
-      log(`Compile back office client library to ${backOfficeClientLibraryDistPath}`);
-      await compileJavaScriptFiles(
-        resolveFilesPaths(applicationConf.backOffice.scriptLibFiles.dev, backOfficeClientJavaScriptPath),
-        backOfficeClientLibraryDistPath
-      );
-
-      log(`Compile back office client to ${backOfficeClientDistPath}`);
-      await compileJavaScriptFiles(
-        resolveFilesPaths(applicationConf.backOffice.scriptFiles.dev, backOfficeClientJavaScriptPath),
-        backOfficeClientDistPath
-      );
-    }
-
-    if (args.front) {
-      const frontOfficeClientJavaScriptPath = path.join(clientPath, 'front/js');
-      const frontOfficeClientDistPath = path.join(assetsPath, applicationConf.custom.scriptFiles.publishPlayer.prod[0]);
-
-      log(`Compile front office client to ${frontOfficeClientDistPath}`);
-      await compileJavaScriptFiles(
-        resolveFilesPaths(applicationConf.custom.scriptFiles.publishPlayer.dev, frontOfficeClientJavaScriptPath),
-        frontOfficeClientDistPath
-      );
-    }
+    log(`Compile front office client to ${frontOfficeClientDistPath}`);
+    await compileJavaScriptFiles(
+      resolveFilesPaths(applicationConf.custom.scriptFiles.publishPlayer.dev, frontJsPath),
+      frontOfficeClientDistPath
+    );
   }
 }
 
