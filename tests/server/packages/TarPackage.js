@@ -123,16 +123,16 @@ describe('TarPackage', function() {
     mock.stopAll();
   });
 
-  describe('saveTimecodes', function() {
+  describe('savePointsOfInterest', function() {
 
     it('should update package state', function() {
       tarPackage.updateState = chai.spy(function(id, state, callback) {
         assert.equal(id, expectedMediaPackage.id, 'Wrong id');
-        assert.equal(state, STATES.SAVING_TIMECODES, 'Wrong state');
+        assert.equal(state, STATES.SAVING_POINTS_OF_INTEREST, 'Wrong state');
         callback();
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
@@ -146,14 +146,14 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected resolve');
       }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
     });
 
@@ -189,7 +189,7 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
@@ -211,7 +211,7 @@ describe('TarPackage', function() {
         callback(null, pois.length, pois);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
       }).catch(function(error) {
@@ -232,7 +232,7 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
@@ -240,7 +240,7 @@ describe('TarPackage', function() {
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
     });
 
@@ -257,14 +257,14 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
     });
 
@@ -326,7 +326,7 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
@@ -352,7 +352,7 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
@@ -360,7 +360,7 @@ describe('TarPackage', function() {
         videoProvider.updateOne.should.have.been.called.exactly(0);
         assert.instanceOf(error, TarPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_TIMECODE, 'Wrong error code');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
     });
 
@@ -429,7 +429,7 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.saveTimecodes().then(function() {
+      return tarPackage.savePointsOfInterest().then(function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         tarPackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);

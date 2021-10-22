@@ -88,7 +88,7 @@ util.inherits(TarPackage, VideoPackage);
 TarPackage.STATES = {
   PACKAGE_EXTRACTED: 'packageExtracted',
   PACKAGE_VALIDATED: 'packageValidated',
-  TIMECODES_SAVED: 'timecodesSaved'
+  POINTS_OF_INTEREST_SAVED: 'pointsOfInterestSaved'
 };
 Object.freeze(TarPackage.STATES);
 
@@ -101,7 +101,7 @@ Object.freeze(TarPackage.STATES);
 TarPackage.TRANSITIONS = {
   EXTRACT_PACKAGE: 'extractPackage',
   VALIDATE_PACKAGE: 'validatePackage',
-  SAVE_TIMECODES: 'saveTimecodes'
+  SAVE_POINTS_OF_INTEREST: 'savePointsOfInterest'
 };
 Object.freeze(TarPackage.TRANSITIONS);
 
@@ -122,7 +122,7 @@ TarPackage.stateTransitions = [
   VideoPackage.TRANSITIONS.GET_METADATA,
   Package.TRANSITIONS.UPLOAD_MEDIA,
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
-  TarPackage.TRANSITIONS.SAVE_TIMECODES,
+  TarPackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY,
   VideoPackage.TRANSITIONS.MERGE
@@ -157,13 +157,13 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
     to: Package.STATES.MEDIA_UPLOADED
   },
   {
-    name: TarPackage.TRANSITIONS.SAVE_TIMECODES,
+    name: TarPackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
     from: Package.STATES.MEDIA_SYNCHRONIZED,
-    to: TarPackage.STATES.TIMECODES_SAVED
+    to: TarPackage.STATES.POINTS_OF_INTEREST_SAVED
   },
   {
     name: VideoPackage.TRANSITIONS.COPY_IMAGES,
-    from: TarPackage.STATES.TIMECODES_SAVED,
+    from: TarPackage.STATES.POINTS_OF_INTEREST_SAVED,
     to: VideoPackage.STATES.COPIED_IMAGES
   }
 ]);
@@ -224,34 +224,22 @@ function validatePackage(callback) {
 }
 
 /**
- * Saves the XML timecode file into a JSON equivalent.
+ * Gets points of interest from the given XML file.
+ *
  * This will check if the file exists first.
  *
- * 1. Test if timecode xml file exists
+ * 1. Test if XML file exists
  * 2. Transcode XML file to a JSON equivalent
- *    e.g.
- * 3. Format JSON
- *    e.g.
  *
  * @example
- * // Transform XML timecodes into JSON
- * // From :
- * {
- *   "player": {
- *     "synchro":
- *     [
- *       {
- *         "id": ["slide_00000.jpeg"],
- *         "timecode": ["0"]
- *       }, {
- *         "id": ["slide_00001.jpeg"],
- *         "timecode": ["1200"]
- *       }
- *     ]
- *   }
- * }
+ * // Transform XML points of interest into JSON
+ * // From:
+ * <player>
+ *   <synchro id="slide_00000.jpeg" timecode="0"/>
+ *   <synchro id="slide_00001.jpeg" timecode="1200"/>
+ * </player>
  *
- * // To :
+ * // To:
  * [
  *   {
  *     "timecode": 0,
@@ -272,30 +260,30 @@ function validatePackage(callback) {
  * @memberof module:publish/packages/TarPackage~TarPackage
  * @this module:publish/packages/TarPackage~TarPackage
  * @private
- * @param {String} xmlTimecodeFilePath The timecode file to save
- * @param {String} destinationFilePath The JSON timecode file path
- * @param {callback} callback The function to call when done
+ * @param {String} xmlPointsOfInterestFilePath The path of the XML file containing points of interest
+ * @param {module:publish/packages/TarPackage~TarPackage~getXmlPointsOfInterestCallback} callback The function to call
+ * when it's done
  */
-function saveTimecodes(xmlTimecodeFilePath, callback) {
-  var self = this;
-  var formattedTimecodes = [];
+function getXmlPointsOfInterest(xmlPointsOfInterestFilePath, callback) {
+  var formattedPointsOfInterest = [];
+
   async.series([
     function(callback) {
 
       // Check if XML file exists
-      fs.access(xmlTimecodeFilePath, function(error) {
+      fs.access(xmlPointsOfInterestFilePath, function(error) {
 
         if (!error)
           callback();
         else
-          callback(new Error('Missing timecode file ' + xmlTimecodeFilePath));
+          callback(new Error('Missing XML points of interest file ' + xmlPointsOfInterestFilePath));
 
       });
     },
     function(callback) {
 
       // Transcode XML to JSON
-      fs.readFile(xmlTimecodeFilePath, function(error, data) {
+      fs.readFile(xmlPointsOfInterestFilePath, function(error, data) {
 
         if (error)
           callback(error);
@@ -303,20 +291,18 @@ function saveTimecodes(xmlTimecodeFilePath, callback) {
           xml2js.parseString(data, {
             mergeAttrs: true
           },
-          function(error, timecodes) {
+          function(error, pointsOfInterest) {
+            if (pointsOfInterest && pointsOfInterest.player && pointsOfInterest.player.synchro) {
 
-            // Transform timecode format to
-            if (timecodes && timecodes.player && timecodes.player.synchro) {
-
-              // Iterate through the list of timecodes
+              // Iterate through the list of points of interest
               // Change JSON organization to be more accessible
-              timecodes.player.synchro.forEach(function(timecodeInfo) {
-                if (timecodeInfo['id'] && timecodeInfo['id'].length) {
-                  formattedTimecodes.push({
-                    timecode: parseInt(timecodeInfo['timecode'][0]),
+              pointsOfInterest.player.synchro.forEach(function(pointOfInterestInfo) {
+                if (pointOfInterestInfo['id'] && pointOfInterestInfo['id'].length) {
+                  formattedPointsOfInterest.push({
+                    timecode: parseInt(pointOfInterestInfo['timecode'][0]),
                     type: 'image',
                     data: {
-                      filename: timecodeInfo['id'][0]
+                      filename: pointOfInterestInfo['id'][0]
                     }
                   });
                 }
@@ -330,19 +316,8 @@ function saveTimecodes(xmlTimecodeFilePath, callback) {
 
     }
   ], function(error) {
-
-    if (error) {
-      callback(error);
-    } else {
-      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-      openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: formattedTimecodes});
-
-      self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
-        callback(error, formattedTimecodes);
-      });
-    }
+    callback(error, formattedPointsOfInterest);
   });
-
 }
 
 /**
@@ -480,7 +455,7 @@ TarPackage.prototype.validatePackage = function() {
  * @async
  * @return {Promise} Promise resolving when transition is done
  */
-TarPackage.prototype.saveTimecodes = function() {
+TarPackage.prototype.savePointsOfInterest = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
@@ -492,7 +467,7 @@ TarPackage.prototype.saveTimecodes = function() {
 
       // Update state
       function(callback) {
-        self.updateState(self.mediaPackage.id, STATES.SAVING_TIMECODES, function(error) {
+        self.updateState(self.mediaPackage.id, STATES.SAVING_POINTS_OF_INTEREST, function(error) {
           callback(error);
         });
       },
@@ -505,14 +480,24 @@ TarPackage.prototype.saveTimecodes = function() {
           pointsOfInterest = self.mediaPackage.metadata.indexes;
           callback(null, pointsOfInterest);
         } else {
-          saveTimecodes.call(self, path.join(extractDirectory, 'synchro.xml'), function(error, formatedTimecodes) {
-            if (error && self.mediaPackage.metadata['rich-media'])
-              callback(error);
-            else {
-              pointsOfInterest = formatedTimecodes;
-              callback(null, pointsOfInterest);
+          getXmlPointsOfInterest.call(
+            self,
+            path.join(extractDirectory, 'synchro.xml'),
+            function(error, pointsOfInterestFromXml) {
+              if (error && self.mediaPackage.metadata['rich-media'])
+                callback(error);
+              else {
+                pointsOfInterest = pointsOfInterestFromXml;
+
+                if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+                openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: pointsOfInterestFromXml});
+
+                self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+                  callback(error, pointsOfInterest);
+                });
+              }
             }
-          });
+          );
         }
       },
 
@@ -628,7 +613,7 @@ TarPackage.prototype.saveTimecodes = function() {
       }
 
     ], function(error) {
-      if (error) reject(new TarPackageError(error.message, ERRORS.SAVE_TIMECODE));
+      if (error) reject(new TarPackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST));
       else resolve();
     });
   });
@@ -671,3 +656,12 @@ TarPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
  * @param {Object} package The package information object
  */
 
+/**
+ * @callback module:publish/packages/TarPackage~TarPackage~getXmlPointsOfInterestCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Array} pointsOfInterest The list of points of interest of type image
+ * @param {Number} pointsOfInterest[].timecode Point of interest timecode
+ * @param {String} pointsOfInterest[].type Point of interest type (alway "image")
+ * @param {Object} pointsOfInterest[].data Point of interest data
+ * @param {String} pointsOfInterest[].data.filename Point of interest image file path in the archive
+ */

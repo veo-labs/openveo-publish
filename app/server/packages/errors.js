@@ -93,14 +93,14 @@ var ERRORS = {
   SAVE_PACKAGE_DATA: 7,
 
   /**
-   * Creating synchro.json file failed.
+   * Saving points of interest failed.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  SAVE_TIMECODE: 8,
+  SAVE_POINTS_OF_INTEREST: 8,
 
   /**
    * Uploading media to media platform failed.

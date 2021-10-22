@@ -103,14 +103,14 @@ var STATES = {
   SYNCHRONIZING: 8,
 
   /**
-   * Package is saving timecodes.
+   * Package is saving points of interest.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  SAVING_TIMECODES: 9,
+  SAVING_POINTS_OF_INTEREST: 9,
 
   /**
    * Package is copying images.
