@@ -66,7 +66,7 @@
     "build": "npm run build:clean && ./scripts/build.js -p",
     "build:back-office-client": "./scripts/build.js -b -p",
     "build:back-office-client:development": "./scripts/build.js -b",
-    "build:clean": "npx ovRemove ./build && npx ovRemove ./assets/be/css/* && npx ovRemove ./assets/be/js/*",
+    "build:clean": "npx ovRemove ./build ./assets/be/css/* ./assets/be/js/*",
     "build:development": "./scripts/build.js",
     "build:front-office-client": "./scripts/build.js -f -p",
     "doc": "npm run doc:publish && npm run doc:back-office && npm run doc:server",
