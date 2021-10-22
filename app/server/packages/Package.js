@@ -486,7 +486,7 @@ Package.prototype.synchronizeMedia = function() {
 };
 
 /**
- * Removes extracted tar files from temporary directory.
+ * Removes temporary directory.
  *
  * This is a transition.
  *

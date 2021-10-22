@@ -1,34 +1,36 @@
 'use strict';
 
 /**
- * @module publish/packages/TarPackage
+ * @module publish/packages/ArchivePackage
  */
 
-var path = require('path');
 var fs = require('fs');
+var path = require('path');
 var util = require('util');
+
 var async = require('async');
 var xml2js = require('xml2js');
 var openVeoApi = require('@openveo/api');
+
 var Package = process.requirePublish('app/server/packages/Package.js');
 var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
-var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
+var ArchivePackageError = process.requirePublish('app/server/packages/ArchivePackageError.js');
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 var nanoid = require('nanoid').nanoid;
 
 /**
- * Defines a TarPackage to manage publication of a tar file.
+ * Defines an ArchivePackage to manage publication of an archive.
  *
- * A tar file may contain :
+ * An archive file may contain:
  *  - A video file
  *  - A list of image files
  *  - A .session file describing the package content
  *
  * @example
- * // tar package object example
+ * // archive package object example
  * {
  *   "id": "13465465", // Id of the package
  *   "type": "vimeo", // Platform type
@@ -37,7 +39,7 @@ var nanoid = require('nanoid').nanoid;
  * }
  *
  * @example
- * // ".session" file example contained in a tar package
+ * // ".session" file example contained in an archive package
  * {
  *   "date": 1425916390, // Unix epoch time of the video record
  *   "rich-media": true, // true if package contains presentation images
@@ -48,7 +50,7 @@ var nanoid = require('nanoid').nanoid;
  *       "type": "image", // Index type (could be "image" or "tag")
  *       "timecode": 0, // Index time (in ms) from the beginning of the video
  *       "data": { // Index data (only for "image" type)
- *         "filename": "slide_00000.jpeg" // The name of the image file in the tar
+ *         "filename": "slide_00000.jpeg" // The name of the image file in the archive
  *       }
  *     },
  *     {
@@ -59,75 +61,75 @@ var nanoid = require('nanoid').nanoid;
  *   ]
  * }
  *
- * @class TarPackage
+ * @class ArchivePackage
  * @extends module:publish/packages/Package~Package
  * @constructor
  * @param {Object} mediaPackage The media description object
  * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider A video provider
  * @param {module:publish/providers/PoiProvider~PoiProvider} poiProvider Points of interest provider
  */
-function TarPackage(mediaPackage, videoProvider, poiProvider) {
-  TarPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
+function ArchivePackage(mediaPackage, videoProvider, poiProvider) {
+  ArchivePackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
 
   // Validate package metadata file name
   if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
-    this.emit('error', new TarPackageError('metadataFileName in publishConf.json must be a String'),
+    this.emit('error', new ArchivePackageError('metadataFileName in publishConf.json must be a String'),
       ERRORS.INVALID_CONFIGURATION);
 
 }
 
-module.exports = TarPackage;
-util.inherits(TarPackage, VideoPackage);
+module.exports = ArchivePackage;
+util.inherits(ArchivePackage, VideoPackage);
 
 /**
- * Process states for tar packages.
+ * Process states for archives packages.
  *
  * @const
  * @type {Object}
  */
-TarPackage.STATES = {
+ArchivePackage.STATES = {
   PACKAGE_EXTRACTED: 'packageExtracted',
   PACKAGE_VALIDATED: 'packageValidated',
   POINTS_OF_INTEREST_SAVED: 'pointsOfInterestSaved'
 };
-Object.freeze(TarPackage.STATES);
+Object.freeze(ArchivePackage.STATES);
 
 /**
- * Tar package process transitions (from one state to another).
+ * Archive package process transitions (from one state to another).
  *
  * @const
  * @type {Object}
  */
-TarPackage.TRANSITIONS = {
+ArchivePackage.TRANSITIONS = {
   EXTRACT_PACKAGE: 'extractPackage',
   VALIDATE_PACKAGE: 'validatePackage',
   SAVE_POINTS_OF_INTEREST: 'savePointsOfInterest'
 };
-Object.freeze(TarPackage.TRANSITIONS);
+Object.freeze(ArchivePackage.TRANSITIONS);
 
 /**
- * Define the order in which transitions will be executed for a TarPackage.
+ * Define the order in which transitions will be executed for an ArchivePackage.
  *
  * @const
  * @type {Object}
  */
-TarPackage.stateTransitions = [
+ArchivePackage.stateTransitions = [
   Package.TRANSITIONS.INIT,
   Package.TRANSITIONS.COPY_PACKAGE,
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
-  TarPackage.TRANSITIONS.EXTRACT_PACKAGE,
-  TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
+  ArchivePackage.TRANSITIONS.EXTRACT_PACKAGE,
+  ArchivePackage.TRANSITIONS.VALIDATE_PACKAGE,
   VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
   VideoPackage.TRANSITIONS.GENERATE_THUMB,
   VideoPackage.TRANSITIONS.GET_METADATA,
   Package.TRANSITIONS.UPLOAD_MEDIA,
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
-  TarPackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
+  ArchivePackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY,
   VideoPackage.TRANSITIONS.MERGE
 ];
-Object.freeze(TarPackage.stateTransitions);
+Object.freeze(ArchivePackage.stateTransitions);
 
 /**
  * Define machine state authorized transitions depending on previous and next states.
@@ -135,21 +137,21 @@ Object.freeze(TarPackage.stateTransitions);
  * @const
  * @type {Object}
  */
-TarPackage.stateMachine = VideoPackage.stateMachine.concat([
+ArchivePackage.stateMachine = VideoPackage.stateMachine.concat([
   {
-    name: TarPackage.TRANSITIONS.EXTRACT_PACKAGE,
+    name: ArchivePackage.TRANSITIONS.EXTRACT_PACKAGE,
     from: Package.ORIGINAL_PACKAGE_REMOVED_STATE,
-    to: TarPackage.STATES.PACKAGE_EXTRACTED
+    to: ArchivePackage.STATES.PACKAGE_EXTRACTED
   },
   {
     name: VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
-    from: TarPackage.STATES.PACKAGE_VALIDATED,
+    from: ArchivePackage.STATES.PACKAGE_VALIDATED,
     to: VideoPackage.STATES.MP4_DEFRAGMENTED
   },
   {
-    name: TarPackage.TRANSITIONS.VALIDATE_PACKAGE,
-    from: TarPackage.STATES.PACKAGE_EXTRACTED,
-    to: TarPackage.STATES.PACKAGE_VALIDATED
+    name: ArchivePackage.TRANSITIONS.VALIDATE_PACKAGE,
+    from: ArchivePackage.STATES.PACKAGE_EXTRACTED,
+    to: ArchivePackage.STATES.PACKAGE_VALIDATED
   },
   {
     name: Package.TRANSITIONS.UPLOAD_MEDIA,
@@ -157,23 +159,22 @@ TarPackage.stateMachine = VideoPackage.stateMachine.concat([
     to: Package.STATES.MEDIA_UPLOADED
   },
   {
-    name: TarPackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
+    name: ArchivePackage.TRANSITIONS.SAVE_POINTS_OF_INTEREST,
     from: Package.STATES.MEDIA_SYNCHRONIZED,
-    to: TarPackage.STATES.POINTS_OF_INTEREST_SAVED
+    to: ArchivePackage.STATES.POINTS_OF_INTEREST_SAVED
   },
   {
     name: VideoPackage.TRANSITIONS.COPY_IMAGES,
-    from: TarPackage.STATES.POINTS_OF_INTEREST_SAVED,
+    from: ArchivePackage.STATES.POINTS_OF_INTEREST_SAVED,
     to: VideoPackage.STATES.COPIED_IMAGES
   }
 ]);
-Object.freeze(TarPackage.stateMachine);
+Object.freeze(ArchivePackage.stateMachine);
 
 /**
  * Validates package content.
  *
- * A video package must contain, at least a valid package information
- * file and a video file.
+ * An archive package must contain, at least a valid package information file and a video file.
  *
  * @example
  * // mediaPackage example
@@ -184,10 +185,11 @@ Object.freeze(TarPackage.stateMachine);
  *   "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
  * }
  *
- * @memberof module:publish/packages/TarPackage~TarPackage
- * @this module:publish/packages/TarPackage~TarPackage
+ * @memberof module:publish/packages/ArchivePackage~ArchivePackage
+ * @this module:publish/packages/ArchivePackage~ArchivePackage
  * @private
- * @param {module:publish/packages/TarPackage~TarPackage~validatePackageCallack} callback The function to call when done
+ * @param {module:publish/packages/ArchivePackage~ArchivePackage~validatePackageCallack} callback The function to call
+ * when done
  */
 function validatePackage(callback) {
   var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
@@ -257,12 +259,12 @@ function validatePackage(callback) {
  *   }
  * ]
  *
- * @memberof module:publish/packages/TarPackage~TarPackage
- * @this module:publish/packages/TarPackage~TarPackage
+ * @memberof module:publish/packages/ArchivePackage~ArchivePackage
+ * @this module:publish/packages/ArchivePackage~ArchivePackage
  * @private
  * @param {String} xmlPointsOfInterestFilePath The path of the XML file containing points of interest
- * @param {module:publish/packages/TarPackage~TarPackage~getXmlPointsOfInterestCallback} callback The function to call
- * when it's done
+ * @param {module:publish/packages/ArchivePackage~ArchivePackage~getXmlPointsOfInterestCallback} callback The function
+ * to call when it's done
  */
 function getXmlPointsOfInterest(xmlPointsOfInterestFilePath, callback) {
   var formattedPointsOfInterest = [];
@@ -325,8 +327,8 @@ function getXmlPointsOfInterest(xmlPointsOfInterestFilePath, callback) {
  *
  * @return {Array} The stack of transitions
  */
-TarPackage.prototype.getTransitions = function() {
-  return TarPackage.stateTransitions;
+ArchivePackage.prototype.getTransitions = function() {
+  return ArchivePackage.stateTransitions;
 };
 
 /**
@@ -334,8 +336,8 @@ TarPackage.prototype.getTransitions = function() {
  *
  * @return {Array} The list of states/transitions
  */
-TarPackage.prototype.getStateMachine = function() {
-  return TarPackage.stateMachine;
+ArchivePackage.prototype.getStateMachine = function() {
+  return ArchivePackage.stateMachine;
 };
 
 /**
@@ -346,7 +348,7 @@ TarPackage.prototype.getStateMachine = function() {
  * @async
  * @return {Promise} Promise resolving when transition is done
  */
-TarPackage.prototype.extractPackage = function() {
+ArchivePackage.prototype.extractPackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
@@ -360,7 +362,7 @@ TarPackage.prototype.extractPackage = function() {
 
       process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
       openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
-        if (error) reject(new TarPackageError(error.message, ERRORS.EXTRACT));
+        if (error) reject(new ArchivePackageError(error.message, ERRORS.EXTRACT));
         else resolve();
       });
 
@@ -376,7 +378,7 @@ TarPackage.prototype.extractPackage = function() {
  * @async
  * @return {Promise} Promise resolving when transition is done
  */
-TarPackage.prototype.validatePackage = function() {
+ArchivePackage.prototype.validatePackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
@@ -388,7 +390,7 @@ TarPackage.prototype.validatePackage = function() {
       if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
         resolve();
       else validatePackage.call(self, function(error, metadata) {
-        if (error) return reject(new TarPackageError(error.message, ERRORS.VALIDATION));
+        if (error) return reject(new ArchivePackageError(error.message, ERRORS.VALIDATION));
 
         if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
 
@@ -455,7 +457,7 @@ TarPackage.prototype.validatePackage = function() {
  * @async
  * @return {Promise} Promise resolving when transition is done
  */
-TarPackage.prototype.savePointsOfInterest = function() {
+ArchivePackage.prototype.savePointsOfInterest = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
@@ -613,7 +615,7 @@ TarPackage.prototype.savePointsOfInterest = function() {
       }
 
     ], function(error) {
-      if (error) reject(new TarPackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST));
+      if (error) reject(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST));
       else resolve();
     });
   });
@@ -624,7 +626,7 @@ TarPackage.prototype.savePointsOfInterest = function() {
  *
  * @return {String} System path of the media file
  */
-TarPackage.prototype.getMediaFilePath = function() {
+ArchivePackage.prototype.getMediaFilePath = function() {
   return path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
 };
 
@@ -637,7 +639,7 @@ TarPackage.prototype.getMediaFilePath = function() {
  * @param {Object} media2 A media
  * @return {Object} Either media1 or media2
  */
-TarPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
+ArchivePackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
   var media1TotalTimecodes = media1.timecodes ? media1.timecodes.length : 0;
   var media2TotalTimecodes = media2.timecodes ? media2.timecodes.length : 0;
 
@@ -651,13 +653,13 @@ TarPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
 };
 
 /**
- * @callback module:publish/packages/TarPackage~TarPackage~validatePackageCallack
+ * @callback module:publish/packages/ArchivePackage~ArchivePackage~validatePackageCallack
  * @param {(Error|undefined)} error The error if an error occurred
  * @param {Object} package The package information object
  */
 
 /**
- * @callback module:publish/packages/TarPackage~TarPackage~getXmlPointsOfInterestCallback
+ * @callback module:publish/packages/ArchivePackage~ArchivePackage~getXmlPointsOfInterestCallback
  * @param {(Error|undefined)} error The error if an error occurred
  * @param {Array} pointsOfInterest The list of points of interest of type image
  * @param {Number} pointsOfInterest[].timecode Point of interest timecode

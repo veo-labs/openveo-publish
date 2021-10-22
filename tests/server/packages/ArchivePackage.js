@@ -7,15 +7,15 @@ var api = require('@openveo/api');
 var mock = require('mock-require');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
-var TarPackageError = process.requirePublish('app/server/packages/TarPackageError.js');
+var ArchivePackageError = process.requirePublish('app/server/packages/ArchivePackageError.js');
 var ResourceFilter = api.storages.ResourceFilter;
 
 var assert = chai.assert;
 chai.should();
 chai.use(spies);
 
-describe('TarPackage', function() {
-  var tarPackage;
+describe('ArchivePackage', function() {
+  var archivePackage;
   var videoProvider;
   var poiProvider;
   var expectedMediaPackage;
@@ -110,10 +110,10 @@ describe('TarPackage', function() {
   beforeEach(function() {
     mock.reRequire(path.join(process.rootPublish, 'app/server/packages/Package.js'));
     mock.reRequire(path.join(process.rootPublish, 'app/server/packages/VideoPackage.js'));
-    var TarPackage = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/TarPackage.js'));
-    tarPackage = new TarPackage(expectedMediaPackage, videoProvider, poiProvider);
-    tarPackage.fsm = {};
-    tarPackage.updateState = chai.spy(function(id, state, callback) {
+    var ArchivePackage = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/ArchivePackage.js'));
+    archivePackage = new ArchivePackage(expectedMediaPackage, videoProvider, poiProvider);
+    archivePackage.fsm = {};
+    archivePackage.updateState = chai.spy(function(id, state, callback) {
       callback();
     });
   });
@@ -126,14 +126,14 @@ describe('TarPackage', function() {
   describe('savePointsOfInterest', function() {
 
     it('should update package state', function() {
-      tarPackage.updateState = chai.spy(function(id, state, callback) {
+      archivePackage.updateState = chai.spy(function(id, state, callback) {
         assert.equal(id, expectedMediaPackage.id, 'Wrong id');
         assert.equal(state, STATES.SAVING_POINTS_OF_INTEREST, 'Wrong state');
         callback();
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+      return archivePackage.savePointsOfInterest().then(function() {
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail('Unexpected error');
@@ -142,16 +142,16 @@ describe('TarPackage', function() {
 
     it('should set package as on error if updating state failed', function() {
       var expectedError = new Error('Something went wrong');
-      tarPackage.updateState = chai.spy(function(id, state, callback) {
+      archivePackage.updateState = chai.spy(function(id, state, callback) {
         callback(expectedError);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
+      return archivePackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected resolve');
       }).catch(function(error) {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, TarPackageError, 'Wrong error type');
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
@@ -189,8 +189,8 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+      return archivePackage.savePointsOfInterest().then(function() {
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
       }).catch(function(error) {
@@ -211,8 +211,8 @@ describe('TarPackage', function() {
         callback(null, pois.length, pois);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+      return archivePackage.savePointsOfInterest().then(function() {
+        archivePackage.updateState.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail('Unexpected error');
@@ -232,13 +232,13 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
+      return archivePackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+        archivePackage.updateState.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, TarPackageError, 'Wrong error type');
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
@@ -257,12 +257,12 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
+      return archivePackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
-        assert.instanceOf(error, TarPackageError, 'Wrong error type');
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
@@ -326,8 +326,8 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
-        tarPackage.updateState.should.have.been.called.exactly(1);
+      return archivePackage.savePointsOfInterest().then(function() {
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
       }).catch(function(error) {
@@ -352,13 +352,13 @@ describe('TarPackage', function() {
         callback(expectedError);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
+      return archivePackage.savePointsOfInterest().then(function() {
         assert.fail('Unexpected transition');
       }).catch(function(error) {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
-        tarPackage.updateState.should.have.been.called.exactly(1);
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, TarPackageError, 'Wrong error type');
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
@@ -429,9 +429,9 @@ describe('TarPackage', function() {
         callback(null, 1);
       });
 
-      return tarPackage.savePointsOfInterest().then(function() {
+      return archivePackage.savePointsOfInterest().then(function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
-        tarPackage.updateState.should.have.been.called.exactly(1);
+        archivePackage.updateState.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
         videoProvider.updateMetadata.should.have.been.called.exactly(1);
         xml2js.parseString.should.have.been.called.exactly(1);
