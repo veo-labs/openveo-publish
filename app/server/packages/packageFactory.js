@@ -26,6 +26,7 @@ module.exports.get = function(type, mediaPackage) {
 
     switch (type) {
       case fileSystem.FILE_TYPES.TAR:
+      case fileSystem.FILE_TYPES.ZIP:
         var ArchivePackage = process.requirePublish('app/server/packages/ArchivePackage.js');
         return new ArchivePackage(mediaPackage, videoProvider, poiProvider);
 

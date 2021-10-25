@@ -192,7 +192,7 @@ PublishPlugin.prototype.start = function(callback) {
             file: packageInfo.originalPackagePath
           }, {
             file: {
-              in: [fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.MP4],
+              in: [fileSystem.FILE_TYPES.MP4, fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.ZIP],
               validateExtension: true
             }
           }, function(error, files) {

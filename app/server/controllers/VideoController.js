@@ -951,7 +951,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
           file: request.files.file[0].path,
           validateExtension: true
         }, {
-          file: {in: [fileSystemApi.FILE_TYPES.MP4, fileSystemApi.FILE_TYPES.TAR]}
+          file: {in: [fileSystemApi.FILE_TYPES.MP4, fileSystemApi.FILE_TYPES.TAR, fileSystemApi.FILE_TYPES.ZIP]}
         }, function(validateError, files) {
           if (validateError || (files.file && !files.file.isValid)) {
             if (validateError)

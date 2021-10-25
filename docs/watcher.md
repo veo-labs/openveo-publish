@@ -4,16 +4,16 @@ The Watcher is capable of listening to some directories specified in [plugin's c
 
 Two types of files can be copied in these directories:
 
-- [tar files](#tar-files)
+- [Archive files](#archive-files)
 - [mp4 files](#mp4-files)
 
 Soon after the file has been copied, it will appear in back end catalogue page where all medias are referenced.
 
 ![Back end catalogue video](images/screenshots/back-end-catalogue-video.jpg)
 
-# tar files
+# Archive files
 
-tar files are used for videos with synchronized images. A valid tar file must contain a **video file**, a **.session** file and a **list of images**.
+Archive files (either tar of zip) are used for videos with points of interest. A valid archive file must contain a **video file**, a **.session** file and eventually a **list of images**.
 
 ## .session file
 
@@ -27,7 +27,7 @@ tar files are used for videos with synchronized images. A valid tar file must co
       "type": "image", // Index type (could be "image" or "tag")
       "timecode": 0, // Index time (in ms) from the beginning of the video
       "data": { // Index data (only for "image" type)
-        "filename": "slide_00000.jpeg" // The name of the image file in the tar
+        "filename": "slide_00000.jpeg" // The name of the image file in the archive
       }
     },
     {

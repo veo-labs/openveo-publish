@@ -420,7 +420,7 @@
         templateOptions: {
           label: $filter('translate')('PUBLISH.MEDIAS.ATTR_MEDIA'),
           description: $filter('translate')('PUBLISH.MEDIAS.FORM_ADD_MEDIA_DESC'),
-          acceptedTypes: '.mp4,.tar',
+          acceptedTypes: '.mp4,.tar,.zip',
           required: true,
           progressBar: false,
           onFileChange: function(files, file, newFiles, duplicateFiles, invalidFiles, event) {

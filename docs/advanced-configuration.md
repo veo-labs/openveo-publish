@@ -16,7 +16,7 @@ Open **~/.openveo/publish/publishConf.json**
 {
   "videoTmpDir" : "/tmp/videos", // Temporary directory to stock uploading videos (video is removed after the upload)
   "maxConcurrentPublish" : 3, // Maximum number of videos to upload simultaneously
-  "metadataFileName" : ".session" // Name of the video metadata file in a tar package
+  "metadataFileName" : ".session" // Name of the video metadata file in an archive package
 }
 ```
 

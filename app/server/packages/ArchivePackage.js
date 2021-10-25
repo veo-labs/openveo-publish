@@ -181,8 +181,8 @@ Object.freeze(ArchivePackage.stateMachine);
  * {
  *   "id" : 1422731934859, // Internal video id
  *   "type" : "vimeo", // The video platform to use
- *   "path" : "C:/Temp/", // The path of the hot folder
- *   "originalPackagePath" : "C:/Temp/video-package.tar", // The original package path in hot folder
+ *   "path" : "/tmp", // The path of the hot folder
+ *   "originalPackagePath" : "/tmp/video-package.tar", // The original package path in hot folder
  * }
  *
  * @memberof module:publish/packages/ArchivePackage~ArchivePackage
@@ -352,21 +352,27 @@ ArchivePackage.prototype.extractPackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    async.series([
 
-    // Extract package
-    self.updateState(self.mediaPackage.id, STATES.EXTRACTING, function() {
+      // Update state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.EXTRACTING, callback);
+      },
 
-      // Copy destination
-      var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.tar');
+      // Extract archive
+      function(callback) {
+        var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+        var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.' + self.mediaPackage.packageType);
 
-      process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
-      openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
-        if (error) reject(new ArchivePackageError(error.message, ERRORS.EXTRACT));
-        else resolve();
-      });
+        process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
+        openVeoApi.fileSystem.extract(packagePath, extractDirectory, callback);
+      }
 
+    ], function(error) {
+      if (error) reject(new ArchivePackageError(error.message, ERRORS.EXTRACT));
+      else resolve();
     });
+
   });
 };
 

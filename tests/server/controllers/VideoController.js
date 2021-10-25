@@ -1338,7 +1338,7 @@ describe('VideoController', function() {
         assert.equal(fields.file, request.files.file[0].path, 'Wrong file path');
         assert.deepEqual(
           descriptor.file.in,
-          [api.fileSystem.FILE_TYPES.MP4, api.fileSystem.FILE_TYPES.TAR],
+          [api.fileSystem.FILE_TYPES.MP4, api.fileSystem.FILE_TYPES.TAR, api.fileSystem.FILE_TYPES.ZIP],
           'Wrong file validator'
         );
         callback(null, {

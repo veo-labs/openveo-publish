@@ -9,6 +9,7 @@
 ## NEW FEATURES
 
 - Improve code documentation by replacing Yuidoc by JSDoc
+- Add support for ZIP archives in addition to TAR archives
 
 ## BUG FIXES
 

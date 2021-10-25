@@ -27,13 +27,6 @@ describe('ArchivePackage', function() {
 
   // Mocks
   beforeEach(function() {
-    expectedMediaPackage = {
-      id: '42',
-      metadata: {
-        indexes: []
-      }
-    };
-
     videoProvider = {
       updateOne: chai.spy(function(filter, modifications, callback) {
         callback(null, 1);
@@ -59,7 +52,8 @@ describe('ArchivePackage', function() {
         }),
         FILE_TYPES: {
           JPG: 'jpg',
-          GIF: 'gif'
+          GIF: 'gif',
+          TAR: 'tar'
         },
         getConfDir: function() {
           return '/conf/dir';
@@ -104,6 +98,14 @@ describe('ArchivePackage', function() {
     mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), poiProvider);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/publishConf.json'), publishConf);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/videoPlatformConf.json'), videoPlatformConf);
+
+    expectedMediaPackage = {
+      id: '42',
+      packageType: openVeoApi.fileSystem.FILE_TYPES.TAR,
+      metadata: {
+        indexes: []
+      }
+    };
   });
 
   // Initializes tests
@@ -437,6 +439,87 @@ describe('ArchivePackage', function() {
         xml2js.parseString.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail('Unexpected error');
+      });
+    });
+
+  });
+
+  describe('extractPackage', function() {
+
+    it('should update package state', function() {
+      archivePackage.updateState = chai.spy(function(id, state, callback) {
+        assert.equal(id, expectedMediaPackage.id, 'Wrong id');
+        assert.equal(state, STATES.EXTRACTING, 'Wrong state');
+        callback();
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        archivePackage.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail('Unexpected error');
+      });
+    });
+
+    it('should set package as on error if updating state failed', function() {
+      var expectedError = new Error('Something went wrong');
+      archivePackage.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        assert.fail('Unexpected resolve');
+      }).catch(function(error) {
+        archivePackage.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(0);
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.EXTRACT, 'Wrong error code');
+      });
+    });
+
+    it('should extract package into its publish temporary directory', function() {
+      openVeoApi.fileSystem.extract = chai.spy(function(packageFilePath, destinationDirectory, callback) {
+        assert.equal(
+          packageFilePath,
+          path.join(
+            publishConf.videoTmpDir,
+            expectedMediaPackage.id,
+            expectedMediaPackage.id + '.' + expectedMediaPackage.packageType
+          ),
+          'Wrong package path'
+        );
+
+        assert.equal(
+          destinationDirectory,
+          path.join(publishConf.videoTmpDir, expectedMediaPackage.id),
+          'Wrong package path'
+        );
+        callback();
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        console.log(error);
+        assert.ok(false, 'Unexpected error');
+      });
+    });
+
+    it('should set package as on error if extraction failed', function() {
+      var expectedError = new Error('Something went wrong');
+
+      openVeoApi.fileSystem.extract = chai.spy(function(packageFilePath, destinationDirectory, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        assert.ok(false, 'Unexpected response');
+      }).catch(function(error) {
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.EXTRACT, 'Wrong error code');
       });
     });
 

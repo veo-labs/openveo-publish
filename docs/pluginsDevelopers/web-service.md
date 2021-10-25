@@ -180,7 +180,7 @@ HTTP Status Code | Details
       },
       ...
     },
-    "packageType" : "tar", // Initialize package type (either tar or mp4)
+    "packageType" : "tar", // Initialize package type (either tar, zip or mp4)
     "link" : "http://openveo.local/publish/video/1444396683105", // Path to play the video
     "mediaId" : "141902178", // Video id on video platform
     "available" : true, // Indicates if video is available or is being encoded
