@@ -394,12 +394,14 @@ VideoProvider.prototype.getOne = function(filter, fields, callback) {
  * @param {Object} [medias[].metadata] Information about the media as a content
  * @param {String} [medias[].metadata.user] The id of the user the media belongs to
  * @param {Array} [medias[].metadata.groups] The list of groups the media belongs to
+ * @param {Boolean} [data.mergeRequired] Indicate that the media is being merged with another one
  * @param {Number} [medias[].errorCode] The media error code (see ERRORS class from module packages)
  * @param {String} [medias[].category] The id of the category the media belongs to
  * @param {Array} [medias[].properties] The list of properties values for this media
  * @param {String} [medias[].packageType] The type of package
  * @param {String} [medias[].lastState] The last media state in publication process
  * @param {String} [medias[].lastTransition] The last media transition in publication process
+ * @param {String} [medias[].lockedByPackage] The id of the package which has locked this package for merge
  * @param {String} [medias[].originalPackagePath] Absolute path of the original package
  * @param {String} [medias[].originalFileName] Original package name without the extension
  * @param {Array} [medias[].mediaId] The list of medias in the media platform. Could have several media ids if media has
@@ -440,6 +442,8 @@ VideoProvider.prototype.add = function(medias, callback) {
       packageType: media.packageType,
       lastState: media.lastState,
       lastTransition: media.lastTransition,
+      lockedByPackage: media.lockedByPackage,
+      mergeRequired: media.mergeRequired,
       originalPackagePath: media.originalPackagePath,
       originalFileName: media.originalFileName,
       mediaId: media.mediaId,
@@ -652,18 +656,20 @@ VideoProvider.prototype.removeLocal = function(filter, callback) {
  * @param {Array} [data.sources] The list of media sources
  * @param {Array} [data.groups] The list of groups ids the media belongs to
  * @param {String} [data.user] The user id the media belongs to
- * @param {Boolean} [available] true if the media is available, false otherwise
- * @param {Number} [state] The media state (see STATES class from module packages)
- * @param {Date} [date] The media date
- * @param {String} [type] The id of the associated media platform
- * @param {Object} [metadata] Information about the media as a content
- * @param {Number} [errorCode] The media error code (see ERRORS class from module packages)
- * @param {String} [packageType] The type of package
- * @param {String} [lastState] The last media state in publication process
- * @param {String} [lastTransition] The last media transition in publication process
- * @param {Array} [mediaId] The list of medias in the media platform. Could have several media ids if media has
+ * @param {Boolean} [data.available] true if the media is available, false otherwise
+ * @param {Number} [data.state] The media state (see STATES class from module packages)
+ * @param {Date} [data.date] The media date
+ * @param {String} [data.type] The id of the associated media platform
+ * @param {Object} [data.metadata] Information about the media as a content
+ * @param {Boolean} [data.mergeRequired] Indicate that the media is being merged with another one
+ * @param {Number} [data.errorCode] The media error code (see ERRORS class from module packages)
+ * @param {String} [data.packageType] The type of package
+ * @param {String} [data.lastState] The last media state in publication process
+ * @param {String} [data.lastTransition] The last media transition in publication process
+ * @param {String} [data.lockedByPackage] The id of the package which has locked this package for merge
+ * @param {Array} [data.mediaId] The list of medias in the media platform. Could have several media ids if media has
  * @param {ltiple sources
- * @param {String} [link] The media link in OpenVeo
+ * @param {String} [data.link] The media link in OpenVeo
  * @param {module:publish/providers/VideoProvider~VideoProvider~updateOneCallback} [callback] The function to call when
  * it's done
  */
@@ -693,6 +699,10 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (Object.prototype.hasOwnProperty.call(data, 'state')) modifications.state = data.state;
   if (Object.prototype.hasOwnProperty.call(data, 'errorCode')) modifications.errorCode = data.errorCode;
   if (Object.prototype.hasOwnProperty.call(data, 'available')) modifications.available = Boolean(data.available);
+  if (Object.prototype.hasOwnProperty.call(data, 'lockedByPackage')) {
+    modifications.lockedByPackage = data.lockedByPackage;
+  }
+  if (Object.prototype.hasOwnProperty.call(data, 'mergeRequired')) modifications.mergeRequired = data.mergeRequired;
   if (Object.prototype.hasOwnProperty.call(data, 'description')) {
     modifications.description = data.description;
     modifications.descriptionText = data.description ? openVeoApi.util.removeHtmlFromText(data.description) : null;

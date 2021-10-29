@@ -225,13 +225,13 @@ module.exports.update = function(callback) {
             var data = {};
 
             if (media.lastState === 'grouped') {
-              data.lastState = VideoPackage.STATES.MERGED;
+              data.lastState = 'merged';
             } else if (media.lastState === 'publicDirectoryPrepared') {
               data.lastState = VideoPackage.STATES.METADATA_RETRIEVED;
             }
 
             if (media.lastTransition === 'group') {
-              data.lastTransition = VideoPackage.TRANSITIONS.MERGE;
+              data.lastTransition = 'merge';
             } else if (media.lastTransition === 'preparePublicDirectory') {
               data.lastTransition = Package.TRANSITIONS.UPLOAD_MEDIA;
             }

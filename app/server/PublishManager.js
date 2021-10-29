@@ -423,8 +423,9 @@ PublishManager.prototype.retry = function(packageId, forceRetry) {
 /**
  * Retries publishing all packages in a non stable state.
  *
- * Stable states are :
+ * Stable states are:
  * - STATES.ERROR
+ * - STATES.WAITING_FOR_MERGE
  * - STATES.WAITING_FOR_UPLOAD
  * - STATES.READY
  * - STATES.PUBLISHED
@@ -437,6 +438,7 @@ PublishManager.prototype.retryAll = function() {
     new ResourceFilter().notIn(
       'state', [
         STATES.ERROR,
+        STATES.WAITING_FOR_MERGE,
         STATES.WAITING_FOR_UPLOAD,
         STATES.READY,
         STATES.PUBLISHED

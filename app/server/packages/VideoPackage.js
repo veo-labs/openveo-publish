@@ -50,8 +50,7 @@ VideoPackage.STATES = {
   MP4_DEFRAGMENTED: 'mp4Defragmented',
   THUMB_GENERATED: 'thumbGenerated',
   COPIED_IMAGES: 'copiedImages',
-  METADATA_RETRIEVED: 'metadataRetrieved',
-  MERGED: 'merged'
+  METADATA_RETRIEVED: 'metadataRetrieved'
 };
 Object.freeze(VideoPackage.STATES);
 
@@ -65,8 +64,7 @@ VideoPackage.TRANSITIONS = {
   DEFRAGMENT_MP4: 'defragmentMp4',
   GENERATE_THUMB: 'generateThumb',
   COPY_IMAGES: 'copyImages',
-  GET_METADATA: 'getMetadata',
-  MERGE: 'merge'
+  GET_METADATA: 'getMetadata'
 };
 Object.freeze(VideoPackage.TRANSITIONS);
 
@@ -87,7 +85,10 @@ VideoPackage.stateTransitions = [
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
   VideoPackage.TRANSITIONS.COPY_IMAGES,
   Package.TRANSITIONS.CLEAN_DIRECTORY,
-  VideoPackage.TRANSITIONS.MERGE
+  Package.TRANSITIONS.INIT_MERGE,
+  Package.TRANSITIONS.MERGE,
+  Package.TRANSITIONS.FINALIZE_MERGE,
+  Package.TRANSITIONS.REMOVE_PACKAGE
 ];
 Object.freeze(VideoPackage.stateTransitions);
 
@@ -127,46 +128,9 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
     name: Package.TRANSITIONS.CLEAN_DIRECTORY,
     from: VideoPackage.STATES.COPIED_IMAGES,
     to: Package.STATES.DIRECTORY_CLEANED
-  },
-  {
-    name: VideoPackage.TRANSITIONS.MERGE,
-    from: Package.STATES.DIRECTORY_CLEANED,
-    to: VideoPackage.STATES.MERGED
   }
 ]);
 Object.freeze(VideoPackage.stateMachine);
-
-/**
- * Waits for the given media to be in one of the given states.
- *
- * Waiting time is 1 second.
- *
- * @memberof module:publish/packages/VideoPackage~VideoPackage
- * @this module:publish/packages/VideoPackage~VideoPackage
- * @private
- * @param {Object} media The media
- * @param {Object} media.id The media id
- * @param {Array} states The authorized states
- * @param {module:publish/packages/VideoPackage~VideoPackage~waitForMediaStateCallback} callback The function to call
- * when done
- */
-function waitForMediaState(media, states, callback) {
-  var self = this;
-
-  this.videoProvider.getOne(
-    new ResourceFilter().equal('id', media.id),
-    null,
-    function(error, fetchedMedia) {
-      if (error) return callback(error);
-      if (!fetchedMedia) return callback(new Error('Media "' + media.id + '" not found'));
-      if (states.indexOf(fetchedMedia.state) !== -1) return callback(null, fetchedMedia);
-
-      setTimeout(function() {
-        waitForMediaState.call(self, media, states, callback);
-      }, 1000);
-    }
-  );
-}
 
 /**
  * Defragment the MP4
@@ -174,6 +138,8 @@ function waitForMediaState(media, states, callback) {
  * If the input file is fragmented, ffmpeg will be used to defragment
  * the MP4. The fragmentation detection of the file is based on an un-
  * known "nb_frames" property in ffprobe output metadata.
+ *
+ * This is a transition.
  *
  * @async
  * @return {Promise} Promise resolving when transition is done
@@ -184,7 +150,7 @@ VideoPackage.prototype.defragmentMp4 = function() {
   return new Promise(function(resolve, reject) {
     var filePath = self.getMediaFilePath();
 
-    self.updateState(self.mediaPackage.id, STATES.DEFRAGMENT_MP4, function() {
+    self.updateState(self.mediaPackage.id, STATES.DEFRAGMENTING_MP4, function() {
       // Detect if file need defragmentation (unknown "nb_frames")
       ffmpeg.ffprobe(filePath, function(error, metadata) {
         if (metadata && Array.isArray(metadata.streams)) {
@@ -258,7 +224,7 @@ VideoPackage.prototype.generateThumb = function() {
   return new Promise(function(resolve, reject) {
     var filePath = self.getMediaFilePath();
 
-    self.updateState(self.mediaPackage.id, STATES.GENERATE_THUMB, function() {
+    self.updateState(self.mediaPackage.id, STATES.GENERATING_THUMB, function() {
       var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
 
       if (self.mediaPackage.originalThumbnailPath !== undefined) {
@@ -331,7 +297,7 @@ VideoPackage.prototype.getMetadata = function() {
   return new Promise(function(resolve, reject) {
     var filePath = self.getMediaFilePath();
 
-    self.updateState(self.mediaPackage.id, STATES.GET_METADATA, function() {
+    self.updateState(self.mediaPackage.id, STATES.GETTING_METADATA, function() {
       if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
       self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
 
@@ -372,12 +338,17 @@ VideoPackage.prototype.copyImages = function() {
 
   return new Promise(function(resolve, reject) {
     var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
-    var videoFinalDir = path.normalize(process.rootPublish + '/assets/player/videos/' + self.mediaPackage.id);
+    var videoFinalDir = path.join(self.mediasPublicPath, self.mediaPackage.id);
     var resources = [];
     var filesToCopy = [];
 
     process.logger.debug('Copy images to ' + videoFinalDir);
     async.series([
+
+      // Change state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.COPYING_IMAGES, callback);
+      },
 
       // Read directory
       function(callback) {
@@ -448,12 +419,11 @@ VideoPackage.prototype.copyImages = function() {
 };
 
 /**
- * Merges the video with the first found video having the same original name.
+ * Merges package media and same package name media.
  *
- * Merging consists of merging the two videos into one in OpenVeo. It means that both videos still exist on the video
- * platform but only one reference exists in OpenVeo with multi remote videos.
- * Depending on the type of package, global information are taken from the current video or the video we are merging
- * with.
+ * Merging consists of merging the two medias into one in OpenVeo. It means that both medias still exist on the media
+ * platform but only one reference exists in OpenVeo with multi remote medias.
+ * The incoming media is merged into the existing one.
  *
  * This is a transition.
  *
@@ -464,115 +434,55 @@ VideoPackage.prototype.merge = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var otherMedia;
-    var mediaToKeep;
-    var mediaToRemove;
+    var lockedPackage;
 
     async.series([
 
-      // Change media state to MERGING
+      // Update package state
       function(callback) {
-        self.updateState(self.mediaPackage.id, STATES.MERGING, function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_CHANGE_MEDIA_STATE));
+        VideoPackage.super_.prototype.merge.call(self).then(function() {
           callback();
+        }).catch(function(error) {
+          reject(error);
         });
       },
 
-      // Find another video with the same name
+      // Find package locked in INIT_MERGE transition
       function(callback) {
         self.videoProvider.getOne(
           new ResourceFilter().and([
-            new ResourceFilter().notEqual('id', self.mediaPackage.id),
-            new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName)
+            new ResourceFilter().equal('state', STATES.WAITING_FOR_MERGE),
+            new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName),
+            new ResourceFilter().equal('lockedByPackage', self.mediaPackage.id)
           ]),
           null,
-          function(error, media) {
-            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_GET_MEDIA_ERROR));
-            otherMedia = media;
+          function(error, foundPackage) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_GET_PACKAGE_WITH_SAME_NAME));
+
+            lockedPackage = foundPackage;
             callback();
           }
         );
       },
 
-      // Wait for the other media to be in READY or PUBLISHED state
+      // Merge package medias with locked package medias
       function(callback) {
-        if (!otherMedia) return callback();
-
-        var expectedStates = [STATES.READY, STATES.PUBLISHED];
-        if (expectedStates.indexOf(otherMedia.state) !== -1) return callback();
-
-        waitForMediaState.call(self, otherMedia, expectedStates, function(error, media) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_WAIT_FOR_MEDIA_ERROR));
-          otherMedia = media;
-          callback();
-        });
-      },
-
-      // Change other media state to MERGING
-      function(callback) {
-        if (!otherMedia) return callback();
-
-        self.updateState(otherMedia.id, STATES.MERGING, function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_CHANGE_OTHER_MEDIA_STATE));
-          callback();
-        });
-      },
-
-      // Merge media with other media
-      function(callback) {
-        if (!otherMedia) return callback();
-
-        var media = self.selectMultiSourcesMedia(otherMedia, self.mediaPackage);
-
-        if (media.id === otherMedia.id) {
-          mediaToKeep = otherMedia;
-          mediaToRemove = self.mediaPackage;
-        } else {
-          mediaToKeep = self.mediaPackage;
-          mediaToRemove = otherMedia;
-        }
-
-        mediaToKeep.mediaId = mediaToKeep.mediaId.concat(mediaToRemove.mediaId);
+        process.logger.debug('Merge medias ids (' + self.mediaPackage.id + ' -> ' + lockedPackage.id + ')');
         self.videoProvider.updateMediaId(
-          mediaToKeep.id,
-          mediaToKeep.mediaId,
+          lockedPackage.id,
+          openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),
           function(error) {
-            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_MEDIAS));
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_UPDATE_MEDIAS));
             callback();
           }
         );
-      },
-
-      // Remove not kept media from OpenVeo but not from the video platform!
-      function(callback) {
-        if (!otherMedia) return callback();
-
-        // Current media package becomes the chosen media
-        self.mediaPackage = mediaToKeep;
-
-        self.videoProvider.removeLocal(new ResourceFilter().equal('id', mediaToRemove.id), function(error) {
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_REMOVE_NOT_CHOSEN));
-          callback();
-        });
       }
 
     ], function(error) {
       if (error) return reject(error);
       resolve();
     });
-
   });
-};
-
-/**
- * Selects the media to use as the base media in multi-sources scenario.
- *
- * @param {Object} media1 A media
- * @param {Object} media2 A media
- * @return {Object} Either media1 or media2
- */
-VideoPackage.prototype.selectMultiSourcesMedia = function(media1, media2) {
-  return media1;
 };
 
 /**
@@ -595,9 +505,3 @@ VideoPackage.prototype.getTransitions = function() {
 VideoPackage.prototype.getStateMachine = function() {
   return VideoPackage.stateMachine;
 };
-
-/**
- * @callback module:publish/packages/VideoPackage~VideoPackage~waitForMediaStateCallback
- * @param {(Error|undefined)} error The error if an error occurred
- * @param {Object} media The media with all properties
- */

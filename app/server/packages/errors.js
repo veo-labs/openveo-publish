@@ -245,64 +245,164 @@ var ERRORS = {
   DUPLICATE_MEDIA: 23,
 
   /**
-   * Merging the media failed while changing state.
+   * Initializing merge failed while looking for packages with the same name.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_CHANGE_MEDIA_STATE: 24,
+  INIT_MERGE_GET_PACKAGES_WITH_SAME_NAME: 24,
 
   /**
-   * Merging the media failed while trying to get a media with the same name.
+   * Initializing merge failed while updating package.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_GET_MEDIA_ERROR: 25,
+  INIT_MERGE_UPDATE_PACKAGE: 25,
 
   /**
-   * Merging the media failed while waiting for a media with the same name to have a stable state.
+   * Initializing merge failed while waiting for a package with the same name to be in READY or PUBLISHED state.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_WAIT_FOR_MEDIA_ERROR: 26,
+  INIT_MERGE_WAIT_FOR_MEDIA: 26,
 
   /**
-   * Merging the media failed while changing state of the other media.
+   * Initializing merge failed while locking the other package.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_CHANGE_OTHER_MEDIA_STATE: 27,
+  INIT_MERGE_LOCK_PACKAGE: 27,
 
   /**
-   * Merging the media failed while merging medias.
+   * Finalizing merge failed while looking for a locked package with the same name.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_MEDIAS: 28,
+  FINALIZE_MERGE_GET_PACKAGE_WITH_SAME_NAME: 28,
 
   /**
-   * Merging the media failed while removing the not chosen media.
+   * Finalizing merge failed while releasing locked package with the same name.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGE_REMOVE_NOT_CHOSEN: 29
+  FINALIZE_MERGE_RELEASE_PACKAGE: 29,
+
+  /**
+   * Merging failed while getting locked package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_GET_PACKAGE_WITH_SAME_NAME: 30,
+
+  /**
+   * Merging failed while reading the public directory of the locked package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_READ_PACKAGE_WITH_SAME_NAME_PUBLIC_DIRECTORY: 31,
+
+  /**
+   * Merging failed while removing sprites of locked package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_REMOVE_PACKAGE_WITH_SAME_NAME_SPRITES: 32,
+
+  /**
+   * Merging failed while copying images to public directory of the locked package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_COPY_IMAGES: 33,
+
+  /**
+   * Merging failed while getting package points of interest.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_GET_POINTS_OF_INTEREST: 34,
+
+  /**
+   * Merging failed while duplicating package points of interest.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_DUPLICATE_POINTS_OF_INTEREST: 35,
+
+  /**
+   * Merging failed while generating sprites of merged points of interest.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_GENERATE_SPRITES: 36,
+
+  /**
+   * Merging failed while updating locked package with the same name with new timecodes, tags and state.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_UPDATE_PACKAGE_WITH_SAME_NAME: 37,
+
+  /**
+   * Merging failed while updating medias of the locked package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGE_UPDATE_MEDIAS: 38,
+
+  /**
+   * Removing the package failed.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  REMOVE_PACKAGE: 39
 
 };
 

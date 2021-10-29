@@ -150,7 +150,7 @@ var STATES = {
    * @default
    * @inner
    */
-  GENERATE_THUMB: 13,
+  GENERATING_THUMB: 13,
 
   /**
    * Package is analyzing media for more information.
@@ -160,7 +160,7 @@ var STATES = {
    * @default
    * @inner
    */
-  GET_METADATA: 14,
+  GETTING_METADATA: 14,
 
   /**
    * Package is defragmenting the mp4.
@@ -170,17 +170,58 @@ var STATES = {
    * @default
    * @inner
    */
-  DEFRAGMENT_MP4: 15,
+  DEFRAGMENTING_MP4: 15,
 
   /**
-   * Package is merging with another one.
+   * Package is looking for another package of the same name to merge with.
    *
    * @const
    * @type {Number}
    * @default
    * @inner
    */
-  MERGING: 16
+  INITIALIZING_MERGE: 16,
+
+  /**
+   * Package has been locked by another one to merge with.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  WAITING_FOR_MERGE: 17,
+
+  /**
+   * Package is merging to a package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  MERGING: 18,
+
+  /**
+   * Package is finalizing merge with the package with the same name.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  FINALIZING_MERGE: 19,
+
+  /**
+   * Package is being removed.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  REMOVING: 20
+
 
 };
 Object.freeze(STATES);

@@ -506,7 +506,7 @@ describe('Migration 11.0.0', function() {
         expectedMedias[0].id,
         'Wrong id'
       );
-      assert.equal(modifications.lastState, VideoPackage.STATES.MERGED, 'Wrong last state');
+      assert.equal(modifications.lastState, 'merged', 'Wrong last state');
 
       callback();
     });
@@ -534,7 +534,7 @@ describe('Migration 11.0.0', function() {
         expectedMedias[0].id,
         'Wrong id'
       );
-      assert.equal(modifications.lastTransition, VideoPackage.TRANSITIONS.MERGE, 'Wrong last transition');
+      assert.equal(modifications.lastTransition, 'merge', 'Wrong last transition');
 
       callback();
     });
@@ -639,7 +639,7 @@ describe('Migration 11.0.0', function() {
     ];
 
     VideoProvider.prototype.updateOne = chai.spy(function(filter, modifications, callback) {
-      if (modifications.lastState === VideoPackage.STATES.MERGED) {
+      if (modifications.lastState === 'merged') {
         callback(expectedError);
       } else {
         callback();

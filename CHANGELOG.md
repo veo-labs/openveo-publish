@@ -1,5 +1,7 @@
 # 12.0.0 / YYYY-MM-DD
 
+Make sure there is no pending video or videos on error before upgrading to 12.0.0.
+
 ## BREAKING CHANGES
 
 - No longer tested on NodeJS &lt; 16.3.0 and NPM &lt; 7.15.1
@@ -10,6 +12,7 @@
 
 - Improve code documentation by replacing Yuidoc by JSDoc
 - Add support for ZIP archives in addition to TAR archives
+- Multi-sources videos now contain all aggregated points of interest (timecodes and tags) instead of only the points of interest of one of the videos
 
 ## BUG FIXES
 

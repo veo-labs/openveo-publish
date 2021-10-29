@@ -4,20 +4,24 @@
  * @module publish/packages/Package
  */
 
-var util = require('util');
-var fs = require('fs');
 var events = require('events');
+var fs = require('fs');
 var path = require('path');
+var util = require('util');
+
 var async = require('async');
 var StateMachine = require('javascript-state-machine');
 var openVeoApi = require('@openveo/api');
+
 var configDir = openVeoApi.fileSystem.getConfDir();
+
 var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
 var videoPlatformConf = require(path.join(configDir, 'publish/videoPlatformConf.json'));
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
 var PackageError = process.requirePublish('app/server/packages/PackageError.js');
+
 var ResourceFilter = openVeoApi.storages.ResourceFilter;
 
 /**
@@ -97,8 +101,18 @@ function Package(mediaPackage, videoProvider, poiProvider) {
        *
        * @type {Object}
        * @instance
+       * @readonly
        */
-      videoPlatformConf: {value: videoPlatformConf}
+      videoPlatformConf: {value: videoPlatformConf},
+
+      /**
+       * Medias public directory path.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      mediasPublicPath: {value: path.join(process.rootPublish, 'assets/player/videos')}
 
     }
 
@@ -126,7 +140,11 @@ Package.STATES = {
   ORIGINAL_PACKAGE_REMOVED: 'originalPackageRemoved',
   MEDIA_UPLOADED: 'mediaUploaded',
   MEDIA_SYNCHRONIZED: 'mediaSynchronized',
-  DIRECTORY_CLEANED: 'directoryCleaned'
+  DIRECTORY_CLEANED: 'directoryCleaned',
+  MERGE_INITIALIZED: 'mergeInitialized',
+  MERGED: 'merged',
+  MERGE_FINALIZED: 'mergeFinalized',
+  PACKAGE_REMOVED: 'packageRemoved'
 };
 Object.freeze(Package.STATES);
 
@@ -142,7 +160,11 @@ Package.TRANSITIONS = {
   REMOVE_ORIGINAL_PACKAGE: 'removeOriginalPackage',
   UPLOAD_MEDIA: 'uploadMedia',
   SYNCHRONIZE_MEDIA: 'synchronizeMedia',
-  CLEAN_DIRECTORY: 'cleanDirectory'
+  CLEAN_DIRECTORY: 'cleanDirectory',
+  INIT_MERGE: 'initMerge',
+  MERGE: 'merge',
+  FINALIZE_MERGE: 'finalizeMerge',
+  REMOVE_PACKAGE: 'removePackage'
 };
 Object.freeze(Package.TRANSITIONS);
 
@@ -158,7 +180,11 @@ Package.stateTransitions = [
   Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
   Package.TRANSITIONS.UPLOAD_MEDIA,
   Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
-  Package.TRANSITIONS.CLEAN_DIRECTORY
+  Package.TRANSITIONS.CLEAN_DIRECTORY,
+  Package.TRANSITIONS.INIT_MERGE,
+  Package.TRANSITIONS.MERGE,
+  Package.TRANSITIONS.FINALIZE_MERGE,
+  Package.TRANSITIONS.REMOVE_PACKAGE
 ];
 Object.freeze(Package.stateTransitions);
 
@@ -198,9 +224,61 @@ Package.stateMachine = [
     name: Package.TRANSITIONS.CLEAN_DIRECTORY,
     from: Package.STATES.MEDIA_SYNCHRONIZED,
     to: Package.STATES.DIRECTORY_CLEANED
+  },
+  {
+    name: Package.TRANSITIONS.INIT_MERGE,
+    from: Package.STATES.DIRECTORY_CLEANED,
+    to: Package.STATES.MERGE_INITIALIZED
+  },
+  {
+    name: Package.TRANSITIONS.MERGE,
+    from: Package.STATES.MERGE_INITIALIZED,
+    to: Package.STATES.MERGED
+  },
+  {
+    name: Package.TRANSITIONS.FINALIZE_MERGE,
+    from: Package.STATES.MERGED,
+    to: Package.STATES.MERGE_FINALIZED
+  },
+  {
+    name: Package.TRANSITIONS.REMOVE_PACKAGE,
+    from: Package.STATES.MERGE_FINALIZED,
+    to: Package.STATES.PACKAGE_REMOVED
   }
 ];
 Object.freeze(Package.stateMachine);
+
+/**
+ * Waits for the given media to be in one of the given states.
+ *
+ * Waiting interval is 1 second.
+ *
+ * @memberof module:publish/packages/Package~Package
+ * @this module:publish/packages/Package~Package
+ * @private
+ * @param {Object} media The media
+ * @param {Object} media.id The media id
+ * @param {Array} states The authorized states
+ * @param {module:publish/packages/Package~Package~waitForMediaStateCallback} callback The function to call
+ * when done
+ */
+function waitForMediaState(media, states, callback) {
+  var self = this;
+
+  this.videoProvider.getOne(
+    new ResourceFilter().equal('id', media.id),
+    null,
+    function(error, fetchedMedia) {
+      if (error) return callback(error);
+      if (!fetchedMedia) return callback(new Error('Media "' + media.id + '" not found'));
+      if (states.indexOf(fetchedMedia.state) !== -1) return callback(null, fetchedMedia);
+
+      setTimeout(function() {
+        waitForMediaState.call(self, media, states, callback);
+      }, 1000);
+    }
+  );
+}
 
 /**
  * Creates a state machine to publish the package.
@@ -272,6 +350,11 @@ Package.prototype.updateState = function(id, state, callback) {
 Package.prototype.executeTransition = function(transition) {
   var self = this;
 
+  if (this.mediaPackage.removed) {
+    process.logger.debug('Package ' + self.mediaPackage.id + ' removed');
+    return self.emit('complete', this.mediaPackage);
+  }
+
   // Package is initialized
   // Memorize the last state and last transition of the package
   async.parallel([
@@ -285,7 +368,11 @@ Package.prototype.executeTransition = function(transition) {
 
     // If no more transition or upload transition reached without platform type
     // The publication is considered done
-    if (!transition || (transition === Package.TRANSITIONS.UPLOAD_MEDIA && !self.mediaPackage.type)) {
+    if (
+      !transition ||
+      (transition === Package.TRANSITIONS.UPLOAD_MEDIA && !self.mediaPackage.type) ||
+      (transition === Package.TRANSITIONS.MERGE && !self.mediaPackage.mergeRequired)
+    ) {
 
       // Package has not been uploaded yet and request a manual upload
       // Change package state
@@ -509,6 +596,264 @@ Package.prototype.cleanDirectory = function() {
 };
 
 /**
+ * Initializes merge if a package is found with the same name.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+Package.prototype.initMerge = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    var lockedPackage;
+
+    async.series([
+
+      // Change media state to INITIALIZING_MERGE
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.INITIALIZING_MERGE, callback);
+      },
+
+      // Try to find another package with the same name
+      function(callback) {
+        self.videoProvider.getAll(
+          new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName),
+          null,
+          {date: 'desc'},
+          function(error, packagesWithSameName) {
+            if (error) return callback(new PackageError(error.message, ERRORS.INIT_MERGE_GET_PACKAGES_WITH_SAME_NAME));
+
+            // If this package has been locked then skip merge as only one package with the same name can be merged
+            // (and so locked) at a time
+            // If one candidate package has been locked then wait for this package to be ready
+            // If no candidate package has been locked then choose either package in READY / PUBLISHED state or the
+            // older one and lock it
+            var defaultPackage;
+            var readyPackage;
+            var skipMerge = false;
+
+            packagesWithSameName.forEach(function(packageWithSameName) {
+              if (!defaultPackage && packageWithSameName.id !== self.mediaPackage.id) {
+                defaultPackage = packageWithSameName;
+              }
+
+              if (packageWithSameName.lockedByPackage && packageWithSameName.id === self.mediaPackage.id) {
+
+                // Package has been locked by another package
+                skipMerge = true;
+
+              } else if (packageWithSameName.lockedByPackage) {
+
+                // Another package has been locked either by this package or another
+                lockedPackage = packageWithSameName;
+
+              } else if (packageWithSameName.state === STATES.READY || packageWithSameName.state === STATES.PUBLISHED) {
+
+                // A package is in READY / PUBLISHED state
+                readyPackage = packageWithSameName;
+
+              }
+            });
+
+            lockedPackage = lockedPackage || readyPackage || defaultPackage;
+            self.mediaPackage.mergeRequired = !skipMerge && lockedPackage !== undefined;
+            callback();
+          }
+        );
+      },
+
+      // Set package as package to be merged
+      function(callback) {
+        if (!self.mediaPackage.mergeRequired) return callback();
+
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            mergeRequired: true
+          },
+          function(error, totalItems) {
+            if (error) {
+              return callback(new PackageError(error.message, ERRORS.INIT_MERGE_UPDATE_PACKAGE));
+            }
+            callback();
+          }
+        );
+      },
+
+      // Wait for the other package to be in READY or PUBLISHED state (so unlocked)
+      function(callback) {
+        if (!self.mediaPackage.mergeRequired) return callback();
+
+        process.logger.debug('Wait for package to be ready (' +
+          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
+        );
+        var expectedStates = [STATES.READY, STATES.PUBLISHED];
+        if (expectedStates.indexOf(lockedPackage.state) !== -1) return callback();
+
+        waitForMediaState.call(self, lockedPackage, expectedStates, function(error) {
+          if (error) {
+            return callback(new PackageError(error.message, ERRORS.INIT_MERGE_WAIT_FOR_MEDIA));
+          }
+          callback();
+        });
+      },
+
+      // Lock other package now that it has been released
+      function(callback) {
+        if (!self.mediaPackage.mergeRequired) return callback();
+
+        process.logger.debug('Lock package (' +
+          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
+        );
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', lockedPackage.id),
+          {
+            lockedByPackage: self.mediaPackage.id,
+            state: STATES.WAITING_FOR_MERGE
+          },
+          function(error, totalItems) {
+            if (error) {
+              return callback(new PackageError(error.message, ERRORS.INIT_MERGE_LOCK_PACKAGE));
+            }
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+
+  });
+};
+
+
+/**
+ * Merges package with the one with the same name.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+Package.prototype.merge = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    self.updateState(self.mediaPackage.id, STATES.MERGING, function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+  });
+};
+
+/**
+ * Finalizes merge by resetting state of the locked package of the same name.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+Package.prototype.finalizeMerge = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    var lockedPackage;
+
+    async.series([
+
+      // Change media state to FINALIZING_MERGE
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.FINALIZING_MERGE, callback);
+      },
+
+      // Find package locked in INIT_MERGE transition
+      function(callback) {
+        self.videoProvider.getOne(
+          new ResourceFilter().and([
+            new ResourceFilter().equal('state', STATES.WAITING_FOR_MERGE),
+            new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName),
+            new ResourceFilter().equal('lockedByPackage', self.mediaPackage.id)
+          ]),
+          null,
+          function(error, foundPackage) {
+            if (error) {
+              return callback(new PackageError(error.message, ERRORS.FINALIZE_MERGE_GET_PACKAGE_WITH_SAME_NAME));
+            }
+
+            lockedPackage = foundPackage;
+            callback();
+          }
+        );
+      },
+
+      // Reset locked package state and release lock
+      // Not that state is reset to READY even if the state was previously PUBLISHED because it requires manual check
+      // by the user before publishing the package
+      function(callback) {
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', lockedPackage.id),
+          {
+            lockedByPackage: null,
+            state: STATES.READY
+          },
+          function(error, totalItems) {
+            if (error) {
+              return callback(new PackageError(error.message, ERRORS.FINALIZE_MERGE_RELEASE_PACKAGE));
+            }
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+  });
+};
+
+/**
+ * Removes the package from OpenVeo but not from the media platform.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+Package.prototype.removePackage = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    async.series([
+
+      // Change media state to REMOVING
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.REMOVING, callback);
+      },
+
+      // Remove package from OpenVeo
+      function(callback) {
+        self.videoProvider.removeLocal(new ResourceFilter().equal('id', self.mediaPackage.id), function(error) {
+          if (error) return callback(new PackageError(error.message, ERRORS.REMOVE_PACKAGE));
+          self.mediaPackage.removed = true;
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+  });
+
+};
+
+/**
  * Gets the stack of transitions corresponding to the package.
  *
  * Each package has its own way to be published, thus transitions stack
@@ -573,4 +918,10 @@ Package.prototype.setError = function(error, doNotUpdateMedia) {
  * @callback module:publish/packages/Package~Package~udapteStateCallback
  * @param {(Error|undefined)} error The error if an error occurred
  * @param {Number} total The number of udpdated items
+ */
+
+/**
+ * @callback module:publish/packages/Package~Package~waitForMediaStateCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} media The media with all properties
  */
