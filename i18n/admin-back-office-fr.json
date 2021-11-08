@@ -120,6 +120,7 @@
     "STATE_18" : "Fusion",
     "STATE_19" : "Finalisation de la fusion",
     "STATE_20" : "Suppression",
+    "STATE_21" : "Suppression des fichiers temporaires",
     "ADD_MEDIA" : "Ajouter une vidéo",
     "REMOVE_SUCCESS" : "La vidéo a été supprimée.",
     "RETRY_SUCCESS" : "Le traitement de la vidéo va être relancé.",

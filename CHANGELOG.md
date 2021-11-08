@@ -7,12 +7,14 @@ Make sure there is no pending video or videos on error before upgrading to 12.0.
 - No longer tested on NodeJS &lt; 16.3.0 and NPM &lt; 7.15.1
 - Drop support for OpenVeo Core &lt; 10.0.0
 - Remove continuous integration with Travis
+- Property `metadataFileName` of publishConf.json configuration file is now ignored, packages in version 1 format must have a file called .session
 
 ## NEW FEATURES
 
 - Improve code documentation by replacing Yuidoc by JSDoc
 - Add support for ZIP archives in addition to TAR archives
 - Multi-sources videos now contain all aggregated points of interest (timecodes and tags) instead of only the points of interest of one of the videos
+- Add support for a new format of archive capable of importing a multi-sources video
 
 ## BUG FIXES
 

@@ -15,13 +15,21 @@ chai.should();
 chai.use(spies);
 
 describe('ArchivePackage', function() {
+  var archiveFormatFactory;
   var ArchivePackage;
   var archivePackage;
+  var expectedArchiveFormat;
   var expectedError = new Error('Something went wrong');
+  var expectedGenerateSpritesResult;
   var expectedPackage;
+  var expectedPackageTemporaryFileName;
+  var expectedPackageTemporaryDirectory;
+  var expectedPackageTemporaryFilePath;
   var expectedPackages;
+  var expectedReaddirResult;
   var fs;
   var openVeoApi;
+  var platformProvider;
   var poiProvider;
   var publishConf;
   var videoPlatformConf;
@@ -31,6 +39,7 @@ describe('ArchivePackage', function() {
   // Mocks
   beforeEach(function() {
     expectedPackages = [];
+    expectedReaddirResult = [];
 
     videoProvider = {
       getOne: chai.spy(function(filter, fields, callback) {
@@ -78,6 +87,9 @@ describe('ArchivePackage', function() {
         },
         performActions: chai.spy(function(actions, callback) {
           callback();
+        }),
+        readdir: chai.spy(function(directoryPath, callback) {
+          callback(null, expectedReaddirResult);
         })
       },
       storages: api.storages,
@@ -85,7 +97,7 @@ describe('ArchivePackage', function() {
       imageProcessor: {
         generateSprites: chai.spy(function(imagesPaths, destinationPath, width, height, totalColumns, maxRows, quality,
           temporaryDirectoryPath, callback) {
-          callback(null, []);
+          callback(null, expectedGenerateSpritesResult);
         })
       }
     };
@@ -113,13 +125,72 @@ describe('ArchivePackage', function() {
       })
     };
 
+    expectedArchiveFormat = {
+      date: 42,
+      medias: ['video1.mp4', 'video2.mp4'],
+      metadatas: {},
+      name: 'Package name',
+      pointsOfInterest: [
+        {
+          type: 'image',
+          timecode: 1000,
+          data: {
+            filename: 'image1.jpg'
+          }
+        },
+        {
+          type: 'tag',
+          timecode: 2000,
+          data: {
+            tagname: 'First tag'
+          }
+        }
+      ],
+      getDate: chai.spy(function(callback) {
+        callback(null, expectedArchiveFormat.date);
+      }),
+      getMedias: chai.spy(function(callback) {
+        callback(null, expectedArchiveFormat.medias);
+      }),
+      getMetadatas: chai.spy(function(callback) {
+        callback(null, expectedArchiveFormat.medias);
+      }),
+      getName: chai.spy(function(callback) {
+        callback(null, expectedArchiveFormat.name);
+      }),
+      getPointsOfInterest: chai.spy(function(callback) {
+        callback(null, expectedArchiveFormat.pointsOfInterest);
+      }),
+      validate: chai.spy(function(callback) {
+        callback(null, true);
+      })
+    };
+
     videoPlatformConf = {};
+    archiveFormatFactory = {
+      get: chai.spy(function(mediaPackagePath, callback) {
+        callback(null, expectedArchiveFormat);
+      })
+    };
+
+    platformProvider = {
+      upload: chai.spy(function(filePath, callback) {
+        callback(null, '1');
+      })
+    };
+    var mediaPlatformFactory = {
+      get: chai.spy(function(type, providerConf) {
+        return platformProvider;
+      })
+    };
 
     mock('@openveo/api', openVeoApi);
     mock('xml2js', xml2js);
     mock('fs', fs);
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), videoProvider);
     mock(path.join(process.rootPublish, 'app/server/providers/PoiProvider.js'), poiProvider);
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), mediaPlatformFactory);
+    mock(path.join(process.rootPublish, 'app/server/packages/archiveFormatFactory.js'), archiveFormatFactory);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/publishConf.json'), publishConf);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/videoPlatformConf.json'), videoPlatformConf);
 
@@ -127,10 +198,38 @@ describe('ArchivePackage', function() {
       id: '42',
       packageType: openVeoApi.fileSystem.FILE_TYPES.TAR,
       originalFileName: 'file',
+      originalPackagePath: '/tmp/package.tar',
       metadata: {
         indexes: []
-      }
+      },
+      title: 'package'
     };
+
+    expectedPackageTemporaryFileName = expectedPackage.id + '.' + expectedPackage.packageType;
+    expectedPackageTemporaryDirectory = path.join(publishConf.videoTmpDir, expectedPackage.id);
+    expectedPackageTemporaryFilePath = path.join(
+      expectedPackageTemporaryDirectory,
+      expectedPackageTemporaryFileName
+    );
+
+    expectedGenerateSpritesResult = expectedArchiveFormat.pointsOfInterest.reduce(
+      function(filtered, pointOfInterest, index) {
+        if (pointOfInterest.type === 'image') {
+          filtered.push(
+            {
+              sprite: '/sprite/path',
+              image: path.join(
+                expectedPackageTemporaryDirectory,
+                expectedArchiveFormat.pointsOfInterest[index].data.filename
+              ),
+              x: index,
+              y: index
+            }
+          );
+        }
+        return filtered;
+      }, []
+    );
   });
 
   // Initializes tests
@@ -140,6 +239,9 @@ describe('ArchivePackage', function() {
     ArchivePackage = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/ArchivePackage.js'));
     archivePackage = new ArchivePackage(expectedPackage, videoProvider, poiProvider);
     archivePackage.fsm = {};
+    ArchivePackage.super_.prototype.defragment = chai.spy(function(filePath, callback) {
+      callback();
+    });
   });
 
   // Stop mocks
@@ -147,20 +249,260 @@ describe('ArchivePackage', function() {
     mock.stopAll();
   });
 
+  describe('defragmentMp4', function() {
+
+    it('should change package state to DEFRAGMENTING_MP4 and defragment all videos files of the archive', function() {
+      var defragmentCount = 0;
+
+      ArchivePackage.super_.prototype.defragment = chai.spy(function(filePath, callback) {
+        assert.equal(
+          filePath,
+          path.join(expectedPackageTemporaryDirectory, expectedArchiveFormat.medias[defragmentCount]),
+          'Wrong file to defragment'
+        );
+
+        defragmentCount++;
+        callback();
+      });
+
+      return archivePackage.defragmentMp4().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(
+          expectedPackage.id,
+          STATES.DEFRAGMENTING_MP4
+        );
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(expectedArchiveFormat.medias.length);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not do anything if no media found in the archive', function() {
+      expectedArchiveFormat.medias = [];
+
+      return archivePackage.defragmentMp4().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(0);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.defragmentMp4().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive format failed', function() {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.defragmentMp4().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.DEFRAGMENT_MP4_GET_FORMAT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting medias files paths failed', function() {
+      expectedArchiveFormat.getMedias = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.defragmentMp4().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.DEFRAGMENT_MP4_GET_MEDIAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if defragmenting failed', function() {
+      ArchivePackage.super_.prototype.defragment = chai.spy(function(filePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.defragmentMp4().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.DEFRAGMENTATION, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        ArchivePackage.super_.prototype.defragment.should.have.been.called.exactly(1);
+      });
+    });
+
+  });
+
   describe('savePointsOfInterest', function() {
 
-    it('should update package state', function() {
-      videoProvider.updateState = chai.spy(function(id, state, callback) {
-        assert.equal(id, expectedPackage.id, 'Wrong id');
-        assert.equal(state, STATES.SAVING_POINTS_OF_INTEREST, 'Wrong state');
+    it('should change package state to SAVING_POINTS_OF_INTEREST and save points of interest', function() {
+      videoProvider.updateMetadata = chai.spy(function(id, metadata, callback) {
+        assert.equal(id, expectedPackage.id, 'Wrong package updated');
+        assert.deepEqual(metadata, {indexes: expectedArchiveFormat.pointsOfInterest}, 'Wrong package updated');
         callback();
+      });
+
+      openVeoApi.imageProcessor.generateSprites = chai.spy(function(imagesPaths, destinationPath, width, height,
+        totalColumns, maxRows, quality, temporaryDirectoryPath, callback) {
+        assert.sameMembers(
+          imagesPaths,
+          expectedArchiveFormat.pointsOfInterest.reduce(function(filtered, pointOfInterest) {
+            if (pointOfInterest.type === 'image') {
+              filtered.push(path.join(expectedPackageTemporaryDirectory, pointOfInterest.data.filename));
+            }
+            return filtered;
+          }, []),
+          'Wrong base images for sprite'
+        );
+        assert.equal(
+          destinationPath,
+          path.join(expectedPackageTemporaryDirectory, 'points-of-interest-images.jpg'),
+          'Wrong sprite destination path'
+        );
+        callback(null, expectedGenerateSpritesResult);
+      });
+
+      poiProvider.add = chai.spy(function(pointsOfInterest, callback) {
+        var expectedPointsOfInterest = expectedArchiveFormat.pointsOfInterest.reduce(
+          function(filtered, pointOfInterest, index) {
+            if (pointOfInterest.type === 'tag') {
+              filtered.push({
+                name: pointOfInterest.data.tagname,
+                value: pointOfInterest.timecode
+              });
+            }
+            return filtered;
+          }, []
+        );
+
+        assert.lengthOf(
+          pointsOfInterest,
+          expectedPointsOfInterest.length,
+          'Wrong number of points of interest inserted'
+        );
+
+        pointsOfInterest.forEach(function(pointOfInterest, i) {
+          assert.equal(
+            pointOfInterest.name,
+            expectedPointsOfInterest[i].name,
+            'Wrong point of interest name'
+          );
+          assert.equal(
+            pointOfInterest.value,
+            expectedPointsOfInterest[i].value,
+            'Wrong point of interest value'
+          );
+        });
+
+        callback(null, pointsOfInterest.length, pointsOfInterest);
+      });
+
+      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
+        var timecodeCount = 0;
+        var expectedTimecodes = [];
+        var expectedTags = [];
+
+        expectedArchiveFormat.pointsOfInterest.forEach(function(pointOfInterest) {
+          if (pointOfInterest.type === 'image') {
+            expectedTimecodes.push({
+              timecode: pointOfInterest.timecode,
+              image: {
+                large: '/publish/' + expectedPackage.id + '/' + pointOfInterest.data.filename,
+                small: {
+                  url: '/publish/' + expectedPackage.id + '/' +
+                  expectedGenerateSpritesResult[timecodeCount].sprite.replace('/sprite/', ''),
+                  x: expectedGenerateSpritesResult[timecodeCount].x,
+                  y: expectedGenerateSpritesResult[timecodeCount].y
+                }
+              }
+            });
+            timecodeCount++;
+          } else if (pointOfInterest.type === 'tag') {
+            expectedTags.push(pointOfInterest.id);
+          }
+        });
+
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackage.id,
+          'Wrong media package id'
+        );
+        assert.lengthOf(
+          modifications.timecodes,
+          expectedTimecodes.length,
+          'Wrong number of timecodes'
+        );
+
+        modifications.timecodes.forEach(function(timecode, index) {
+          assert.isString(timecode.id, 'Expected timecode id to be generated');
+          assert.equal(timecode.timecode, expectedTimecodes[index].timecode, 'Wrong timecode timecode');
+          assert.equal(
+            timecode.image.large,
+            expectedTimecodes[index].image.large,
+            'Wrong timecode large file URL'
+          );
+          assert.equal(
+            timecode.image.small.url,
+            expectedTimecodes[index].image.small.url,
+            'Wrong image sprite URL'
+          );
+
+          assert.equal(
+            timecode.image.small.x,
+            expectedTimecodes[index].image.small.x,
+            'Wrong timecode sprite x coordinate'
+          );
+          assert.equal(
+            timecode.image.small.y,
+            expectedTimecodes[index].image.small.y,
+            'Wrong timecode sprite y coordinate'
+          );
+        });
+
+        assert.deepEqual(modifications.tags, expectedTags, 'Wrong updated tags');
+        callback(null, 1);
       });
 
       return archivePackage.savePointsOfInterest().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.SAVING_POINTS_OF_INTEREST);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -170,293 +512,239 @@ describe('ArchivePackage', function() {
       });
 
       return archivePackage.savePointsOfInterest().then(function() {
-        assert.fail('Unexpected resolve');
+        assert.fail('Unexpected promise resolution');
       }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
         videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(0);
+        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
         videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
-        assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
       });
     });
 
-    it('should save media package tags based on package metadata', function() {
-      expectedPackage.metadata.indexes = [
+    it('should use the category if tag name if not specified', function() {
+      expectedArchiveFormat.pointsOfInterest = [
         {
           type: 'tag',
           timecode: 42000,
           data: {
-            tagname: 'tag1'
-          }
-        }
-      ];
-      var expectedTag = expectedPackage.metadata.indexes[0];
-      var expectedTagId = '42';
-
-      poiProvider.add = chai.spy(function(pois, callback) {
-        pois[0].id = expectedTagId;
-        assert.lengthOf(pois, expectedPackage.metadata.indexes.length, 'Wrong number of tags');
-        assert.equal(pois[0].name, expectedTag.data.tagname, 'Wrong tag name');
-        assert.equal(pois[0].value, expectedTag.timecode, 'Wrong tag value');
-        callback(null, pois.length, pois);
-      });
-
-      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedPackage.id,
-          'Wrong media package id'
-        );
-
-        assert.sameMembers(modifications.tags, [expectedTagId], 'Wrong tags associated to the media');
-        callback(null, 1);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
-        poiProvider.add.should.have.been.called.exactly(1);
-      }).catch(function(error) {
-        assert.fail('Unexpected error');
-      });
-    });
-
-    it('should generate a tag name if not specified', function() {
-      expectedPackage.metadata.indexes = [
-        {
-          type: 'tag',
-          timecode: 42000
-        }
-      ];
-
-      poiProvider.add = chai.spy(function(pois, callback) {
-        assert.isString(pois[0].name, 'Expected tag name to be generated');
-        callback(null, pois.length, pois);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        poiProvider.add.should.have.been.called.exactly(1);
-      }).catch(function(error) {
-        assert.fail('Unexpected error');
-      });
-    });
-
-    it('should set package as on error if adding tags failed', function() {
-      expectedPackage.metadata.indexes = [
-        {
-          type: 'tag',
-          timecode: 42000
-        }
-      ];
-
-      poiProvider.add = chai.spy(function(pois, callback) {
-        callback(expectedError);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        assert.fail('Unexpected transition');
-      }).catch(function(error) {
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        poiProvider.add.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
-        assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
-      });
-    });
-
-    it('should set package as on error if updating media failed', function() {
-      expectedPackage.metadata.indexes = [
-        {
-          type: 'tag',
-          timecode: 42000
-        }
-      ];
-
-      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        callback(expectedError);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        assert.fail('Unexpected transition');
-      }).catch(function(error) {
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
-        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
-        assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
-      });
-    });
-
-    it('should save media package images', function() {
-      expectedPackage.metadata.indexes = [
-        {
-          type: 'image',
-          timecode: 42000,
-          data: {
-            filename: 'filename.jpg'
-          }
-        }
-      ];
-      var expectedImagesReferences = [
-        {
-          sprite: '/sprite/path',
-          image: path.join(
-            publishConf.videoTmpDir,
-            expectedPackage.id,
-            expectedPackage.metadata.indexes[0].data.filename
-          ),
-          x: 42,
-          y: 42
-        }
-      ];
-
-      openVeoApi.imageProcessor.generateSprites = chai.spy(function(imagesPaths, destinationPath, width, height,
-        totalColumns, maxRows, quality, temporaryDirectoryPath, callback) {
-        callback(null, expectedImagesReferences);
-      });
-
-      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        var expectedImage = expectedPackage.metadata.indexes[0];
-        var expectedImageReference = expectedImagesReferences[0];
-
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedPackage.id,
-          'Wrong media package id'
-        );
-        assert.lengthOf(
-          modifications.timecodes,
-          expectedPackage.metadata.indexes.length,
-          'Wrong number of images'
-        );
-        assert.isString(modifications.timecodes[0].id, 'Expected image id to be generated');
-        assert.equal(modifications.timecodes[0].timecode, expectedImage.timecode, 'Wrong image timecode');
-        assert.equal(
-          modifications.timecodes[0].image.large,
-          '/publish/' + expectedPackage.id + '/' + expectedImage.data.filename,
-          'Wrong image URL');
-        assert.equal(
-          modifications.timecodes[0].image.small.url,
-          '/publish/' + expectedPackage.id + '/' + expectedImageReference.sprite.replace('/sprite/', ''),
-          'Wrong image sprite URL'
-        );
-        assert.equal(modifications.timecodes[0].image.small.x, expectedImageReference.x, 'Wrong x coordinate');
-        assert.equal(modifications.timecodes[0].image.small.y, expectedImageReference.y, 'Wrong y coordinate');
-        callback(null, 1);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
-        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
-      }).catch(function(error) {
-        assert.fail('Unexpected error');
-      });
-    });
-
-    it('should set package as on error if generating sprite failed', function() {
-      expectedPackage.metadata.indexes = [
-        {
-          type: 'image',
-          timecode: 42000,
-          data: {
-            filename: 'filename.jpg'
+            category: 'Category 1'
           }
         }
       ];
 
-      openVeoApi.imageProcessor.generateSprites = chai.spy(function(imagesPaths, destinationPath, width, height,
-        totalColumns, maxRows, quality, temporaryDirectoryPath, callback) {
-        callback(expectedError);
+      poiProvider.add = chai.spy(function(pointsOfInterest, callback) {
+        assert.equal(
+          pointsOfInterest[0].name,
+          expectedArchiveFormat.pointsOfInterest[0].data.category,
+          'Wrong tag name'
+        );
+        callback(null, pointsOfInterest.length, pointsOfInterest);
       });
 
       return archivePackage.savePointsOfInterest().then(function() {
-        assert.fail('Unexpected transition');
-      }).catch(function(error) {
-        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         videoProvider.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(0);
-        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
-        assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST, 'Wrong error code');
-      });
-    });
-
-    it('should retrieve points of interest images from synchro.xml if not specified in metadata', function() {
-      expectedPackage.metadata.indexes = null;
-      var expectedXmlAsJs = {
-        player: {
-          synchro: [
-            {
-              id: ['filename.jpg'],
-              timecode: ['42000']
-            }
-          ]
-        }
-      };
-      var expectedImagesReferences = [
-        {
-          sprite: '/sprite/path',
-          image: path.join(
-            publishConf.videoTmpDir,
-            expectedPackage.id,
-            expectedXmlAsJs.player.synchro[0].id[0]
-          ),
-          x: 42,
-          y: 42
-        }
-      ];
-
-      openVeoApi.imageProcessor.generateSprites = chai.spy(function(imagesPaths, destinationPath, width, height,
-        totalColumns, maxRows, quality, temporaryDirectoryPath, callback) {
-        callback(null, expectedImagesReferences);
-      });
-
-      xml2js.parseString = chai.spy(function(data, options, callback) {
-        callback(null, expectedXmlAsJs);
-      });
-
-      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
-        var expectedImage = expectedXmlAsJs.player.synchro[0];
-        var expectedImageReference = expectedImagesReferences[0];
-
-        assert.equal(
-          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          expectedPackage.id,
-          'Wrong media package id'
-        );
-        assert.lengthOf(
-          modifications.timecodes,
-          expectedPackage.metadata.indexes.length,
-          'Wrong number of images'
-        );
-
-        assert.isString(modifications.timecodes[0].id, 'Expected image id to be generated');
-        assert.equal(modifications.timecodes[0].timecode, parseInt(expectedImage.timecode[0]), 'Wrong image timecode');
-        assert.equal(
-          modifications.timecodes[0].image.large,
-          '/publish/' + expectedPackage.id + '/' + expectedImage.id[0],
-          'Wrong image URL');
-        assert.equal(
-          modifications.timecodes[0].image.small.url,
-          '/publish/' + expectedPackage.id + '/' + expectedImageReference.sprite.replace('/sprite/', ''),
-          'Wrong image sprite URL'
-        );
-        assert.equal(modifications.timecodes[0].image.small.x, expectedImageReference.x, 'Wrong x coordinate');
-        assert.equal(modifications.timecodes[0].image.small.y, expectedImageReference.y, 'Wrong y coordinate');
-        callback(null, 1);
-      });
-
-      return archivePackage.savePointsOfInterest().then(function() {
-        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
-        videoProvider.updateState.should.have.been.called.exactly(1);
-        videoProvider.updateOne.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
         videoProvider.updateMetadata.should.have.been.called.exactly(1);
-        xml2js.parseString.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
+      });
+    });
+
+    it('should generate tag name if not specified nor category', function() {
+      expectedArchiveFormat.pointsOfInterest = [
+        {
+          type: 'tag',
+          timecode: 42000
+        }
+      ];
+
+      poiProvider.add = chai.spy(function(pointsOfInterest, callback) {
+        assert.equal(
+          pointsOfInterest[0].name,
+          'Tag1',
+          'Wrong tag name'
+        );
+        callback(null, pointsOfInterest.length, pointsOfInterest);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not do anything if there is no point of interest in the archive', function() {
+      expectedArchiveFormat.pointsOfInterest = [];
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(0);
+        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive format failed', function() {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_GET_FORMAT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(0);
+        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting points of interest failed', function() {
+      expectedArchiveFormat.getPointsOfInterest = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_GET_POINTS_OF_INTEREST, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package metadata failed', function() {
+      videoProvider.updateMetadata = chai.spy(function(id, metadata, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE_METADATA, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if generating sprites failed', function() {
+      openVeoApi.imageProcessor.generateSprites = chai.spy(function(imagesPaths, destinationPath, width, height,
+        totalColumns, maxRows, quality, temporaryDirectoryPath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_GENERATE_SPRITES, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if saving tags failed', function() {
+      poiProvider.add = chai.spy(function(tags, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_ADD_TAGS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      videoProvider.updateOne = chai.spy(function(id, data, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.savePointsOfInterest().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
+        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+        poiProvider.add.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
       });
     });
 
@@ -464,76 +752,279 @@ describe('ArchivePackage', function() {
 
   describe('extractPackage', function() {
 
-    it('should update package state', function() {
-      videoProvider.updateState = chai.spy(function(id, state, callback) {
-        assert.equal(id, expectedPackage.id, 'Wrong id');
-        assert.equal(state, STATES.EXTRACTING, 'Wrong state');
-        callback();
+    it('should change package state to EXTRACTING and extract archive into its temporary directory', function() {
+      expectedReaddirResult = [
+        {
+          isDirectory: function() {
+            return false;
+          },
+          path: expectedPackageTemporaryFilePath
+        },
+        {
+          isDirectory: function() {
+            return false;
+          },
+          path: path.join(expectedPackageTemporaryDirectory, 'video.mp4')
+        }
+      ];
+
+      return archivePackage.extractPackage().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.EXTRACTING);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.with(
+          expectedPackageTemporaryFilePath,
+          expectedPackageTemporaryDirectory
+        );
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.with(expectedPackageTemporaryDirectory);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+
+        assert.isUndefined(expectedPackage.temporarySubDirectory, 'Unexpected temporary sub directory');
+        assert.equal(
+          archivePackage.packageTemporaryDirectory,
+          expectedPackageTemporaryDirectory,
+          'Wrong temporary directory'
+        );
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should change package temporary directory if archive resources are embedded in a directory', function() {
+      var expectedTopDirectoryName = 'test';
+
+      expectedReaddirResult = [
+        {
+          isDirectory: function() {
+            return false;
+          },
+          path: expectedPackageTemporaryFilePath
+        },
+        {
+          isDirectory: function() {
+            return true;
+          },
+          path: path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName)
+        }
+      ];
+
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackage.id,
+          'Wrong package updated'
+        );
+        assert.deepEqual(data, {temporarySubDirectory: expectedTopDirectoryName}, 'Wrong updated data');
+        callback(null, 1);
       });
 
       return archivePackage.extractPackage().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+
+        assert.equal(
+          expectedPackage.temporarySubDirectory,
+          expectedTopDirectoryName,
+          'Wrong temporary sub directory'
+        );
+        assert.equal(
+          archivePackage.packageTemporaryDirectory,
+          path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName),
+          'Wrong temporary directory'
+        );
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
-    it('should set package as on error if updating state failed', function() {
+    it('should not change package temporary directory if already changed', function() {
+      var expectedTopDirectoryName = 'test';
+
+      expectedPackage.temporarySubDirectory = expectedTopDirectoryName;
+      archivePackage.packageTemporaryDirectory = path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName);
+      expectedReaddirResult = [
+        {
+          isDirectory: function() {
+            return false;
+          },
+          path: expectedPackageTemporaryFilePath
+        },
+        {
+          isDirectory: function() {
+            return true;
+          },
+          path: path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName)
+        }
+      ];
+
+      return archivePackage.extractPackage().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+
+        assert.equal(
+          expectedPackage.temporarySubDirectory,
+          expectedTopDirectoryName,
+          'Wrong temporary sub directory'
+        );
+        assert.equal(
+          archivePackage.packageTemporaryDirectory,
+          path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName),
+          'Wrong temporary directory'
+        );
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if updating state failed', function() {
       videoProvider.updateState = chai.spy(function(id, state, callback) {
         callback(expectedError);
       });
 
       return archivePackage.extractPackage().then(function() {
-        assert.fail('Unexpected resolve');
+        assert.fail('Unexpected promise resolution');
       }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
         videoProvider.updateState.should.have.been.called.exactly(1);
         openVeoApi.fileSystem.extract.should.have.been.called.exactly(0);
-        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
-        assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.EXTRACT, 'Wrong error code');
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
       });
     });
 
-    it('should extract package into its publish temporary directory', function() {
-      openVeoApi.fileSystem.extract = chai.spy(function(packageFilePath, destinationDirectory, callback) {
-        assert.equal(
-          packageFilePath,
-          path.join(
-            publishConf.videoTmpDir,
-            expectedPackage.id,
-            expectedPackage.id + '.' + expectedPackage.packageType
-          ),
-          'Wrong package path'
-        );
-
-        assert.equal(
-          destinationDirectory,
-          path.join(publishConf.videoTmpDir, expectedPackage.id),
-          'Wrong package path'
-        );
-        callback();
-      });
-
-      return archivePackage.extractPackage().then(function() {
-        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
-      }).catch(function(error) {
-        assert.ok(false, 'Unexpected error');
-      });
-    });
-
-    it('should set package as on error if extraction failed', function() {
+    it('should reject promise if extraction failed', function() {
       openVeoApi.fileSystem.extract = chai.spy(function(packageFilePath, destinationDirectory, callback) {
         callback(expectedError);
       });
 
       return archivePackage.extractPackage().then(function() {
-        assert.ok(false, 'Unexpected response');
+        assert.fail('Unexpected promise resolution');
       }).catch(function(error) {
-        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
         assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
         assert.equal(error.code, ERRORS.EXTRACT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if verifying extraction failed', function() {
+      openVeoApi.fileSystem.readdir = chai.spy(function(directoryPath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.EXTRACT_VERIFY, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      var expectedTopDirectoryName = 'test';
+
+      expectedReaddirResult = [
+        {
+          isDirectory: function() {
+            return false;
+          },
+          path: expectedPackageTemporaryFilePath
+        },
+        {
+          isDirectory: function() {
+            return true;
+          },
+          path: path.join(expectedPackageTemporaryDirectory, expectedTopDirectoryName)
+        }
+      ];
+
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.extractPackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.EXTRACT_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.extract.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.readdir.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      });
+    });
+
+  });
+
+  describe('getMediaFilePath', function() {
+
+    it('should get first media file path contained in the archive', function(done) {
+      archivePackage.getMediaFilePath(function(error, mediaFilePath) {
+        assert.isNull(error, 'Unexpected error');
+
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+
+        assert.equal(
+          mediaFilePath,
+          path.join(
+            expectedPackageTemporaryDirectory,
+            expectedArchiveFormat.medias[0]
+          ),
+          'Wrong media file path'
+        );
+
+        done();
+      });
+    });
+
+    it('should execute callback with an error if getting archive format failed', function(done) {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      archivePackage.getMediaFilePath(function(error, mediaFilePath) {
+        assert.strictEqual(error, expectedError);
+        assert.isUndefined(mediaFilePath, 'Unexpected media file path');
+
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+
+        done();
+      });
+    });
+
+    it('should execute callback with an error if getting archive medias failed', function(done) {
+      expectedArchiveFormat.getMedias = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      archivePackage.getMediaFilePath(function(error, mediaFilePath) {
+        assert.strictEqual(error, expectedError);
+        assert.isUndefined(mediaFilePath, 'Unexpected media file path');
+
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+
+        done();
       });
     });
 
@@ -705,7 +1196,7 @@ describe('ArchivePackage', function() {
       return archivePackage.merge().then(function() {
         ArchivePackage.super_.prototype.merge.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -740,12 +1231,12 @@ describe('ArchivePackage', function() {
         );
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'originalFileName').value,
-          archivePackage.mediaPackage.originalFileName,
+          expectedPackage.originalFileName,
           'Searching for wrong locked package original file name'
         );
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'lockedByPackage').value,
-          archivePackage.mediaPackage.id,
+          expectedPackage.id,
           'Searching for wrong locked package locker'
         );
 
@@ -931,7 +1422,7 @@ describe('ArchivePackage', function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -949,7 +1440,7 @@ describe('ArchivePackage', function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(0);
         videoProvider.updateOne.should.have.been.called.exactly(0);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -974,7 +1465,7 @@ describe('ArchivePackage', function() {
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -1171,6 +1662,400 @@ describe('ArchivePackage', function() {
         poiProvider.getAll.should.have.been.called.exactly(1);
         poiProvider.add.should.have.been.called.exactly(1);
         openVeoApi.imageProcessor.generateSprites.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      });
+    });
+
+  });
+
+  describe('uploadMedia', function() {
+
+    it('should change package state to UPLOADING and upload all medias to the media platform', function() {
+      var expectedMediasIds = ['90', '91'];
+      var uploadCount = 0;
+
+      platformProvider.upload = chai.spy(function(filePath, callback) {
+        assert.equal(filePath, path.join(
+          expectedPackageTemporaryDirectory,
+          expectedArchiveFormat.medias[uploadCount]
+        ), 'Wrong file uploaded');
+        callback(null, expectedMediasIds[uploadCount++]);
+      });
+
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackage.id,
+          'Wrong package updated'
+        );
+        assert.equal(data.link, '/publish/video/' + expectedPackage.id, 'Wrong package link');
+        assert.sameMembers(data.mediaId, expectedMediasIds, 'Wrong package medias ids');
+        callback();
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.UPLOADING);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(expectedArchiveFormat.medias.length);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not upload anything if medias have already been uploaded', function() {
+      expectedPackage.mediaId = expectedArchiveFormat.medias.map(function(media, index) {
+        return index;
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should upload only not uploaded medias', function() {
+      var expectedMediaId = '90';
+      expectedPackage.mediaId = [expectedMediaId];
+
+      platformProvider.upload = chai.spy(function(filePath, callback) {
+        assert.equal(filePath, path.join(
+          expectedPackageTemporaryDirectory,
+          expectedArchiveFormat.medias[1]
+        ), 'Wrong uploaded file');
+        callback(null, '1');
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(
+          expectedArchiveFormat.medias.length - 1
+        );
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        platformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive format failed', function() {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.UPLOAD_MEDIA_GET_FORMAT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        platformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting medias files names failed', function() {
+      expectedArchiveFormat.getMedias = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.UPLOAD_MEDIA_GET_MEDIAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if uploading a media failed', function() {
+      platformProvider.upload = chai.spy(function(filePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.MEDIA_UPLOAD, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.UPLOAD_MEDIA_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        platformProvider.upload.should.have.been.called.exactly(expectedArchiveFormat.medias.length);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      });
+    });
+
+  });
+
+  describe('validatePackage', function() {
+
+    it('should change package state to VALIDATING and get package information', function() {
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackage.id,
+          'Wrong package updated'
+        );
+        assert.equal(data.date, expectedArchiveFormat.date, 'Wrong updated package date');
+        assert.isDefined(data.metadata, 'Expected package metadata to be updated');
+        assert.equal(data.title, expectedArchiveFormat.name, 'Wrong updated package title');
+        callback();
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.VALIDATING);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not modify package title if name is not in archive metadatas', function() {
+      var expectedTitle = expectedPackage.title;
+      expectedArchiveFormat.name = null;
+
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(data.title, expectedTitle, 'Wrong updated package title');
+        callback();
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive format failed', function() {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATE_GET_FORMAT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if archive is not valid', function() {
+      expectedArchiveFormat.validate = chai.spy(function(callback) {
+        callback(null, false);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.code, ERRORS.VALIDATION, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if validating the archive failed', function() {
+      expectedArchiveFormat.validate = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATION, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive metadatas failed', function() {
+      expectedArchiveFormat.getMetadatas = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATE_GET_METADATAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive date failed', function() {
+      expectedArchiveFormat.getDate = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATE_GET_METADATAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive name failed', function() {
+      expectedArchiveFormat.getName = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATE_GET_METADATAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.validatePackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.VALIDATE_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.validate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMetadatas.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getName.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       });
     });

@@ -402,7 +402,227 @@ var ERRORS = {
    * @default
    * @inner
    */
-  REMOVE_PACKAGE: 39
+  REMOVE_PACKAGE: 39,
+
+  /**
+   * Validating package failed while getting archive format.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  VALIDATE_GET_FORMAT: 40,
+
+  /**
+   * Validating package failed while getting archive metadatas.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  VALIDATE_GET_METADATAS: 41,
+
+  /**
+   * Validating package failed while updating package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  VALIDATE_UPDATE_PACKAGE: 42,
+
+  /**
+   * Uploading media failed while getting media file path.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  UPLOAD_GET_MEDIA_FILE_PATH: 43,
+
+  /**
+   * Uploading media failed while updating the package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  UPLOAD_MEDIA_UPDATE_PACKAGE: 44,
+
+  /**
+   * Getting media metadata failed while getting media file path.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GET_METADATA_GET_MEDIA_FILE_PATH: 45,
+
+  /**
+   * Getting media metadata failed while updating package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GET_METADATA_UPDATE_PACKAGE: 46,
+
+  /**
+   * Generating thumb failed while getting media file path.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GENERATE_THUMB_GET_MEDIA_FILE_PATH: 47,
+
+  /**
+   * Generating thumb failed while copying original thumb.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GENERATE_THUMB_COPY_ORIGINAL: 48,
+
+  /**
+   * Generating thumb failed while removing original thumb.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GENERATE_THUMB_REMOVE_ORIGINAL: 49,
+
+  /**
+   * Generating thumb failed while updating package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GENERATE_THUMB_UPDATE_PACKAGE: 50,
+
+  /**
+   * Defragmenting MP4 failed while getting archive format.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  DEFRAGMENT_MP4_GET_FORMAT: 51,
+
+  /**
+   * Defragmenting MP4 failed while getting medias.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  DEFRAGMENT_MP4_GET_MEDIAS: 52,
+
+  /**
+   * Uploading media failed while getting archive format.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  UPLOAD_MEDIA_GET_FORMAT: 53,
+
+  /**
+   * Uploading media failed while getting medias.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  UPLOAD_MEDIA_GET_MEDIAS: 54,
+
+  /**
+   * Saving points of interest failed while getting archive format.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  SAVE_POINTS_OF_INTEREST_GET_FORMAT: 55,
+
+  /**
+   * Saving points of interest failed while saving package metadata.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE_METADATA: 56,
+
+  /**
+   * Saving points of interest failed while generating sprites.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  SAVE_POINTS_OF_INTEREST_GENERATE_SPRITES: 57,
+
+  /**
+   * Saving points of interest failed while adding tags.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  SAVE_POINTS_OF_INTEREST_ADD_TAGS: 58,
+
+  /**
+   * Saving points of interest failed while updating package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE: 59,
+
+  /**
+   * Extracting archive failed while veryfing extracted files.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  EXTRACT_VERIFY: 60,
+
+  /**
+   * Extracting archive failed while updating package.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  EXTRACT_UPDATE_PACKAGE: 61
 
 };
 

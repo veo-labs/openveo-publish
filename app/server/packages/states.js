@@ -220,8 +220,17 @@ var STATES = {
    * @default
    * @inner
    */
-  REMOVING: 20
+  REMOVING: 20,
 
+  /**
+   * Package temporary directory is being removed.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  CLEANING: 21
 
 };
 Object.freeze(STATES);

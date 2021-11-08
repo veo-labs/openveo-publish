@@ -56,6 +56,11 @@ var ResourceFilter = openVeoApi.storages.ResourceFilter;
  */
 function Package(mediaPackage, videoProvider, poiProvider) {
 
+  // Validate temporary directory
+  if (!publishConf.videoTmpDir || (typeof publishConf.videoTmpDir !== 'string'))
+    this.emit('error', new PackageError('videoTmpDir in publishConf.json must be a String'),
+      ERRORS.INVALID_CONFIGURATION);
+
   Object.defineProperties(this,
 
     /** @lends module:publish/packages/Package~Package */
@@ -112,16 +117,26 @@ function Package(mediaPackage, videoProvider, poiProvider) {
        * @instance
        * @readonly
        */
-      mediasPublicPath: {value: path.join(process.rootPublish, 'assets/player/videos')}
+      mediasPublicPath: {value: path.join(process.rootPublish, 'assets/player/videos')},
+
+      /**
+       * Package temporary directory path.
+       *
+       * @type {String}
+       * @instance
+       */
+      packageTemporaryDirectory: {
+        value: path.join(
+          publishConf.videoTmpDir,
+          String(mediaPackage.id),
+          mediaPackage.temporarySubDirectory || ''
+        ),
+        writable: true
+      }
 
     }
 
   );
-
-  // Validate temporary directory
-  if (!this.publishConf.videoTmpDir || (typeof this.publishConf.videoTmpDir !== 'string'))
-    this.emit('error', new PackageError('videoTmpDir in publishConf.json must be a String'),
-      ERRORS.INVALID_CONFIGURATION);
 }
 
 util.inherits(Package, events.EventEmitter);
@@ -305,13 +320,13 @@ Package.prototype.init = function(initialState, initialTransition) {
   // Handle each enter state event to launch automatically the next
   // transition regarding the stack of transitions
   this.fsm.observe('onEnterState', function() {
-    process.logger.verbose('State = ' + self.fsm.state, {id: self.mediaPackage.id});
+    self.log('State = ' + self.fsm.state, 'verbose');
     self.executeTransition((transitions[transition + 1]) ? transitions[++transition] : null);
   });
 
   // Handle each leave state event to execute the corresponding transition
   this.fsm.observe('onLeaveState', function(event) {
-    process.logger.verbose('Transition = ' + event.transition, {id: self.mediaPackage.id});
+    self.log('Transition = ' + event.transition, 'verbose');
 
     // Executes function corresponding to transition
     if (self[event.transition]) {
@@ -351,8 +366,8 @@ Package.prototype.executeTransition = function(transition) {
   var self = this;
 
   if (this.mediaPackage.removed) {
-    process.logger.debug('Package ' + self.mediaPackage.id + ' removed');
-    return self.emit('complete', this.mediaPackage);
+    this.log('Package removed');
+    return this.emit('complete', this.mediaPackage);
   }
 
   // Package is initialized
@@ -377,7 +392,7 @@ Package.prototype.executeTransition = function(transition) {
       // Package has not been uploaded yet and request a manual upload
       // Change package state
       if (transition === Package.TRANSITIONS.UPLOAD_MEDIA) {
-        process.logger.debug('Package ' + self.mediaPackage.id + ' is waiting for manual upload');
+        self.log('Package is waiting for manual upload');
         self.updateState(self.mediaPackage.id, STATES.WAITING_FOR_UPLOAD, function() {
           self.emit('complete', self.mediaPackage);
         });
@@ -411,7 +426,7 @@ Package.prototype.executeTransition = function(transition) {
  * @return {Promise} Promise resolving when transition is done
  */
 Package.prototype.initPackage = function() {
-  process.logger.debug('Init package ' + this.mediaPackage.id);
+  this.log('Init package');
 
   var self = this;
 
@@ -450,13 +465,16 @@ Package.prototype.copyPackage = function() {
   return new Promise(function(resolve, reject) {
 
     // Destination of the copy
-    var destinationFilePath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id),
-      self.mediaPackage.id + '.' + self.mediaPackage.packageType);
+    var destinationFilePath = path.join(
+      self.packageTemporaryDirectory,
+      self.mediaPackage.id + '.' + self.mediaPackage.packageType
+    );
 
     self.updateState(self.mediaPackage.id, STATES.COPYING, function() {
 
       // Copy package
-      process.logger.debug('Copy ' + self.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
+      self.log('Copy ' + self.mediaPackage.originalPackagePath + ' to ' + destinationFilePath);
+
       openVeoApi.fileSystem.copy(self.mediaPackage.originalPackagePath, destinationFilePath, function(copyError) {
         if (copyError) reject(new PackageError(copyError.message, ERRORS.COPY));
         else resolve();
@@ -483,7 +501,8 @@ Package.prototype.removeOriginalPackage = function() {
       function(callback) {
 
         // Try to remove the original package
-        process.logger.debug('Remove original package ' + self.mediaPackage.originalPackagePath);
+        self.log('Remove original package ' + self.mediaPackage.originalPackagePath);
+
         fs.unlink(self.mediaPackage.originalPackagePath, function(error) {
           if (error) callback(new PackageError(error.message, ERRORS.UNLINK));
           else callback();
@@ -498,7 +517,7 @@ Package.prototype.removeOriginalPackage = function() {
 };
 
 /**
- * Uploads the media to the video platform.
+ * Uploads the media to the media platform.
  *
  * This is a transition.
  *
@@ -507,37 +526,68 @@ Package.prototype.removeOriginalPackage = function() {
  */
 Package.prototype.uploadMedia = function() {
   var self = this;
+  var mediaFilePath;
 
   return new Promise(function(resolve, reject) {
-    self.updateState(self.mediaPackage.id, STATES.UPLOADING, function() {
 
-      // Get media plaform provider from package type
-      var mediaPlatformProvider = mediaPlatformFactory.get(self.mediaPackage.type,
-        self.videoPlatformConf[self.mediaPackage.type]);
+    async.series([
 
-      // Start uploading the media to the platform
-      process.logger.debug('Upload media ' + self.mediaPackage.id);
-      mediaPlatformProvider.upload(self.getMediaFilePath(), function(error, mediaId) {
-        if (error) return reject(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.UPLOADING, callback);
+      },
 
-        async.series([
+      // Get media file name
+      function(callback) {
+        if (self.mediaPackage.mediaId && self.mediaPackage.mediaId.length) return callback();
 
-          function(callback) {
-            self.mediaPackage.link = '/publish/video/' + self.mediaPackage.id;
-            self.videoProvider.updateLink(self.mediaPackage.id, self.mediaPackage.link, callback);
-          },
-
-          function(callback) {
-            self.mediaPackage.mediaId = [mediaId];
-            self.videoProvider.updateMediaId(self.mediaPackage.id, self.mediaPackage.mediaId, callback);
-          }
-
-        ], function() {
-          resolve();
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new PackageError(error.message, ERRORS.UPLOAD_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
         });
+      },
 
-      });
+      // Upload media
+      function(callback) {
+        if (self.mediaPackage.mediaId && self.mediaPackage.mediaId.length) return callback();
 
+        // Get media plaform provider from package type
+        var mediaPlatformProvider = mediaPlatformFactory.get(
+          self.mediaPackage.type,
+          self.videoPlatformConf[self.mediaPackage.type]
+        );
+
+        // Start uploading the media to the platform
+        self.log('Upload media ' + mediaFilePath);
+
+        mediaPlatformProvider.upload(mediaFilePath, function(error, id) {
+          if (error) return callback(new PackageError(error.message, ERRORS.MEDIA_UPLOAD));
+
+          self.mediaPackage.link = '/publish/video/' + self.mediaPackage.id;
+          self.mediaPackage.mediaId = [id];
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            link: self.mediaPackage.link,
+            mediaId: self.mediaPackage.mediaId
+          },
+          function(error) {
+            if (error) return callback(new PackageError(error.message, ERRORS.UPLOAD_MEDIA_UPDATE_PACKAGE));
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
     });
   });
 };
@@ -554,7 +604,7 @@ Package.prototype.synchronizeMedia = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    process.logger.debug('Synchronize media ' + self.mediaPackage.id);
+    self.log('Synchronize media');
 
     self.updateState(self.mediaPackage.id, STATES.SYNCHRONIZING, function() {
 
@@ -584,12 +634,30 @@ Package.prototype.cleanDirectory = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var directoryToRemove = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    async.series([
 
-    // Remove package temporary directory
-    process.logger.debug('Remove temporary directory ' + directoryToRemove);
-    openVeoApi.fileSystem.rmdir(directoryToRemove, function(error) {
-      if (error) reject(new PackageError(error.message, ERRORS.CLEAN_DIRECTORY));
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.CLEANING, callback);
+      },
+
+      // Remove temporary directory
+      function(callback) {
+        var directoryToRemove = self.packageTemporaryDirectory.replace(
+          new RegExp('(.*)/' + self.mediaPackage.temporarySubDirectory),
+          '$1'
+        );
+
+        self.log('Remove temporary directory ' + directoryToRemove);
+
+        openVeoApi.fileSystem.rmdir(directoryToRemove, function(error) {
+          if (error) return callback(new PackageError(error.message, ERRORS.CLEAN_DIRECTORY));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
       else resolve();
     });
   });
@@ -686,9 +754,8 @@ Package.prototype.initMerge = function() {
       function(callback) {
         if (!self.mediaPackage.mergeRequired) return callback();
 
-        process.logger.debug('Wait for package to be ready (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Wait for package ' + lockedPackage.id + ' to be ready');
+
         var expectedStates = [STATES.READY, STATES.PUBLISHED];
         if (expectedStates.indexOf(lockedPackage.state) !== -1) return callback();
 
@@ -704,9 +771,8 @@ Package.prototype.initMerge = function() {
       function(callback) {
         if (!self.mediaPackage.mergeRequired) return callback();
 
-        process.logger.debug('Lock package (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Lock package ' + lockedPackage.id);
+
         self.videoProvider.updateOne(
           new ResourceFilter().equal('id', lockedPackage.id),
           {
@@ -877,13 +943,23 @@ Package.prototype.getStateMachine = function() {
 /**
  * Gets the media file path of the package.
  *
- * @return {String} System path of the media file
+ * @return {module:publish/packages/Package~Package~getMediaFilePathCallback} Function to call when its done
  */
-Package.prototype.getMediaFilePath = function() {
-  return path.join(this.publishConf.videoTmpDir,
-    String(this.mediaPackage.id),
+Package.prototype.getMediaFilePath = function(callback) {
+  callback(null, path.join(
+    this.packageTemporaryDirectory,
     this.mediaPackage.id + '.' + this.mediaPackage.packageType
-  );
+  ));
+};
+
+/**
+ * Logs given message suffixing it with the package id.
+ *
+ * @param {String} message The message to log
+ * @param {String} [level="debug"] The expected log level
+ */
+Package.prototype.log = function(message, level) {
+  process.logger[level || 'debug'](message, {id: this.mediaPackage.id});
 };
 
 /**
@@ -913,6 +989,12 @@ Package.prototype.setError = function(error, doNotUpdateMedia) {
 
   }
 };
+
+/**
+ * @callback module:publish/packages/Package~Package~getMediaFilePathCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} mediaFilePath The path of the media file in temporary directory
+ */
 
 /**
  * @callback module:publish/packages/Package~Package~udapteStateCallback

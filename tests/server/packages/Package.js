@@ -18,10 +18,14 @@ chai.should();
 chai.use(spies);
 
 describe('Package', function() {
+  var expectedPackage;
   var expectedPackages;
+  var expectedPackageTemporaryDirectory;
   var expectedError = new Error('Something went wrong');
   var fs;
   var mediaPackage;
+  var mediaPlatformFactory;
+  var mediaPlatformProvider;
   var openVeoApi;
   var Package;
   var poiProvider;
@@ -95,8 +99,24 @@ describe('Package', function() {
       videoTmpDir: '/tmp'
     };
 
+    mediaPlatformProvider = {
+      upload: chai.spy(function(mediaFilePath, callback) {
+        callback(null, 'upload-id');
+      })
+    };
+
+    mediaPlatformFactory = {
+      get: chai.spy(function() {
+        return mediaPlatformProvider;
+      })
+    };
+
+    videoPlatformConf = {};
+
     mock('@openveo/api', openVeoApi);
     mock('fs', fs);
+
+    mock(path.join(process.rootPublish, 'app/server/providers/mediaPlatforms/factory.js'), mediaPlatformFactory);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/publishConf.json'), publishConf);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/videoPlatformConf.json'), videoPlatformConf);
   });
@@ -104,20 +124,89 @@ describe('Package', function() {
   // Initializes tests
   beforeEach(function() {
     Package = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/Package.js'));
-    mediaPackage = new Package({
+    expectedPackage = {
       id: '42',
       originalFileName: 'file',
       metadata: {
         indexes: []
-      }
-    }, videoProvider, poiProvider);
+      },
+      packageType: 'mp4',
+      type: 'local'
+    };
+    expectedPackageTemporaryDirectory = path.join(publishConf.videoTmpDir, expectedPackage.id);
 
+    mediaPackage = new Package(expectedPackage, videoProvider, poiProvider);
     mediaPackage.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
   });
 
   // Stop mocks
   afterEach(function() {
     mock.stopAll();
+  });
+
+  describe('cleanDirectory', function() {
+
+    it('should change package state to CLEANING and remove temporary directory', function() {
+      return mediaPackage.cleanDirectory().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.CLEANING);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.with(expectedPackageTemporaryDirectory);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should remove top level temporary directory if sub directory', function() {
+      var expectedTemporarySubDirectory = 'sub-directory';
+      mediaPackage.packageTemporaryDirectory = path.join(
+        expectedPackageTemporaryDirectory,
+        expectedTemporarySubDirectory
+      );
+      expectedPackage.temporarySubDirectory = expectedTemporarySubDirectory;
+
+      return mediaPackage.cleanDirectory().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.CLEANING);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.with(expectedPackageTemporaryDirectory);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.cleanDirectory().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if removing temporary directory failed', function() {
+      openVeoApi.fileSystem.rmdir = chai.spy(function(directoryPath, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.cleanDirectory().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, PackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.CLEAN_DIRECTORY, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        openVeoApi.fileSystem.rmdir.should.have.been.called.exactly(1);
+      });
+    });
+
   });
 
   describe('executeTransition', function() {
@@ -128,7 +217,7 @@ describe('Package', function() {
         done();
       });
 
-      mediaPackage.mediaPackage.removed = true;
+      expectedPackage.removed = true;
       mediaPackage.executeTransition();
     });
 
@@ -146,8 +235,137 @@ describe('Package', function() {
         done();
       });
 
-      mediaPackage.mediaPackage.mergeRequired = false;
+      expectedPackage.mergeRequired = false;
       mediaPackage.executeTransition(Package.TRANSITIONS.MERGE);
+    });
+
+  });
+
+  describe('uploadMedia', function() {
+
+    it('should change package state to UPLOADING and upload media file', function() {
+      var expectedMediaId = '99';
+
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        assert.equal(state, STATES.UPLOADING, 'Wrong state');
+        callback();
+      });
+
+      mediaPlatformProvider.upload = chai.spy(function(mediaFilePath, callback) {
+        assert.equal(
+          mediaFilePath,
+          path.join(
+            expectedPackageTemporaryDirectory,
+            expectedPackage.id + '.' + expectedPackage.packageType
+          ),
+          'Wrong file to upload'
+        );
+
+        callback(null, expectedMediaId);
+      });
+
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackage.id,
+          'Wrong package updated'
+        );
+        assert.equal(data.link, '/publish/video/' + expectedPackage.id, 'Wrong media link');
+        assert.sameMembers(data.mediaId, [expectedMediaId], 'Wrong media ids');
+        callback();
+      });
+
+      return mediaPackage.uploadMedia().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not upload media if already uploaded', function() {
+      expectedPackage.mediaId = ['99'];
+
+      return mediaPackage.uploadMedia().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, Error, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting media file path failed', function() {
+      Package.prototype.getMediaFilePath = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, PackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.UPLOAD_GET_MEDIA_FILE_PATH, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        Package.prototype.getMediaFilePath.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if uploading media failed', function() {
+      mediaPlatformProvider.upload = chai.spy(function(mediaFilePath, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, PackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.MEDIA_UPLOAD, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.uploadMedia().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, PackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.UPLOAD_MEDIA_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        mediaPlatformProvider.upload.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
+      });
     });
 
   });
@@ -158,10 +376,10 @@ describe('Package', function() {
       expectedPackages = [
         {
           id: '43',
-          originalFileName: mediaPackage.mediaPackage.originalFileName,
+          originalFileName: expectedPackage.originalFileName,
           state: STATES.READY
         },
-        mediaPackage.mediaPackage
+        expectedPackage
       ];
     });
 
@@ -177,7 +395,7 @@ describe('Package', function() {
         if (updateOneCount === 0) {
           assert.equal(
             filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-            mediaPackage.mediaPackage.id,
+            expectedPackage.id,
             'Expected package to be set as package to be merged'
           );
           assert.ok(data.mergeRequired, 'Expected package to be marked as package to be merged');
@@ -187,7 +405,7 @@ describe('Package', function() {
             expectedPackages[0].id,
             'Expected searched package not to have the same id as the package'
           );
-          assert.equal(data.lockedByPackage, mediaPackage.mediaPackage.id, 'Wrong lock');
+          assert.equal(data.lockedByPackage, expectedPackage.id, 'Wrong lock');
           assert.equal(data.state, STATES.WAITING_FOR_MERGE, 'Wrong locked state');
         }
 
@@ -198,7 +416,7 @@ describe('Package', function() {
       videoProvider.getAll = chai.spy(function(filter, fields, sort, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'originalFileName').value,
-          mediaPackage.mediaPackage.originalFileName,
+          expectedPackage.originalFileName,
           'Wrong original file name'
         );
         callback(null, expectedPackages);
@@ -209,7 +427,7 @@ describe('Package', function() {
         videoProvider.getAll.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(2);
 
-        assert.equal(mediaPackage.mediaPackage.mergeRequired, true, 'Expected package to be marked for merge');
+        assert.equal(expectedPackage.mergeRequired, true, 'Expected package to be marked for merge');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -218,18 +436,18 @@ describe('Package', function() {
     it('should skip merge if package has been locked by another package', function() {
       var concurrentPackage = {
         id: '44',
-        originalFileName: mediaPackage.mediaPackage.originalFileName,
+        originalFileName: expectedPackage.originalFileName,
         state: STATES.INITIALIZING_MERGE
       };
       expectedPackages.push(concurrentPackage);
-      mediaPackage.mediaPackage.lockedByPackage = concurrentPackage.id;
+      expectedPackage.lockedByPackage = concurrentPackage.id;
 
       return mediaPackage.initMerge().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getAll.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(0);
 
-        assert.equal(mediaPackage.mediaPackage.mergeRequired, false, 'Expected package to not be marked for merge');
+        assert.equal(expectedPackage.mergeRequired, false, 'Expected package to not be marked for merge');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -238,7 +456,7 @@ describe('Package', function() {
     it('should lock the oldest package with same name if no package locked and no package ready', function() {
       var oldestPackage = {
         id: '44',
-        originalFileName: mediaPackage.mediaPackage.originalFileName,
+        originalFileName: expectedPackage.originalFileName,
         state: STATES.COPYING
       };
       var updateOneCount = 0;
@@ -263,7 +481,7 @@ describe('Package', function() {
             oldestPackage.id,
             'Wrong locked package'
           );
-          assert.equal(data.lockedByPackage, mediaPackage.mediaPackage.id, 'Wrong lock');
+          assert.equal(data.lockedByPackage, expectedPackage.id, 'Wrong lock');
           assert.equal(data.state, STATES.WAITING_FOR_MERGE, 'Wrong locked state');
         }
 
@@ -277,7 +495,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.at.least(1);
         videoProvider.updateOne.should.have.been.called.exactly(2);
 
-        assert.equal(mediaPackage.mediaPackage.mergeRequired, true, 'Expected package to not be marked for merge');
+        assert.equal(expectedPackage.mergeRequired, true, 'Expected package to not be marked for merge');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -302,7 +520,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.at.least(1);
         videoProvider.updateOne.should.have.been.called.at.least(2);
 
-        assert.equal(mediaPackage.mediaPackage.mergeRequired, true, 'Expected package to be marked for merge');
+        assert.equal(expectedPackage.mergeRequired, true, 'Expected package to be marked for merge');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -310,7 +528,7 @@ describe('Package', function() {
 
     it('should reject promise if setting package state failed', function() {
       videoProvider.updateState = chai.spy(function(id, state, callback) {
-        if (id === mediaPackage.mediaPackage.id) {
+        if (id === expectedPackage.id) {
           return callback(expectedError);
         }
         callback(null, 1);
@@ -327,7 +545,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.at.least(0);
         videoProvider.updateOne.should.have.been.called.exactly(0);
 
-        assert.isUndefined(mediaPackage.mediaPackage.mergeRequired, 'Expected package not to be marked for merge');
+        assert.isUndefined(expectedPackage.mergeRequired, 'Expected package not to be marked for merge');
       });
     });
 
@@ -348,7 +566,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.exactly(0);
         videoProvider.updateOne.should.have.been.called.exactly(0);
 
-        assert.isUndefined(mediaPackage.mediaPackage.mergeRequired, 'Expected package not to be marked for merge');
+        assert.isUndefined(expectedPackage.mergeRequired, 'Expected package not to be marked for merge');
       });
     });
 
@@ -369,7 +587,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.exactly(0);
         videoProvider.updateOne.should.have.been.called.exactly(1);
 
-        assert.ok(mediaPackage.mediaPackage.mergeRequired, 'Expected package to be marked for merge');
+        assert.ok(expectedPackage.mergeRequired, 'Expected package to be marked for merge');
       });
     });
 
@@ -392,7 +610,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
 
-        assert.ok(mediaPackage.mediaPackage.mergeRequired, 'Expected package to be marked for merge');
+        assert.ok(expectedPackage.mergeRequired, 'Expected package to be marked for merge');
       });
     });
 
@@ -419,7 +637,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.exactly(0);
         videoProvider.updateOne.should.have.been.called.exactly(2);
 
-        assert.ok(mediaPackage.mediaPackage.mergeRequired, 'Expected package to be marked for merge');
+        assert.ok(expectedPackage.mergeRequired, 'Expected package to be marked for merge');
       });
     });
 
@@ -431,7 +649,7 @@ describe('Package', function() {
       return mediaPackage.merge().then(function() {
         assert.ok(true);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -443,16 +661,16 @@ describe('Package', function() {
       expectedPackages = [
         {
           id: '43',
-          originalFileName: mediaPackage.mediaPackage.originalFileName,
+          originalFileName: expectedPackage.originalFileName,
           state: STATES.WAITING_FOR_MERGE,
-          lockedByPackage: mediaPackage.mediaPackage.id
+          lockedByPackage: expectedPackage.id
         }
       ];
     });
 
     it('should change package state to FINALIZING_MERGE and release package with same name', function() {
       videoProvider.updateState = chai.spy(function(id, state, callback) {
-        assert.equal(id, mediaPackage.mediaPackage.id, 'Wrong package id');
+        assert.equal(id, expectedPackage.id, 'Wrong package id');
         assert.equal(state, STATES.FINALIZING_MERGE, 'Wrong package state');
         callback(null, 1);
       });
@@ -460,12 +678,12 @@ describe('Package', function() {
       videoProvider.getOne = chai.spy(function(filter, fields, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'originalFileName').value,
-          mediaPackage.mediaPackage.originalFileName,
+          expectedPackage.originalFileName,
           'Getting wrong locked package file name'
         );
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'lockedByPackage').value,
-          mediaPackage.mediaPackage.id,
+          expectedPackage.id,
           'Getting wrong locked package locker'
         );
         callback(null, expectedPackages[0]);
@@ -488,7 +706,7 @@ describe('Package', function() {
         videoProvider.getOne.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -550,7 +768,7 @@ describe('Package', function() {
 
     it('should remove package from OpenVeo and marked it as removed', function() {
       videoProvider.updateState = chai.spy(function(id, state, callback) {
-        assert.equal(id, mediaPackage.mediaPackage.id, 'Wrong package id');
+        assert.equal(id, expectedPackage.id, 'Wrong package id');
         assert.equal(state, STATES.REMOVING, 'Wrong package state');
         callback(null, 1);
       });
@@ -558,7 +776,7 @@ describe('Package', function() {
       videoProvider.removeLocal = chai.spy(function(filter, callback) {
         assert.equal(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
-          mediaPackage.mediaPackage.id,
+          expectedPackage.id,
           'Wrong package to remove'
         );
         callback(null, 1);
@@ -568,9 +786,9 @@ describe('Package', function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.removeLocal.should.have.been.called.exactly(1);
 
-        assert.equal(mediaPackage.mediaPackage.removed, true, 'Expected package to be marked as removed');
+        assert.equal(expectedPackage.removed, true, 'Expected package to be marked as removed');
       }).catch(function(error) {
-        assert.fail('Unexpected error');
+        assert.fail(error);
       });
     });
 
@@ -588,7 +806,7 @@ describe('Package', function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.removeLocal.should.have.been.called.exactly(0);
 
-        assert.isUndefined(mediaPackage.mediaPackage.removed, 'Expected package to not be marked as removed');
+        assert.isUndefined(expectedPackage.removed, 'Expected package to not be marked as removed');
       });
     });
 
@@ -606,7 +824,7 @@ describe('Package', function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.removeLocal.should.have.been.called.exactly(1);
 
-        assert.isUndefined(mediaPackage.mediaPackage.removed, 'Expected package to not be marked as removed');
+        assert.isUndefined(expectedPackage.removed, 'Expected package to not be marked as removed');
       });
     });
 

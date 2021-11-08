@@ -9,9 +9,10 @@ var path = require('path');
 var util = require('util');
 
 var async = require('async');
-var xml2js = require('xml2js');
 var openVeoApi = require('@openveo/api');
 
+var archiveFormatFactory = process.requirePublish('app/server/packages/archiveFormatFactory.js');
+var mediaPlatformFactory = process.requirePublish('app/server/providers/mediaPlatforms/factory.js');
 var Package = process.requirePublish('app/server/packages/Package.js');
 var VideoPackage = process.requirePublish('app/server/packages/VideoPackage.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
@@ -26,8 +27,8 @@ var nanoid = require('nanoid').nanoid;
  *
  * An archive file may contain:
  *  - A video file
- *  - A list of image files
- *  - A .session file describing the package content
+ *  - A list of images files
+ *  - A description file
  *
  * @example
  * // archive package object example
@@ -70,12 +71,6 @@ var nanoid = require('nanoid').nanoid;
  */
 function ArchivePackage(mediaPackage, videoProvider, poiProvider) {
   ArchivePackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
-
-  // Validate package metadata file name
-  if (!this.publishConf.metadataFileName || (typeof this.publishConf.metadataFileName !== 'string'))
-    this.emit('error', new ArchivePackageError('metadataFileName in publishConf.json must be a String'),
-      ERRORS.INVALID_CONFIGURATION);
-
 }
 
 module.exports = ArchivePackage;
@@ -175,60 +170,6 @@ ArchivePackage.stateMachine = VideoPackage.stateMachine.concat([
 Object.freeze(ArchivePackage.stateMachine);
 
 /**
- * Validates package content.
- *
- * An archive package must contain, at least a valid package information file and a video file.
- *
- * @example
- * // mediaPackage example
- * {
- *   "id" : 1422731934859, // Internal video id
- *   "type" : "vimeo", // The video platform to use
- *   "path" : "/tmp", // The path of the hot folder
- *   "originalPackagePath" : "/tmp/video-package.tar", // The original package path in hot folder
- * }
- *
- * @memberof module:publish/packages/ArchivePackage~ArchivePackage
- * @this module:publish/packages/ArchivePackage~ArchivePackage
- * @private
- * @param {module:publish/packages/ArchivePackage~ArchivePackage~validatePackageCallack} callback The function to call
- * when done
- */
-function validatePackage(callback) {
-  var extractDirectory = path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id));
-
-  // Read package information file
-  openVeoApi.fileSystem.getJSONFileContent(path.join(extractDirectory, this.publishConf.metadataFileName),
-    function(error, packageInformation) {
-
-      // Failed reading file or parsing JSON
-      if (error) {
-        callback(new Error(error.message));
-      } else if (packageInformation.filename) {
-
-        // Got the name of the video file
-        // Test if video file really exists in package
-        fs.access(path.join(extractDirectory, packageInformation.filename), function(error) {
-
-          if (!error)
-            callback(null, packageInformation);
-          else
-            callback(new Error('Missing file ' + packageInformation.filename));
-
-        });
-
-      } else {
-
-        // No video file name in metadata, package is not valid
-        callback(new Error('No video file name found in metadata file'));
-
-      }
-
-    });
-
-}
-
-/**
  * Generates sprites for the given points of interest of type "image".
  *
  * Other types of points of interest will be ignored.
@@ -317,6 +258,9 @@ function generatePointsOfInterestSprites(
 /**
  * Gets formatted list of points of interest of type "tag" from given points of interest.
  *
+ * @memberof module:publish/packages/ArchivePackage~ArchivePackage
+ * @this module:publish/packages/ArchivePackage~ArchivePackage
+ * @private
  * @param {Array} pointsOfInterest The list of points of interest as found in the package
  * @param {String} pointsOfInterest[].type Point of interest type (ignored if not "tag")
  * @param {Number} pointsOfInterest[].timecode Point of interest timecode
@@ -340,103 +284,6 @@ function getPointsOfInterestTags(pointsOfInterest) {
 }
 
 /**
- * Gets points of interest from the given XML file.
- *
- * This will check if the file exists first.
- *
- * 1. Test if XML file exists
- * 2. Transcode XML file to a JSON equivalent
- *
- * @example
- * // Transform XML points of interest into JSON
- * // From:
- * <player>
- *   <synchro id="slide_00000.jpeg" timecode="0"/>
- *   <synchro id="slide_00001.jpeg" timecode="1200"/>
- * </player>
- *
- * // To:
- * [
- *   {
- *     "timecode": 0,
- *     "type": "image"
- *     "data": {
- *       "filename": "slide_00000.jpeg"
- *     }
- *   },
- *   {
- *     "timecode": 1200,
- *     "type": "image"
- *     "data": {
- *       "filename": "slide_00001.jpeg"
- *     }
- *   }
- * ]
- *
- * @memberof module:publish/packages/ArchivePackage~ArchivePackage
- * @this module:publish/packages/ArchivePackage~ArchivePackage
- * @private
- * @param {String} xmlPointsOfInterestFilePath The path of the XML file containing points of interest
- * @param {module:publish/packages/ArchivePackage~ArchivePackage~getXmlPointsOfInterestCallback} callback The function
- * to call when it's done
- */
-function getXmlPointsOfInterest(xmlPointsOfInterestFilePath, callback) {
-  var formattedPointsOfInterest = [];
-
-  async.series([
-    function(callback) {
-
-      // Check if XML file exists
-      fs.access(xmlPointsOfInterestFilePath, function(error) {
-
-        if (!error)
-          callback();
-        else
-          callback(new Error('Missing XML points of interest file ' + xmlPointsOfInterestFilePath));
-
-      });
-    },
-    function(callback) {
-
-      // Transcode XML to JSON
-      fs.readFile(xmlPointsOfInterestFilePath, function(error, data) {
-
-        if (error)
-          callback(error);
-        else {
-          xml2js.parseString(data, {
-            mergeAttrs: true
-          },
-          function(error, pointsOfInterest) {
-            if (pointsOfInterest && pointsOfInterest.player && pointsOfInterest.player.synchro) {
-
-              // Iterate through the list of points of interest
-              // Change JSON organization to be more accessible
-              pointsOfInterest.player.synchro.forEach(function(pointOfInterestInfo) {
-                if (pointOfInterestInfo['id'] && pointOfInterestInfo['id'].length) {
-                  formattedPointsOfInterest.push({
-                    timecode: parseInt(pointOfInterestInfo['timecode'][0]),
-                    type: 'image',
-                    data: {
-                      filename: pointOfInterestInfo['id'][0]
-                    }
-                  });
-                }
-              });
-            }
-            callback(error);
-          });
-        }
-
-      });
-
-    }
-  ], function(error) {
-    callback(error, formattedPointsOfInterest);
-  });
-}
-
-/**
  * Gets the stack of transitions corresponding to the package.
  *
  * @return {Array} The stack of transitions
@@ -455,6 +302,75 @@ ArchivePackage.prototype.getStateMachine = function() {
 };
 
 /**
+ * Defragments all medias files contained in the archive.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+ArchivePackage.prototype.defragmentMp4 = function() {
+  var self = this;
+  var archiveFormat;
+  var mediasFilesPaths;
+
+  return new Promise(function(resolve, reject) {
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.DEFRAGMENTING_MP4, callback);
+      },
+
+      // Get archive format
+      function(callback) {
+        archiveFormatFactory.get(
+          self.packageTemporaryDirectory,
+          function(error, format) {
+            if (error) return reject(new ArchivePackageError(error.message, ERRORS.DEFRAGMENT_MP4_GET_FORMAT));
+            archiveFormat = format;
+            callback();
+          }
+        );
+      },
+
+      // Get medias
+      function(callback) {
+        archiveFormat.getMedias(function(error, mediasFilesNames) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.DEFRAGMENT_MP4_GET_MEDIAS));
+          mediasFilesPaths = mediasFilesNames.map(function(mediaFileName) {
+            return path.join(self.packageTemporaryDirectory, mediaFileName);
+          });
+          callback();
+        });
+      },
+
+      // Defragment medias
+      function(callback) {
+        if (!mediasFilesPaths || !mediasFilesPaths.length) return callback();
+
+        var defragmentFunctions = [];
+
+        mediasFilesPaths.forEach(function(mediaFilePath) {
+          defragmentFunctions.push(function(callback) {
+            self.defragment(mediaFilePath, callback);
+          });
+        });
+
+        async.series(defragmentFunctions, function(error) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.DEFRAGMENTATION));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
  * Extracts package into temporary directory.
  *
  * This is a transition.
@@ -466,6 +382,9 @@ ArchivePackage.prototype.extractPackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
+    var extractDirectory = self.packageTemporaryDirectory;
+    var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.' + self.mediaPackage.packageType);
+
     async.series([
 
       // Update state
@@ -475,18 +394,174 @@ ArchivePackage.prototype.extractPackage = function() {
 
       // Extract archive
       function(callback) {
-        var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
-        var packagePath = path.join(extractDirectory, self.mediaPackage.id + '.' + self.mediaPackage.packageType);
+        self.log('Extract package ' + packagePath + ' to ' + extractDirectory);
 
-        process.logger.debug('Extract package ' + packagePath + ' to ' + extractDirectory);
-        openVeoApi.fileSystem.extract(packagePath, extractDirectory, callback);
+        openVeoApi.fileSystem.extract(packagePath, extractDirectory, function(error) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.EXTRACT));
+          callback();
+        });
+      },
+
+      // Read media package temporary directory to verify that archive resources weren't contained in a folder
+      function(callback) {
+        if (self.mediaPackage.temporarySubDirectory) return callback();
+
+        openVeoApi.fileSystem.readdir(self.packageTemporaryDirectory, function(error, stats) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.EXTRACT_VERIFY));
+
+          var topLevelStats = stats.reduce(function(filtered, stat, index) {
+            if (path.dirname(stat.path) === self.packageTemporaryDirectory && stat.path !== packagePath) {
+              filtered.push(stat);
+            }
+            return filtered;
+          }, []);
+
+          if (topLevelStats.length === 1) {
+            if (topLevelStats[0].isDirectory()) {
+              self.mediaPackage.temporarySubDirectory = path.basename(topLevelStats[0].path);
+              self.packageTemporaryDirectory = path.join(
+                self.packageTemporaryDirectory,
+                self.mediaPackage.temporarySubDirectory
+              );
+            }
+
+          }
+
+          callback();
+        });
+      },
+
+      // If resources are wrapped inside a folder change package temporary directory
+      function(callback) {
+        if (!self.mediaPackage.temporarySubDirectory) return callback();
+
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            temporarySubDirectory: self.mediaPackage.temporarySubDirectory
+          },
+          function(error) {
+            if (error) return callback(new ArchivePackageError(error.message, ERRORS.EXTRACT_UPDATE_PACKAGE));
+            callback();
+          }
+        );
       }
 
     ], function(error) {
-      if (error) reject(new ArchivePackageError(error.message, ERRORS.EXTRACT));
+      if (error) reject(error);
       else resolve();
     });
 
+  });
+};
+
+/**
+ * Uploads the medias to the media platform.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+ArchivePackage.prototype.uploadMedia = function() {
+  var self = this;
+  var archiveFormat;
+  var mediasFilesPaths;
+
+  return new Promise(function(resolve, reject) {
+    self.mediaPackage.link = '/publish/video/' + self.mediaPackage.id;
+
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.UPLOADING, callback);
+      },
+
+      // Get archive format
+      function(callback) {
+        archiveFormatFactory.get(
+          self.packageTemporaryDirectory,
+          function(error, format) {
+            if (error) return reject(new ArchivePackageError(error.message, ERRORS.UPLOAD_MEDIA_GET_FORMAT));
+            archiveFormat = format;
+            callback();
+          }
+        );
+      },
+
+      // Get medias
+      function(callback) {
+        archiveFormat.getMedias(function(error, mediasFilesNames) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.UPLOAD_MEDIA_GET_MEDIAS));
+          mediasFilesPaths = mediasFilesNames.map(function(mediaFileName) {
+            return path.join(self.packageTemporaryDirectory, mediaFileName);
+          });
+          callback();
+        });
+      },
+
+      // Upload media
+      function(callback) {
+        if (self.mediaPackage.mediaId && self.mediaPackage.mediaId.length === mediasFilesPaths.length) {
+          return callback();
+        }
+
+        var totalMediasToSkip = 0;
+        var uploadMediaFunctions = [];
+
+        if (self.mediaPackage.mediaId) totalMediasToSkip = self.mediaPackage.mediaId.length;
+        else self.mediaPackage.mediaId = [];
+
+        // Upload only medias which haven't been uploaded yet (some medias could have been uploaded if package
+        // processing failed on this transition)
+        mediasFilesPaths = mediasFilesPaths.slice(totalMediasToSkip);
+
+        // Get media plaform provider from package type
+        var mediaPlatformProvider = mediaPlatformFactory.get(
+          self.mediaPackage.type,
+          self.videoPlatformConf[self.mediaPackage.type]
+        );
+
+        mediasFilesPaths.forEach(function(mediaFilePath) {
+          uploadMediaFunctions.push(function(callback) {
+
+            // Start uploading the media to the platform
+            self.log('Upload media ' + mediaFilePath);
+
+            mediaPlatformProvider.upload(mediaFilePath, function(error, id) {
+              if (error) return callback(error);
+              self.mediaPackage.mediaId.push(id);
+              callback();
+            });
+          });
+        });
+
+        async.series(uploadMediaFunctions, function(error) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.MEDIA_UPLOAD));
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            link: self.mediaPackage.link,
+            mediaId: self.mediaPackage.mediaId
+          },
+          function(error) {
+            if (error) return callback(new ArchivePackageError(error.message, ERRORS.UPLOAD_MEDIA_UPDATE_PACKAGE));
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
   });
 };
 
@@ -502,75 +577,109 @@ ArchivePackage.prototype.validatePackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    process.logger.debug('Validate package ' + self.mediaPackage.originalPackagePath);
+    var archiveFormat;
 
-    self.updateState(self.mediaPackage.id, STATES.VALIDATING, function() {
+    self.log('Validate package');
 
-      // Validate package content
-      if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes)
-        resolve();
-      else validatePackage.call(self, function(error, metadata) {
-        if (error) return reject(new ArchivePackageError(error.message, ERRORS.VALIDATION));
+    async.series([
 
+      // Update state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.VALIDATING, callback);
+      },
+
+      // Get archive format
+      function(callback) {
+        archiveFormatFactory.get(
+          self.packageTemporaryDirectory,
+          function(error, format) {
+            if (error) return reject(new ArchivePackageError(error.message, ERRORS.VALIDATE_GET_FORMAT));
+            archiveFormat = format;
+            callback();
+          }
+        );
+      },
+
+      // Validate package
+      function(callback) {
+        archiveFormat.validate(function(error, isValid) {
+          if (!error && !isValid) error = new Error('Invalid archive format');
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.VALIDATION));
+
+          callback();
+        });
+      },
+
+      // Get archive metadatas
+      function(callback) {
         if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
 
-        openVeoApi.util.merge(self.mediaPackage.metadata, metadata);
+        async.series([
 
-        async.parallel([
           function(callback) {
-            self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, callback);
+            archiveFormat.getMetadatas(function(error, metadatas) {
+              if (error) return callback(error);
+              openVeoApi.util.merge(self.mediaPackage.metadata, metadatas);
+              callback();
+            });
           },
+
           function(callback) {
-            if (self.mediaPackage.metadata.date) {
-              self.mediaPackage.date = self.mediaPackage.metadata.date * 1000;
-              self.videoProvider.updateDate(self.mediaPackage.id, self.mediaPackage.date, callback);
-            } else callback();
+            archiveFormat.getDate(function(error, date) {
+              if (error) return callback(error);
+              self.mediaPackage.date = date;
+              callback();
+            });
           },
+
           function(callback) {
-            var pathDescriptor = path.parse(self.mediaPackage.originalPackagePath);
-            if (self.mediaPackage.metadata.name && self.mediaPackage.title === pathDescriptor.name) {
-              self.mediaPackage.title = self.mediaPackage.metadata.name;
-              self.videoProvider.updateTitle(self.mediaPackage.id, self.mediaPackage.title, callback);
-            } else callback();
+            archiveFormat.getName(function(error, name) {
+              if (error) return callback(error);
+
+              var pathDescriptor = path.parse(self.mediaPackage.originalPackagePath);
+              if (name && self.mediaPackage.title === pathDescriptor.name) {
+                self.mediaPackage.title = name;
+              }
+
+              callback();
+            });
           }
-        ], function() {
-          resolve();
-        });
-      });
 
+        ], function(error) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.VALIDATE_GET_METADATAS));
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', self.mediaPackage.id),
+          {
+            date: self.mediaPackage.date,
+            metadata: self.mediaPackage.metadata,
+            title: self.mediaPackage.title
+          },
+          function(error) {
+            if (error) return callback(new ArchivePackageError(error.message, ERRORS.VALIDATE_UPDATE_PACKAGE));
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
     });
+
   });
 };
 
 /**
  * Saves package points of interest.
  *
- * It expects package metadata to have a property "indexes" containing a list of points of interest with for each one:
- *  - **String** type The type of the point of interest, either "image" or "tag"
- *  - **Number** timecode The time of the point of interest in the video (in milliseconds)
- *  - **Object** data Information about the point of interest depending on its type, see below
- *
- * "data" property of a point of interest of type "image":
- *  - **String** filename The name of the image file in the package
- *
- * "data" property of a point of interest of type "tag":
- *  - **String** tagname The name of the tag
- *
- * Instead of defining the points of interest in package metadata, it is possible to define them in a "synchro.xml"
- * file at the root of the package with the following content:
- * ```html
- * <pre>
- *   <?xml version="1.0"?>
- *   <player>
- *     <synchro id="slide_00000.jpeg" timecode="0"/>
- *     <synchro id="slide_00001.jpeg" timecode="1400"/>
- *     ...
- *   </player>
- * </pre>
- * ```
- *
- * However using "synchro.xml" is deprecated and should not be used anymore. Also note that it is not possible to
- * define points of interest of type "tag" using this method.
+ * The archive package can contain points of interest of type tag or image.
+ * Points of interest are described in the archive metadatas file.
  *
  * This is a transition.
  *
@@ -581,12 +690,15 @@ ArchivePackage.prototype.savePointsOfInterest = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    var archiveFormat;
+    var extractDirectory = self.packageTemporaryDirectory;
     var pointsOfInterest;
     var tags;
     var timecodes;
 
-    process.logger.debug('Save points of interests');
+    self.log('Save points of interest');
+
+    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
 
     async.series([
 
@@ -595,36 +707,51 @@ ArchivePackage.prototype.savePointsOfInterest = function() {
         self.updateState(self.mediaPackage.id, STATES.SAVING_POINTS_OF_INTEREST, callback);
       },
 
-      // Retrieve points of interest either from metadata or "synchro.xml" file
+      // Get archive format
       function(callback) {
-        if (self.mediaPackage.metadata && self.mediaPackage.metadata.indexes) {
-          pointsOfInterest = self.mediaPackage.metadata.indexes;
-          callback();
-        } else {
-          getXmlPointsOfInterest.call(
-            self,
-            path.join(extractDirectory, 'synchro.xml'),
-            function(error, pointsOfInterestFromXml) {
-              if (error && self.mediaPackage.metadata['rich-media'])
-                callback(error);
-              else {
-                pointsOfInterest = pointsOfInterestFromXml;
-
-                if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-                openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: pointsOfInterestFromXml});
-
-                self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
-                  callback();
-                });
-              }
+        archiveFormatFactory.get(
+          self.packageTemporaryDirectory,
+          function(error, format) {
+            if (error) {
+              return callback(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_GET_FORMAT));
             }
-          );
-        }
+
+            archiveFormat = format;
+            callback();
+          }
+        );
+      },
+
+      // Retrieve points of interest
+      function(callback) {
+        archiveFormat.getPointsOfInterest(function(error, pointsOfInterestMetadatas) {
+          if (error) {
+            return callback(
+              new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_GET_POINTS_OF_INTEREST)
+            );
+          }
+
+          pointsOfInterest = pointsOfInterestMetadatas;
+          openVeoApi.util.merge(self.mediaPackage.metadata, {indexes: pointsOfInterest});
+          callback();
+        });
+      },
+
+      // Update package metadata
+      function(callback) {
+        self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+          if (error) {
+            return callback(
+              new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE_METADATA)
+            );
+          }
+          callback();
+        });
       },
 
       // Generate sprites for the points of interest of type "image"
       function(callback) {
-        if (!pointsOfInterest) return callback();
+        if (!pointsOfInterest || !pointsOfInterest.length) return callback();
 
         generatePointsOfInterestSprites.call(
           self,
@@ -634,20 +761,22 @@ ArchivePackage.prototype.savePointsOfInterest = function() {
           extractDirectory,
           extractDirectory,
           function(error, formattedPointsOfInterestImages) {
+            if (error) {
+              return callback(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_GENERATE_SPRITES));
+            }
             timecodes = formattedPointsOfInterestImages;
-            callback(error);
+            callback();
           }
         );
       },
 
       // Save points of interest of type "tag"
       function(callback) {
-        if (!pointsOfInterest) return callback();
+        if (!pointsOfInterest || !pointsOfInterest.length) return callback();
 
         tags = getPointsOfInterestTags(pointsOfInterest);
         self.poiProvider.add(tags, function(error, total, addedTags) {
-          if (error) return callback(error);
-
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_ADD_TAGS));
           tags = addedTags;
           callback();
         });
@@ -665,12 +794,17 @@ ArchivePackage.prototype.savePointsOfInterest = function() {
             tags: self.mediaPackage.tags,
             timecodes: self.mediaPackage.timecodes
           },
-          callback
+          function(error) {
+            if (error) {
+              return callback(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST_UPDATE_PACKAGE));
+            }
+            callback();
+          }
         );
       }
 
     ], function(error) {
-      if (error) reject(new ArchivePackageError(error.message, ERRORS.SAVE_POINTS_OF_INTEREST));
+      if (error) reject(error);
       else resolve();
     });
   });
@@ -727,9 +861,8 @@ ArchivePackage.prototype.merge = function() {
       function(callback) {
         if (!self.mediaPackage.timecodes.length) return callback();
 
-        process.logger.debug('Remove locked package sprites (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Remove locked package (' + lockedPackage.id + ') sprites');
+
         var lockedPackagePublicDirectory = path.join(self.mediasPublicPath, lockedPackage.id);
 
         // Read locked package public directory
@@ -770,9 +903,8 @@ ArchivePackage.prototype.merge = function() {
         var mediaPackagePublicDirectory = path.join(self.mediasPublicPath, self.mediaPackage.id);
         var lockedPackagePublicDirectory = path.join(self.mediasPublicPath, lockedPackage.id);
 
-        process.logger.debug('Copy package points of interest images to locked package (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Copy package points of interest images to locked package (' + lockedPackage.id + ')');
+
         openVeoApi.fileSystem.performActions(self.mediaPackage.timecodes.map(function(timecode) {
           return {
             type: openVeoApi.fileSystem.ACTIONS.COPY,
@@ -838,9 +970,8 @@ ArchivePackage.prototype.merge = function() {
       function(callback) {
         if (!packagePointsOfInterestTags.length) return callback();
 
-        process.logger.debug('Duplicate points of interest of type "tag" (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Duplicate points of interest of type "tag"');
+
         self.poiProvider.add(
           packagePointsOfInterestTags.map(function(pointOfInterestTag) {
             return {
@@ -863,9 +994,8 @@ ArchivePackage.prototype.merge = function() {
       function(callback) {
         if (!pointsOfInterestImages.length) return callback();
 
-        process.logger.debug('Generate sprites for merged points of interest of type "image" (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Generate sprites for merged points of interest of type "image" (' + lockedPackage.id + ')');
+
         generatePointsOfInterestSprites.call(
           self,
           lockedPackage.id,
@@ -888,9 +1018,8 @@ ArchivePackage.prototype.merge = function() {
       function(callback) {
         if (!self.mediaPackage.timecodes.length && !self.mediaPackage.tags.length) return callback();
 
-        process.logger.debug('Update locked package points of interest (' +
-          self.mediaPackage.id + ' -> ' + lockedPackage.id + ')'
-        );
+        self.log('Update locked package (' + lockedPackage.id + ') points of interest');
+
         self.videoProvider.updateOne(
           new ResourceFilter().equal('id', lockedPackage.id),
           {
@@ -917,12 +1046,39 @@ ArchivePackage.prototype.merge = function() {
 };
 
 /**
- * Gets the media file path of the package.
+ * Gets the first media file path in temporary directory.
  *
- * @return {String} System path of the media file
+ * @return {module:publish/packages/Package~Package~getMediaFilePathCallback} Function to call when its done
  */
-ArchivePackage.prototype.getMediaFilePath = function() {
-  return path.join(this.publishConf.videoTmpDir, String(this.mediaPackage.id), this.mediaPackage.metadata.filename);
+ArchivePackage.prototype.getMediaFilePath = function(callback) {
+  var archiveFormat;
+  var mediasFilesNames;
+  var self = this;
+
+  async.series([
+
+    // Get archive format
+    function(callback) {
+      archiveFormatFactory.get(self.packageTemporaryDirectory, function(error, format) {
+        if (error) return callback(error);
+        archiveFormat = format;
+        callback();
+      });
+    },
+
+    // Get the list of medias files names in the archive from metadatas
+    function(callback) {
+      archiveFormat.getMedias(function(error, medias) {
+        if (error) return callback(error);
+        mediasFilesNames = medias;
+        callback();
+      });
+    }
+
+  ], function(error) {
+    if (error) return callback(error);
+    callback(null, path.join(self.packageTemporaryDirectory, mediasFilesNames[0]));
+  });
 };
 
 /**
@@ -943,14 +1099,4 @@ ArchivePackage.prototype.getMediaFilePath = function() {
  * @param {Number} pointsOfInterest[].image.small.x Point of interest small image x coordinate inside sprite
  * @param {Number} pointsOfInterest[].image.small.y Point of interest small image y coordinate inside sprite
  * @param {String} pointsOfInterest[].image.large Point of interest large image URI
- */
-
-/**
- * @callback module:publish/packages/ArchivePackage~ArchivePackage~getXmlPointsOfInterestCallback
- * @param {(Error|undefined)} error The error if an error occurred
- * @param {Array} pointsOfInterest The list of points of interest of type image
- * @param {Number} pointsOfInterest[].timecode Point of interest timecode
- * @param {String} pointsOfInterest[].type Point of interest type (alway "image")
- * @param {Object} pointsOfInterest[].data Point of interest data
- * @param {String} pointsOfInterest[].data.filename Point of interest image file path in the archive
  */

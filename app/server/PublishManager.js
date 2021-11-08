@@ -272,13 +272,13 @@ function addPackage(mediaPackage) {
 
     // Add package to queue
     this.queue.push(mediaPackage);
-    process.logger.debug('Add package ' + mediaPackage.originalPackagePath + '(' + mediaPackage.id + ') to queue');
+    process.logger.debug('Add package ' + mediaPackage.originalPackagePath + ' (' + mediaPackage.id + ') to queue');
     return false;
   } else {
 
     // Process can deal with the package
     process.logger.debug('Add package ' + mediaPackage.originalPackagePath +
-                      '(' + mediaPackage.id + ') to pending packages');
+                      ' (' + mediaPackage.id + ') to pending packages');
 
     // Add package to the list of pending packages
     this.pendingPackages.push(mediaPackage);

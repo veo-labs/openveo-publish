@@ -120,6 +120,7 @@
     "STATE_18" : "Merging",
     "STATE_19" : "Finalizing merge",
     "STATE_20" : "Removing",
+    "STATE_21" : "Removing temporary files",
     "ADD_MEDIA" : "Add a video",
     "REMOVE_SUCCESS" : "Video successfully removed.",
     "RETRY_SUCCESS" : "Video processing will be retried soon.",

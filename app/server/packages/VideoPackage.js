@@ -133,26 +133,32 @@ VideoPackage.stateMachine = Package.stateMachine.concat([
 Object.freeze(VideoPackage.stateMachine);
 
 /**
- * Defragment the MP4
+ * Defragments given MP4 file.
  *
- * If the input file is fragmented, ffmpeg will be used to defragment
- * the MP4. The fragmentation detection of the file is based on an un-
- * known "nb_frames" property in ffprobe output metadata.
+ * If the input file is fragmented, FFMPEG will be used to defragment the MP4.
+ * The fragmentation detection of the file is based on an unknown "nb_frames" property in FFPROBE output metadata.
  *
- * This is a transition.
+ * If file is not fragmented, it does nothing.
  *
- * @async
- * @return {Promise} Promise resolving when transition is done
+ * @param {String} mp4FilePath The path of the MP4 file to defragment
+ * @return {callback} Function to call when its done
  */
-VideoPackage.prototype.defragmentMp4 = function() {
+VideoPackage.prototype.defragment = function(mp4FilePath, callback) {
+  var defragmentationRequired = false;
+  var mp4FilePathElements = path.parse(mp4FilePath);
+  var defragmentedFilePath = path.join(
+    mp4FilePathElements.dir,
+    mp4FilePathElements.name + '-defrag' + mp4FilePathElements.ext
+  );
   var self = this;
 
-  return new Promise(function(resolve, reject) {
-    var filePath = self.getMediaFilePath();
+  async.series([
 
-    self.updateState(self.mediaPackage.id, STATES.DEFRAGMENTING_MP4, function() {
-      // Detect if file need defragmentation (unknown "nb_frames")
-      ffmpeg.ffprobe(filePath, function(error, metadata) {
+    // Detect if file need defragmentation (unknown "nb_frames")
+    function(callback) {
+      ffmpeg.ffprobe(mp4FilePath, function(error, metadata) {
+        if (error) return callback(error);
+
         if (metadata && Array.isArray(metadata.streams)) {
           var fragmentedStreams = metadata.streams.filter(function(stream) {
             if (stream.codec_type !== 'video')
@@ -161,48 +167,112 @@ VideoPackage.prototype.defragmentMp4 = function() {
             return stream.nb_frames === 'N/A';
           });
 
-          if (fragmentedStreams.length === 0) {
-            process.logger.debug('No defragmentation is needed (' + self.mediaPackage.id + ')');
+          defragmentationRequired = fragmentedStreams.length !== 0;
+        }
 
-            return resolve();
-          }
-
-          var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
-          var defragmentedFile = path.join(destinationPath, 'video_defrag.mp4');
-
-          // MP4 defragmentation
-          ffmpeg(filePath)
-            .audioCodec('copy')
-            .videoCodec('copy')
-            .outputOptions('-movflags faststart')
-            .on('start', function() {
-              process.logger.debug('Starting defragmentation (' + self.mediaPackage.id + ') ' +
-                                   'of ' + filePath + ' to ' + defragmentedFile);
-            })
-            .on('error', function(error) {
-              reject(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
-            })
-            .on('end', function() {
-              process.logger.debug('Defragmentation complete (' + self.mediaPackage.id + ')');
-
-              // Replace original file
-              process.logger.debug('Removing fragmented file ' + filePath);
-              fs.unlink(filePath, function(error) {
-                if (error) reject(new VideoPackageError(error.message, ERRORS.UNLINK_FRAGMENTED));
-
-                process.logger.debug('Replacing original file (' + self.mediaPackage.id + ') with ' + defragmentedFile);
-                fs.rename(defragmentedFile, filePath, function(error) {
-                  if (error) reject(new VideoPackageError(error.message, ERRORS.REPLACE_FRAGMENTED));
-
-                  process.logger.debug('Original file replaced (' + self.mediaPackage.id + ')');
-
-                  return resolve();
-                });
-              });
-            })
-            .save(defragmentedFile);
-        } else return resolve();
+        callback();
       });
+    },
+
+    // Defragment media file
+    function(callback) {
+      if (!defragmentationRequired) {
+        self.log('No defragmentation is needed for file ' + mp4FilePath, 'verbose');
+        return callback();
+      }
+
+      // MP4 defragmentation
+      ffmpeg(mp4FilePath)
+        .audioCodec('copy')
+        .videoCodec('copy')
+        .outputOptions('-movflags faststart')
+        .on('start', function() {
+          self.log(
+            'Starting defragmentation of ' + mp4FilePath + ' to ' + defragmentedFilePath,
+            'verbose'
+          );
+        })
+        .on('error', function(error) {
+          callback(error);
+        })
+        .on('end', function() {
+          self.log('Defragmentation complete for file ' + mp4FilePath, 'verbose');
+          callback();
+        })
+        .save(defragmentedFilePath);
+    },
+
+    // Remove original media file
+    function(callback) {
+      if (!defragmentationRequired) return callback();
+
+      // Replace original file
+      self.log('Removing original fragmented file ' + mp4FilePath, 'verbose');
+
+      fs.unlink(mp4FilePath, function(error) {
+        if (error) return callback(error);
+        callback();
+      });
+    },
+
+    // Rename fragmented media file
+    function(callback) {
+      if (!defragmentationRequired) return callback();
+
+      self.log('Renaming file ' + defragmentedFilePath + ' into ' + mp4FilePath, 'verbose');
+
+      fs.rename(defragmentedFilePath, mp4FilePath, function(error) {
+        if (error) return callback(error);
+
+        self.log(defragmentedFilePath + ' renamed into ' + mp4FilePath, 'verbose');
+
+        callback();
+      });
+    }
+
+  ], callback);
+};
+
+/**
+ * Defragments the MP4.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.defragmentMp4 = function() {
+  var self = this;
+  var mediaFilePath;
+
+  return new Promise(function(resolve, reject) {
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.DEFRAGMENTING_MP4, callback);
+      },
+
+      // Get media file name
+      function(callback) {
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.DEFRAGMENT_MP4_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
+        });
+      },
+
+      // Defragment media file
+      function(callback) {
+        self.defragment(mediaFilePath, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
     });
   });
 };
@@ -220,71 +290,92 @@ VideoPackage.prototype.defragmentMp4 = function() {
  */
 VideoPackage.prototype.generateThumb = function() {
   var self = this;
+  var mediaFilePath;
 
   return new Promise(function(resolve, reject) {
-    var filePath = self.getMediaFilePath();
 
-    self.updateState(self.mediaPackage.id, STATES.GENERATING_THUMB, function() {
-      var destinationPath = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    async.series([
 
-      if (self.mediaPackage.originalThumbnailPath !== undefined) {
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GENERATING_THUMB, callback);
+      },
 
-        async.series([
+      // Get media file name
+      function(callback) {
+        if (self.mediaPackage.mediaId && self.mediaPackage.mediaId.length) return callback();
 
-          // Thumbnail already exists for this package, copy the thumbnail
-          function(callback) {
-            process.logger.debug('Copy thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-            openVeoApi.fileSystem.copy(
-              self.mediaPackage.originalThumbnailPath,
-              path.join(destinationPath, 'thumbnail.jpg'),
-              callback
-            );
-          },
-
-          // Remove original thumbnail
-          function(callback) {
-            process.logger.debug('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
-            fs.unlink(self.mediaPackage.originalThumbnailPath, callback);
-          }
-
-        ], function(error) {
-          if (error) return reject(new VideoPackageError(error.message, ERRORS.COPY_THUMB));
-          self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
-          self.videoProvider.updateThumbnail(
-            self.mediaPackage.id,
-            self.mediaPackage.thumbnail,
-            function() {
-              resolve();
-            }
-          );
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
         });
+      },
 
-      } else {
+      // Copy thumbnail if it already exists for this package
+      function(callback) {
+        if (self.mediaPackage.originalThumbnailPath === undefined) return callback();
+
+        self.log('Copy thumbnail in ' + self.packageTemporaryDirectory);
+
+        openVeoApi.fileSystem.copy(
+          self.mediaPackage.originalThumbnailPath,
+          path.join(self.packageTemporaryDirectory, 'thumbnail.jpg'),
+          function(error) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_COPY_ORIGINAL));
+            self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
+            callback();
+          }
+        );
+      },
+
+      // Remove original thumbnail
+      function(callback) {
+        if (self.mediaPackage.originalThumbnailPath === undefined) return callback();
+
+        self.log('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+
+        fs.unlink(self.mediaPackage.originalThumbnailPath, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_REMOVE_ORIGINAL));
+          callback();
+        });
+      },
+
       // Generate thumb
-        process.logger.debug('Generate thumbnail (' + self.mediaPackage.id + ') in ' + destinationPath);
-        ffmpeg(filePath).screenshots({
+      function(callback) {
+        if (self.mediaPackage.originalThumbnailPath !== undefined) return callback();
+
+        self.log('Generate thumbnail in ' + self.packageTemporaryDirectory);
+
+        ffmpeg(mediaFilePath).screenshots({
           timestamps: ['10%'],
           filename: 'thumbnail.jpg',
-          folder: destinationPath
+          folder: self.packageTemporaryDirectory
         }).on('error', function(error) {
-          reject(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
+          callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
         }).on('end', function() {
           self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
-          self.videoProvider.updateThumbnail(
-            self.mediaPackage.id,
-            self.mediaPackage.thumbnail,
-            function() {
-              resolve();
-            }
-          );
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateThumbnail(self.mediaPackage.id, self.mediaPackage.thumbnail, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_UPDATE_PACKAGE));
+          callback();
         });
       }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
     });
   });
 };
 
 /**
- * Retrieves video height from video metadatas.
+ * Retrieves video height.
  *
  * This is a transition.
  *
@@ -293,34 +384,64 @@ VideoPackage.prototype.generateThumb = function() {
  */
 VideoPackage.prototype.getMetadata = function() {
   var self = this;
+  var mediaFilePath;
 
   return new Promise(function(resolve, reject) {
-    var filePath = self.getMediaFilePath();
+    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+    self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
 
-    self.updateState(self.mediaPackage.id, STATES.GETTING_METADATA, function() {
-      if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-      self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
+    async.series([
 
-      if (self.mediaPackage.metadata['profile-settings']['video-height']) return resolve();
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GETTING_METADATA, callback);
+      },
 
-      ffmpeg.ffprobe(filePath, function(error, metadata) {
-        if (error || !metadata.streams) return reject(new VideoPackageError(error.message, ERRORS.GET_METADATA));
+      // Get media file name
+      function(callback) {
+        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
 
-        // Find video stream
-        var videoStream;
-        for (var i = 0; i < metadata.streams.length; i++) {
-          if (metadata.streams[i]['codec_type'] === 'video')
-            videoStream = metadata.streams[i];
-        }
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
+        });
+      },
 
-        // Got video stream associated to the video file
-        if (videoStream) {
-          self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-          self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function() {
-            resolve();
-          });
-        } else reject(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
-      });
+      // Get video height
+      function(callback) {
+        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
+
+        ffmpeg.ffprobe(mediaFilePath, function(error, metadata) {
+          if (!error && !metadata.streams) error = new Error('No streams found in media file');
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA));
+
+          // Find video stream
+          var videoStream;
+          for (var i = 0; i < metadata.streams.length; i++) {
+            if (metadata.streams[i]['codec_type'] === 'video')
+              videoStream = metadata.streams[i];
+          }
+
+          // Got video stream associated to the video file
+          if (videoStream) {
+            self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
+            callback();
+          } else callback(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_UPDATE_PACKAGE));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
     });
   });
 };
@@ -337,12 +458,13 @@ VideoPackage.prototype.copyImages = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var extractDirectory = path.join(self.publishConf.videoTmpDir, String(self.mediaPackage.id));
+    var extractDirectory = self.packageTemporaryDirectory;
     var videoFinalDir = path.join(self.mediasPublicPath, self.mediaPackage.id);
     var resources = [];
     var filesToCopy = [];
 
-    process.logger.debug('Copy images to ' + videoFinalDir);
+    self.log('Copy images to ' + videoFinalDir);
+
     async.series([
 
       // Change state
@@ -352,7 +474,8 @@ VideoPackage.prototype.copyImages = function() {
 
       // Read directory
       function(callback) {
-        process.logger.verbose('Scan directory ' + extractDirectory + ' for images');
+        self.log('Scan directory ' + extractDirectory + ' for images', 'verbose');
+
         fs.readdir(extractDirectory, function(error, files) {
           if (error)
             callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
@@ -375,7 +498,7 @@ VideoPackage.prototype.copyImages = function() {
 
         openVeoApi.util.validateFiles(filesToValidate, filesValidationDescriptor, function(error, files) {
           if (error)
-            process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
+            self.log(error.message, 'warn');
 
           for (var filePath in files) {
             if (files[filePath].isValid)
@@ -393,14 +516,17 @@ VideoPackage.prototype.copyImages = function() {
         if (!filesToCopy.length) return callback();
 
         filesToCopy.forEach(function(file) {
-          process.logger.verbose('Copy image ' + path.join(extractDirectory, file) +
-                                 ' to ' + path.join(videoFinalDir, file));
+          self.log(
+            'Copy image ' + path.join(extractDirectory, file) + ' to ' + path.join(videoFinalDir, file),
+            'verbose'
+          );
+
           openVeoApi.fileSystem.copy(
             path.join(extractDirectory, file),
             path.join(videoFinalDir, file),
             function(error) {
               if (error)
-                process.logger.warn(error.message, {action: 'copyImages', mediaId: self.mediaPackage.id});
+                self.log(error.message, 'warn');
 
               filesLeftToCopy--;
 
@@ -467,7 +593,8 @@ VideoPackage.prototype.merge = function() {
 
       // Merge package medias with locked package medias
       function(callback) {
-        process.logger.debug('Merge medias ids (' + self.mediaPackage.id + ' -> ' + lockedPackage.id + ')');
+        self.log('Merge medias ids with medias ids of package ' + lockedPackage.id);
+
         self.videoProvider.updateMediaId(
           lockedPackage.id,
           openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),

@@ -414,6 +414,7 @@ VideoProvider.prototype.getOne = function(filter, fields, callback) {
  * @param {Number} [medias[].views=0] The statistic number of views
  * @param {String} [medias[].thumbnail] The media thumbnail URI
  * @param {String} [medias[].link] The media link in OpenVeo
+ * @param {String} [medias[].temporarySubDirectory] The sub path of package files in its temporary directory
  *
  * @param {module:publish/providers/VideoProvider~VideoProvider~addCallback} [callback] The function to call when it's
  * done
@@ -454,7 +455,8 @@ VideoProvider.prototype.add = function(medias, callback) {
       sources: media.sources || [],
       views: media.views || 0,
       thumbnail: media.thumbnail,
-      link: media.link
+      link: media.link,
+      temporarySubDirectory: media.temporarySubDirectory
     };
 
     data.metadata.user = media.user || anonymousId;
@@ -670,6 +672,7 @@ VideoProvider.prototype.removeLocal = function(filter, callback) {
  * @param {Array} [data.mediaId] The list of medias in the media platform. Could have several media ids if media has
  * @param {ltiple sources
  * @param {String} [data.link] The media link in OpenVeo
+ * @param {String} [data.temporarySubDirectory] The sub path of package files in its temporary directory
  * @param {module:publish/providers/VideoProvider~VideoProvider~updateOneCallback} [callback] The function to call when
  * it's done
  */
@@ -692,6 +695,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (data.packageType) modifications.packageType = data.packageType;
   if (data.mediaId) modifications.mediaId = data.mediaId;
   if (data.link) modifications.link = data.link;
+  if (data.temporarySubDirectory) modifications.temporarySubDirectory = data.temporarySubDirectory;
   if (Object.prototype.hasOwnProperty.call(data, 'lastState')) modifications.lastState = data.lastState;
   if (Object.prototype.hasOwnProperty.call(data, 'views')) modifications.views = parseInt(data.views);
   if (Object.prototype.hasOwnProperty.call(data, 'category')) modifications.category = data.category;
