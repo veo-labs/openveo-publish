@@ -8,6 +8,7 @@ Make sure there is no pending video or videos on error before upgrading to 12.0.
 - Drop support for OpenVeo Core &lt; 10.0.0
 - Remove continuous integration with Travis
 - Property `metadataFileName` of publishConf.json configuration file is now ignored, packages in version 1 format must have a file called .session
+- Prevent from pasting styles in rich text editors, it now pastes only plain text
 
 ## NEW FEATURES
 

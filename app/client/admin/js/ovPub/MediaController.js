@@ -75,7 +75,7 @@
 
     // TinyMCE options
     var tinyOptions = {
-      plugins: 'lists link autolink autoresize textpattern',
+      plugins: 'lists link autolink autoresize textpattern paste',
       autoresize_bottom_margin: 20, // eslint-disable-line
       menubar: false,
       toolbar: 'undo redo | styleselect removeformat | bold italic ' +
@@ -102,7 +102,8 @@
           {title: 'Blockquote', format: 'blockquote'}
         ]
       }],
-      content_css: '/be/css/tinymce.css?' + new Date().getTime() // eslint-disable-line
+      content_css: '/be/css/tinymce.css?' + new Date().getTime(), // eslint-disable-line
+      paste_as_text: true // eslint-disable-line
     };
 
     /**
