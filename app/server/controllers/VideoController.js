@@ -2244,7 +2244,7 @@ VideoController.prototype.removeEntitiesAction = function(request, response, nex
       function(error, medias, pagination) {
         if (error) return next(HTTP_ERRORS.REMOVE_MEDIAS_GET_MEDIAS_ERROR);
 
-        medias.forEach(function(media) {
+        for (var media of medias) {
 
           // Make sure user is authorized to modify the media
           if (!self.isUserAuthorized(request.user, media, ContentController.OPERATIONS.DELETE)) {
@@ -2263,8 +2263,9 @@ VideoController.prototype.removeEntitiesAction = function(request, response, nex
             );
             return next(HTTP_ERRORS.REMOVE_MEDIAS_STATE_ERROR);
           }
+
           mediaIdsToRemove.push(media.id);
-        });
+        }
 
         if (!mediaIdsToRemove.length) return next(HTTP_ERRORS.REMOVE_MEDIAS_ERROR);
 
