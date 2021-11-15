@@ -263,17 +263,21 @@ function createMediaPackageManager(mediaPackage) {
  */
 function addPackage(mediaPackage) {
   process.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
-  var idAllreadyPending = this.pendingPackages.filter(function(pendingPackage) {
-    return mediaPackage.originalFileName === pendingPackage.originalFileName;
+
+  // Packages of the same name are authorized to be treated simultaneously
+  // From a list of packages with the same name we don't know which one is actually not waiting for another one
+  var pendingPackagesWithAnotherName = this.pendingPackages.filter(function(pendingPackage) {
+    return mediaPackage.originalFileName !== pendingPackage.originalFileName;
   });
 
   // Too much pending packages
-  if (this.pendingPackages.length >= this.maxConcurrentPackage || idAllreadyPending.length) {
+  if (pendingPackagesWithAnotherName.length >= this.maxConcurrentPackage) {
 
     // Add package to queue
     this.queue.push(mediaPackage);
     process.logger.debug('Add package ' + mediaPackage.originalPackagePath + ' (' + mediaPackage.id + ') to queue');
     return false;
+
   } else {
 
     // Process can deal with the package
@@ -283,6 +287,7 @@ function addPackage(mediaPackage) {
     // Add package to the list of pending packages
     this.pendingPackages.push(mediaPackage);
     return true;
+
   }
 }
 
