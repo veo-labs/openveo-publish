@@ -47,8 +47,15 @@ describe('ArchiveFormatVersion2', function() {
         },
         {
           text: 'Second tag',
-          timecode: 1,
+          timecode: 2,
           category: 1
+        },
+        {
+          text: 'Third tag',
+          timecode: 3
+        },
+        {
+          timecode: 4
         }
       ]
     };
@@ -135,7 +142,8 @@ describe('ArchiveFormatVersion2', function() {
               timecode: tag.timestamp * 1000,
               data: {
                 tagname: tag.text,
-                category: expectedGetPropertyValues.categories[tag.category].label
+                category: expectedGetPropertyValues.categories[tag.category] &&
+                  expectedGetPropertyValues.categories[tag.category].label
               }
             };
           }),

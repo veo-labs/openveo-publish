@@ -61,7 +61,9 @@ ArchiveFormatVersion2.prototype.getPointsOfInterest = function(callback) {
         timecode: tag.timestamp * 1000,
         data: {
           tagname: tag.text,
-          category: metadatas.categories && metadatas.categories[tag.category].label
+          category: metadatas.categories &&
+            metadatas.categories[tag.category] &&
+            metadatas.categories[tag.category].label
         }
       };
     }));
