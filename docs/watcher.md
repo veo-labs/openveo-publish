@@ -71,8 +71,9 @@ It can contain some optional properties:
 
 ### synchro.xml file **(DEPRECATED)**
 
-** The use of this file is deprecated.
-This file is used only if indexes information are not in .session file.**
+** The use of this file is deprecated.**
+
+All points of interest find in this file are added to the points of interest found in **.session** file.
 
 **synchro.xml** file is used to map each images to a video timecode. If **rich-media** property is set to "true" in **.session** file, **synchro.xml** file must be present.
 

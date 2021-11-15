@@ -81,46 +81,28 @@ util.inherits(ArchiveFormatVersion1, ArchiveFormat);
 function getImagesPointsOfInterestFromXmlFile(xmlFilePath, callback) {
   var formattedPointsOfInterest = [];
 
-  async.series([
+  fs.readFile(xmlFilePath, function(error, data) {
+    if (error) return callback(error);
 
-    // Check if XML file exists
-    function(callback) {
-      fs.access(xmlFilePath, function(error) {
-        if (!error)
-          callback();
-        else
-          callback(new Error('Missing XML points of interest file ' + xmlFilePath));
-      });
-    },
+    xml2js.parseString(data, {mergeAttrs: true}, function(error, pointsOfInterest) {
+      if (pointsOfInterest && pointsOfInterest.player && pointsOfInterest.player.synchro) {
 
-    // Transcode XML to JSON
-    function(callback) {
-      fs.readFile(xmlFilePath, function(error, data) {
-        if (error) return callback(error);
-
-        xml2js.parseString(data, {mergeAttrs: true}, function(error, pointsOfInterest) {
-          if (pointsOfInterest && pointsOfInterest.player && pointsOfInterest.player.synchro) {
-
-            // Iterate through the list of points of interest
-            // Change JSON organization to be more accessible
-            pointsOfInterest.player.synchro.forEach(function(pointOfInterestInfo) {
-              if (pointOfInterestInfo['id'] && pointOfInterestInfo['id'].length) {
-                formattedPointsOfInterest.push({
-                  timecode: parseInt(pointOfInterestInfo['timecode'][0]),
-                  type: 'image',
-                  data: {
-                    filename: pointOfInterestInfo['id'][0]
-                  }
-                });
+        // Iterate through the list of points of interest
+        // Change JSON organization to be more accessible
+        pointsOfInterest.player.synchro.forEach(function(pointOfInterestInfo) {
+          if (pointOfInterestInfo['id'] && pointOfInterestInfo['id'].length) {
+            formattedPointsOfInterest.push({
+              timecode: parseInt(pointOfInterestInfo['timecode'][0]),
+              type: 'image',
+              data: {
+                filename: pointOfInterestInfo['id'][0]
               }
             });
           }
-          callback(error);
         });
-      });
-    }
-  ], function(error) {
-    callback(error, formattedPointsOfInterest);
+      }
+      callback(error, formattedPointsOfInterest);
+    });
   });
 }
 
@@ -157,20 +139,20 @@ ArchiveFormatVersion1.prototype.getPointsOfInterest = function(callback) {
       });
     },
 
-    // Points of interest were not found in metadatas file, try to get them from deprecated synchro.xml file
+    // Points of interest can also be found in metadatas file, try to get them from deprecated synchro.xml file
     function(callback) {
-      if (pointsOfInterest) return callback();
+      var xmlFilePath = path.join(self.mediaPackagePath, 'synchro.xml');
 
-      getImagesPointsOfInterestFromXmlFile.call(
-        self,
-        path.join(self.mediaPackagePath, 'synchro.xml'),
-        function(error, pointsOfInterestFromXml) {
+      fs.access(xmlFilePath, function(error) {
+        if (error) return callback();
+
+        getImagesPointsOfInterestFromXmlFile.call(self, xmlFilePath, function(error, pointsOfInterestFromXml) {
           if (error) return callback(error);
 
-          pointsOfInterest = pointsOfInterestFromXml;
+          pointsOfInterest = (pointsOfInterest || []).concat(pointsOfInterestFromXml);
           callback();
-        }
-      );
+        });
+      });
     }
 
   ], function(error) {

@@ -133,37 +133,22 @@ describe('ArchiveFormatVersion1', function() {
 
   describe('getPointsOfInterest', function() {
 
-    it('should get the list of points of interest from metadatas', function(done) {
-      archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
-        assert.isNull(error, 'Unexpected error');
-        assert.deepEqual(pointsOfInterest, expectedGetPropertyValues.indexes, 'Wrong points of interest');
-
-        ArchiveFormat.prototype.getProperty.should.have.been.called.exactly(1);
-        ArchiveFormat.prototype.getProperty.should.have.been.called.with('indexes');
-        fs.access.should.have.been.called.exactly(0);
-        fs.readFile.should.have.been.called.exactly(0);
-        xml2js.parseString.should.have.been.called.exactly(0);
-
-        done();
-      });
-    });
-
-    it('should get the list of points of interest from synchro.xml file if none in metadatas', function(done) {
-      expectedGetPropertyValues.indexes = null;
-
+    it('should get the list of points of interest from metadatas and synchro.xml file', function(done) {
       archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
         assert.isNull(error, 'Unexpected error');
         assert.deepEqual(
           pointsOfInterest,
-          expectedParseStringResult.player.synchro.map(function(pointOfInterest) {
-            return {
-              type: 'image',
-              timecode: pointOfInterest.timecode[0],
-              data: {
-                filename: pointOfInterest.id[0]
-              }
-            };
-          }),
+          expectedGetPropertyValues.indexes.concat(
+            expectedParseStringResult.player.synchro.map(function(pointOfInterest) {
+              return {
+                type: 'image',
+                timecode: pointOfInterest.timecode[0],
+                data: {
+                  filename: pointOfInterest.id[0]
+                }
+              };
+            })
+          ),
           'Wrong points of interest'
         );
 
@@ -175,6 +160,26 @@ describe('ArchiveFormatVersion1', function() {
         fs.readFile.should.have.been.called.with(expectedXmlDescriptionFilePath);
         xml2js.parseString.should.have.been.called.exactly(1);
         xml2js.parseString.should.have.been.called.with(expectedReadFileResult);
+
+        done();
+      });
+    });
+
+    it('should ignore deprecated synchro.xml file if its does not exist', function(done) {
+      fs.access = chai.spy(function(filePath, callback) {
+        callback(new Error('synchro.xml file not found'));
+      });
+
+      archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
+        assert.isNull(error, 'Unexpected error');
+        assert.deepEqual(pointsOfInterest, expectedGetPropertyValues.indexes, 'Wrong points of interest');
+
+        ArchiveFormat.prototype.getProperty.should.have.been.called.exactly(1);
+        ArchiveFormat.prototype.getProperty.should.have.been.called.with('indexes');
+        fs.access.should.have.been.called.exactly(1);
+        fs.access.should.have.been.called.with(expectedXmlDescriptionFilePath);
+        fs.readFile.should.have.been.called.exactly(0);
+        xml2js.parseString.should.have.been.called.exactly(0);
 
         done();
       });
@@ -197,29 +202,6 @@ describe('ArchiveFormatVersion1', function() {
         done();
       });
     });
-
-    it(
-      'should execute callback with an error if no metadatas points of interest and synchro.xml does not exist',
-      function(done) {
-        expectedGetPropertyValues.indexes = null;
-
-        fs.access = chai.spy(function(filePath, callback) {
-          callback(expectedError);
-        });
-
-        archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
-          assert.instanceOf(error, Error, 'Wrong error');
-          assert.isUndefined(pointsOfInterest, 'Unexpected points of interest');
-
-          ArchiveFormat.prototype.getProperty.should.have.been.called.exactly(1);
-          fs.access.should.have.been.called.exactly(1);
-          fs.readFile.should.have.been.called.exactly(0);
-          xml2js.parseString.should.have.been.called.exactly(0);
-
-          done();
-        });
-      }
-    );
 
     it(
       'should execute callback with an error if no metadatas points of interest and reading synchro.xml failed',
