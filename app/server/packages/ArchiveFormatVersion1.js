@@ -125,7 +125,7 @@ ArchiveFormatVersion1.prototype.getMedias = function(callback) {
  * done
  */
 ArchiveFormatVersion1.prototype.getPointsOfInterest = function(callback) {
-  var pointsOfInterest;
+  var pointsOfInterest = [];
   var self = this;
 
   async.series([
@@ -134,7 +134,28 @@ ArchiveFormatVersion1.prototype.getPointsOfInterest = function(callback) {
     function(callback) {
       self.getProperty('indexes', function(error, indexes) {
         if (error) return callback(error);
-        pointsOfInterest = indexes;
+        pointsOfInterest = (indexes || []).map(function(index) {
+          var pointOfInterest = {
+            type: index.type,
+            timecode: index.timecode,
+            data: {}
+          };
+
+          if (index.data) {
+            if (index.type === 'image') {
+              pointOfInterest.data = {
+                filename: index.data.filename
+              };
+            } else if (index.type === 'tag') {
+              pointOfInterest.data = {
+                category: index.data.category,
+                description: index.data.text,
+                name: index.data.tagname
+              };
+            }
+          }
+          return pointOfInterest;
+        });
         callback();
       });
     },
@@ -149,7 +170,7 @@ ArchiveFormatVersion1.prototype.getPointsOfInterest = function(callback) {
         getImagesPointsOfInterestFromXmlFile.call(self, xmlFilePath, function(error, pointsOfInterestFromXml) {
           if (error) return callback(error);
 
-          pointsOfInterest = (pointsOfInterest || []).concat(pointsOfInterestFromXml);
+          pointsOfInterest = pointsOfInterest.concat(pointsOfInterestFromXml);
           callback();
         });
       });

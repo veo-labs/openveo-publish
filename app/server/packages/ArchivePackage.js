@@ -264,7 +264,7 @@ function generatePointsOfInterestSprites(
  * @param {Array} pointsOfInterest The list of points of interest as found in the package
  * @param {String} pointsOfInterest[].type Point of interest type (ignored if not "tag")
  * @param {Number} pointsOfInterest[].timecode Point of interest timecode
- * @param {String} [pointsOfInterest[].tagname] Point of interest name
+ * @param {String} [pointsOfInterest[].name] Point of interest name
  * @param {String} [pointsOfInterest[].category] Point of interest category
  * @return {Array} The formatted list of tags
  */
@@ -275,8 +275,9 @@ function getPointsOfInterestTags(pointsOfInterest) {
     if (pointOfInterest.type === 'tag') {
       filtered.push({
         value: pointOfInterest.timecode,
-        name: (pointOfInterest.data && (pointOfInterest.data.tagname || pointOfInterest.data.category)) ||
-        'Tag' + (++countTagsWithoutName)
+        name: (pointOfInterest.data && (pointOfInterest.data.name || pointOfInterest.data.category)) ||
+        'Tag' + (++countTagsWithoutName),
+        description: (pointOfInterest.data && pointOfInterest.data.description) || null
       });
     }
     return filtered;

@@ -47,16 +47,17 @@ It can contain some optional properties:
     {
       "type": "image", // Point of interest type (could be "image" or "tag")
       "timecode": 0, // Point of interest time (in ms) from the beginning of the video
-      "data": { // Point of interest associated data (only for "image" type)
+      "data": { // Point of interest associated data
         "filename": "slide_00000.jpeg" // The name of the image file in the archive
       }
     },
     {
       "type": "tag", // Point of interest type (must be "image" or "tag")
       "timecode": 9500, // Point of interest (in ms) from the beginning of the video
-      "data": { // Optional - Point of interest associated data (only for "image" type)
+      "data": { // Point of interest associated data
         "category": "Tag category", // Optional - The name of the category the tag belongs to used as a fallback when no tag name is specified
-        "tagname": "Very important moment" // Optional - Tag name, if not defined the category will be used as the tag name and if neither category nor tag name are defined it will be replaced by 'TagN' where N is an incremental number
+        "tagname": "Very important moment", // Optional - Tag name, if not defined the category will be used as the tag name and if neither category nor tag name are defined it will be replaced by 'TagN' where N is an incremental number
+        "text": "Tag description" // Optional - Point of interest description
       }
     },
     ...
@@ -65,7 +66,7 @@ It can contain some optional properties:
 ```
 
 - at time **0ms**, image **slide_00000.jpeg** will be displayed (**slide_00000.jpeg** file must be present in the package)
-- at time **9500ms** a tag named "**Very important moment**" will be displayed and will redirect video at time **9500ms**
+- at time **9500ms** a tag named "**Very important moment**", with description "**Tag description**", will be displayed and will redirect video at time **9500ms**
 
 **Nb:** All extra properties are kept but won't be used directly by Publish.
 
@@ -142,14 +143,17 @@ It can contain some optional properties:
   "name": "Example", // The name of the multi-sources video
   "tags": [ // The list of points of interest of type tag
     {
-      "text": "Tag text", // Point of interest name
+      "category": 0, // Optional - Index of the tag's category from the list of categories used as a fallback when no tag name is specified
+      "name": "Very important moment", // Optional - Tag name, if not defined the category will be used as the tag name and if neither category nor tag name are defined it will be replaced by 'TagN' where N is an incremental number
       "timestamp": 3.184865, // Point of interest time (in s) from the beginning of the video
-      "category": 0 // Index of the tag's category from the list of categories
+      "text": "Tag description" // Optional - Point of interest description
     },
     ...
   ]
 }
 ```
+
+- at time **3184ms** a tag named "**Very important moment**", with description "**Tag description**", will be displayed and will redirect video at time **3184ms**
 
 **Nb:** All extra properties are kept but won't be used directly by Publish.
 

@@ -41,17 +41,22 @@ describe('ArchiveFormatVersion2', function() {
       ],
       tags: [
         {
-          text: 'First tag',
-          timecode: 1,
-          category: 0
+          category: 0,
+          name: 'First tag',
+          text: 'First tag description',
+          timecode: 1
         },
         {
-          text: 'Second tag',
-          timecode: 2,
-          category: 1
+          category: 1,
+          text: 'Second tag description',
+          timecode: 2
         },
         {
-          text: 'Third tag',
+          name: 'Third tag',
+          timecode: 3
+        },
+        {
+          text: 'Fourth tag description',
           timecode: 3
         },
         {
@@ -131,22 +136,34 @@ describe('ArchiveFormatVersion2', function() {
 
   describe('getPointsOfInterest', function() {
 
+    /**
+     * Formats tags as found in archive format version 2 into expected points of interest.
+     *
+     * @param {Array} tags The list of tags as defined in the archive metadatas
+     * @return {Array} The expected list of points of interest
+     */
+    function formatTagsIntoPointsOfInterest(tags) {
+      return tags.map(function(tag) {
+        return {
+          type: 'tag',
+          timecode: tag.timestamp * 1000,
+          data: {
+            category: expectedGetPropertyValues.categories &&
+              expectedGetPropertyValues.categories[tag.category] &&
+              expectedGetPropertyValues.categories[tag.category].label,
+            description: tag.text,
+            name: tag.name
+          }
+        };
+      });
+    }
+
     it('should get the list of points of interest in the archive', function(done) {
       archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
         assert.isNull(error, 'Unexpected error');
         assert.deepEqual(
           pointsOfInterest,
-          expectedGetPropertyValues.tags.map(function(tag) {
-            return {
-              type: 'tag',
-              timecode: tag.timestamp * 1000,
-              data: {
-                tagname: tag.text,
-                category: expectedGetPropertyValues.categories[tag.category] &&
-                  expectedGetPropertyValues.categories[tag.category].label
-              }
-            };
-          }),
+          formatTagsIntoPointsOfInterest(expectedGetPropertyValues.tags),
           'Wrong points of interest'
         );
 

@@ -42,8 +42,27 @@ describe('ArchiveFormatVersion1', function() {
           timecode: 2000,
           data: {
             tagname: 'First tag',
-            category: 'Category 1'
+            category: 'Category 1',
+            text: 'First tag description'
           }
+        },
+        {
+          type: 'tag',
+          timecode: 3000,
+          data: {
+            category: 'Category 2'
+          }
+        },
+        {
+          type: 'tag',
+          timecode: 4000,
+          data: {
+            text: 'Third tag description'
+          }
+        },
+        {
+          type: 'tag',
+          timecode: 4000
         }
       ]
     };
@@ -133,12 +152,44 @@ describe('ArchiveFormatVersion1', function() {
 
   describe('getPointsOfInterest', function() {
 
+    /**
+     * Formats indexes as found in archive format version 1 into expected points of interest.
+     *
+     * @param {Array} indexes The list of points of interest as defined in the archive metadatas
+     * @return {Array} The expected list of points of interest
+     */
+    function formatIndexesIntoPointsOfInterest(indexes) {
+      return indexes.map(function(index) {
+        var pointOfInterest = {
+          type: index.type,
+          timecode: index.timecode,
+          data: {}
+        };
+
+        if (index.data) {
+          if (index.type === 'image') {
+            pointOfInterest.data = {
+              filename: index.data.filename
+            };
+          } else if (index.type === 'tag') {
+            pointOfInterest.data = {
+              category: index.data.category,
+              description: index.data.text,
+              name: index.data.tagname
+            };
+          }
+        }
+
+        return pointOfInterest;
+      });
+    }
+
     it('should get the list of points of interest from metadatas and synchro.xml file', function(done) {
       archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
         assert.isNull(error, 'Unexpected error');
         assert.deepEqual(
           pointsOfInterest,
-          expectedGetPropertyValues.indexes.concat(
+          formatIndexesIntoPointsOfInterest(expectedGetPropertyValues.indexes).concat(
             expectedParseStringResult.player.synchro.map(function(pointOfInterest) {
               return {
                 type: 'image',
@@ -172,7 +223,11 @@ describe('ArchiveFormatVersion1', function() {
 
       archiveFormat.getPointsOfInterest(function(error, pointsOfInterest) {
         assert.isNull(error, 'Unexpected error');
-        assert.deepEqual(pointsOfInterest, expectedGetPropertyValues.indexes, 'Wrong points of interest');
+        assert.deepEqual(
+          pointsOfInterest,
+          formatIndexesIntoPointsOfInterest(expectedGetPropertyValues.indexes),
+          'Wrong points of interest'
+        );
 
         ArchiveFormat.prototype.getProperty.should.have.been.called.exactly(1);
         ArchiveFormat.prototype.getProperty.should.have.been.called.with('indexes');

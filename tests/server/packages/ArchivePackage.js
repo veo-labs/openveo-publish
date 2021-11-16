@@ -142,7 +142,8 @@ describe('ArchivePackage', function() {
           type: 'tag',
           timecode: 2000,
           data: {
-            tagname: 'First tag'
+            name: 'First tag',
+            description: 'First tag description'
           }
         }
       ],
@@ -397,7 +398,8 @@ describe('ArchivePackage', function() {
           function(filtered, pointOfInterest, index) {
             if (pointOfInterest.type === 'tag') {
               filtered.push({
-                name: pointOfInterest.data.tagname,
+                description: pointOfInterest.data.description,
+                name: pointOfInterest.data.name,
                 value: pointOfInterest.timecode
               });
             }
