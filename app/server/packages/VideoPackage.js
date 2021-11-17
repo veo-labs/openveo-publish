@@ -573,7 +573,7 @@ VideoPackage.prototype.merge = function() {
         });
       },
 
-      // Find package locked in INIT_MERGE transition
+      // Find package locked in WAITING_FOR_MERGE state
       function(callback) {
         self.videoProvider.getOne(
           new ResourceFilter().and([

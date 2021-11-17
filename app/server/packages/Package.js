@@ -837,7 +837,7 @@ Package.prototype.finalizeMerge = function() {
         self.updateState(self.mediaPackage.id, STATES.FINALIZING_MERGE, callback);
       },
 
-      // Find package locked in INIT_MERGE transition
+      // Find package locked in WAITING_FOR_MERGE state
       function(callback) {
         self.videoProvider.getOne(
           new ResourceFilter().and([
