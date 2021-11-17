@@ -785,7 +785,7 @@ ArchivePackage.prototype.savePointsOfInterest = function() {
 
       // Save timecodes and tags into the media
       function(callback) {
-        self.mediaPackage.timecodes = timecodes;
+        self.mediaPackage.timecodes = timecodes || [];
         self.mediaPackage.tags = (tags || []).map(function(tag) {
           return tag.id;
         });

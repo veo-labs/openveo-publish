@@ -591,6 +591,12 @@ describe('ArchivePackage', function() {
     it('should not do anything if there is no point of interest in the archive', function() {
       expectedArchiveFormat.pointsOfInterest = [];
 
+      videoProvider.updateOne = chai.spy(function(filter, modifications, callback) {
+        assert.lengthOf(modifications.tags, 0, 'Unexpected tags');
+        assert.lengthOf(modifications.timecodes, 0, 'Unexpected timecodes');
+        callback();
+      });
+
       return archivePackage.savePointsOfInterest().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         expectedArchiveFormat.getPointsOfInterest.should.have.been.called.exactly(1);
