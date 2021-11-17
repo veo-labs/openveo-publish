@@ -314,7 +314,7 @@ VideoPackage.prototype.generateThumb = function() {
 
       // Copy thumbnail if it already exists for this package
       function(callback) {
-        if (self.mediaPackage.originalThumbnailPath === undefined) return callback();
+        if (!self.mediaPackage.originalThumbnailPath) return callback();
 
         self.log('Copy thumbnail in ' + self.packageTemporaryDirectory);
 
@@ -331,7 +331,7 @@ VideoPackage.prototype.generateThumb = function() {
 
       // Remove original thumbnail
       function(callback) {
-        if (self.mediaPackage.originalThumbnailPath === undefined) return callback();
+        if (!self.mediaPackage.originalThumbnailPath) return callback();
 
         self.log('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
 
@@ -343,7 +343,7 @@ VideoPackage.prototype.generateThumb = function() {
 
       // Generate thumb
       function(callback) {
-        if (self.mediaPackage.originalThumbnailPath !== undefined) return callback();
+        if (self.mediaPackage.originalThumbnailPath) return callback();
 
         self.log('Generate thumbnail in ' + self.packageTemporaryDirectory);
 

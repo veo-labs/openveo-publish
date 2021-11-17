@@ -490,7 +490,7 @@ Package.prototype.initPackage = function() {
     self.videoProvider.add([self.mediaPackage], function(addError, total, addedMediaPackages) {
       if (addError) return reject(new PackageError(addError.message, ERRORS.SAVE_PACKAGE_DATA));
       self.emit('stateChanged', self.mediaPackage);
-      self.mediaPackage = addedMediaPackages[0];
+      self.mediaPackage = Object.assign(self.mediaPackage, addedMediaPackages[0]);
       resolve();
     });
   });
