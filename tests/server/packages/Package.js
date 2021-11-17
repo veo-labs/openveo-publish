@@ -40,7 +40,7 @@ describe('Package', function() {
     poiProvider = {};
     videoProvider = {
       add: chai.spy(function(medias, callback) {
-        callback(null);
+        callback(null, medias.length, medias);
       }),
       getOne: chai.spy(function(filter, fields, callback) {
         callback(null, expectedPackages[0]);
@@ -125,6 +125,7 @@ describe('Package', function() {
   beforeEach(function() {
     Package = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/Package.js'));
     expectedPackage = {
+      date: Date.now(),
       id: '42',
       originalFileName: 'file',
       metadata: {
@@ -142,6 +143,63 @@ describe('Package', function() {
   // Stop mocks
   afterEach(function() {
     mock.stopAll();
+  });
+
+  describe('initPackage', function() {
+
+    it('should set package defaults and add it to the storage', function() {
+      chai.spy.on(mediaPackage, 'emit');
+
+      return mediaPackage.initPackage().then(function() {
+        assert.equal(mediaPackage.mediaPackage.state, STATES.PENDING, 'Wrong package state');
+        assert.equal(mediaPackage.mediaPackage.errorCode, ERRORS.NO_ERROR, 'Wrong package error code');
+        assert.equal(mediaPackage.mediaPackage.date, expectedPackage.date, 'Wrong package date');
+        assert.deepEqual(mediaPackage.mediaPackage.properties, {}, 'Wrong package properties');
+        assert.deepEqual(mediaPackage.mediaPackage.metadata, expectedPackage.metadata, 'Wrong package metadata');
+        assert.equal(
+          mediaPackage.mediaPackage.lastState,
+          Package.STATES.PACKAGE_INITIALIZED,
+          'Wrong package last state'
+        );
+        assert.equal(
+          mediaPackage.mediaPackage.lastTransition,
+          Package.TRANSITIONS.COPY_PACKAGE,
+          'Wrong package last transition'
+        );
+        videoProvider.add.should.have.been.called.exactly(1);
+        mediaPackage.emit.should.have.been.called.exactly(1);
+        mediaPackage.emit.should.have.been.called.with('stateChanged', mediaPackage.mediaPackage);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should generate date in not specified in package', function() {
+      expectedPackage.date = null;
+
+      return mediaPackage.initPackage().then(function() {
+        assert.isDefined(mediaPackage.mediaPackage.date, 'Expected date');
+        videoProvider.add.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if adding package to storage failed', function() {
+      videoProvider.add = chai.spy(function(medias, callback) {
+        callback(expectedError);
+      });
+
+      return mediaPackage.initPackage().then(function() {
+        assert.fail('Unexpected promise resolution');
+        videoProvider.add.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.instanceOf(error, PackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.SAVE_PACKAGE_DATA, 'Wrong error code');
+      });
+    });
+
   });
 
   describe('cleanDirectory', function() {
@@ -428,6 +486,7 @@ describe('Package', function() {
         videoProvider.updateOne.should.have.been.called.exactly(2);
 
         assert.equal(expectedPackage.mergeRequired, true, 'Expected package to be marked for merge');
+        assert.equal(Package.lockedPackages[expectedPackage.id], expectedPackages[0].id, 'Wrong locked package');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -441,6 +500,26 @@ describe('Package', function() {
       };
       expectedPackages.push(concurrentPackage);
       expectedPackage.lockedByPackage = concurrentPackage.id;
+
+      return mediaPackage.initMerge().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.getAll.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
+
+        assert.equal(expectedPackage.mergeRequired, false, 'Expected package to not be marked for merge');
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should skip merge if package has been locked by another package even if storage is not up to date', function() {
+      var concurrentPackage = {
+        id: '44',
+        originalFileName: expectedPackage.originalFileName,
+        state: STATES.INITIALIZING_MERGE
+      };
+      expectedPackages.push(concurrentPackage);
+      Package.lockedPackages[concurrentPackage.id] = expectedPackage.id;
 
       return mediaPackage.initMerge().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
@@ -643,6 +722,31 @@ describe('Package', function() {
 
   });
 
+  describe('lockPackage', function() {
+    var packageToLock;
+
+    beforeEach(function() {
+      packageToLock = {
+        id: '43'
+      };
+    });
+
+    it('should lock a package', function() {
+      mediaPackage.lockPackage(packageToLock);
+
+      assert.equal(Package.lockedPackages[expectedPackage.id], packageToLock.id, 'Wrong locked package');
+    });
+
+    it('should not lock an already locked package', function() {
+      Package.lockedPackages['44'] = packageToLock.id;
+
+      mediaPackage.lockPackage(packageToLock);
+
+      assert.isUndefined(Package.lockedPackages[expectedPackage.id], 'Unexpected locked package');
+    });
+
+  });
+
   describe('merge', function() {
 
     it('should resolve promise', function() {
@@ -666,6 +770,7 @@ describe('Package', function() {
           lockedByPackage: expectedPackage.id
         }
       ];
+      Package.lockedPackages[expectedPackage.id] = expectedPackages[0].id;
     });
 
     it('should change package state to FINALIZING_MERGE and release package with same name', function() {
@@ -705,6 +810,8 @@ describe('Package', function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getOne.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
+
+        assert.isUndefined(Package.lockedPackages[expectedPackage.id], 'Unexpected lock');
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -830,5 +937,50 @@ describe('Package', function() {
 
   });
 
+  describe('setError', function() {
+
+    beforeEach(function() {
+      expectedError = new PackageError('Something went wrong', ERRORS.SAVE_PACKAGE_DATA);
+      Package.lockedPackages[expectedPackage.id] = '43';
+    });
+
+    it('should emit "error" event, release lock, update state to ERROR and update package error code', function(done) {
+      mediaPackage.on('error', function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.ERROR);
+        videoProvider.updateErrorCode.should.have.been.called.exactly(1);
+        videoProvider.updateErrorCode.should.have.been.called.with(expectedPackage.id, expectedError.code);
+
+        assert.isUndefined(Package.lockedPackages[expectedPackage.id]);
+        done();
+      });
+
+      mediaPackage.setError(expectedError);
+    });
+
+    it('should not update media if doNotUpdateMedia is true', function(done) {
+      mediaPackage.on('error', function() {
+        videoProvider.updateState.should.have.been.called.exactly(0);
+        videoProvider.updateErrorCode.should.have.been.called.exactly(0);
+
+        assert.isUndefined(Package.lockedPackages[expectedPackage.id]);
+        done();
+      });
+
+      mediaPackage.setError(expectedError, true);
+    });
+
+    it('should not do anything if error is not set', function() {
+      chai.spy.on(mediaPackage, 'emit');
+
+      mediaPackage.setError();
+
+      mediaPackage.emit.should.have.been.called.exactly(0);
+      videoProvider.updateState.should.have.been.called.exactly(0);
+      videoProvider.updateErrorCode.should.have.been.called.exactly(0);
+      assert.isDefined(Package.lockedPackages[expectedPackage.id], 'Expected lock');
+    });
+
+  });
 });
 

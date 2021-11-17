@@ -264,6 +264,19 @@ Package.stateMachine = [
 Object.freeze(Package.stateMachine);
 
 /**
+ * Packages that have been locked by another one with the locker id as property name and the locked id as property
+ * value.
+ *
+ * This object is static to offer a loop safe context for packages which might try to lock another package with the
+ * same name at the same time.
+ * Lock information is stored in storage but is not loop safe.
+ *
+ * @const
+ * @type {Object}
+ */
+Package.lockedPackages = {};
+
+/**
  * Waits for the given media to be in one of the given states.
  *
  * Waiting interval is 1 second.
@@ -293,6 +306,40 @@ function waitForMediaState(media, states, callback) {
       }, 1000);
     }
   );
+}
+
+/**
+ * Finds if a package is actually locked.
+ *
+ * @memberof module:publish/packages/Package~Package
+ * @this module:publish/packages/Package~Package
+ * @private
+ * @param {Object} packageToTest The package to test
+ * @param {String} packageToTest.id The package to test
+ * @return {Boolean} true if package is locked, false otherwise
+ */
+function isLocked(packageToTest) {
+  return Object.values(Package.lockedPackages).indexOf(packageToTest.id) !== -1;
+}
+
+/**
+ * Finds locker's id of a package.
+ *
+ * @memberof module:publish/packages/Package~Package
+ * @this module:publish/packages/Package~Package
+ * @private
+ * @param {Object} lockedPackage The locked package
+ * @param {String} lockedPackage.id The locked package id
+ * @return {(String|null)} The locker's id of the given package or null if package isn't locked
+ */
+function getLockerId(lockedPackage) {
+  for (var lockerId in Package.lockedPackages) {
+    if (Package.lockedPackages[lockerId] === lockedPackage.id) {
+      return lockerId;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -431,9 +478,6 @@ Package.prototype.initPackage = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var filter = new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName);
-    if (self.mediaPackage.type) filter.equal('type', self.mediaPackage.type);
-
     self.mediaPackage.state = STATES.PENDING;
     self.mediaPackage.link = null;
     self.mediaPackage.mediaId = null;
@@ -443,9 +487,10 @@ Package.prototype.initPackage = function() {
     self.mediaPackage.lastState = Package.STATES.PACKAGE_INITIALIZED;
     self.mediaPackage.lastTransition = Package.TRANSITIONS.COPY_PACKAGE;
     if (self.mediaPackage.date === undefined) self.mediaPackage.date = Date.now();
-    self.videoProvider.add([self.mediaPackage], function(addError) {
+    self.videoProvider.add([self.mediaPackage], function(addError, total, addedMediaPackages) {
       if (addError) return reject(new PackageError(addError.message, ERRORS.SAVE_PACKAGE_DATA));
       self.emit('stateChanged', self.mediaPackage);
+      self.mediaPackage = addedMediaPackages[0];
       resolve();
     });
   });
@@ -675,7 +720,7 @@ Package.prototype.initMerge = function() {
   var self = this;
 
   return new Promise(function(resolve, reject) {
-    var lockedPackage;
+    var packageToLock;
 
     async.series([
 
@@ -699,20 +744,20 @@ Package.prototype.initMerge = function() {
             // If no candidate package has been locked then choose either package in READY / PUBLISHED state or the
             // older one and lock it
             var defaultPackage;
+            var lockedPackage;
             var readyPackage;
             var skipMerge = false;
 
             packagesWithSameName.forEach(function(packageWithSameName) {
-              if (!defaultPackage && packageWithSameName.id !== self.mediaPackage.id) {
-                defaultPackage = packageWithSameName;
-              }
+              var isPackageWithSameNameLocked = isLocked(packageWithSameName) ||
+                 packageWithSameName.lockedByPackage;
 
-              if (packageWithSameName.lockedByPackage && packageWithSameName.id === self.mediaPackage.id) {
+              if (isPackageWithSameNameLocked && packageWithSameName.id === self.mediaPackage.id) {
 
-                // Package has been locked by another package
+                // Current package has been locked by another package
                 skipMerge = true;
 
-              } else if (packageWithSameName.lockedByPackage) {
+              } else if (isPackageWithSameNameLocked) {
 
                 // Another package has been locked either by this package or another
                 lockedPackage = packageWithSameName;
@@ -722,11 +767,25 @@ Package.prototype.initMerge = function() {
                 // A package is in READY / PUBLISHED state
                 readyPackage = packageWithSameName;
 
+              } else if (!defaultPackage && packageWithSameName.id !== self.mediaPackage.id) {
+
+                // Other package with same name is not locked nor in READY / PUBLISHED state
+                // Choose it as the default package to lock
+                defaultPackage = packageWithSameName;
+
               }
             });
 
-            lockedPackage = lockedPackage || readyPackage || defaultPackage;
-            self.mediaPackage.mergeRequired = !skipMerge && lockedPackage !== undefined;
+            packageToLock = lockedPackage || readyPackage || defaultPackage;
+            self.mediaPackage.mergeRequired = !skipMerge && packageToLock !== undefined;
+
+            if (self.mediaPackage.mergeRequired) {
+
+              // Lock package if not already locked
+              self.lockPackage(packageToLock);
+
+            }
+
             callback();
           }
         );
@@ -754,27 +813,76 @@ Package.prototype.initMerge = function() {
       function(callback) {
         if (!self.mediaPackage.mergeRequired) return callback();
 
-        self.log('Wait for package ' + lockedPackage.id + ' to be ready');
-
         var expectedStates = [STATES.READY, STATES.PUBLISHED];
-        if (expectedStates.indexOf(lockedPackage.state) !== -1) return callback();
+        var waitForPackage = function(waitForPackageCallback) {
 
-        waitForMediaState.call(self, lockedPackage, expectedStates, function(error) {
-          if (error) {
-            return callback(new PackageError(error.message, ERRORS.INIT_MERGE_WAIT_FOR_MEDIA));
+          if (isLocked(packageToLock) && getLockerId(packageToLock) !== self.mediaPackage.id) {
+
+            // Package has already been locked by another one
+            // Wait again for the package to be released
+            self.log(
+              'Package ' + packageToLock.id + ' already locked by package ' + getLockerId(packageToLock),
+              'verbose'
+            );
+
+            setTimeout(function() {
+              waitForPackage(waitForPackageCallback);
+            }, 1000);
+            return;
           }
-          callback();
-        });
+
+          // Wait for other package to be in READY / PUBLISHED state
+          waitForMediaState.call(self, packageToLock, expectedStates, function(error) {
+            if (error) {
+              return waitForPackageCallback(new PackageError(error.message, ERRORS.INIT_MERGE_WAIT_FOR_MEDIA));
+            }
+
+            if (isLocked(packageToLock) && getLockerId(packageToLock) !== self.mediaPackage.id) {
+
+              // Package has already been locked by another one thus its state is going to change soon
+              // Wait again for the package to be released and in READY / PUBLISHED state
+              self.log(
+                'Package ' + packageToLock.id + ' ready but locked by package ' + getLockerId(packageToLock),
+                'verbose'
+              );
+              waitForPackage(waitForPackageCallback);
+
+            } else {
+
+              // Package has not been locked by any other package
+              // Lock it
+              self.lockPackage(packageToLock);
+              waitForPackageCallback();
+
+            }
+          });
+
+        };
+
+        if (
+          expectedStates.indexOf(packageToLock.state) !== -1 &&
+          getLockerId(packageToLock) === self.mediaPackage.id
+        ) {
+
+          // Package is already in READY / PUBLISHED state and package has been locked by current package
+          return callback();
+
+        } else {
+
+          self.log('Wait for package ' + packageToLock.id + ' to be ready');
+          waitForPackage(callback);
+
+        }
       },
 
       // Lock other package now that it has been released
       function(callback) {
         if (!self.mediaPackage.mergeRequired) return callback();
 
-        self.log('Lock package ' + lockedPackage.id);
+        self.log('Change package ' + packageToLock.id + ' state to WAITING_FOR_MERGE');
 
         self.videoProvider.updateOne(
-          new ResourceFilter().equal('id', lockedPackage.id),
+          new ResourceFilter().equal('id', packageToLock.id),
           {
             lockedByPackage: self.mediaPackage.id,
             state: STATES.WAITING_FOR_MERGE
@@ -783,6 +891,7 @@ Package.prototype.initMerge = function() {
             if (error) {
               return callback(new PackageError(error.message, ERRORS.INIT_MERGE_LOCK_PACKAGE));
             }
+
             callback();
           }
         );
@@ -795,7 +904,6 @@ Package.prototype.initMerge = function() {
 
   });
 };
-
 
 /**
  * Merges package with the one with the same name.
@@ -871,6 +979,10 @@ Package.prototype.finalizeMerge = function() {
             if (error) {
               return callback(new PackageError(error.message, ERRORS.FINALIZE_MERGE_RELEASE_PACKAGE));
             }
+
+            self.log('Release lock on package ' + Package.lockedPackages[self.mediaPackage.id], 'verbose');
+            delete Package.lockedPackages[self.mediaPackage.id];
+
             callback();
           }
         );
@@ -953,6 +1065,18 @@ Package.prototype.getMediaFilePath = function(callback) {
 };
 
 /**
+ * Locks given package if not already locked.
+ *
+ * @param {Object} packageToLock The package to lock
+ */
+Package.prototype.lockPackage = function(packageToLock) {
+  if (isLocked(packageToLock)) return;
+
+  this.log('Lock package ' + packageToLock.id, 'verbose');
+  Package.lockedPackages[this.mediaPackage.id] = packageToLock.id;
+};
+
+/**
  * Logs given message suffixing it with the package id.
  *
  * @param {String} message The message to log
@@ -973,6 +1097,11 @@ Package.prototype.setError = function(error, doNotUpdateMedia) {
 
   // An error occurred
   if (error) {
+
+    if (Package.lockedPackages[this.mediaPackage.id]) {
+      this.log('Release lock on package ' + Package.lockedPackages[this.mediaPackage.id], 'verbose');
+      delete Package.lockedPackages[this.mediaPackage.id];
+    }
 
     async.parallel([
       function(callback) {
