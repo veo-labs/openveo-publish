@@ -48,7 +48,7 @@ module.exports.onUsersDeleted = function(ids, callback) {
               videoProvider.updateOne(
                 new ResourceFilter().equal('id', media.id),
                 {
-                  'metadata.user': null
+                  user: null
                 },
                 callback
               );

@@ -105,7 +105,7 @@ describe('Listeners', function() {
           expectedMedias[0].id,
           'Wrong media id'
         );
-        assert.isNull(modifications['metadata.user'], 'Unexpected user');
+        assert.isNull(modifications['user'], 'Unexpected user');
         callback(null, 1);
       });
 

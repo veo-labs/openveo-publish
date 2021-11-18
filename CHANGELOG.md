@@ -23,6 +23,7 @@ Make sure there is no pending video or videos on error before upgrading to 12.0.
 - Fix unhandled promise rejection in publication process when an error occurred
 - Fix web service end point DELETE videos/{video-id} which was raising an uncatched error when trying to remove a video without having the permission to do it or when trying to remove a video in unstable state
 - Fix old OpenVeo video points of interest conversion (from percentage to milliseconds) which wasn't working anymore since version 11.0.0
+- Fix error message when removing a user when this user is the owner of one or more medias, error introduced in version 6.0.0
 
 ## DEPENDENCIES
 
