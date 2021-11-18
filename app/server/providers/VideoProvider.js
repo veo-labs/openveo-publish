@@ -322,64 +322,6 @@ VideoProvider.prototype.getPoiFilePath = function(mediaId, file) {
 };
 
 /**
- * Fetches a media.
- *
- * If filter corresponds to more than one media, the first found media will be the returned one.
- * If the media point of interest are in percents, needPointsOfInterestUnitConversion property will be added
- * to the media.
- *
- * @param {ResourceFilter} [filter] Rules to filter medias
- * @param {Object} [fields] Fields to be included or excluded from the response, by default all
- * fields are returned. Only "exclude" or "include" can be specified, not both
- * @param {Array} [fields.include] The list of fields to include in the response, all other fields are excluded
- * @param {Array} [fields.exclude] The list of fields to exclude from response, all other fields are included. Ignored
- * if include is also specified.
- * @param {module:publish/providers/VideoProvider~VideoProvider~getOneCallback} callback The function to call when it's
- * done
- */
-VideoProvider.prototype.getOne = function(filter, fields, callback) {
-  VideoProvider.super_.prototype.getOne.call(this, filter, fields, function(getOneError, media) {
-    if (getOneError) return callback(getOneError);
-    if (!media) return callback();
-
-    var last;
-
-    // Order points of interest by (time) value
-    // instead of creation order
-    var ordering = function(a, b) {
-      switch (true) {
-        case a.value < b.value:
-          return -1;
-
-        case a.value > b.value:
-          return 1;
-
-        default:
-          return 0;
-      }
-    };
-
-    var pointsOfInterest = [media.chapters, media.tags, media.cut];
-    var poi;
-    for (var i = 0; i < pointsOfInterest.length; i++) {
-      poi = pointsOfInterest[i];
-
-      if (!poi || poi.length === 0) {
-        continue;
-      }
-
-      poi.sort(ordering);
-      last = poi[poi.length - 1];
-
-      media.needPointsOfInterestUnitConversion = last.value <= 1 && last.value !== 0;
-      break;
-    }
-
-    callback(null, media);
-  });
-};
-
-/**
  * Adds medias.
  *
  * @param {Array} medias The list of medias to store

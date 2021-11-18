@@ -379,7 +379,8 @@ describe('VideoController', function() {
       expectedMedias = [
         {
           id: '42',
-          state: STATES.PUBLISHED
+          state: STATES.PUBLISHED,
+          cut: []
         }
       ];
 
@@ -435,7 +436,8 @@ describe('VideoController', function() {
           id: expectedMediaId,
           state: STATES.PUBLISHED,
           tags: ['1'],
-          chapters: ['2']
+          chapters: ['2'],
+          cut: []
         }
       ];
 
@@ -605,7 +607,8 @@ describe('VideoController', function() {
             'profile-settings': {
               'video-height': expectedVideoDefinition
             }
-          }
+          },
+          cut: []
         }
       ];
 
@@ -652,7 +655,8 @@ describe('VideoController', function() {
             'profile-settings': {
               'video-height': 720
             }
-          }
+          },
+          cut: []
         }
       ];
 
@@ -694,6 +698,7 @@ describe('VideoController', function() {
       expectedPois = [
         {
           id: 'tagId',
+          value: 1000,
           file: {
             url: expectedTagFileUri
           }
@@ -727,6 +732,7 @@ describe('VideoController', function() {
               ]
             }
           ],
+          cut: [],
           thumbnail: expectedThumbnailUri
         }
       ];
@@ -782,7 +788,8 @@ describe('VideoController', function() {
                 }
               ]
             }
-          ]
+          ],
+          cut: []
         }
       ];
 
@@ -802,6 +809,30 @@ describe('VideoController', function() {
       });
     });
 
+    it('should mark media for points of interest conversion if needed', function(done) {
+      expectedMedias = [
+        {
+          id: 42,
+          state: STATES.READY,
+          cut: [{value: 0}, {value: 1}]
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      response.send = function(data) {
+        assert.ok(
+          data.entity.needPointsOfInterestUnitConversion,
+          'Expected marker'
+        );
+        done();
+      };
+
+      videoController.getVideoReadyAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
   });
 
   describe('getEntityAction', function() {
@@ -809,7 +840,8 @@ describe('VideoController', function() {
     it('should send response with the media from OpenVeo and the video from the platform', function(done) {
       expectedMedias = [
         {
-          id: '42'
+          id: '42',
+          cut: []
         }
       ];
 
@@ -901,7 +933,8 @@ describe('VideoController', function() {
         {
           id: expectedMediaId,
           tags: ['1'],
-          chapters: ['2']
+          chapters: ['2'],
+          cut: []
         }
       ];
 
@@ -993,7 +1026,8 @@ describe('VideoController', function() {
             'profile-settings': {
               'video-height': expectedVideoDefinition
             }
-          }
+          },
+          cut: []
         }
       ];
 
@@ -1040,7 +1074,8 @@ describe('VideoController', function() {
             'profile-settings': {
               'video-height': 720
             }
-          }
+          },
+          cut: []
         }
       ];
 
@@ -1082,6 +1117,7 @@ describe('VideoController', function() {
       expectedPois = [
         {
           id: 'tagId',
+          value: 1000,
           file: {
             url: expectedTagFileUri
           }
@@ -1115,6 +1151,7 @@ describe('VideoController', function() {
               ]
             }
           ],
+          cut: [],
           thumbnail: expectedThumbnailUri
         }
       ];
@@ -1170,7 +1207,8 @@ describe('VideoController', function() {
                 }
               ]
             }
-          ]
+          ],
+          cut: []
         }
       ];
 
@@ -1193,7 +1231,8 @@ describe('VideoController', function() {
     it('should not exclude "metadata" property', function(done) {
       expectedMedias = [
         {
-          id: '42'
+          id: '42',
+          cut: []
         }
       ];
 
@@ -1215,6 +1254,29 @@ describe('VideoController', function() {
 
       response.send = function(data) {
         VideoProvider.prototype.getOne.should.have.been.called.exactly(1);
+        done();
+      };
+
+      videoController.getEntityAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next function');
+      });
+    });
+
+    it('should mark media for points of interest conversion if needed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          cut: [{value: 0}, {value: 1}]
+        }
+      ];
+
+      request.params.id = expectedMedias[0].id;
+
+      response.send = function(data) {
+        assert.ok(
+          data.entity.needPointsOfInterestUnitConversion,
+          'Expected marker'
+        );
         done();
       };
 
@@ -2154,7 +2216,7 @@ describe('VideoController', function() {
   describe('getEntitiesAction', function() {
 
     it('should be able to respond with the first page of medias and pagination', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {};
 
       VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
@@ -2215,7 +2277,7 @@ describe('VideoController', function() {
     });
 
     it('should be able to search by indexed fields', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {query: 'search text'};
       VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
         assert.equal(
@@ -2241,7 +2303,7 @@ describe('VideoController', function() {
 
     it('should be able to search by both media indexed fields and points of interest indexed fields', function(done) {
       request.query = {query: 'search text', searchInPois: 1};
-      expectedMedias = [{id: '42'}];
+      expectedMedias = [{id: '42', cut: []}];
       expectedPois = [{id: '43'}];
 
       PoiProvider.prototype.getAll = chai.spy(function(filter, fields, sort, callback) {
@@ -2311,7 +2373,7 @@ describe('VideoController', function() {
 
     it('should be able to deactivate the smart search', function(done) {
       var expectedQuery = '42';
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {query: expectedQuery, useSmartSearch: 0};
 
       VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
@@ -2343,7 +2405,7 @@ describe('VideoController', function() {
     it('should be able to sort results by either title, description, date, state, views or category', function(done) {
       var asyncActions = [];
       var orderedProperties = ['title', 'description', 'date', 'state', 'views', 'category'];
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
 
       function test(property, order, callback) {
         request.query = {sortOrder: order, sortBy: property};
@@ -2412,7 +2474,7 @@ describe('VideoController', function() {
     });
 
     it('should not exclude "metadata" property', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {exclude: ['metadata'], include: ['field']};
 
       VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
@@ -2462,7 +2524,7 @@ describe('VideoController', function() {
     });
 
     it('should be able to filter results by states', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {states: [STATES.PENDING]};
 
       VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
@@ -2488,7 +2550,7 @@ describe('VideoController', function() {
     it('should be able to filter results by category', function(done) {
       var expectedCategoryIds = ['42', '43'];
       request.query = {categories: expectedCategoryIds[0]};
-      expectedMedias = [{id: '44'}];
+      expectedMedias = [{id: '44', cut: []}];
       expectedCategories = [
         {
           id: expectedCategoryIds[0],
@@ -2521,7 +2583,7 @@ describe('VideoController', function() {
     });
 
     it('should be able to filter results by groups', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {groups: ['42']};
 
       VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
@@ -2545,7 +2607,7 @@ describe('VideoController', function() {
     });
 
     it('should be able to filter results by owners', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       request.query = {user: ['40']};
 
       VideoProvider.prototype.get = function(filter, fields, limit, page, sort, callback) {
@@ -2569,7 +2631,7 @@ describe('VideoController', function() {
     });
 
     it('should be able to filter results by date', function(done) {
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       var expectedStartDate = '01/19/2017';
       var expectedEndDate = '02/20/2017';
       request.query = {dateStart: expectedStartDate, dateEnd: '02/20/2017'};
@@ -2611,7 +2673,7 @@ describe('VideoController', function() {
       expectedEndDate.setDate(expectedStartDate.getDate() + 1);
 
       var expectedQueryProperties = {};
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       expectedProperties = [
         {
           id: 'property1',
@@ -2703,7 +2765,7 @@ describe('VideoController', function() {
     it('should ignore unknown custom properties', function(done) {
       var expectedQueryProperties = {};
       var propertyId = 'unknownProperty';
-      expectedMedias = [{id: 42}];
+      expectedMedias = [{id: 42, cut: []}];
       expectedQueryProperties[propertyId] = 'value1';
       request.query = {properties: expectedQueryProperties};
 
@@ -2810,7 +2872,8 @@ describe('VideoController', function() {
         {
           id: expectedMediaId,
           tags: ['1'],
-          chapters: ['2']
+          chapters: ['2'],
+          cut: []
         }
       ];
 
@@ -2877,7 +2940,8 @@ describe('VideoController', function() {
         {
           id: '42',
           tags: [expectedPois[0].id],
-          chapters: [expectedPois[1].id]
+          chapters: [expectedPois[1].id],
+          cut: []
         }
       ];
 
@@ -2930,7 +2994,8 @@ describe('VideoController', function() {
       expectedMedias = [
         {
           id: 42,
-          properties: expectedPropertiesValues
+          properties: expectedPropertiesValues,
+          cut: []
         }
       ];
       expectedProperties = [
@@ -2967,6 +3032,7 @@ describe('VideoController', function() {
       expectedPois = [
         {
           id: 'tagId',
+          value: 1000,
           file: {
             url: expectedTagFileUri
           }
@@ -2999,6 +3065,7 @@ describe('VideoController', function() {
               ]
             }
           ],
+          cut: [],
           thumbnail: expectedThumbnailUri
         },
         {
@@ -3012,7 +3079,8 @@ describe('VideoController', function() {
                 }
               ]
             }
-          ]
+          ],
+          cut: []
         }
       ];
 
@@ -3054,6 +3122,36 @@ describe('VideoController', function() {
         assert.ok(false, 'Unexpected call to next');
       });
     });
+
+    it('should mark medias for points of interest conversion if needed', function(done) {
+      expectedMedias = [
+        {
+          id: '42',
+          cut: [{value: 0}, {value: 1}]
+        },
+        {
+          id: '43',
+          cut: [{value: 1000}, {value: 5000}]
+        }
+      ];
+
+      response.send = function(data) {
+        assert.ok(
+          data.entities[0].needPointsOfInterestUnitConversion,
+          'Expected marker on first media'
+        );
+        assert.isNotOk(
+          data.entities[1].needPointsOfInterestUnitConversion,
+          'Unexpected marker on second media'
+        );
+        done();
+      };
+
+      videoController.getEntitiesAction(request, response, function(error) {
+        assert.ok(false, 'Unexpected call to next');
+      });
+    });
+
   });
 
   describe('publishVideosAction', function() {
@@ -3840,7 +3938,6 @@ describe('VideoController', function() {
           tags: [expectedPois[0].id],
           chapters: [expectedPois[1].id],
           cut: [{value: expectedStartCut}, {value: expectedEndCut}],
-          needPointsOfInterestUnitConversion: true,
           state: STATES.PUBLISHED
         }
       ];
@@ -3948,6 +4045,7 @@ describe('VideoController', function() {
       expectedPois = [
         {
           id: 'tagId',
+          value: 0.1,
           file: {
             url: expectedTagFileUri
           }
@@ -3978,6 +4076,7 @@ describe('VideoController', function() {
               ]
             }
           ],
+          cut: [],
           thumbnail: expectedThumbnailUri
         }
       ];
@@ -4126,8 +4225,7 @@ describe('VideoController', function() {
           id: '42',
           state: STATES.PUBLISHED,
           tags: ['1'],
-          cut: [{value: 0}, {value: 1}],
-          needPointsOfInterestUnitConversion: true
+          cut: [{value: 0}, {value: 1}]
         }
       ];
 
@@ -4152,7 +4250,7 @@ describe('VideoController', function() {
       expectedPois = [
         {
           id: '1',
-          value: 1000,
+          value: 0.1,
           name: 'Tag name',
           description: 'Tag description'
         }
@@ -4162,7 +4260,6 @@ describe('VideoController', function() {
           id: '42',
           tags: [expectedPois[0].id],
           cut: [{value: 0}, {value: 1}],
-          needPointsOfInterestUnitConversion: true,
           state: STATES.PUBLISHED
         }
       ];
@@ -4189,8 +4286,7 @@ describe('VideoController', function() {
         {
           id: '42',
           state: STATES.PUBLISHED,
-          cut: [{value: 0}, {value: 1}],
-          needPointsOfInterestUnitConversion: true
+          cut: [{value: 0}, {value: 1}]
         }
       ];
 
@@ -4216,7 +4312,7 @@ describe('VideoController', function() {
         {
           id: '42',
           state: STATES.PUBLISHED,
-          needPointsOfInterestUnitConversion: false
+          cut: []
         }
       ];
 

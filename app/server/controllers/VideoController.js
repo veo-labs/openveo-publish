@@ -45,6 +45,38 @@ module.exports = VideoController;
 util.inherits(VideoController, ContentController);
 
 /**
+ * Tests if given points of interest are expressed in percentage instead of milliseconds.
+ *
+ * Old versions of OpenVeo Publish were using percentage instead of milliseconds for chapters, tags and cuts.
+ *
+ * @static
+ * @private
+ * @memberof module:publish/controllers/VideoController~VideoController
+ * @param {Array} pointsOfInterest The list of points of interest
+ * @param {Number} pointsOfInterest[].value Point of interest value
+ * @return {Boolean} true if unit is percentage, false if unit is milliseconds
+ */
+function isPointsOfInterestOldUnit(pointsOfInterest) {
+  if (!pointsOfInterest || !pointsOfInterest.length) return false;
+
+  var sortedPointsOfInterest = pointsOfInterest.sort(function(a, b) {
+    switch (true) {
+      case a.value < b.value:
+        return -1;
+
+      case a.value > b.value:
+        return 1;
+
+      default:
+        return 0;
+    }
+  });
+
+  return sortedPointsOfInterest[sortedPointsOfInterest.length - 1].value <= 1 &&
+    sortedPointsOfInterest[sortedPointsOfInterest.length - 1].value !== 0;
+}
+
+/**
  * Resolves medias resources urls using CDN url.
  *
  * Medias may have attached resources like files associated to tags, timecodes images, thumbnail image and
@@ -417,7 +449,10 @@ function removePoisAction(type, request, response, next) {
  */
 function populateMediaWithPois(media, callback) {
   var poisIds = (media.chapters || []).concat(media.tags || []);
-  if (!poisIds.length) return callback();
+  if (!poisIds.length) {
+    media.needPointsOfInterestUnitConversion = isPointsOfInterestOldUnit((media.cut || []));
+    return callback();
+  }
 
   var poiProvider = new PoiProvider(coreApi.getDatabase());
   poiProvider.getAll(
@@ -448,6 +483,8 @@ function populateMediaWithPois(media, callback) {
           return media.chapters.indexOf(poi.id) !== -1;
         });
       }
+
+      media.needPointsOfInterestUnitConversion = isPointsOfInterestOldUnit(pois.concat(media.cut));
 
       callback();
     }
@@ -2053,12 +2090,15 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
     // Get media points of interest
     function(callback) {
       var poisIds = (media.chapters || []).concat(media.tags || []);
-      if (!poisIds.length) return callback();
+      if (!poisIds.length) {
+        media.needPointsOfInterestUnitConversion = isPointsOfInterestOldUnit(media.cut);
+        return callback();
+      }
 
       poiProvider.getAll(
         new ResourceFilter().in('id', poisIds),
         {
-          include: ['id', 'value']
+          exclude: ['_id']
         },
         {
           id: 'desc'
@@ -2070,6 +2110,8 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
             process.logger.error(getPoisError.message, {error: getPoisError, method: 'convertPoiAction'});
             return callback(HTTP_ERRORS.CONVERT_POIS_GET_POIS_ERROR);
           }
+
+          media.needPointsOfInterestUnitConversion = isPointsOfInterestOldUnit(pois.concat(media.cut));
 
           callback();
         }
@@ -2105,7 +2147,7 @@ VideoController.prototype.convertPoiAction = function(request, response, next) {
 
     // Convert cuts
     function(callback) {
-      if (!media.needPointsOfInterestUnitConversion || !media.cut) return callback();
+      if (!media.needPointsOfInterestUnitConversion || !media.cut.length) return callback();
 
       media.cut[0].value = convertToMilliseconds(media.cut[0].value);
       media.cut[1].value = convertToMilliseconds(media.cut[1].value);
