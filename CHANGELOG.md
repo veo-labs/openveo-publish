@@ -1,4 +1,4 @@
-# 12.0.0 / YYYY-MM-DD
+# 12.0.0 / 2021-11-19
 
 Make sure there is no pending video or videos on error before upgrading to 12.0.0.
 
@@ -27,6 +27,8 @@ Make sure there is no pending video or videos on error before upgrading to 12.0.
 
 ## DEPENDENCIES
 
+- **@openveo/player** has been upgraded from 6.0.0 to **7.0.0**
+- **@openveo/rest-nodejs-client** has been upgraded from 4.0.0 to **5.0.1**
 - **chai** has been upgraded from 4.2.0 to **4.3.4**
 - **dashjs** has been upgraded from 3.0.3 to **4.1.0**
 - **eslint** has been upgraded from 22.0.0 to **23.0.0**
