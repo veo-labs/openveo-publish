@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: packages/VideoPackage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: packages/VideoPackage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/providers/VideoPackage
+ */
+
+var util = require('util');
+var path = require('path');
+var fs = require('fs');
+var async = require('async');
+var ffmpeg = require('fluent-ffmpeg');
+var openVeoApi = require('@openveo/api');
+var Package = process.requirePublish('app/server/packages/Package.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var VideoPackageError = process.requirePublish('app/server/packages/VideoPackageError.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var fileSystem = openVeoApi.fileSystem;
+
+// Accepted images files extensions in the package
+var acceptedImagesExtensions = [
+  fileSystem.FILE_TYPES.JPG,
+  fileSystem.FILE_TYPES.GIF
+];
+
+/**
+ * Defines a VideoPackage to manage publication of a video file.
+ *
+ * @class VideoPackage
+ * @extends module:publish/packages/Package~Package
+ * @constructor
+ * @param {Object} mediaPackage Information about the video
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider A video provider
+ * @param {module:publish/providers/PoiProvider~PoiProvider} poiProvider Points of interest provider
+ */
+function VideoPackage(mediaPackage, videoProvider, poiProvider) {
+  VideoPackage.super_.call(this, mediaPackage, videoProvider, poiProvider);
+}
+
+module.exports = VideoPackage;
+util.inherits(VideoPackage, Package);
+
+/**
+ * Process states for video packages.
+ *
+ * @const
+ * @type {Object}
+ */
+VideoPackage.STATES = {
+  MP4_DEFRAGMENTED: 'mp4Defragmented',
+  THUMB_GENERATED: 'thumbGenerated',
+  COPIED_IMAGES: 'copiedImages',
+  METADATA_RETRIEVED: 'metadataRetrieved'
+};
+Object.freeze(VideoPackage.STATES);
+
+/**
+ * Video package process transitions (from one state to another).
+ *
+ * @const
+ * @type {Object}
+ */
+VideoPackage.TRANSITIONS = {
+  DEFRAGMENT_MP4: 'defragmentMp4',
+  GENERATE_THUMB: 'generateThumb',
+  COPY_IMAGES: 'copyImages',
+  GET_METADATA: 'getMetadata'
+};
+Object.freeze(VideoPackage.TRANSITIONS);
+
+/**
+ * Define the order in which transitions will be executed for a video Package.
+ *
+ * @const
+ * @type {Object}
+ */
+VideoPackage.stateTransitions = [
+  Package.TRANSITIONS.INIT,
+  Package.TRANSITIONS.COPY_PACKAGE,
+  VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
+  VideoPackage.TRANSITIONS.GENERATE_THUMB,
+  VideoPackage.TRANSITIONS.GET_METADATA,
+  Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+  Package.TRANSITIONS.UPLOAD_MEDIA,
+  Package.TRANSITIONS.SYNCHRONIZE_MEDIA,
+  VideoPackage.TRANSITIONS.COPY_IMAGES,
+  Package.TRANSITIONS.CLEAN_DIRECTORY,
+  Package.TRANSITIONS.INIT_MERGE,
+  Package.TRANSITIONS.MERGE,
+  Package.TRANSITIONS.FINALIZE_MERGE,
+  Package.TRANSITIONS.REMOVE_PACKAGE
+];
+Object.freeze(VideoPackage.stateTransitions);
+
+/**
+ * Define machine state authorized transitions depending on previous and next states.
+ *
+ * @const
+ * @type {Object}
+ */
+VideoPackage.stateMachine = Package.stateMachine.concat([
+  {
+    name: VideoPackage.TRANSITIONS.DEFRAGMENT_MP4,
+    from: Package.STATES.PACKAGE_COPIED,
+    to: VideoPackage.STATES.MP4_DEFRAGMENTED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.GENERATE_THUMB,
+    from: VideoPackage.STATES.MP4_DEFRAGMENTED,
+    to: VideoPackage.STATES.THUMB_GENERATED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.GET_METADATA,
+    from: VideoPackage.STATES.THUMB_GENERATED,
+    to: VideoPackage.STATES.METADATA_RETRIEVED
+  },
+  {
+    name: Package.TRANSITIONS.REMOVE_ORIGINAL_PACKAGE,
+    from: VideoPackage.STATES.METADATA_RETRIEVED,
+    to: Package.STATES.ORIGINAL_PACKAGE_REMOVED
+  },
+  {
+    name: VideoPackage.TRANSITIONS.COPY_IMAGES,
+    from: Package.STATES.MEDIA_SYNCHRONIZED,
+    to: VideoPackage.STATES.COPIED_IMAGES
+  },
+  {
+    name: Package.TRANSITIONS.CLEAN_DIRECTORY,
+    from: VideoPackage.STATES.COPIED_IMAGES,
+    to: Package.STATES.DIRECTORY_CLEANED
+  }
+]);
+Object.freeze(VideoPackage.stateMachine);
+
+/**
+ * Defragments given MP4 file.
+ *
+ * If the input file is fragmented, FFMPEG will be used to defragment the MP4.
+ * The fragmentation detection of the file is based on an unknown "nb_frames" property in FFPROBE output metadata.
+ *
+ * If file is not fragmented, it does nothing.
+ *
+ * @param {String} mp4FilePath The path of the MP4 file to defragment
+ * @return {callback} Function to call when its done
+ */
+VideoPackage.prototype.defragment = function(mp4FilePath, callback) {
+  var defragmentationRequired = false;
+  var mp4FilePathElements = path.parse(mp4FilePath);
+  var defragmentedFilePath = path.join(
+    mp4FilePathElements.dir,
+    mp4FilePathElements.name + '-defrag' + mp4FilePathElements.ext
+  );
+  var self = this;
+
+  async.series([
+
+    // Detect if file need defragmentation (unknown "nb_frames")
+    function(callback) {
+      ffmpeg.ffprobe(mp4FilePath, function(error, metadata) {
+        if (error) return callback(error);
+
+        if (metadata &amp;&amp; Array.isArray(metadata.streams)) {
+          var fragmentedStreams = metadata.streams.filter(function(stream) {
+            if (stream.codec_type !== 'video')
+              return false;
+
+            return stream.nb_frames === 'N/A';
+          });
+
+          defragmentationRequired = fragmentedStreams.length !== 0;
+        }
+
+        callback();
+      });
+    },
+
+    // Defragment media file
+    function(callback) {
+      if (!defragmentationRequired) {
+        self.log('No defragmentation is needed for file ' + mp4FilePath, 'verbose');
+        return callback();
+      }
+
+      // MP4 defragmentation
+      ffmpeg(mp4FilePath)
+        .audioCodec('copy')
+        .videoCodec('copy')
+        .outputOptions('-movflags faststart')
+        .on('start', function() {
+          self.log(
+            'Starting defragmentation of ' + mp4FilePath + ' to ' + defragmentedFilePath,
+            'verbose'
+          );
+        })
+        .on('error', function(error) {
+          callback(error);
+        })
+        .on('end', function() {
+          self.log('Defragmentation complete for file ' + mp4FilePath, 'verbose');
+          callback();
+        })
+        .save(defragmentedFilePath);
+    },
+
+    // Remove original media file
+    function(callback) {
+      if (!defragmentationRequired) return callback();
+
+      // Replace original file
+      self.log('Removing original fragmented file ' + mp4FilePath, 'verbose');
+
+      fs.unlink(mp4FilePath, function(error) {
+        if (error) return callback(error);
+        callback();
+      });
+    },
+
+    // Rename fragmented media file
+    function(callback) {
+      if (!defragmentationRequired) return callback();
+
+      self.log('Renaming file ' + defragmentedFilePath + ' into ' + mp4FilePath, 'verbose');
+
+      fs.rename(defragmentedFilePath, mp4FilePath, function(error) {
+        if (error) return callback(error);
+
+        self.log(defragmentedFilePath + ' renamed into ' + mp4FilePath, 'verbose');
+
+        callback();
+      });
+    }
+
+  ], callback);
+};
+
+/**
+ * Defragments the MP4.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.defragmentMp4 = function() {
+  var self = this;
+  var mediaFilePath;
+
+  return new Promise(function(resolve, reject) {
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.DEFRAGMENTING_MP4, callback);
+      },
+
+      // Get media file name
+      function(callback) {
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.DEFRAGMENT_MP4_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
+        });
+      },
+
+      // Defragment media file
+      function(callback) {
+        self.defragment(mediaFilePath, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.DEFRAGMENTATION));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
+ * Generates a thumbnail for the video.
+ *
+ * If no thumbnail has been provided by the user form, ffmpeg will be
+ * used to extract an image from the video to generate a thumbnail.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.generateThumb = function() {
+  var self = this;
+  var mediaFilePath;
+
+  return new Promise(function(resolve, reject) {
+
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GENERATING_THUMB, callback);
+      },
+
+      // Get media file name
+      function(callback) {
+        if (self.mediaPackage.mediaId &amp;&amp; self.mediaPackage.mediaId.length) return callback();
+
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
+        });
+      },
+
+      // Copy thumbnail if it already exists for this package
+      function(callback) {
+        if (!self.mediaPackage.originalThumbnailPath) return callback();
+
+        self.log('Copy thumbnail in ' + self.packageTemporaryDirectory);
+
+        openVeoApi.fileSystem.copy(
+          self.mediaPackage.originalThumbnailPath,
+          path.join(self.packageTemporaryDirectory, 'thumbnail.jpg'),
+          function(error) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_COPY_ORIGINAL));
+            self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
+            callback();
+          }
+        );
+      },
+
+      // Remove original thumbnail
+      function(callback) {
+        if (!self.mediaPackage.originalThumbnailPath) return callback();
+
+        self.log('Remove original thumbnail ' + self.mediaPackage.originalThumbnailPath);
+
+        fs.unlink(self.mediaPackage.originalThumbnailPath, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_REMOVE_ORIGINAL));
+          callback();
+        });
+      },
+
+      // Generate thumb
+      function(callback) {
+        if (self.mediaPackage.originalThumbnailPath) return callback();
+
+        self.log('Generate thumbnail in ' + self.packageTemporaryDirectory);
+
+        ffmpeg(mediaFilePath).screenshots({
+          timestamps: ['10%'],
+          filename: 'thumbnail.jpg',
+          folder: self.packageTemporaryDirectory
+        }).on('error', function(error) {
+          callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB));
+        }).on('end', function() {
+          self.mediaPackage.thumbnail = '/publish/' + self.mediaPackage.id + '/thumbnail.jpg';
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateThumbnail(self.mediaPackage.id, self.mediaPackage.thumbnail, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GENERATE_THUMB_UPDATE_PACKAGE));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
+ * Retrieves video height.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.getMetadata = function() {
+  var self = this;
+  var mediaFilePath;
+
+  return new Promise(function(resolve, reject) {
+    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
+    self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
+
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GETTING_METADATA, callback);
+      },
+
+      // Get media file name
+      function(callback) {
+        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
+
+        self.getMediaFilePath(function(error, filePath) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_GET_MEDIA_FILE_PATH));
+          mediaFilePath = filePath;
+          callback();
+        });
+      },
+
+      // Get video height
+      function(callback) {
+        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
+
+        ffmpeg.ffprobe(mediaFilePath, function(error, metadata) {
+          if (!error &amp;&amp; !metadata.streams) error = new Error('No streams found in media file');
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA));
+
+          // Find video stream
+          var videoStream;
+          for (var i = 0; i &lt; metadata.streams.length; i++) {
+            if (metadata.streams[i]['codec_type'] === 'video')
+              videoStream = metadata.streams[i];
+          }
+
+          // Got video stream associated to the video file
+          if (videoStream) {
+            self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
+            callback();
+          } else callback(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_UPDATE_PACKAGE));
+          callback();
+        });
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
+ * Copies presentation images from temporary directory to the public directory.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.copyImages = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    var extractDirectory = self.packageTemporaryDirectory;
+    var videoFinalDir = path.join(self.mediasPublicPath, self.mediaPackage.id);
+    var resources = [];
+    var filesToCopy = [];
+
+    self.log('Copy images to ' + videoFinalDir);
+
+    async.series([
+
+      // Change state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.COPYING_IMAGES, callback);
+      },
+
+      // Read directory
+      function(callback) {
+        self.log('Scan directory ' + extractDirectory + ' for images', 'verbose');
+
+        fs.readdir(extractDirectory, function(error, files) {
+          if (error)
+            callback(new VideoPackageError(error.message, ERRORS.SCAN_FOR_IMAGES));
+          else {
+            resources = files;
+            callback();
+          }
+        });
+      },
+
+      // Validate files in the directory to keep only accepted types
+      function(callback) {
+        var filesToValidate = {};
+        var filesValidationDescriptor = {};
+
+        resources.forEach(function(resource) {
+          filesToValidate[resource] = path.join(extractDirectory, resource);
+          filesValidationDescriptor[resource] = {in: acceptedImagesExtensions};
+        });
+
+        openVeoApi.util.validateFiles(filesToValidate, filesValidationDescriptor, function(error, files) {
+          if (error)
+            self.log(error.message, 'warn');
+
+          for (var filePath in files) {
+            if (files[filePath].isValid)
+              filesToCopy.push(filePath);
+          }
+
+          callback();
+        });
+      },
+
+      // Copy images
+      function(callback) {
+        var filesLeftToCopy = filesToCopy.length;
+
+        if (!filesToCopy.length) return callback();
+
+        filesToCopy.forEach(function(file) {
+          self.log(
+            'Copy image ' + path.join(extractDirectory, file) + ' to ' + path.join(videoFinalDir, file),
+            'verbose'
+          );
+
+          openVeoApi.fileSystem.copy(
+            path.join(extractDirectory, file),
+            path.join(videoFinalDir, file),
+            function(error) {
+              if (error)
+                self.log(error.message, 'warn');
+
+              filesLeftToCopy--;
+
+              if (filesLeftToCopy === 0)
+                callback();
+            }
+          );
+        });
+
+      }
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
+ * Merges package media and same package name media.
+ *
+ * Merging consists of merging the two medias into one in OpenVeo. It means that both medias still exist on the media
+ * platform but only one reference exists in OpenVeo with multi remote medias.
+ * The incoming media is merged into the existing one.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+VideoPackage.prototype.merge = function() {
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    var lockedPackage;
+
+    async.series([
+
+      // Update package state
+      function(callback) {
+        VideoPackage.super_.prototype.merge.call(self).then(function() {
+          callback();
+        }).catch(function(error) {
+          reject(error);
+        });
+      },
+
+      // Find package locked in WAITING_FOR_MERGE state
+      function(callback) {
+        self.videoProvider.getOne(
+          new ResourceFilter().and([
+            new ResourceFilter().equal('state', STATES.WAITING_FOR_MERGE),
+            new ResourceFilter().equal('originalFileName', self.mediaPackage.originalFileName),
+            new ResourceFilter().equal('lockedByPackage', self.mediaPackage.id)
+          ]),
+          null,
+          function(error, foundPackage) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_GET_PACKAGE_WITH_SAME_NAME));
+
+            lockedPackage = foundPackage;
+            callback();
+          }
+        );
+      },
+
+      // Merge package medias with locked package medias
+      function(callback) {
+        self.log('Merge medias ids with medias ids of package ' + lockedPackage.id);
+
+        self.videoProvider.updateMediaId(
+          lockedPackage.id,
+          openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),
+          function(error) {
+            if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_UPDATE_MEDIAS));
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) return reject(error);
+      resolve();
+    });
+  });
+};
+
+/**
+ * Gets the stack of transitions corresponding to the package.
+ *
+ * Each package has its own way to be published, thus transitions stack
+ * is different by package.
+ *
+ * @return {Array} The stack of transitions
+ */
+VideoPackage.prototype.getTransitions = function() {
+  return VideoPackage.stateTransitions;
+};
+
+/**
+ * Gets the list of transitions states corresponding to the package.
+ *
+ * @return {Array} The list of states/transitions
+ */
+VideoPackage.prototype.getStateMachine = function() {
+  return VideoPackage.stateMachine;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Nov 19 2021 16:36:44 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
