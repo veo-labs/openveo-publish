@@ -1,3 +1,9 @@
+# 12.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix server crash when trying to upload a video to Vimeo without upload permission, error introduced in version 1.0.0
+
 # 12.0.0 / 2021-11-19
 
 Make sure there is no pending video or videos on error before upgrading to 12.0.0.

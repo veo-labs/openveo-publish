@@ -87,7 +87,7 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
 
         // User does not have permission to upload
         if (!body.upload_quota)
-          callback(new Error('User does not have permission to upload on Vimeo'));
+          return callback(new Error('User does not have permission to upload on Vimeo'));
 
         // Checks the size of the media to upload
         fs.stat(mediaFilePath, function(error, stats) {
