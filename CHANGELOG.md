@@ -66,7 +66,7 @@ Make sure there is no pending video or videos on error before upgrading to 12.0.
 
 ## BUG FIXES
 
-- Fix message "This media is not yet available on the streaming platform..." appearing when displaying videos stored in Youtube. Bug introcued in version 11.0.3
+- Fix message "This media is not yet available on the streaming platform..." appearing when displaying videos stored in Youtube. Bug introduced in version 11.0.3
 
 # 11.1.0 / 2021-01-21
 
