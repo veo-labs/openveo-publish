@@ -154,7 +154,7 @@ describe('VideoController', function() {
     };
 
     mediaPlatformProvider = {
-      getMediaInfo: function(id, expectedDefinition, callback) {
+      getMediasInfo: function(mediasIds, expectedMediasHeights, callback) {
         callback({});
       },
       update: chai.spy(function(media, datas, force, callback) {
@@ -592,7 +592,7 @@ describe('VideoController', function() {
     });
 
     it('should send response with media and information from the video platform', function(done) {
-      var expectedVideoDefinition = 720;
+      var expectedMediasHeights = [720];
       var expectedInfo = {
         available: true,
         sources: []
@@ -603,20 +603,16 @@ describe('VideoController', function() {
           state: STATES.PUBLISHED,
           type: TYPES.LOCAL,
           mediaId: ['43'],
-          metadata: {
-            'profile-settings': {
-              'video-height': expectedVideoDefinition
-            }
-          },
+          mediasHeights: expectedMediasHeights,
           cut: []
         }
       ];
 
       request.params.id = expectedMedias[0].id;
 
-      mediaPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediasInfo = chai.spy(function(ids, mediasHeights, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
-        assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
+        assert.equal(mediasHeights, expectedMediasHeights, 'Wrong medias heights');
         callback(null, expectedInfo);
       });
 
@@ -634,7 +630,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        mediaPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
+        mediaPlatformProvider.getMediasInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -651,11 +647,7 @@ describe('VideoController', function() {
           state: STATES.PUBLISHED,
           type: TYPES.LOCAL,
           mediaId: ['43'],
-          metadata: {
-            'profile-settings': {
-              'video-height': 720
-            }
-          },
+          mediasHeights: [720],
           cut: []
         }
       ];
@@ -668,7 +660,7 @@ describe('VideoController', function() {
         return mediaPlatformProvider;
       };
 
-      mediaPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediasInfo = function(ids, mediasHeights, callback) {
         callback(new Error('Something went wrong'));
       };
 
@@ -1011,7 +1003,7 @@ describe('VideoController', function() {
     });
 
     it('should send response with media and information from the video platform', function(done) {
-      var expectedVideoDefinition = 720;
+      var expectedMediasHeights = [720];
       var expectedInfo = {
         available: true,
         sources: []
@@ -1022,20 +1014,16 @@ describe('VideoController', function() {
           state: STATES.PUBLISHED,
           type: TYPES.LOCAL,
           mediaId: ['43'],
-          metadata: {
-            'profile-settings': {
-              'video-height': expectedVideoDefinition
-            }
-          },
+          mediasHeights: expectedMediasHeights,
           cut: []
         }
       ];
 
       request.params.id = expectedMedias[0].id;
 
-      mediaPlatformProvider.getMediaInfo = chai.spy(function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediasInfo = chai.spy(function(ids, mediasHeights, callback) {
         assert.deepEqual(ids, expectedMedias[0].mediaId, 'Wrong ids');
-        assert.equal(videoDefinition, expectedVideoDefinition, 'Wrong video definition');
+        assert.equal(mediasHeights, expectedMediasHeights, 'Wrong medias heights');
         callback(null, expectedInfo);
       });
 
@@ -1053,7 +1041,7 @@ describe('VideoController', function() {
       response.send = function(data) {
         assert.equal(data.entity.available, expectedInfo.available, 'Wrong availability');
         assert.strictEqual(data.entity.sources, expectedInfo.sources, 'Wrong sources');
-        mediaPlatformProvider.getMediaInfo.should.have.been.called.exactly(1);
+        mediaPlatformProvider.getMediasInfo.should.have.been.called.exactly(1);
         VideoProvider.prototype.updateOne.should.have.been.called.exactly(1);
         done();
       };
@@ -1070,11 +1058,7 @@ describe('VideoController', function() {
           state: STATES.PUBLISHED,
           type: TYPES.LOCAL,
           mediaId: ['43'],
-          metadata: {
-            'profile-settings': {
-              'video-height': 720
-            }
-          },
+          mediasHeights: [720],
           cut: []
         }
       ];
@@ -1087,7 +1071,7 @@ describe('VideoController', function() {
         return mediaPlatformProvider;
       };
 
-      mediaPlatformProvider.getMediaInfo = function(ids, videoDefinition, callback) {
+      mediaPlatformProvider.getMediasInfo = function(ids, mediasHeights, callback) {
         callback(new Error('Something went wrong'));
       };
 

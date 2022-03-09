@@ -106,20 +106,20 @@ TlsProvider.prototype.upload = function(mediaFilePath, callback) {
 };
 
 /**
- * Gets information about a media hosted by TLS.
+ * Gets information about medias hosted by TLS.
  *
- * @param {Array} mediaIds The list of media ids
- * @param {String} expectedDefintion The expected media definition. This is not use for TLS provider as TLS
- * doesn't transcode medias
+ * @param {Array} mediasIds The TLS ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids. This is not used
+ * for TLS provider as TLS doesn't transcode medias
  * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
  * callback The function to call when it's done
  */
-TlsProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
+TlsProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
   var self = this;
   var parallel = [];
   var infos = {sources: [], available: true};
 
-  mediaIds.forEach(function(mediaId) {
+  mediasIds.forEach(function(mediaId) {
     parallel.push(function(callback) {
 
       // Get media information from TLS

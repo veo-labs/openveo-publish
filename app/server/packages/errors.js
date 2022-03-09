@@ -622,7 +622,37 @@ var ERRORS = {
    * @default
    * @inner
    */
-  EXTRACT_UPDATE_PACKAGE: 61
+  EXTRACT_UPDATE_PACKAGE: 61,
+
+  /**
+   * Gettings metadata failed while getting archive format.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GET_METADATA_GET_FORMAT: 62,
+
+  /**
+   * Gettings metadata failed while getting archive medias.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GET_METADATA_GET_MEDIAS: 63,
+
+  /**
+   * Gettings metadata failed while getting medias heights.
+   *
+   * @const
+   * @type {Number}
+   * @default
+   * @inner
+   */
+  GET_METADATA_GET_MEDIAS_HEIGHTS: 64
 
 };
 

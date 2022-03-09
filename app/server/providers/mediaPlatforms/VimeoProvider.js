@@ -125,30 +125,27 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
 };
 
 /**
- * Gets information about a media hosted by Vimeo.
+ * Gets information about medias hosted by Vimeo.
  *
- * Media is considered available if the expected media definition has been transcoded by the media platform.
+ * Media is considered available if the expected media height has been transcoded by the media platform.
  *
- * @param {String} mediaId The Vimeo id of the media
- * @param {Number} expectedDefintion The expected media definition
+ * @param {Array} mediasIds The Vimeo ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids
  * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
  * callback The function to call when it's done
  */
-VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
-  if (!mediaIds) {
-    callback(new Error('media id should be defined'), null);
-    return;
-  }
+VimeoProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
   var self = this;
 
   var parallel = [];
   var infos = {sources: [], available: true};
-  mediaIds.forEach(function(mediaId) {
+  mediasIds.forEach(function(mediaId, index) {
     parallel.push(function(cb) {
 
       // Ask Vimeo for media information
       self.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
-        var available = !expectedDefinition ? true : false;
+        var available = false;
+        var expectedMediaHeight = expectedMediasHeights[index];
 
         if (!error) {
           var info = {};
@@ -173,7 +170,7 @@ VimeoProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, ca
                 // Set the media as "available" as soon as the expected definition has been transcoded
                 // If media height is not standard, Vimeo eventually change its definition to something close, thus
                 // we add a factor error of 22% of the expected definition to deal with those cases
-                if (Math.abs(file.height - expectedDefinition) < (expectedDefinition * 0.22))
+                if (Math.abs(file.height - expectedMediaHeight) < (expectedMediaHeight * 0.22))
                   available = true;
               }
             }

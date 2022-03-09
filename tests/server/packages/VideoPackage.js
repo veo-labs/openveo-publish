@@ -50,6 +50,9 @@ describe('VideoPackage', function() {
       getOne: chai.spy(function(filter, fields, callback) {
         callback(null, expectedPackages[0]);
       }),
+      updateOne: chai.spy(function(filter, modifications, callback) {
+        callback(null, 1);
+      }),
       updateThumbnail: chai.spy(function(id, thumbnail, callback) {
         callback(null, 1);
       }),
@@ -60,6 +63,9 @@ describe('VideoPackage', function() {
         callback(null, 1);
       }),
       updateMediaId: chai.spy(function(id, mediaId, callback) {
+        callback(null, 1);
+      }),
+      updateMediasHeights: chai.spy(function(id, mediasHeights, callback) {
         callback(null, 1);
       }),
       updateState: chai.spy(function(id, state, callback) {
@@ -553,11 +559,11 @@ describe('VideoPackage', function() {
   describe('getMetadata', function() {
 
     it('should change package state to GETTING_METADATA and get the height of the video', function() {
-      videoProvider.updateMetadata = chai.spy(function(id, metadata, callback) {
+      videoProvider.updateMediasHeights = chai.spy(function(id, mediasHeights, callback) {
         assert.equal(id, videoPackage.mediaPackage.id, 'Wrong package updated');
-        assert.equal(
-          metadata['profile-settings']['video-height'],
-          expectedFfprobeResult.streams[0].height,
+        assert.deepEqual(
+          mediasHeights,
+          [expectedFfprobeResult.streams[0].height],
           'Wrong video height'
         );
         callback();
@@ -574,22 +580,19 @@ describe('VideoPackage', function() {
             videoPackage.mediaPackage.id + '.' + videoPackage.mediaPackage.packageType
           )
         );
-        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail(error);
       });
     });
 
     it('should just update package if video height is already known', function() {
-      videoPackage.mediaPackage.metadata = {
-        'profile-settings': {
-          'video-height': 1080
-        }
-      };
+      videoPackage.mediaPackage.mediasHeights = [1080];
+
       return videoPackage.getMetadata().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(0);
-        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -607,7 +610,7 @@ describe('VideoPackage', function() {
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(0);
-        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
       });
     });
 
@@ -626,7 +629,7 @@ describe('VideoPackage', function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         VideoPackage.super_.prototype.getMediaFilePath.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(0);
-        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
       });
     });
 
@@ -640,11 +643,11 @@ describe('VideoPackage', function() {
       }).catch(function(error) {
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
         assert.equal(error.message, expectedError.message, 'Wrong error message');
-        assert.equal(error.code, ERRORS.GET_METADATA, 'Wrong error code');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS, 'Wrong error code');
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
       });
     });
 
@@ -655,11 +658,11 @@ describe('VideoPackage', function() {
         assert.fail('Unexpected promise resolution');
       }).catch(function(error) {
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
-        assert.equal(error.code, ERRORS.GET_METADATA, 'Wrong error code');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS, 'Wrong error code');
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
       });
     });
 
@@ -672,16 +675,16 @@ describe('VideoPackage', function() {
         assert.fail('Unexpected promise resolution');
       }).catch(function(error) {
         assert.instanceOf(error, VideoPackageError, 'Wrong error type');
-        assert.equal(error.code, ERRORS.GET_METADATA, 'Wrong error code');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS, 'Wrong error code');
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        videoProvider.updateMetadata.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
       });
     });
 
     it('should reject promise if getting video height failed', function() {
-      videoProvider.updateMetadata = chai.spy(function(id, metadata, callback) {
+      videoProvider.updateMediasHeights = chai.spy(function(id, mediasHeights, callback) {
         callback(expectedError);
       });
 
@@ -694,7 +697,7 @@ describe('VideoPackage', function() {
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        videoProvider.updateMetadata.should.have.been.called.exactly(1);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
       });
     });
 
@@ -707,10 +710,12 @@ describe('VideoPackage', function() {
         id: '43',
         lockedByPackage: videoPackage.mediaPackage.id,
         mediaId: ['1'],
+        mediasHeights: [720],
         originalFileName: videoPackage.mediaPackage.originalFileName,
         state: STATES.WAITING_FOR_MERGE
       }];
       videoPackage.mediaPackage.mediaId = ['2'];
+      videoPackage.mediaPackage.mediasHeights = [1080];
     });
 
     it('should change package state to MERGING and merge package with the same file name locked package', function() {
@@ -740,12 +745,21 @@ describe('VideoPackage', function() {
         callback(null, expectedPackages[0]);
       });
 
-      videoProvider.updateMediaId = chai.spy(function(id, mediaId, callback) {
-        assert.equal(id, expectedPackages[0].id, 'Wrong package updated');
+      videoProvider.updateOne = chai.spy(function(filter, data, callback) {
+        assert.equal(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.EQUAL, 'id').value,
+          expectedPackages[0].id,
+          'Wrong package updated'
+        );
         assert.sameOrderedMembers(
-          mediaId,
+          data.mediaId,
           [expectedPackages[0].mediaId[0], videoPackage.mediaPackage.mediaId[0]],
           'Wrong merged medias'
+        );
+        assert.sameOrderedMembers(
+          data.mediasHeights,
+          [expectedPackages[0].mediasHeights[0], videoPackage.mediaPackage.mediasHeights[0]],
+          'Wrong merged medias heights'
         );
         callback();
       });
@@ -753,7 +767,7 @@ describe('VideoPackage', function() {
       return videoPackage.merge().then(function() {
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getOne.should.have.been.called.exactly(1);
-        videoProvider.updateMediaId.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
       }).catch(function(error) {
         assert.fail(error);
       });
@@ -773,7 +787,7 @@ describe('VideoPackage', function() {
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getOne.should.have.been.called.exactly(0);
-        videoProvider.updateMediaId.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
       });
     });
 
@@ -791,12 +805,12 @@ describe('VideoPackage', function() {
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getOne.should.have.been.called.exactly(1);
-        videoProvider.updateMediaId.should.have.been.called.exactly(0);
+        videoProvider.updateOne.should.have.been.called.exactly(0);
       });
     });
 
     it('should reject promise if merging medias failed', function() {
-      videoProvider.updateMediaId = chai.spy(function(id, mediaId, callback) {
+      videoProvider.updateOne = chai.spy(function(id, mediaId, callback) {
         callback(expectedError);
       });
 
@@ -809,7 +823,7 @@ describe('VideoPackage', function() {
 
         videoProvider.updateState.should.have.been.called.exactly(1);
         videoProvider.getOne.should.have.been.called.exactly(1);
-        videoProvider.updateMediaId.should.have.been.called.exactly(1);
+        videoProvider.updateOne.should.have.been.called.exactly(1);
         videoProvider.removeLocal.should.have.been.called.exactly(0);
       });
     });

@@ -3,6 +3,7 @@
 ## BUG FIXES
 
 - Fix server crash when trying to upload a video to Vimeo without upload permission, error introduced in version 1.0.0
+- Fix message "This media is not yet available on the streaming platform..." appearing when displaying multi-sources videos with different definitions hosted on Vimeo. Bug introduced in version 2.1.0
 
 # 12.0.0 / 2021-11-19
 

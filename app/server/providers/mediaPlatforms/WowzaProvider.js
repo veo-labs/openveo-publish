@@ -100,21 +100,17 @@ WowzaProvider.prototype.upload = function(mediaFilePath, callback) {
 };
 
 /**
- * Gets information about a media hosted by Wowza.
+ * Gets information about medias hosted by Wowza.
  *
- * @param {String} mediaId The Wowza id of the media
- * @param {String} expectedDefintion The expected media definition, not used for this provider
+ * @param {Array} mediasIds The Wowza ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids. This is not used
+ * for Wowza provider as Wowza doesn't transcode medias
  * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
  * callback The function to call when it's done
  */
-WowzaProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
-  if (!mediaIds) {
-    callback(new Error('media id should be defined'), null);
-    return;
-  }
-
+WowzaProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
   var infos = {sources: [], available: true};
-  mediaIds.forEach(function(mediaId) {
+  mediasIds.forEach(function(mediaId) {
     var info = {};
     info.adaptive = [
       {

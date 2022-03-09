@@ -1083,6 +1083,95 @@ ArchivePackage.prototype.getMediaFilePath = function(callback) {
 };
 
 /**
+ * Retrieves information about archive videos.
+ *
+ * This is a transition.
+ *
+ * @async
+ * @return {Promise} Promise resolving when transition is done
+ */
+ArchivePackage.prototype.getMetadata = function() {
+  var archiveFormat;
+  var mediasFilesPaths;
+  var self = this;
+
+  return new Promise(function(resolve, reject) {
+    async.series([
+
+      // Update package state
+      function(callback) {
+        self.updateState(self.mediaPackage.id, STATES.GETTING_METADATA, callback);
+      },
+
+      // Get archive format
+      function(callback) {
+        archiveFormatFactory.get(self.packageTemporaryDirectory, function(error, format) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.GET_METADATA_GET_FORMAT));
+          archiveFormat = format;
+          callback();
+        });
+      },
+
+      // Get the list of medias files paths in the archive from metadatas
+      function(callback) {
+        archiveFormat.getMedias(function(error, mediasFilesNames) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.GET_METADATA_GET_MEDIAS));
+          mediasFilesPaths = mediasFilesNames.map(function(mediaFileName) {
+            return path.join(self.packageTemporaryDirectory, mediaFileName);
+          });
+          callback();
+        });
+      },
+
+      // Get medias heights
+      function(callback) {
+        if (self.mediaPackage.mediasHeights && self.mediaPackage.mediasHeights.length === mediasFilesPaths.length) {
+          return callback();
+        }
+
+        var totalMediasToSkip = 0;
+
+        if (self.mediaPackage.mediasHeights) totalMediasToSkip = self.mediaPackage.mediasHeights.length;
+        else self.mediaPackage.mediasHeights = [];
+
+        // Gets videos heights only for medias which haven't been processed yet (some medias could have been analyzed
+        // if package processing failed on this transition)
+        var getVideoHeightFunctions = mediasFilesPaths.slice(totalMediasToSkip).map(function(mediaFilePath) {
+          return function(callback) {
+            self.getVideoHeight(mediaFilePath, function(error, videoHeight) {
+              if (error) return callback(error);
+              self.mediaPackage.mediasHeights.push(videoHeight);
+              callback();
+            });
+          };
+        });
+
+        async.series(getVideoHeightFunctions, function(error) {
+          if (error) return callback(new ArchivePackageError(error.message, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS));
+          callback();
+        });
+      },
+
+      // Update package
+      function(callback) {
+        self.videoProvider.updateMediasHeights(
+          self.mediaPackage.id,
+          self.mediaPackage.mediasHeights || [],
+          function(error) {
+            if (error) return callback(new ArchivePackageError(error.message, ERRORS.GET_METADATA_UPDATE_PACKAGE));
+            callback();
+          }
+        );
+      }
+
+    ], function(error) {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+};
+
+/**
  * @callback module:publish/packages/ArchivePackage~ArchivePackage~validatePackageCallack
  * @param {(Error|undefined)} error The error if an error occurred
  * @param {Object} package The package information object

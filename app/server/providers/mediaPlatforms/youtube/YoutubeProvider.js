@@ -257,20 +257,19 @@ YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams
 };
 
 /**
- * Gets information about a media hosted by Youtube.
+ * Gets information about medias hosted by Youtube.
  *
- * @param {String} mediaId The Youtube id of the media
+ * @param {Array} mediasIds The Youtube ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids. This is not used
+ * for Youtube provider as Youtube doesn't transcode medias
  * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
  * callback The function to call when it's done
  */
-YoutubeProvider.prototype.getMediaInfo = function(mediaId, definition, callback) {
-  if (!mediaId) {
-    callback(new Error('media id should be defined'), null);
-    return;
-  }
+YoutubeProvider.prototype.getMediasInfo = function(mediasId, expectedMediasHeights, callback) {
 
   // sources and pictures are not necessary: youtube player manage its own data
-  callback(null, {available: true, sources: [], pictures: [], mediaId: mediaId});
+  callback(null, {available: true, sources: [], pictures: [], mediaId: mediasId});
+
 };
 
 /**

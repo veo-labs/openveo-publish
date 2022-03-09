@@ -528,14 +528,13 @@ function updateMediaWithPlatformInfo(media, callback) {
 
   // Get information about the media from the medias platform
   var mediaPlatformProvider = mediaPlatformFactory.get(media.type, platforms[media.type]);
-  var expectedDefinition = media.metadata['profile-settings']['video-height'];
 
   // Compatibility with old mediaId format
-  var mediaId = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
+  var mediasIds = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
   var provider = this.getProvider();
 
   // Get media availability and sources
-  mediaPlatformProvider.getMediaInfo(mediaId, expectedDefinition, function(error, info) {
+  mediaPlatformProvider.getMediasInfo(mediasIds, media.mediasHeights, function(error, info) {
     if (error) return callback(error);
 
     media.available = info.available;

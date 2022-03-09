@@ -375,7 +375,7 @@ VideoPackage.prototype.generateThumb = function() {
 };
 
 /**
- * Retrieves video height.
+ * Retrieves information about the video.
  *
  * This is a transition.
  *
@@ -387,9 +387,6 @@ VideoPackage.prototype.getMetadata = function() {
   var mediaFilePath;
 
   return new Promise(function(resolve, reject) {
-    if (!self.mediaPackage.metadata) self.mediaPackage.metadata = {};
-    self.mediaPackage.metadata['profile-settings'] = self.mediaPackage.metadata['profile-settings'] || {};
-
     async.series([
 
       // Update package state
@@ -399,7 +396,7 @@ VideoPackage.prototype.getMetadata = function() {
 
       // Get media file name
       function(callback) {
-        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
+        if (self.mediaPackage.mediasHeights && self.mediaPackage.mediasHeights.length) return callback();
 
         self.getMediaFilePath(function(error, filePath) {
           if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_GET_MEDIA_FILE_PATH));
@@ -410,30 +407,18 @@ VideoPackage.prototype.getMetadata = function() {
 
       // Get video height
       function(callback) {
-        if (self.mediaPackage.metadata['profile-settings']['video-height']) return callback();
+        if (self.mediaPackage.mediasHeights && self.mediaPackage.mediasHeights.length) return callback();
 
-        ffmpeg.ffprobe(mediaFilePath, function(error, metadata) {
-          if (!error && !metadata.streams) error = new Error('No streams found in media file');
-          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA));
-
-          // Find video stream
-          var videoStream;
-          for (var i = 0; i < metadata.streams.length; i++) {
-            if (metadata.streams[i]['codec_type'] === 'video')
-              videoStream = metadata.streams[i];
-          }
-
-          // Got video stream associated to the video file
-          if (videoStream) {
-            self.mediaPackage.metadata['profile-settings']['video-height'] = videoStream.height;
-            callback();
-          } else callback(new VideoPackageError('No video stream found', ERRORS.GET_METADATA));
+        self.getVideoHeight(mediaFilePath, function(error, videoHeight) {
+          if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS));
+          self.mediaPackage.mediasHeights = [videoHeight];
+          callback();
         });
       },
 
       // Update package
       function(callback) {
-        self.videoProvider.updateMetadata(self.mediaPackage.id, self.mediaPackage.metadata, function(error) {
+        self.videoProvider.updateMediasHeights(self.mediaPackage.id, self.mediaPackage.mediasHeights, function(error) {
           if (error) return callback(new VideoPackageError(error.message, ERRORS.GET_METADATA_UPDATE_PACKAGE));
           callback();
         });
@@ -544,6 +529,34 @@ VideoPackage.prototype.copyImages = function() {
   });
 };
 
+
+/**
+ * Gets the height of the given video.
+ *
+ * @param {String} videoFilePath Path of the video file
+ * @return {module:publish/packages/VideoPackage~VideoPackage~getVideoHeightCallback} Function to call when its done
+ */
+VideoPackage.prototype.getVideoHeight = function(videoFilePath, callback) {
+  ffmpeg.ffprobe(videoFilePath, function(error, metadata) {
+    if (!error && !metadata.streams) error = new Error('No stream found in media file');
+    if (error) return callback(error);
+
+    // Find video stream
+    var videoStream;
+    for (var i = 0; i < metadata.streams.length; i++) {
+      if (metadata.streams[i]['codec_type'] === 'video')
+        videoStream = metadata.streams[i];
+    }
+
+    if (videoStream) {
+
+      // Got video stream associated to the video file
+      callback(null, videoStream.height);
+
+    } else callback(new Error('No video stream found'));
+  });
+};
+
 /**
  * Merges package media and same package name media.
  *
@@ -593,11 +606,14 @@ VideoPackage.prototype.merge = function() {
 
       // Merge package medias with locked package medias
       function(callback) {
-        self.log('Merge medias ids with medias ids of package ' + lockedPackage.id);
+        self.log('Merge medias with medias of package ' + lockedPackage.id);
 
-        self.videoProvider.updateMediaId(
-          lockedPackage.id,
-          openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),
+        self.videoProvider.updateOne(
+          new ResourceFilter().equal('id', lockedPackage.id),
+          {
+            mediaId: openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),
+            mediasHeights: openVeoApi.util.joinArray(lockedPackage.mediasHeights, self.mediaPackage.mediasHeights)
+          },
           function(error) {
             if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_UPDATE_MEDIAS));
             callback();
@@ -632,3 +648,10 @@ VideoPackage.prototype.getTransitions = function() {
 VideoPackage.prototype.getStateMachine = function() {
   return VideoPackage.stateMachine;
 };
+
+/**
+ * @callback module:publish/packages/VideoPackage~VideoPackage~getVideoHeightCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} height The video height in pixels
+ */
+

@@ -259,7 +259,7 @@ describe('TlsProvider', function() {
 
   });
 
-  describe('getMediaInfo', function() {
+  describe('getMediasInfo', function() {
     var provider;
 
     beforeEach(function() {
@@ -290,7 +290,7 @@ describe('TlsProvider', function() {
         return Promise.resolve(response);
       });
 
-      provider.getMediaInfo(expectedMediaIds, null, function(error, data) {
+      provider.getMediasInfo(expectedMediaIds, null, function(error, data) {
         assert.isNull(error, 'Unexpected error');
         assert.ok(data.available, 'Expected media to be available');
 
@@ -325,7 +325,7 @@ describe('TlsProvider', function() {
         return Promise.resolve(response);
       });
 
-      provider.getMediaInfo(expectedMediaIds, null, function(error, data) {
+      provider.getMediasInfo(expectedMediaIds, null, function(error, data) {
         assert.isNull(error, 'Unexpected error');
         assert.notOk(data.available, 'Expected media to be available');
         TlsClient.prototype.get.should.have.been.called.exactly(expectedMediaIds.length);
@@ -336,7 +336,7 @@ describe('TlsProvider', function() {
     it('should set media as available if no resource', function(done) {
       var expectedMediaIds = [];
 
-      provider.getMediaInfo(expectedMediaIds, null, function(error, data) {
+      provider.getMediasInfo(expectedMediaIds, null, function(error, data) {
         assert.isNull(error, 'Unexpected error');
         assert.isEmpty(data.sources, 'Wrong sources');
         assert.ok(data.available, 'Expected media to be available');
@@ -353,7 +353,7 @@ describe('TlsProvider', function() {
         return Promise.reject(expectedError);
       });
 
-      provider.getMediaInfo(expectedMediaIds, null, function(error, data) {
+      provider.getMediasInfo(expectedMediaIds, null, function(error, data) {
         assert.strictEqual(error, expectedError, 'Wrong error');
         assert.isUndefined(data, 'Unexpected data');
         TlsClient.prototype.get.should.have.been.called.exactly(expectedMediaIds.length);

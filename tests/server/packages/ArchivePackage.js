@@ -51,6 +51,9 @@ describe('ArchivePackage', function() {
       updateMediaId: chai.spy(function(id, mediaId, callback) {
         callback(null, 1);
       }),
+      updateMediasHeights: chai.spy(function(id, mediasHeights, callback) {
+        callback(null, 1);
+      }),
       updateMetadata: chai.spy(function(id, metadata, callback) {
         callback(null, 1);
       }),
@@ -240,6 +243,9 @@ describe('ArchivePackage', function() {
     ArchivePackage = mock.reRequire(path.join(process.rootPublish, 'app/server/packages/ArchivePackage.js'));
     archivePackage = new ArchivePackage(expectedPackage, videoProvider, poiProvider);
     archivePackage.fsm = {};
+    archivePackage.getVideoHeight = chai.spy(function(videoPath, callback) {
+      callback(null, 720);
+    });
     ArchivePackage.super_.prototype.defragment = chai.spy(function(filePath, callback) {
       callback();
     });
@@ -2065,6 +2071,176 @@ describe('ArchivePackage', function() {
         expectedArchiveFormat.getDate.should.have.been.called.exactly(1);
         expectedArchiveFormat.getName.should.have.been.called.exactly(1);
         videoProvider.updateOne.should.have.been.called.exactly(1);
+      });
+    });
+
+  });
+
+  describe('getMetadata', function() {
+
+    it('should change package state to GETTING_METADATA and get height of each video', function() {
+      var count = 0;
+      var expectedMediasHeights = [720, 1080];
+
+      archivePackage.getVideoHeight = chai.spy(function(videoPath, callback) {
+        assert.equal(videoPath, path.join(
+          expectedPackageTemporaryDirectory,
+          expectedArchiveFormat.medias[count]
+        ), 'Getting video height of wrong video ' + videoPath);
+        callback(null, expectedMediasHeights[count++]);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        videoProvider.updateState.should.have.been.called.with(expectedPackage.id, STATES.GETTING_METADATA);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.with(expectedPackageTemporaryDirectory);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(expectedArchiveFormat.medias.length);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
+        videoProvider.updateMediasHeights.should.have.been.called.with(expectedPackage.id, expectedMediasHeights);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should not analyze medias videos if videos height have already been retrieved', function() {
+      expectedPackage.mediaId = [];
+      expectedPackage.mediasHeights = [];
+      expectedArchiveFormat.medias.forEach(function(media, index) {
+        expectedPackage.mediaId.push(String(index));
+        expectedPackage.mediasHeights.push(720);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should get video height only if not known', function() {
+      expectedPackage.mediaId = ['90'];
+      expectedPackage.mediasHeights = [720];
+
+      archivePackage.getVideoHeight = chai.spy(function(videoPath, callback) {
+        assert.equal(videoPath, path.join(
+          expectedPackageTemporaryDirectory,
+          expectedArchiveFormat.medias[1]
+        ), 'Getting video height of wrong video ' + videoPath);
+        callback(null, 720);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(expectedArchiveFormat.medias.length - 1);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
+      }).catch(function(error) {
+        assert.fail(error);
+      });
+    });
+
+    it('should reject promise if changing package state failed', function() {
+      videoProvider.updateState = chai.spy(function(id, state, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(0);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting archive format failed', function() {
+      archiveFormatFactory.get = chai.spy(function(mediaPackagePath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_FORMAT, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(0);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting medias files paths failed', function() {
+      expectedArchiveFormat.getMedias = chai.spy(function(callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_MEDIAS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(0);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if getting a video height failed', function() {
+      archivePackage.getVideoHeight = chai.spy(function(videoPath, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.GET_METADATA_GET_MEDIAS_HEIGHTS, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(1);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(0);
+      });
+    });
+
+    it('should reject promise if updating package failed', function() {
+      videoProvider.updateMediasHeights = chai.spy(function(id, mediasHeights, callback) {
+        callback(expectedError);
+      });
+
+      return archivePackage.getMetadata().then(function() {
+        assert.fail('Unexpected promise resolution');
+      }).catch(function(error) {
+        assert.instanceOf(error, ArchivePackageError, 'Wrong error type');
+        assert.equal(error.message, expectedError.message, 'Wrong error message');
+        assert.equal(error.code, ERRORS.GET_METADATA_UPDATE_PACKAGE, 'Wrong error code');
+
+        videoProvider.updateState.should.have.been.called.exactly(1);
+        archiveFormatFactory.get.should.have.been.called.exactly(1);
+        expectedArchiveFormat.getMedias.should.have.been.called.exactly(1);
+        archivePackage.getVideoHeight.should.have.been.called.exactly(expectedArchiveFormat.medias.length);
+        videoProvider.updateMediasHeights.should.have.been.called.exactly(1);
       });
     });
 

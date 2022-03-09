@@ -55,27 +55,25 @@ LocalProvider.prototype.upload = function(mediaFilePath, callback) {
 };
 
 /**
- * Gets information about a media hosted by Local.
+ * Gets information about medias hosted by Local.
  *
- * @param {String} mediaId The local id of the media
- * @param {String} expectedDefintion The expected media definition, not used for this provider
+ * @param {Array} mediasIds The local ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids. This is not used
+ * for local provider as local doesn't transcode medias
  * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
  * callback The function to call when it's done
  */
-LocalProvider.prototype.getMediaInfo = function(mediaIds, expectedDefinition, callback) {
+LocalProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
   var self = this;
-  if (!mediaIds) {
-    callback(new Error('media id should be defined'), null);
-    return;
-  }
 
   var infos = {sources: [], available: true};
-  mediaIds.forEach(function(mediaId) {
-    var info = {};
+  mediasIds.forEach(function(mediaId, index) {
     var basePath = self.conf.streamPath + '/' + mediaId + '/video.mp4';
+    var expectedMediaHeight = expectedMediasHeights[index];
+    var info = {};
     info.files = [{
       quality: 2, // 0 = mobile, 1 = sd, 2 = hd
-      height: expectedDefinition,
+      height: expectedMediaHeight,
       link: basePath
     }];
     infos.sources.push(info);

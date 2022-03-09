@@ -346,8 +346,10 @@ VideoProvider.prototype.getPoiFilePath = function(mediaId, file) {
  * @param {String} [medias[].lockedByPackage] The id of the package which has locked this package for merge
  * @param {String} [medias[].originalPackagePath] Absolute path of the original package
  * @param {String} [medias[].originalFileName] Original package name without the extension
- * @param {Array} [medias[].mediaId] The list of medias in the media platform. Could have several media ids if media has
- * @param {ltiple sources
+ * @param {Array} [medias[].mediaId] The list of medias in the media platform. Could have several media ids if media
+ * has multiple sources
+ * @param {Array} [medias[].mediasHeights] The list of medias heights in the same order as mediaId. Could have several
+ * heights if media has multiple sources
  * @param {Array} [medias[].timecodes] The list of media timecodes
  * @param {Array} [medias[].chapters] The list of media chapters
  * @param {Array} [medias[].tags] The list of media tags
@@ -390,6 +392,7 @@ VideoProvider.prototype.add = function(medias, callback) {
       originalPackagePath: media.originalPackagePath,
       originalFileName: media.originalFileName,
       mediaId: media.mediaId,
+      mediasHeights: media.mediasHeights,
       timecodes: media.timecodes || [],
       chapters: media.chapters || [],
       tags: media.tags || [],
@@ -480,6 +483,18 @@ VideoProvider.prototype.updateLink = function(id, link, callback) {
  */
 VideoProvider.prototype.updateMediaId = function(id, idMediaPlatform, callback) {
   updateMedia.call(this, id, {mediaId: idMediaPlatform}, callback);
+};
+
+/**
+ * Updates medias heights.
+ *
+ * @param {String} id The id of the media to update
+ * @param {Array} heights The list of videos heights
+ * @param {module:publish/providers/VideoProvider~VideoProvider~updatePropertyCallback} callback The function to call
+ * when it's done
+ */
+VideoProvider.prototype.updateMediasHeights = function(id, heights, callback) {
+  updateMedia.call(this, id, {mediasHeights: heights}, callback);
 };
 
 /**
@@ -612,6 +627,7 @@ VideoProvider.prototype.removeLocal = function(filter, callback) {
  * @param {String} [data.lastTransition] The last media transition in publication process
  * @param {String} [data.lockedByPackage] The id of the package which has locked this package for merge
  * @param {Array} [data.mediaId] The list of medias in the media platform. Could have several media ids if media has
+ * @param {Array} [data.mediasHeights] The list of medias heights in the same order as mediaId
  * @param {ltiple sources
  * @param {String} [data.link] The media link in OpenVeo
  * @param {String} [data.temporarySubDirectory] The sub path of package files in its temporary directory
@@ -636,6 +652,7 @@ VideoProvider.prototype.updateOne = function(filter, data, callback) {
   if (data.metadata) modifications.metadata = data.metadata;
   if (data.packageType) modifications.packageType = data.packageType;
   if (data.mediaId) modifications.mediaId = data.mediaId;
+  if (data.mediasHeights) modifications.mediasHeights = data.mediasHeights;
   if (data.link) modifications.link = data.link;
   if (data.temporarySubDirectory) modifications.temporarySubDirectory = data.temporarySubDirectory;
   if (Object.prototype.hasOwnProperty.call(data, 'lastState')) modifications.lastState = data.lastState;
