@@ -829,7 +829,7 @@ describe('Videos web service', function() {
               process.api.getCoreApi().getSuperAdminId(),
               'Expected media to belong to the super administrator'
             );
-            assert.equal(media.metadata['profile-settings']['video-height'], 1080, 'Wrong video height');
+            assert.deepEqual(media.mediasHeights, [1080], 'Wrong video height');
             assert.deepEqual(media.metadata.groups, expectedGroups, 'Wrong groups');
             assert.match(media.originalFileName, new RegExp(expectedFileName + '-.*'), 'Wrong file name');
             assert.equal(media.title, expectedVideoTitle, 'Wrong title');
