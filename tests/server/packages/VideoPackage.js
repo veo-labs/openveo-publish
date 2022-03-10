@@ -715,7 +715,7 @@ describe('VideoPackage', function() {
         state: STATES.WAITING_FOR_MERGE
       }];
       videoPackage.mediaPackage.mediaId = ['2'];
-      videoPackage.mediaPackage.mediasHeights = [1080];
+      videoPackage.mediaPackage.mediasHeights = [720];
     });
 
     it('should change package state to MERGING and merge package with the same file name locked package', function() {

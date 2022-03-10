@@ -612,7 +612,7 @@ VideoPackage.prototype.merge = function() {
           new ResourceFilter().equal('id', lockedPackage.id),
           {
             mediaId: openVeoApi.util.joinArray(lockedPackage.mediaId, self.mediaPackage.mediaId),
-            mediasHeights: openVeoApi.util.joinArray(lockedPackage.mediasHeights, self.mediaPackage.mediasHeights)
+            mediasHeights: lockedPackage.mediasHeights.concat(self.mediaPackage.mediasHeights)
           },
           function(error) {
             if (error) return callback(new VideoPackageError(error.message, ERRORS.MERGE_UPDATE_MEDIAS));
