@@ -1,10 +1,15 @@
-# 12.0.1 / YYYY-MM-DD
+# 13.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- Drop support for OpenVeo Core &lt; 10.0.1
 
 ## BUG FIXES
 
 - Fix server crash when trying to upload a video to Vimeo without upload permission, error introduced in version 1.0.0
 - Fix message "This media is not yet available on the streaming platform..." appearing when displaying multi-sources videos with different definitions hosted on Vimeo. Bug introduced in version 2.1.0
 - Fix the order of sources in the player for multi-sources medias which wasn't respecting the order of the multi-sources package. Bug introduced in version 12.0.0
+- Fix searching by keywords in the catalog of medias wich wasn't working for a non-admin user. Bug introduced in version 11.0.0
 
 # 12.0.0 / 2021-11-19
 

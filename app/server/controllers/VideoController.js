@@ -1572,10 +1572,14 @@ VideoController.prototype.getEntitiesAction = function(request, response, next) 
 
     // Get the list of medias
     function(callback) {
-      if (params.query && params.useSmartSearch) filter.or(querySearchFilters);
+      filter.and([self.addAccessFilter(null, request.user)]);
+
+      if (params.query && params.useSmartSearch) {
+        filter.and([new ResourceFilter().or(querySearchFilters)]);
+      }
 
       provider.get(
-        self.addAccessFilter(filter, request.user),
+        filter,
         fields,
         params.limit,
         params.page,

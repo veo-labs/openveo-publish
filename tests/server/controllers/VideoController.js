@@ -2207,39 +2207,39 @@ describe('VideoController', function() {
         assert.deepEqual(
           filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'metadata.user').value,
           [request.user.id, anonymousId],
-          'Wrong filter'
+          'Wrong access filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.SEARCH),
-          'Unexpected search query'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH),
+          'Unexpected search query filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.SCORE),
-          'Unexpected score'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'title'),
+          'Unexpected regex filter on title'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.REGEX),
-          'Unexpected regex'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.REGEX, 'description'),
+          'Unexpected regex filter on description'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'state'),
-          'Unexpected state'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'state'),
+          'Unexpected state filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.LESSER_THAN, 'date'),
-          'Unexpected date'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.LESSER_THAN, 'date'),
+          'Unexpected date filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.GREATER_THAN_EQUAL, 'date'),
-          'Unexpected date'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.GREATER_THAN_EQUAL, 'date'),
+          'Unexpected date filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'category'),
-          'Unexpected category'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'category'),
+          'Unexpected category filter'
         );
-        assert.notOk(
-          filter.hasOperation(ResourceFilter.OPERATORS.IN, 'metadata.groups'),
-          'Unexpected groups'
+        assert.isNull(
+          filter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'metadata.groups'),
+          'Unexpected groups filter'
         );
         assert.isUndefined(fields.include, 'Unexpected include');
         assert.isUndefined(fields.exclude, 'Unexpected exclude');
@@ -2295,10 +2295,11 @@ describe('VideoController', function() {
       });
 
       VideoProvider.prototype.get = chai.spy(function(filter, fields, limit, page, sort, callback) {
-        var orOperation = filter.getLogicalOperation(ResourceFilter.OPERATORS.OR);
-        var searchFilter = orOperation.filters[0];
-        var searchInChaptersFilter = orOperation.filters[1];
-        var searchInTagsFilter = orOperation.filters[2];
+        var andOperation = filter.getLogicalOperation(ResourceFilter.OPERATORS.AND);
+        var queryOrOperation = andOperation.filters[1].getLogicalOperation(ResourceFilter.OPERATORS.OR);
+        var searchFilter = queryOrOperation.filters[0];
+        var searchInChaptersFilter = queryOrOperation.filters[1];
+        var searchInTagsFilter = queryOrOperation.filters[2];
 
         assert.equal(
           searchFilter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH).value,
@@ -2306,12 +2307,12 @@ describe('VideoController', function() {
           'Wrong search operation'
         );
         assert.sameMembers(
-          searchInChaptersFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN).value,
+          searchInChaptersFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'chapters').value,
           [expectedPois[0].id],
           'Wrong search in chapters operation'
         );
         assert.sameMembers(
-          searchInTagsFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN).value,
+          searchInTagsFilter.getComparisonOperation(ResourceFilter.OPERATORS.IN, 'tags').value,
           [expectedPois[0].id],
           'Wrong search in tags operation'
         );
@@ -2371,8 +2372,8 @@ describe('VideoController', function() {
           '/' + expectedQuery + '/i',
           'Wrong operation on "description"'
         );
-        assert.notOk(filter.hasOperation(ResourceFilter.OPERATORS.SEARCH, 'Unexpected search operation'));
-        assert.notOk(filter.hasOperation(ResourceFilter.OPERATORS.SCORE, 'Unexpected score operation'));
+        assert.isNull(filter.getComparisonOperation(ResourceFilter.OPERATORS.SEARCH, 'Unexpected search filter'));
+        assert.isUndefined(sort.score, 'Unexpected score sort');
         callback(null, expectedMedias, expectedPagination);
       });
 
