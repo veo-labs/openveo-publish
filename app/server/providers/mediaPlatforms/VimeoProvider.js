@@ -137,10 +137,10 @@ VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
 VimeoProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
   var self = this;
 
-  var parallel = [];
+  var series = [];
   var infos = {sources: [], available: true};
   mediasIds.forEach(function(mediaId, index) {
-    parallel.push(function(cb) {
+    series.push(function(cb) {
 
       // Ask Vimeo for media information
       self.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
@@ -186,7 +186,7 @@ VimeoProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeight
     });
   });
 
-  async.parallel(parallel, function(error) {
+  async.series(series, function(error) {
     if (error)
       callback(error);
     else {
