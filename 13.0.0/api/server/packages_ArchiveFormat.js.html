@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: packages/ArchiveFormat.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: packages/ArchiveFormat.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+var path = require('path');
+
+var openVeoApi = require('@openveo/api');
+
+/**
+ * @module publish/packages/ArchiveFormat
+ */
+
+/**
+ * Defines an ArchiveFormat to manage the content of an archive.
+ *
+ * An ArchiveFormat must contain:
+ *  - A video file
+ *  - A file containing archive metadatas
+ *
+ *  Archive metadatas may contain:
+ *  - A property containing the date of the archive
+ *  - A property containing the name of the archive
+ *
+ * @class ArchiveFormat
+ * @constructor
+ * @param {String} mediaPackagePath The directory where to find extracted files of the archive
+ * @param {String} metadatasFileName The name of the metadatas file in the archive
+ * @param {String} metadataDateProperty The name of the property in metadatas containing the date of the archive
+ * @param {String} metadataNameProperty The name of the property in metadatas containing the name of the archive
+ */
+function ArchiveFormat(mediaPackagePath, metadatasFileName, metadataDateProperty, metadataNameProperty) {
+
+  Object.defineProperties(this,
+
+    /** @lends module:publish/packages/ArchiveFormat~ArchiveFormat */
+    {
+
+      /**
+       * The metadatas file path.
+       *
+       * @type {Object}
+       * @instance
+       * @readonly
+       */
+      descriptionFilePath: {value: path.join(mediaPackagePath, metadatasFileName)},
+
+      /**
+       * The archive metadatas.
+       *
+       * @type {Object}
+       * @instance
+       */
+      metadatas: {value: null, writable: true},
+
+      /**
+       * The name of the property in metadatas containing the date of the archive.
+       *
+       * @type {Object}
+       * @instance
+       */
+      metadataDateProperty: {value: metadataDateProperty},
+
+      /**
+       * The name of the property in metadatas containing the name of the archive.
+       *
+       * @type {Object}
+       * @instance
+       */
+      metadataNameProperty: {value: metadataNameProperty},
+
+      /**
+       * The path of the media package.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      mediaPackagePath: {value: mediaPackagePath}
+
+    }
+
+  );
+
+}
+
+module.exports = ArchiveFormat;
+
+/**
+ * Gets archive metadatas.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getMetadatasCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.getMetadatas = function(callback) {
+  var self = this;
+
+  if (this.metadatas) return callback(null, this.metadatas);
+
+  openVeoApi.fileSystem.getJSONFileContent(this.descriptionFilePath, function(error, packageInformation) {
+    if (error) return callback(error);
+    self.metadatas = packageInformation;
+    callback(null, self.metadatas);
+  });
+};
+
+/**
+ * Gets archive date from metadatas.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getDateCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.getDate = function(callback) {
+  this.getProperty(this.metadataDateProperty, function(error, date) {
+    if (error) return callback(error);
+    callback(null, date * 1000);
+  });
+};
+
+/**
+ * Gets archive name from metadatas.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getNameCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.getName = function(callback) {
+  this.getProperty(this.metadataNameProperty, callback);
+};
+
+/**
+ * Gets property value from metadatas.
+ *
+ * @param {String} property The path of the property to look for in metadatas
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getPropertyCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.getProperty = function(property, callback) {
+  var self = this;
+
+  if (this.metadatas) {
+    return callback(null, openVeoApi.util.evaluateDeepObjectProperties(property, this.metadatas));
+  }
+
+  this.getMetadatas(function(error, metadatas) {
+    if (error) return callback(error);
+    callback(null, openVeoApi.util.evaluateDeepObjectProperties(property, self.metadatas));
+  });
+};
+
+/**
+ * Gets medias files names from metadatas.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getMediasCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.getMedias = function(callback) {
+  throw new Error('getMedias method not implemented for this ArchiveFormat');
+};
+
+/**
+ * Gets points of interest from metadatas.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~getPointsOfInterestCallback} Function to call when its
+ * done
+ */
+ArchiveFormat.prototype.getPointsOfInterest = function(callback) {
+  throw new Error('getPointsOfInterest method not implemented for this ArchiveFormat');
+};
+
+/**
+ * Validates the archive.
+ *
+ * @return {module:publish/packages/ArchiveFormat~ArchiveFormat~validateCallback} Function to call when its done
+ */
+ArchiveFormat.prototype.validate = function(callback) {
+  throw new Error('validate method not implemented for this ArchiveFormat');
+};
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getDateCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} date Archive timestamp in milliseconds
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getMediasCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Array} medias The list of medias files names in the archive
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getMetadatasCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Object} metadatas Archive metadatas
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getNameCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} name Archive name
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getPointsOfInterestCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Array} pointsOfInterest The list of points of interest
+ * @param {String} pointsOfInterest[].type Points of interest type
+ * @param {String} pointsOfInterest[].timecode Points of interest time in milliseconds from the beginning of the media
+ * @param {Object} pointsOfInterest[].data Points of interest additional data depending on its type
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~getPropertyCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {*} value The property value from archive metadatas
+ */
+
+/**
+ * @callback module:publish/packages/ArchiveFormat~ArchiveFormat~validateCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Boolean} isValid true if valid, false otherwise
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Mar 11 2022 07:52:11 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: providers/mediaPlatforms/youtube/YoutubeProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: providers/mediaPlatforms/youtube/YoutubeProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/providers/mediaPlatforms/youtube/YoutubeProvider
+ */
+
+var fs = require('fs');
+var util = require('util');
+var mime = require('mime');
+var async = require('async');
+var google = require('googleapis').google;
+var youtube = google.youtube('v3');
+var YoutubeResumableUpload = process.requirePublish(
+  'app/server/providers/mediaPlatforms/youtube/YoutubeResumableUpload.js'
+);
+var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
+
+/**
+ * Available upload methods.
+ *
+ * @memberof module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider
+ * @const
+ * @type {Array}
+ * @private
+ */
+var UPLOAD_METHODS = ['uploadClassic', 'uploadResumable'];
+Object.freeze(UPLOAD_METHODS);
+
+/**
+ * Available privacy statuses.
+ *
+ * @memberof module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider
+ * @const
+ * @type {Array}
+ */
+var PRIVACY_STATUSES = ['public', 'private', 'unlisted'];
+Object.freeze(PRIVACY_STATUSES);
+
+/**
+ * Defines a YoutubeProvider class to interact with [youtube platform](https://youtube.com/).
+ *
+ * @class YoutubeProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
+ * @constructor
+ * @param {Object} providerConf A youtube configuration object
+ * @param {String} providerConf.uploadMethod The upload method to use (see UPLOAD_METHODS)
+ * @param {String} providerConf.privacy The media privacy on Youtube (see PRIVACY_STATUSES)
+ * @param {module:publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper} googleOAuthHelper The
+ * Google OAuth helper
+ */
+function YoutubeProvider(providerConf, googleOAuthHelper) {
+  YoutubeProvider.super_.call(this, providerConf);
+
+  Object.defineProperties(this,
+
+    /** @lends module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider */
+    {
+
+      /**
+       * Youtube upload method, uploadClassic or uploadResumable.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      uploadMethod: {
+        value: UPLOAD_METHODS.indexOf(this.conf.uploadMethod) > -1 ? this.conf.uploadMethod : 'uploadClassic'
+      },
+
+      /**
+       * Privacy to apply to uploaded medias either public, private or unlisted.
+       *
+       * @type {String}
+       * @instance
+       * @readonly
+       */
+      privacy: {
+        value: PRIVACY_STATUSES.indexOf(this.conf['privacy']) > -1 ? this.conf['privacy'] : 'public'
+      },
+
+      /**
+       * The Google OAuth Helper to use to connect to Google APIs.
+       *
+       * @type {GoogleOAuthHelper}
+       * @instance
+       * @readonly
+       */
+      googleOAuthHelper: {value: googleOAuthHelper}
+
+    }
+
+  );
+}
+
+module.exports = YoutubeProvider;
+util.inherits(YoutubeProvider, MediaPlatformProvider);
+
+/**
+ * Youtube category ids.
+ *
+ * @const
+ * @type {Object}
+ */
+YoutubeProvider.CATEGORIES = {
+  EDUCATION: 27
+};
+Object.freeze(YoutubeProvider.CATEGORIES);
+
+/**
+ * Uploads a media to the Youtube platform.
+ *
+ * @param {String} mediaFilePath The absolute path of the media to upload
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
+ */
+YoutubeProvider.prototype.upload = function(mediaFilePath, callback) {
+  var uploadParams = {
+    resource: {
+      snippet: {
+        title: 'Media name',
+        description: 'Media description',
+        categoryId: YoutubeProvider.CATEGORIES.EDUCATION
+      },
+      status: {
+        privacyStatus: this.privacy
+      }
+    }
+  };
+  uploadParams.part = (['id'].concat(Object.keys(uploadParams.resource))).join(',');
+  this[this.uploadMethod](mediaFilePath, uploadParams, callback);
+};
+
+/**
+ * Uploads to Youtube in the classic way, using Youtube API.
+ *
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadClassicCallback}
+ * callback callback The function to call when its done
+ */
+YoutubeProvider.prototype.uploadClassic = function(mediaFilePath, uploadParams, callback) {
+  var self = this;
+  var mediaId;
+  var media = fs.createReadStream(mediaFilePath);
+
+  uploadParams.media = {
+    mediaType: mime.getType(mediaFilePath),
+    body: media
+  };
+
+  async.series([
+
+    // Check auth
+    function(callback) {
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        self.googleOAuthHelper.oauth2Client.setCredentials(token);
+        callback();
+      });
+    },
+
+    // Upload media
+    function(callback) {
+      uploadParams.auth = self.googleOAuthHelper.oauth2Client;
+      youtube.videos.insert(uploadParams, function(error, response) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        mediaId = response.id;
+        callback();
+      });
+
+    }
+  ], function(error) {
+    callback(error, mediaId);
+  });
+
+};
+
+
+/**
+ * Uploads to Youtube in a fail safe way, using resumable uploads.
+ *
+ * The upload can fail 3 times before failing globally, each times it fails it perform an upload again starting where
+ * it previously failed (ie: not re-uploading all the media)
+ *
+ * @param {String} mediaFilePath The absolute path to the media to upload
+ * @param {Object} uploadParams Parameters to send to Youtube when calling the API
+ * @param {module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadResumableCallback}
+ * callback The function to call when its done
+ */
+YoutubeProvider.prototype.uploadResumable = function(mediaFilePath, uploadParams, callback) {
+  var self = this;
+  var mediaId;
+  var stats;
+
+  async.series([
+
+    // Check auth
+    function(callback) {
+      self.googleOAuthHelper.getFreshToken(function(error, token) {
+        if (error) return callback(error);
+
+        uploadParams.auth = token;
+        callback();
+      });
+    },
+
+    // Get file size
+    function(callback) {
+      fs.stat(mediaFilePath, function(error, fileStats) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        stats = fileStats;
+        callback();
+      });
+    },
+
+    // Upload media
+    function(callback) {
+      if (!Object.prototype.hasOwnProperty.call(uploadParams, 'auth') || !uploadParams.auth) {
+        callback(new Error('Auth has not been set correctly'));
+        return;
+      }
+      var resumableUpload = new YoutubeResumableUpload();
+
+      resumableUpload.tokens = uploadParams.auth;
+      resumableUpload.filepath = mediaFilePath;
+      resumableUpload.stats = stats;
+      resumableUpload.metadata = uploadParams.resource;
+      resumableUpload.retry = 3;
+
+      resumableUpload.on('progress', function(progress) {
+        process.logger.debug('Upload progress: ' + progress);
+      });
+      resumableUpload.on('error', function(error) {
+        process.logger.error('Upload error: ' + error.message);
+        if (resumableUpload.retry === 0) {
+          callback(error);
+        }
+      });
+      resumableUpload.on('success', function(media) {
+        media = JSON.parse(media);
+        mediaId = media.id;
+        callback();
+      });
+      resumableUpload.upload();
+    }
+  ], function(error) {
+    callback(error, mediaId);
+  });
+
+};
+
+/**
+ * Gets information about medias hosted by Youtube.
+ *
+ * @param {Array} mediasIds The Youtube ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids. This is not used
+ * for Youtube provider as Youtube doesn't transcode medias
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
+ */
+YoutubeProvider.prototype.getMediasInfo = function(mediasId, expectedMediasHeights, callback) {
+
+  // sources and pictures are not necessary: youtube player manage its own data
+  callback(null, {available: true, sources: [], pictures: [], mediaId: mediasId});
+
+};
+
+/**
+ * Removes a media from the Youtube platform.
+ *
+ * @param {Array} mediaIds Youtube media ids to remove
+ * @param {callback} callback The function to call when it's done
+ */
+YoutubeProvider.prototype.remove = function(mediaIds, callback) {
+  var self = this;
+
+  if (!mediaIds) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var series = [];
+
+  series.push(function(callback) {
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
+      callback();
+    });
+  });
+
+  mediaIds.forEach(function(mediaId) {
+    series.push(function(callback) {
+      var deleteParam = {
+        id: mediaId,
+        part: 'id'
+      };
+      deleteParam.auth = self.googleOAuthHelper.oauth2Client;
+      youtube.videos.delete(deleteParam, function(error) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        callback();
+      });
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * Updates a media resources on the platform.
+ *
+ * If media has several resources on the platform, the same update will be performed for all resources.
+ * Actually only the media title is synchronized with Youtube.
+ *
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The datas to update
+ * @param {String} [data.title] The media title. Be careful only the first 100 characters will be used, also
+ * "less than" and "greater than" characters will be removed
+ * @param {Boolean} force true to force the update even if title hasn't changed, false otherwise
+ * @param {callback} callback The function to call when it's done
+ */
+YoutubeProvider.prototype.update = function(media, data, force, callback) {
+  if (!data.title || (data.title === media.title &amp;&amp; !force)) return callback();
+
+  var self = this;
+  var series = [];
+
+  series.push(function(callback) {
+    self.googleOAuthHelper.getFreshToken(function(error, token) {
+      if (error) return callback(error);
+
+      self.googleOAuthHelper.oauth2Client.setCredentials(token);
+      callback();
+    });
+  });
+
+  media.mediaId.forEach(function(mediaId) {
+    series.push(function(callback) {
+      youtube.videos.update({
+        part: 'snippet',
+        auth: self.googleOAuthHelper.oauth2Client,
+        resource: {
+          id: mediaId,
+          snippet: {
+            title: data.title.substring(0, 100).replace(/&lt;|>/g, ''),
+            categoryId: YoutubeProvider.CATEGORIES.EDUCATION
+          }
+        }
+      }, callback);
+    });
+  });
+
+  async.series(series, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadClassicCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} id The media id on the Youtube platform
+ */
+
+/**
+ * @callback module:publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider~uploadResumableCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {String} id The media id on the Youtube platform
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Mar 11 2022 07:52:11 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
