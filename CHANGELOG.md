@@ -1,4 +1,4 @@
-# 13.0.0 / YYYY-MM-DD
+# 13.0.0 / 2022-03-11
 
 ## BREAKING CHANGES
 

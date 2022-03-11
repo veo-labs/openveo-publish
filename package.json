@@ -1,6 +1,6 @@
 {
   "name": "@openveo/publish",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "description": "OpenVeo video publication plugin",
   "keywords": [
     "openveo",
