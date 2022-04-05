@@ -55,7 +55,6 @@
         $scope.volumeIconDisplayed = isParameterTrue(urlParams['volume-icon'], true);
         $scope.templateIconDisplayed = isParameterTrue(urlParams['template-icon'], true);
         $scope.settingsIconDisplayed = isParameterTrue(urlParams['settings-icon'], true);
-        $scope.veoLabsIconDisplayed = isParameterTrue(urlParams['veo-labs-icon'], true);
         $scope.timeDisplayed = isParameterTrue(urlParams['time'], true);
         $scope.chaptersDisplayed = isParameterTrue(urlParams['chapters'], true);
         $scope.tagsDisplayed = isParameterTrue(urlParams['tags'], true);

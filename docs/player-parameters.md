@@ -96,14 +96,6 @@ Indicates if settings icon must be displayed or not (Default to `true`).
   ?settings-icon=false
 ```
 
-## veo-labs-icon
-
-Indicates if Veo-Labs icon must be displayed or not (Default to `true`).
-
-```html
-  ?veo-labs-icon=false
-```
-
 ## time
 
 Indicates if video time / duration must be displayed or not (Default to `true`).

@@ -1,3 +1,13 @@
+# 14.0.0 / YYYY-MM-DD
+
+## BREAKING CHANGES
+
+- Veo-Labs brand has been removed from OpenVeo Player
+
+## DEPENDENCIES
+
+- **@openveo/player** has been upgraded from 7.0.0 to **8.0.0**
+
 # 13.0.0 / 2022-03-11
 
 ## BREAKING CHANGES

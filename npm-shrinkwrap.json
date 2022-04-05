@@ -10,7 +10,7 @@
       "hasInstallScript": true,
       "license": "AGPL-3.0",
       "dependencies": {
-        "@openveo/player": "^7.0.0",
+        "@openveo/player": "^8.0.0",
         "@openveo/rest-nodejs-client": "^5.0.1",
         "angular": "1.5.11",
         "angular-animate": "1.5.11",
@@ -235,9 +235,9 @@
       "dev": true
     },
     "node_modules/@openveo/player": {
-      "version": "7.0.0",
-      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-7.0.0.tgz",
-      "integrity": "sha512-Y2RybyMnMxAvvUwjCxV/bgb5FLbpMXuxz2gueJHl2alw5sWSR0ZzV6yY7VLpXpUak+dvPrS1f9+2o9arxif5FQ==",
+      "version": "8.0.0",
+      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-8.0.0.tgz",
+      "integrity": "sha512-GPp9oiIrHweVweES0GGdEfS93XlFYd6lfRJSVo7zVjSZI0I11n6Ol4liF05/jloAWIbMULN51a/jGVIDkCOBuA==",
       "engines": {
         "node": ">=16.3.0",
         "npm": ">=7.15.1"
@@ -5638,9 +5638,9 @@
       "dev": true
     },
     "@openveo/player": {
-      "version": "7.0.0",
-      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-7.0.0.tgz",
-      "integrity": "sha512-Y2RybyMnMxAvvUwjCxV/bgb5FLbpMXuxz2gueJHl2alw5sWSR0ZzV6yY7VLpXpUak+dvPrS1f9+2o9arxif5FQ=="
+      "version": "8.0.0",
+      "resolved": "https://registry.npmjs.org/@openveo/player/-/player-8.0.0.tgz",
+      "integrity": "sha512-GPp9oiIrHweVweES0GGdEfS93XlFYd6lfRJSVo7zVjSZI0I11n6Ol4liF05/jloAWIbMULN51a/jGVIDkCOBuA=="
     },
     "@openveo/rest-nodejs-client": {
       "version": "5.0.1",
