@@ -1,12 +1,12 @@
 {
   "name": "@openveo/publish",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@openveo/publish",
-      "version": "13.0.0",
+      "version": "14.0.0",
       "hasInstallScript": true,
       "license": "AGPL-3.0",
       "dependencies": {
