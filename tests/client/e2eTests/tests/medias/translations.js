@@ -206,6 +206,7 @@ describe('Media page translations', function() {
   });
 
   it('should be available for medias status in different languages', function() {
+    this.timeout(500000);
     checkStateTranslations();
   });
 

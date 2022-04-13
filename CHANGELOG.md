@@ -1,3 +1,9 @@
+# 14.0.1 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix media page translations end to end test which could exceed tests timeout
+
 # 14.0.0 / 2022-04-05
 
 ## BREAKING CHANGES
