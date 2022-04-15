@@ -270,18 +270,15 @@ describe('Videos web service', function() {
           'publish/videos?searchInPois=1&query=' + encodeURIComponent(searchQuery)
         ).then(function(results) {
           var videos = results.entities;
-          check(function() {
-            assert.lengthOf(videos, mediasToAdd.length, 'Unexpected number of videos');
-            assert.equal(videos[0].id, mediasToAdd[3].id, 'Wrong video 1');
-            assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
-            assert.equal(videos[2].id, mediasToAdd[0].id, 'Wrong video 3');
-            assert.equal(videos[3].id, mediasToAdd[2].id, 'Wrong video 4');
-          }, done);
-        }).catch(function(error) {
-          check(function() {
-            assert.ok(false, error.message);
-          }, done);
+          assert.lengthOf(videos, mediasToAdd.length, 'Unexpected number of videos');
+          assert.equal(videos[0].id, mediasToAdd[3].id, 'Wrong video 1');
+          assert.equal(videos[1].id, mediasToAdd[1].id, 'Wrong video 2');
+          assert.ok(videos[2].id === mediasToAdd[0].id || videos[2].id === mediasToAdd[2].id, 'Wrong video 3');
+          assert.ok(videos[3].id === mediasToAdd[0].id || videos[2].id === mediasToAdd[2].id, 'Wrong video 4');
+          done();
         });
+      }).catch(function(error) {
+        done(error);
       });
     });
 
