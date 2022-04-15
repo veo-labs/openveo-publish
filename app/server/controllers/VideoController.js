@@ -194,6 +194,7 @@ function updatePoiAction(type, request, response, next) {
     return next(HTTP_ERRORS.UPDATE_POI_WRONG_PARAMETERS);
   }
 
+  var fileInfo = null;
   var media;
   var poi;
   var mediaId = params.id;
@@ -226,9 +227,10 @@ function updatePoiAction(type, request, response, next) {
         if (!request.body.info) return callback(HTTP_ERRORS.UPDATE_POI_MISSING_PARAMETERS);
 
         var file = request.files.file ? request.files.file[0] : null;
+        var info = JSON.parse(request.body.info);
 
         try {
-          poi = openVeoApi.util.shallowValidateObject(JSON.parse(request.body.info), {
+          poi = openVeoApi.util.shallowValidateObject(info, {
             value: {type: 'number'},
             name: {type: 'string'},
             description: {type: 'string'}
@@ -238,14 +240,18 @@ function updatePoiAction(type, request, response, next) {
         }
 
         if (file) {
-          poi.file = {
+          fileInfo = {
             originalName: file.originalname,
             mimeType: file.mimetype,
             fileName: file.filename,
             size: file.size,
             path: file.path
           };
+          poi.file = fileInfo;
           poi.file.url = provider.getPoiFilePath(mediaId, poi.file);
+        } else if (info.file) {
+          fileInfo = info.file;
+          delete poi.file;
         } else {
           poi.file = null;
         }
@@ -329,6 +335,7 @@ function updatePoiAction(type, request, response, next) {
   ], function(error) {
     if (error) return next(error);
     poi.id = poiId;
+    poi.file = fileInfo;
     response.send({total: totalUpdatedPois, poi: poi});
   });
 }
