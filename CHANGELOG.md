@@ -4,6 +4,7 @@
 
 - Fix media page translations end to end test which could exceed tests timeout
 - Fix updating a media tag with existing file, the file was removed. Bug introduced in version 11.0.0
+- Fix media edition from the catalog which wasn't working for medias present before upgrading to version &gt;= 13.0.0
 
 # 14.0.0 / 2022-04-05
 
