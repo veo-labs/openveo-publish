@@ -12,7 +12,7 @@
       "dependencies": {
         "@openveo/player": "^8.0.0",
         "@openveo/rest-nodejs-client": "^5.0.1",
-        "angular": "1.5.11",
+        "angular": "1.8.3",
         "angular-animate": "1.5.11",
         "angular-cookies": "1.5.11",
         "async": "^3.2.0",
@@ -474,9 +474,10 @@
       "integrity": "sha512-8UEa58QDLauDNfpbrX55Q9jrGHThw2ZMdOky5Gl1CDtVeJDPVrG4Jxx1N8jw2gkWaff5UUuX1KJd+9zGe2B+ZA=="
     },
     "node_modules/angular": {
-      "version": "1.5.11",
-      "resolved": "https://registry.npmjs.org/angular/-/angular-1.5.11.tgz",
-      "integrity": "sha1-jFunOG8VllyazzQp9ogVU6raMNY="
+      "version": "1.8.3",
+      "resolved": "https://registry.npmjs.org/angular/-/angular-1.8.3.tgz",
+      "integrity": "sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==",
+      "deprecated": "For the actively supported Angular, see https://www.npmjs.com/package/@angular/core. AngularJS support has officially ended. For extended AngularJS support options, see https://goo.gle/angularjs-path-forward."
     },
     "node_modules/angular-animate": {
       "version": "1.5.11",
@@ -2736,7 +2737,7 @@
     },
     "node_modules/imsc/node_modules/sax": {
       "version": "1.2.1",
-      "resolved": "http://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
+      "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
       "integrity": "sha1-e45lYZCyKOgaZq6nSEgNgozS03o="
     },
     "node_modules/imurmurhash": {
@@ -5827,9 +5828,9 @@
       }
     },
     "angular": {
-      "version": "1.5.11",
-      "resolved": "https://registry.npmjs.org/angular/-/angular-1.5.11.tgz",
-      "integrity": "sha1-jFunOG8VllyazzQp9ogVU6raMNY="
+      "version": "1.8.3",
+      "resolved": "https://registry.npmjs.org/angular/-/angular-1.8.3.tgz",
+      "integrity": "sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw=="
     },
     "angular-animate": {
       "version": "1.5.11",
@@ -7615,7 +7616,7 @@
       "dependencies": {
         "sax": {
           "version": "1.2.1",
-          "resolved": "http://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
+          "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
           "integrity": "sha1-e45lYZCyKOgaZq6nSEgNgozS03o="
         }
       }
