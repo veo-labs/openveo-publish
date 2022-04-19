@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PublishPlugin.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PublishPlugin.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/PublishPlugin
+ */
+
+var path = require('path');
+var util = require('util');
+
+var async = require('async');
+var express = require('express');
+var openVeoApi = require('@openveo/api');
+
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var VideoProvider = process.requirePublish('app/server/providers/VideoProvider.js');
+var PublishManager = process.requirePublish('app/server/PublishManager.js');
+var PublishPluginApi = process.requirePublish('app/server/PublishPluginApi.js');
+var listener = process.requirePublish('app/server/listener.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var fileSystem = openVeoApi.fileSystem;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+
+var configDir = openVeoApi.fileSystem.getConfDir();
+var watcherConf = require(path.join(configDir, 'publish/watcherConf.json'));
+var publishConf = require(path.join(configDir, 'publish/publishConf.json'));
+
+/**
+ * Defines the Publish Plugin that will be loaded by the core application.
+ *
+ * @class PublishPlugin
+ * @extends Plugin
+ * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about Plugin
+ */
+function PublishPlugin() {
+  PublishPlugin.super_.call(this);
+
+  Object.defineProperties(this,
+
+    /** @lends module:publish/PublishPlugin~PublishPlugin */
+    {
+
+      /**
+       * Publish public router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      router: {value: express.Router()},
+
+      /**
+       * Publish private router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      privateRouter: {value: express.Router()},
+
+      /**
+       * Publish web service router.
+       *
+       * @type {Router}
+       * @instance
+       * @readonly
+       */
+      webServiceRouter: {value: express.Router()},
+
+      /**
+       * Publish APIs.
+       *
+       * @type {module:publish/PublishPluginApi~PublishPluginApi}
+       * @instance
+       * @readonly
+       */
+      api: {value: new PublishPluginApi()}
+
+    }
+
+  );
+}
+
+module.exports = PublishPlugin;
+util.inherits(PublishPlugin, openVeoApi.plugin.Plugin);
+
+/**
+ * Sets listeners on events.
+ *
+ * @memberof module:publish/PublishPlugin~PublishPlugin
+ * @this module:publish/PublishPlugin~PublishPlugin
+ * @private
+ */
+function setListeners() {
+  var coreApi = process.api.getCoreApi();
+  var CORE_HOOKS = coreApi.getHooks();
+  var PUBLISH_HOOKS = this.api.getHooks();
+  coreApi.registerAction(CORE_HOOKS.USERS_DELETED, listener.onUsersDeleted);
+  coreApi.registerAction(CORE_HOOKS.GROUPS_DELETED, listener.onGroupsDeleted);
+  coreApi.registerAction(PUBLISH_HOOKS.PROPERTIES_DELETED, listener.onPropertiesDeleted);
+  coreApi.registerAction(PUBLISH_HOOKS.MEDIAS_DELETED, listener.onMediasDeleted);
+}
+
+/**
+ * Prepares plugin by creating required database indexes.
+ *
+ * This is automatically called by core application after plugin is loaded.
+ *
+ * @param {callback} callback Function to call when it's done
+ */
+PublishPlugin.prototype.init = function(callback) {
+  var coreApi = process.api.getCoreApi();
+  var database = coreApi.getDatabase();
+  var asyncFunctions = [];
+  var providers = [
+    new PropertyProvider(database),
+    new VideoProvider(database)
+  ];
+
+  // Set event listeners on core and plugins
+  setListeners.call(this);
+
+  providers.forEach(function(provider) {
+    if (provider.createIndexes) {
+      asyncFunctions.push(function(callback) {
+        provider.createIndexes(callback);
+      });
+    }
+  });
+
+  async.parallel(asyncFunctions, function(error, results) {
+    callback(error);
+  });
+};
+
+/**
+ * Starts the watcher when plugin is ready.
+ *
+ * This is automatically called by core application after plugin is initialized.
+ *
+ * TODO: When a cache mechanism will be implemented, Publish settings will have to be pulled from cache.
+ *
+ * @param {callback} callback Function to call when it's done
+ */
+PublishPlugin.prototype.start = function(callback) {
+  var coreApi = process.api.getCoreApi();
+  var database = coreApi.getDatabase();
+  var videoProvider = new VideoProvider(database);
+  var publishManager = PublishManager.get(videoProvider, publishConf.maxConcurrentPackage);
+
+  // Do not start the watcher if the process is the web service
+  if (!process.isWebService) {
+    var watcher = new openVeoApi.watcher.Watcher();
+    var hotFoldersPaths = [];
+
+    // Retrieve the list of hot folders paths from configuration
+    watcherConf.hotFolders.forEach(function(hotFolder) {
+      if (
+        typeof hotFolder === 'object' &amp;&amp;
+        typeof hotFolder.path === 'string'
+      )
+        hotFoldersPaths.push(path.normalize(hotFolder.path));
+    });
+
+    // Listen to watcher's errors
+    watcher.on('error', function(error) {
+      process.logger.error(error &amp;&amp; error.message, {code: error.code, directoryPath: error.directoryPath});
+    });
+
+    // Listen to watcher's new detected files
+    watcher.on('create', function(resourcePath) {
+      process.logger.info('Watcher detected a new resource : ' + resourcePath);
+      var pathDescriptor = path.parse(resourcePath);
+      var packageInfo = null;
+
+      // Find the hot folder in which the file was added
+      watcherConf.hotFolders.forEach(function(hotFolder) {
+        if (path.normalize(pathDescriptor.dir).indexOf(path.normalize(hotFolder.path)) === 0) {
+          packageInfo = JSON.parse(JSON.stringify(hotFolder));
+          return;
+        }
+      });
+
+      packageInfo['originalPackagePath'] = resourcePath;
+      packageInfo['originalFileName'] = pathDescriptor.name;
+
+      async.series([
+
+        // Validate file
+        function(callback) {
+          openVeoApi.util.validateFiles({
+            file: packageInfo.originalPackagePath
+          }, {
+            file: {
+              in: [fileSystem.FILE_TYPES.MP4, fileSystem.FILE_TYPES.TAR, fileSystem.FILE_TYPES.ZIP],
+              validateExtension: true
+            }
+          }, function(error, files) {
+            if (error || (files.file &amp;&amp; !files.file.isValid)) {
+              var errorMessage = (error &amp;&amp; error.message) ||
+                  'Media package type is not valid (' + packageInfo.originalPackagePath + ')';
+              process.logger.error(errorMessage, {code: ERRORS.INVALID_PACKAGE_TYPE});
+              callback(new Error(errorMessage));
+            } else {
+              callback(null, files.file.type);
+            }
+          });
+        },
+
+        // Get Publish medias settings
+        function(callback) {
+          var settingProvider = process.api.getCoreApi().settingProvider;
+
+          settingProvider.getOne(
+            new ResourceFilter().equal('id', 'publish-watcher'),
+            null,
+            function(error, setting) {
+              if (error) {
+                process.logger.error(
+                  'Failed getting media settings with message: "' + (error &amp;&amp; error.message) + '"'
+                );
+              }
+
+              callback(error, setting &amp;&amp; setting.value);
+            }
+          );
+        }
+
+      ], function(error, results) {
+        if (error) return;
+
+        var packageType = results[0];
+        var mediasSettings = results[1];
+
+        packageInfo.packageType = packageType;
+        if (mediasSettings) {
+          if (mediasSettings.owner) packageInfo.user = mediasSettings.owner;
+          if (mediasSettings.group) packageInfo.groups = [mediasSettings.group];
+        }
+        publishManager.publish(packageInfo);
+      });
+
+    });
+
+    // Listen publish manager's errors
+    publishManager.on('error', function(error) {
+      process.logger.error(error &amp;&amp; error.message, {code: error.code});
+    });
+
+    // Listen to publish manager's end of processing for a media
+    publishManager.on('complete', function(mediaPackage) {
+      process.logger.info('Publish complete for media ' + mediaPackage.id);
+    });
+
+    // Listen to publish manager's event informing that a media processing is retrying
+    publishManager.on('retry', function(mediaPackage) {
+      process.logger.info('Retry publishing media ' + mediaPackage.id + ' started');
+    });
+
+    // Listen to publish manager's event informing that a media, waiting for upload, starts uploading
+    publishManager.on('upload', function(mediaPackage) {
+      process.logger.info('Force uploading media ' + mediaPackage.id + ' started');
+    });
+
+    // Watch hot folders
+    watcher.add(hotFoldersPaths, function(results) {
+      results.forEach(function(result) {
+        if (result.error)
+          process.logger.error(result.error &amp;&amp; result.error.message);
+      });
+
+      // Retry all packages which are not in a stable state
+      publishManager.retryAll();
+
+      callback();
+    });
+
+  } else
+    callback();
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Apr 19 2022 09:48:29 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

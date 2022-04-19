@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/PropertyController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/PropertyController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/controllers/PropertyController
+ */
+
+var util = require('util');
+var openVeoApi = require('@openveo/api');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+var EntityController = openVeoApi.controllers.EntityController;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+
+/**
+ * Defines a controller to handle actions relative to properties' routes.
+ *
+ * @class PropertyController
+ * @extends EntityController
+ * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityController
+ */
+function PropertyController() {
+  PropertyController.super_.call(this);
+}
+
+module.exports = PropertyController;
+util.inherits(PropertyController, EntityController);
+
+/**
+ * Gets the list of custom property types.
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+PropertyController.prototype.getPropertyTypesAction = function(request, response, next) {
+  response.send({
+    types: PropertyProvider.availableTypes
+  });
+};
+
+/**
+ * Gets custom properties.
+ *
+ * @example
+ * // Response example
+ * {
+ *   "entities" : [ ... ],
+ *   "pagination" : {
+ *     "limit": ..., // The limit number of custom properties by page
+ *     "page": ..., // The actual page
+ *     "pages": ..., // The total number of pages
+ *     "size": ... // The total number of custom properties
+ * }
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} [request.query] Request's query
+ * @param {(String|Array)} [request.query.include] The list of fields to include from returned properties
+ * @param {(String|Array)} [request.query.exclude] The list of fields to exclude from returned properties. Ignored if
+ * include is also specified.
+ * @param {String} [request.query.query] Search query to search on both name and description
+ * @param {Number} [request.query.useSmartSearch=1] 1 to use a more advanced search mechanism, 0 to use a simple search
+ * based on a regular expression
+ * @param {Array} [request.query.types] To filter properties by type
+ * @param {String} [request.query.page=0] The expected page
+ * @param {String} [request.query.limit=10] The expected limit
+ * @param {String} [request.query.sortBy="name"] The field to sort properties by (either **name** or **description**)
+ * @param {String} [request.query.sortOrder="desc"] The sort order (either **asc** or **desc**)
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+PropertyController.prototype.getEntitiesAction = function(request, response, next) {
+  var params;
+  var provider = this.getProvider();
+
+  try {
+    params = openVeoApi.util.shallowValidateObject(request.query, {
+      include: {type: 'array&lt;string>'},
+      exclude: {type: 'array&lt;string>'},
+      query: {type: 'string'},
+      useSmartSearch: {type: 'number', in: [0, 1], default: 1},
+      types: {type: 'array&lt;string>'},
+      limit: {type: 'number', gt: 0},
+      page: {type: 'number', gte: 0, default: 0},
+      sortBy: {type: 'string', in: ['name', 'description'], default: 'name'},
+      sortOrder: {type: 'string', in: ['asc', 'desc'], default: 'desc'}
+    });
+  } catch (error) {
+    return next(HTTP_ERRORS.GET_PROPERTIES_WRONG_PARAMETERS);
+  }
+
+  // Build sort
+  var sort = {};
+  sort[params.sortBy] = params.sortOrder;
+
+  // Build filter
+  var filter = new ResourceFilter();
+
+  // Add search query
+  if (params.query) {
+    if (params.useSmartSearch)
+      filter.search('"' + params.query + '"');
+    else {
+      var queryRegExp = new RegExp(openVeoApi.util.escapeTextForRegExp(params.query), 'i');
+      filter.or([
+        new ResourceFilter().regex('name', queryRegExp),
+        new ResourceFilter().regex('description', queryRegExp)
+      ]);
+    }
+  }
+
+  // Add property types
+  if (params.types &amp;&amp; params.types.length) filter.in('type', params.types);
+
+  provider.get(
+    filter,
+    {
+      exclude: params.exclude,
+      include: params.include
+    },
+    params.limit,
+    params.page,
+    sort,
+    function(error, customProperties, pagination) {
+      if (error) {
+        process.logger.error(error.message, {error: error, method: 'getEntitiesAction'});
+        return next(HTTP_ERRORS.GET_PROPERTIES_ERROR);
+      }
+      response.send({
+        entities: customProperties,
+        pagination: pagination
+      });
+    }
+  );
+};
+
+/**
+ * Gets associated provider.
+ *
+ * @return {module:publish/providers/PropertyProvider~PropertyProvider} The provider associated to the controller
+ */
+PropertyController.prototype.getProvider = function(request) {
+  return new PropertyProvider(process.api.getCoreApi().getDatabase());
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Apr 19 2022 09:48:29 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

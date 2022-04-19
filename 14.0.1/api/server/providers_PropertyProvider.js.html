@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: providers/PropertyProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: providers/PropertyProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/providers/PropertyProvider
+ */
+
+var util = require('util');
+var async = require('async');
+var nanoid = require('nanoid').nanoid;
+var openVeoApi = require('@openveo/api');
+
+/**
+ * Defines a PropertyProvider to get and save custom properties.
+ *
+ * @class PropertyProvider
+ * @extends EntityProvider
+ * @constructor
+ * @param {Database} database The database to interact with
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityProvider or Database
+ */
+function PropertyProvider(database) {
+  PropertyProvider.super_.call(this, database, 'publish_properties');
+}
+
+module.exports = PropertyProvider;
+util.inherits(PropertyProvider, openVeoApi.providers.EntityProvider);
+
+/**
+ * Property types.
+ *
+ * @const
+ * @type {Object}
+ */
+PropertyProvider.TYPES = {
+  TEXT: 'text',
+  LIST: 'list',
+  BOOLEAN: 'boolean',
+  DATE_TIME: 'dateTime'
+};
+Object.freeze(PropertyProvider.TYPES);
+
+/**
+ * The list of available property types.
+ *
+ * @const
+ * @type {Array}
+ */
+PropertyProvider.availableTypes = [
+  PropertyProvider.TYPES.TEXT,
+  PropertyProvider.TYPES.LIST,
+  PropertyProvider.TYPES.BOOLEAN,
+  PropertyProvider.TYPES.DATE_TIME
+];
+Object.freeze(PropertyProvider.availableTypes);
+
+/**
+ * Adds custom properties.
+ *
+ * @param {Array} customProperties The list of custom properties to store with for each custom property:
+ * @param {String} customProperties.name The property name
+ * @param {String} customProperties.description The property description
+ * @param {String} customProperties.type The property type (see PropertyProvider.availableTypes)
+ * @param {String} [customProperties.id] The property id, generated if not specified
+ * @param {Array} [customProperties.values] The list of values if type is PropertyProvider.TYPES.LIST
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~addCallback} [callback] The function to call when
+ * it's done
+ */
+PropertyProvider.prototype.add = function(customProperties, callback) {
+  var customPropertiesToAdd = [];
+
+  for (var i = 0; i &lt; customProperties.length; i++) {
+    var customProperty = customProperties[i];
+
+    if (!customProperty.name || !customProperty.description)
+      return this.executeCallback(callback, new TypeError('Requires name and description to add a custom property'));
+
+    if (PropertyProvider.availableTypes.indexOf(customProperty.type) &lt; 0)
+      return this.executeCallback(callback, new TypeError('Invalid property type ' + customProperty.type));
+
+    var property = {
+      id: customProperty.id || nanoid(),
+      name: customProperty.name,
+      description: customProperty.description,
+      type: customProperty.type
+    };
+
+    if (customProperty.type === PropertyProvider.TYPES.LIST)
+      property.values = customProperty.values || [];
+
+    customPropertiesToAdd.push(property);
+  }
+
+  PropertyProvider.super_.prototype.add.call(this, customPropertiesToAdd, callback);
+};
+
+/**
+ * Updates a custom property.
+ *
+ * @param {ResourceFilter} [filter] Rules to filter property to update
+ * @param {Object} data The modifications to perform
+ * @param {String} [data.name] The property name
+ * @param {String} [data.description] The property description
+ * @param {String} [data.type] The property type (see PropertyProvider.availableTypes)
+ * @param {String} [data.id] The property id, generated if not specified
+ * @param {Array} [data.values] The list of values if type is PropertyProvider.TYPES.LIST
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~updateOneCallback} [callback] The function to
+ * call when it's done
+ */
+PropertyProvider.prototype.updateOne = function(filter, data, callback) {
+  var modifications = {};
+  if (data.name) modifications.name = data.name;
+  if (data.description) modifications.description = data.description;
+  if (data.type) modifications.type = data.type;
+  if (data.type === PropertyProvider.TYPES.LIST)
+    modifications.values = data.values || [];
+  else
+    modifications.values = null;
+
+  PropertyProvider.super_.prototype.updateOne.call(this, filter, modifications, callback);
+};
+
+/**
+ * Removes custom properties.
+ *
+ * This will execute publish hook "PROPERTIES_DELETED" after removing custom properties with:
+ * - **Array** The list of removed properties
+ *
+ * @param {ResourceFilter} [filter] Rules to filter properties to remove
+ * @param {module:publish/providers/PropertyProvider~PropertyProvider~removeCallback} [callback] The function to call
+ * when it's done
+ */
+PropertyProvider.prototype.remove = function(filter, callback) {
+  var self = this;
+  var customPropertyIds;
+  var totalRemovedProperties;
+
+  async.series([
+
+    // Get custom property ids
+    function(callback) {
+      self.getAll(
+        filter,
+        {
+          include: ['id']
+        },
+        {
+          id: 'desc'
+        },
+        function(getAllError, customProperties) {
+          if (getAllError) return callback(getAllError);
+          if (!customProperties || !customProperties.length) return callback();
+
+          customPropertyIds = customProperties.map(function(customProperty) {
+            return customProperty.id;
+          });
+
+          callback();
+        }
+      );
+    },
+
+    // Remove custom properties
+    function(callback) {
+      if (!customPropertyIds || !customPropertyIds.length) return callback();
+
+      PropertyProvider.super_.prototype.remove.call(self, filter, function(removeError, total) {
+        totalRemovedProperties = total;
+        callback(removeError);
+      });
+    },
+
+    // Execute hook
+    function(callback) {
+      if (!customPropertyIds || !customPropertyIds.length) return callback();
+
+      var api = process.api.getCoreApi();
+      var publishApi = process.api.getApi('publish');
+      api.executeHook(
+        publishApi.getHooks().PROPERTIES_DELETED,
+        customPropertyIds,
+        function(hookError) {
+          self.executeCallback(callback, hookError);
+        }
+      );
+    }
+
+  ], function(error, results) {
+    self.executeCallback(callback, error, !error ? totalRemovedProperties : undefined);
+  });
+};
+
+/**
+ * Creates properties indexes.
+ *
+ * @param {callback} callback Function to call when it's done
+ */
+PropertyProvider.prototype.createIndexes = function(callback) {
+  var language = process.api.getCoreApi().getContentLanguage();
+
+  this.storage.createIndexes(this.location, [
+
+    // eslint-disable-next-line camelcase
+    {key: {name: 'text', description: 'text'}, weights: {name: 2}, default_language: language, name: 'querySearch'}
+
+  ], function(error, result) {
+    if (result &amp;&amp; result.note)
+      process.logger.debug('Create properties indexes : ' + result.note);
+
+    callback(error);
+  });
+};
+
+/**
+ * Drops an index from database collection.
+ *
+ * @param {String} indexName The name of the index to drop
+ * @param {callback} callback Function to call when it's done
+ */
+PropertyProvider.prototype.dropIndex = function(indexName, callback) {
+  this.storage.dropIndex(this.location, indexName, function(error, result) {
+    if (result &amp;&amp; result.ok)
+      process.logger.debug('Index "' + indexName + '" dropped');
+
+    callback(error);
+  });
+};
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~addCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The total amount of properties inserted
+ * @param {Array} properties The list of added properties
+ */
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~updateOneCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total 1 if everything went fine
+ */
+
+/**
+ * @callback module:publish/providers/PropertyProvider~PropertyProvider~removeCallback
+ * @param {(Error|undefined)} error The error if an error occurred
+ * @param {Number} total The number of removed properties
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Apr 19 2022 09:48:29 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
