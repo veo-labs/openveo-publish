@@ -116,6 +116,22 @@ describe('Migration 14.0.1', function() {
     });
   });
 
+  it('should not do anything on medias without profile settings', function(done) {
+    expectedMedias = [
+      {
+        id: '42',
+        mediaId: '1',
+        metadata: {}
+      }
+    ];
+
+    migration.update(function(error) {
+      assert.isUndefined(error, 'Unexpected error');
+      VideoProvider.prototype.updateOne.should.have.been.called.exactly(0);
+      done();
+    });
+  });
+
   it('should execute callback with an error if getting medias failed', function(done) {
     expectedMedias = [
       {

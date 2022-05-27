@@ -44,6 +44,8 @@ module.exports.update = function(callback) {
           var asyncActions = [];
 
           medias.forEach(function(media) {
+            if (!media.metadata['profile-settings']) return;
+
             asyncActions.push(function(callback) {
               var mediaIds = !Array.isArray(media.mediaId) ? [media.mediaId] : media.mediaId;
 

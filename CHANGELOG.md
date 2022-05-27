@@ -3,6 +3,7 @@
 ## BUG FIXES
 
 - Fix server crash when aborting upload while adding a media
+- Fix migration to version &gt;= 14.0.0 which could failed when encountering very old medias
 
 # 14.0.1 / 2022-04-19
 
