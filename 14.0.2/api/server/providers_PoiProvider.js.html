@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: providers/PoiProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: providers/PoiProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/providers/PoiProvider
+ */
+
+var util = require('util');
+var async = require('async');
+var nanoid = require('nanoid').nanoid;
+var openVeoApi = require('@openveo/api');
+var fileSystemApi = openVeoApi.fileSystem;
+var NotFoundError = openVeoApi.errors.NotFoundError;
+
+/**
+ * Defines a PoiProvider to get and save points of interest.
+ *
+ * @class PoiProvider
+ * @extends EntityProvider
+ * @constructor
+ * @param {Database} database The database to interact with
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about EntityProvider or Database
+ */
+function PoiProvider(database) {
+  PoiProvider.super_.call(this, database, 'publish_poi');
+}
+
+module.exports = PoiProvider;
+util.inherits(PoiProvider, openVeoApi.providers.EntityProvider);
+
+/**
+ * Adds points of interest.
+ *
+ * @param {Array} pois The list of points of interest to store
+ * @param {String} pois[].name The point of interest name
+ * @param {Number} pois[].value The point of interest time in milliseconds
+ * @param {String} [pois[].description] The point of interest description
+ * @param {Object} [pois[].poi.file] The file to associate to the point of interest
+ * @param {String} pois[].poi.file.originalName The file original name
+ * @param {String} pois[].poi.file.mimeType The file MIME type
+ * @param {String} pois[].poi.file.fileName The file name
+ * @param {Number} pois[].poi.file.size The file size in Bytes
+ * @param {String} pois[].poi.file.url The file URL
+ * @param {String} pois[].poi.file.path The file path on the file system
+ * @param {module:publish/providers/PoiProvider~PoiProvider~addCallback} [callback] The function to call when it's done
+ */
+PoiProvider.prototype.add = function(pois, callback) {
+  var poisToAdd = [];
+
+  for (var i = 0; i &lt; pois.length; i++) {
+    var poi = pois[i];
+
+    if (!Object.prototype.hasOwnProperty.call(poi, 'name') || !Object.prototype.hasOwnProperty.call(poi, 'value'))
+      return this.executeCallback(callback, new TypeError('Requires name and value to add a point of interest'));
+
+    var poiToAdd = {
+      id: poi.id || nanoid(),
+      name: poi.name,
+      value: poi.value,
+      description: poi.description,
+      descriptionText: poi.description &amp;&amp; openVeoApi.util.removeHtmlFromText(poi.description),
+      file: null
+    };
+
+    if (poi.file) {
+      poiToAdd.file = {
+        originalName: poi.file.originalName,
+        mimeType: poi.file.mimeType,
+        fileName: poi.file.fileName,
+        size: poi.file.size,
+        url: poi.file.url,
+        path: poi.file.path
+      };
+    }
+
+    poisToAdd.push(poiToAdd);
+  }
+
+  PoiProvider.super_.prototype.add.call(this, poisToAdd, callback);
+};
+
+/**
+ * Updates a point of interest.
+ *
+ * @param {ResourceFilter} [filter] Rules to filter the point of interest to update
+ * @param {Object} poi The point of interest description object
+ * @param {Number} [poi.value] The point of interest time in milliseconds
+ * @param {String} [poi.name] The point of interest name
+ * @param {String} [poi.description] The point of interest description
+ * @param {Object} [poi.file] The new file to associate to the point of interest replacing the previous one, if null
+ * the file is removed
+ * @param {String} [poi.file.originalName] The file original name
+ * @param {String} [poi.file.mimeType] The file MIME type
+ * @param {String} [poi.file.fileName] The file name
+ * @param {String} [poi.file.size] The file size in Bytes
+ * @param {String} [poi.file.url] The file URL
+ * @param {String} [poi.file.path] The file path on the file system
+ * @param {module:publish/providers/PoiProvider~PoiProvider~updateOneCallback} [callback] The function to call when
+ * it's done
+ */
+PoiProvider.prototype.updateOne = function(filter, poi, callback) {
+  var self = this;
+  var oldFilePath;
+  var total;
+  var asyncFunctions = [];
+
+  // Get point of interest
+  this.getOne(
+    filter,
+    {
+      include: ['id', 'file']
+    },
+    function(getOneError, storedPoi) {
+      if (getOneError) return self.executeCallback(callback, getOneError);
+      if (!storedPoi) return self.executeCallback(callback, new NotFoundError(JSON.stringify(filter)));
+
+      if (poi.file) {
+
+        // New file
+
+        // Old file should be deleted
+        // Mark old file as "to be deleted"
+        if (storedPoi.file)
+          oldFilePath = storedPoi.file.path;
+
+        storedPoi.file = {
+          originalName: poi.file.originalName,
+          mimeType: poi.file.mimeType,
+          fileName: poi.file.fileName,
+          size: poi.file.size,
+          url: poi.file.url,
+          path: poi.file.path
+        };
+
+      } else if (poi.file === null) {
+
+        // No file is associated to the point of interest anymore
+
+        if (storedPoi.file) {
+
+          // No more file associated to the point of interest
+          // Mark old file as "to be deleted"
+          oldFilePath = storedPoi.file.path;
+
+        }
+
+        storedPoi.file = null;
+      }
+
+      if (poi.name) storedPoi.name = poi.name;
+      if (Object.prototype.hasOwnProperty.call(poi, 'value')) storedPoi.value = poi.value;
+      if (Object.prototype.hasOwnProperty.call(poi, 'description')) {
+        storedPoi.description = poi.description;
+        storedPoi.descriptionText = poi.description ? openVeoApi.util.removeHtmlFromText(poi.description) : null;
+      }
+
+      // Remove file
+      if (oldFilePath) {
+        asyncFunctions.push(function(removeCallback) {
+          fileSystemApi.rm(oldFilePath, function(removeError) {
+            removeCallback(removeError);
+          });
+        });
+      }
+
+      // Update point of interest
+      asyncFunctions.push(function(updateCallback) {
+        PoiProvider.super_.prototype.updateOne.call(self, filter, storedPoi, function(error, updateTotal) {
+          total = updateTotal;
+          self.executeCallback(updateCallback, error);
+        });
+      });
+
+      async.parallel(asyncFunctions, function(error) {
+        return self.executeCallback(callback, error, total);
+      });
+
+    }
+  );
+};
+
+/**
+ * Removes points of interest.
+ *
+ * File associated to the points of interest will be removed as well.
+ *
+ * @param {ResourceFilter} [filter] Rules to filter points of interest to remove
+ * @param {module:publish/providers/PoiProvider~PoiProvider~removeCallback} [callback] The function to call when it's
+ * done
+ */
+PoiProvider.prototype.remove = function(filter, callback) {
+  var self = this;
+  var pois;
+  var totalRemovedPois = 0;
+
+  async.series([
+
+    // Get points of interest
+    function(callback) {
+      self.getAll(filter,
+        {
+          include: ['id', 'file']
+        },
+        {
+          id: 'desc'
+        },
+        function(getAllError, fetchedPois) {
+          pois = fetchedPois;
+          return self.executeCallback(callback, getAllError);
+        }
+      );
+    },
+
+    // Remove related files
+    function(callback) {
+      if (!pois || !pois.length) return callback();
+
+      var asyncFunctions = [];
+      var filesPaths = pois.map(function(poi) {
+        return poi.file ? poi.file.path : null;
+      });
+
+      if (!filesPaths.length) return callback();
+      filesPaths.forEach(function(filePath) {
+        if (!filePath) return;
+
+        asyncFunctions.push(function(removeCallback) {
+          fileSystemApi.rm(filePath, function(removeError) {
+            if (removeError &amp;&amp; removeError.code !== 'ENOENT') return removeCallback(removeError);
+            removeCallback();
+          });
+        });
+      });
+
+      async.parallel(asyncFunctions, function(error) {
+        self.executeCallback(callback, error);
+      });
+    },
+
+    // Remove points of interest
+    function(callback) {
+      if (!pois || !pois.length) return callback();
+
+      PoiProvider.super_.prototype.remove.call(self, filter, function(error, total) {
+        totalRemovedPois = total;
+        self.executeCallback(callback, error);
+      });
+    }
+
+  ], function(error) {
+    self.executeCallback(callback, error, totalRemovedPois);
+  });
+
+};
+
+/**
+ * Creates points of interest indexes.
+ *
+ * @param {callback} callback Function to call when it's done
+ */
+PoiProvider.prototype.createIndexes = function(callback) {
+  var language = process.api.getCoreApi().getContentLanguage();
+
+  this.storage.createIndexes(this.location, [
+
+    // eslint-disable-next-line camelcase
+    {key: {name: 'text', descriptionText: 'text'}, weights: {name: 2}, default_language: language, name: 'querySearch'}
+
+  ], function(error, result) {
+    if (result &amp;&amp; result.note)
+      process.logger.debug('Create points of interest indexes : ' + result.note);
+
+    callback(error);
+  });
+};
+
+/**
+ * Drops an index from database collection.
+ *
+ * @param {String} indexName The name of the index to drop
+ * @param {callback} callback Function to call when it's done
+ */
+PoiProvider.prototype.dropIndex = function(indexName, callback) {
+  this.storage.dropIndex(this.location, indexName, function(error, result) {
+    if (result &amp;&amp; result.ok)
+      process.logger.debug('Index "' + indexName + '" dropped');
+
+    callback(error);
+  });
+};
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~addCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The total amount of points of interest inserted
+ * @param {Array} pois The list of added points of interest
+ */
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~updateOneCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total 1 if everything went fine
+ */
+
+/**
+ * @callback module:publish/providers/PoiProvider~PoiProvider~removeCallback
+ * @param {(Error|null)} error The error if an error occurred, null otherwise
+ * @param {Number} total The number of removed points of interest
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri May 27 2022 07:50:38 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

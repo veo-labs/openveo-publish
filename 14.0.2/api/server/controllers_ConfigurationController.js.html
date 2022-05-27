@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/ConfigurationController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/ConfigurationController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/controllers/ConfigurationController
+ */
+
+var util = require('util');
+var path = require('path');
+var async = require('async');
+var openVeoApi = require('@openveo/api');
+var GoogleOAuthHelper = process.requirePublish('app/server/providers/mediaPlatforms/youtube/GoogleOAuthHelper.js');
+var PropertyProvider = process.requirePublish('app/server/providers/PropertyProvider.js');
+var HTTP_ERRORS = process.requirePublish('app/server/controllers/httpErrors.js');
+var confDir = path.join(openVeoApi.fileSystem.getConfDir(), 'publish');
+var videoPlatformConf = require(path.join(confDir, 'videoPlatformConf.json'));
+var Controller = openVeoApi.controllers.Controller;
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+var utilExt = openVeoApi.util;
+
+/**
+ * Defines a controller to handle actions relative to configuration's routes.
+ *
+ * @class ConfigurationController
+ * @extends Controller
+ * @constructor
+ * @see {@link https://github.com/veo-labs/openveo-api|OpenVeo API documentation} for more information about Controller
+ */
+function ConfigurationController() {
+  ConfigurationController.super_.call(this);
+}
+
+module.exports = ConfigurationController;
+util.inherits(ConfigurationController, Controller);
+
+/**
+ * Retrieves publish plugin configurations.
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.getConfigurationAllAction = function(request, response, next) {
+  var configurations = {};
+
+  async.series([
+
+    // Get Youtube configuration
+    function(callback) {
+      if (videoPlatformConf['youtube']) {
+        var youtubeConf = configurations['youtube'] = {};
+        var googleOAuthHelper = new GoogleOAuthHelper();
+
+        googleOAuthHelper.hasToken(function(error, hasToken) {
+          if (error) {
+            process.logger.error('Error while retrieving Google account token with message : ' + error.message);
+            return callback(error);
+          }
+
+          youtubeConf.hasToken = hasToken;
+          youtubeConf.authUrl = googleOAuthHelper.getAuthUrl(
+            {
+              scope: [
+                'https://www.googleapis.com/auth/youtube',
+                'https://www.googleapis.com/auth/youtube.upload'
+              ]
+            }
+          );
+          callback();
+        });
+      } else
+        callback();
+    },
+
+    // Get catalog configuration
+    function(callback) {
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-catalog'),
+        null,
+        function(error, catalogSettings) {
+          if (error) return callback(error);
+
+          configurations['publishCatalog'] = catalogSettings &amp;&amp; catalogSettings.value;
+          callback();
+        }
+      );
+    },
+
+    // Get Watcher configuration
+    function(callback) {
+      configurations['publishWatcher'] = {};
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-watcher'),
+        null,
+        function(error, watcherSettings) {
+          if (error) return callback(error);
+
+          configurations['publishWatcher'] = watcherSettings &amp;&amp; watcherSettings.value;
+          callback();
+        }
+      );
+    },
+
+    // Get TLS configuration
+    function(callback) {
+      if (!videoPlatformConf['tls']) return callback();
+
+      configurations['publishTls'] = {};
+      var settingProvider = process.api.getCoreApi().settingProvider;
+
+      settingProvider.getOne(
+        new ResourceFilter().equal('id', 'publish-tls'),
+        null,
+        function(error, tlsSettings) {
+          if (error) return callback(error);
+
+          configurations['publishTls'] = (tlsSettings &amp;&amp; tlsSettings.value) ? tlsSettings.value : {};
+          callback();
+        }
+      );
+    }
+
+  ], function(error, results) {
+    if (error) {
+      process.logger.error(error.message, {error: error, method: 'getConfigurationAllAction'});
+      next(HTTP_ERRORS.GET_CONFIGURATION_ERROR);
+    } else
+      response.send(configurations);
+  });
+};
+
+/**
+ * Redirects action that will be called by google when the user associate our application,
+ * a code will be in the parameters.
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.query Request's query
+ * @param {String} request.query.code Google authentication code
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.handleGoogleOAuthCodeAction = function(request, response, next) {
+  var code = request.query.code;
+  var googleOAuthHelper = new GoogleOAuthHelper();
+
+  process.logger.debug('Code received ', code);
+  googleOAuthHelper.persistTokenWithCode(code, function(error) {
+    if (error)
+      process.logger.error('Error while trying to retrieve access token', error);
+
+    response.redirect('/be/publish/configuration');
+  });
+};
+
+/**
+ * Saves watcher settings.
+ *
+ * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "owner": ..., // The id of the owner that will be associated to medias uploaded through the watcher
+ *     "group": ... // The id of the content group that will be associated to medias uploaded through the watcher
+ *   },
+ *   "total": 1
+ * }
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {String} request.body.owner The id of the owner for new uploaded medias
+ * @param {String} request.body.group The id of the group for new uploaded medias
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.saveWatcherSettings = function(request, response, next) {
+  if (request.body) {
+    var settingProvider = process.api.getCoreApi().settingProvider;
+    var parsedBody;
+
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        owner: {type: 'string'},
+        group: {type: 'string'}
+      });
+
+    } catch (error) {
+      return next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_WRONG_PARAMETERS);
+    }
+
+    settingProvider.add(
+      [
+        {
+          id: 'publish-watcher',
+          value: parsedBody
+        }
+      ],
+      function(error, total, settings) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'saveWatcherSettings'});
+          next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_ERROR);
+        } else {
+          response.send({settings: settings[0].value, total: total});
+        }
+      }
+    );
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SAVE_WATCHER_SETTINGS_MISSING_PARAMETERS);
+
+  }
+};
+
+/**
+ * Saves TLS settings.
+ *
+ * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "properties": ... // The list of custom property ids
+ *   },
+ *   "total": 1
+ * }
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {String} request.body.properties The list of custom property ids
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.saveTlsSettingsAction = function(request, response, next) {
+  if (request.body) {
+    var coreApi = process.api.getCoreApi();
+    var settingProvider = coreApi.settingProvider;
+    var customProperties;
+    var parsedBody;
+
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        properties: {type: 'array&lt;string>'}
+      });
+    } catch (error) {
+      return next(HTTP_ERRORS.SAVE_TLS_SETTINGS_WRONG_PARAMETERS);
+    }
+
+    if (!parsedBody.properties) parsedBody.properties = [];
+
+    async.series([
+
+      // Get the list of custom properties
+      function(callback) {
+        var database = coreApi.getDatabase();
+        var propertyProvider = new PropertyProvider(database);
+
+        propertyProvider.getAll(null, null, {id: 'desc'}, function(error, properties) {
+          if (error) {
+            process.logger.error(error.message, {error: error, method: 'saveTlsSettings'});
+            return callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_CUSTOM_PROPERTIES_ERROR);
+          }
+
+          customProperties = properties;
+          callback();
+        });
+      },
+
+      // Validate custom properties
+      function(callback) {
+        for (var i = 0; i &lt; parsedBody.properties.length; i++) {
+          var found = false;
+
+          for (var j = 0; j &lt; customProperties.length; j++) {
+            if (customProperties[j].id === parsedBody.properties[i]) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) return callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_WRONG_PROPERTIES_PARAMETER);
+        }
+
+        callback();
+      },
+
+      // Save settings
+      function(callback) {
+        settingProvider.add(
+          [
+            {
+              id: 'publish-tls',
+              value: parsedBody
+            }
+          ],
+          function(error, total, settings) {
+            if (error) {
+              process.logger.error(error.message, {error: error, method: 'saveTlsSettingsAction'});
+              callback(HTTP_ERRORS.SAVE_TLS_SETTINGS_ERROR);
+            } else {
+              callback(null, total, settings);
+            }
+          }
+        );
+      }
+
+    ], function(error, results) {
+      if (error) return next(error);
+      response.send({settings: results[2][1][0].value, total: results[2][0]});
+    });
+
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SAVE_TLS_SETTINGS_MISSING_PARAMETERS);
+
+  }
+};
+
+/**
+ * Saves catalog settings.
+ *
+ * @example
+ * // Response example
+ * {
+ *   "settings" : {
+ *     "refreshInterval": 50 // The refresh interval in seconds
+ *   },
+ *   "total": 1
+ * }
+ *
+ * @param {Request} request ExpressJS HTTP Request
+ * @param {Object} request.body Request's body
+ * @param {Number} request.body.refreshInterval The refresh interval in seconds
+ * @param {Response} response ExpressJS HTTP Response
+ * @param {Function} next Function to defer execution to the next registered middleware
+ */
+ConfigurationController.prototype.saveCatalogSettingsAction = function(request, response, next) {
+  if (request.body) {
+    var coreApi = process.api.getCoreApi();
+    var settingProvider = coreApi.settingProvider;
+    var parsedBody;
+
+    try {
+      parsedBody = utilExt.shallowValidateObject(request.body, {
+        refreshInterval: {type: 'number'}
+      });
+    } catch (error) {
+      return next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_WRONG_PARAMETERS);
+    }
+
+    settingProvider.add(
+      [
+        {
+          id: 'publish-catalog',
+          value: parsedBody
+        }
+      ],
+      function(error, total, settings) {
+        if (error) {
+          process.logger.error(error.message, {error: error, method: 'saveCatalogSettingsAction'});
+          next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_ERROR);
+        } else {
+          response.send({
+            settings: settings[0].value,
+            total: total
+          });
+        }
+      }
+    );
+  } else {
+
+    // Missing body
+    next(HTTP_ERRORS.SAVE_CATALOG_SETTINGS_MISSING_PARAMETERS);
+
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri May 27 2022 07:50:38 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
