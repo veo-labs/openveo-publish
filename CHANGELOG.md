@@ -1,3 +1,9 @@
+# 14.0.2 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix server crash when aborting upload while adding a media
+
 # 14.0.1 / 2022-04-19
 
 ## BUG FIXES

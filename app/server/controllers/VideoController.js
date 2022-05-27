@@ -1134,7 +1134,7 @@ VideoController.prototype.addEntityAction = function(request, response, next) {
 
     ], function(error) {
       if (error) {
-        if (request.files && request.files.file && request.files.file.length) {
+        if (request.files && request.files.file && request.files.file.length && request.files.file[0].path) {
 
           // Remove temporary file
           fs.unlink(request.files.file[0].path, function(unlinkError) {
