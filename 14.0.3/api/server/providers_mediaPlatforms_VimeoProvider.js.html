@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: providers/mediaPlatforms/VimeoProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: providers/mediaPlatforms/VimeoProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module publish/providers/mediaPlatforms/VimeoProvider
+ */
+
+var util = require('util');
+var fs = require('fs');
+var vimeoAPI = require('vimeo');
+var async = require('async');
+var MediaPlatformProvider = process.requirePublish('app/server/providers/mediaPlatforms/MediaPlatformProvider.js');
+
+/**
+ * Defines a VimeoProvider class to interact with [vimeo platform](https://vimeo.com/).
+ *
+ * @class VimeoProvider
+ * @extends module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider
+ * @constructor
+ * @param {Object} providerConf A vimeo configuration object
+ * @param {String} providerConf.clientId Vimeo client id
+ * @param {String} providerConf.clientSecret Vimeo client secret
+ * @param {String} providerConf.accessToken Vimeo client access token
+ */
+function VimeoProvider(providerConf) {
+  VimeoProvider.super_.call(this, providerConf);
+
+  Object.defineProperties(this,
+
+    /** @lends module:publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider */
+    {
+
+      /**
+       * Vimeo client library.
+       *
+       * @type {Vimeo}
+       * @instance
+       * @readonly
+       */
+      vimeo: {value: new vimeoAPI.Vimeo(this.conf.clientId, this.conf.clientSecret, this.conf.accessToken)},
+
+      /**
+       * List of accepted media qualities.
+       *
+       * @type {Object}
+       * @instance
+       * @readonly
+       */
+      qualitiesMap: {
+        value: {
+          sd: MediaPlatformProvider.QUALITIES.SD,
+          mobile: MediaPlatformProvider.QUALITIES.MOBILE,
+          hd: MediaPlatformProvider.QUALITIES.HD
+        }
+      }
+
+    }
+
+  );
+}
+
+module.exports = VimeoProvider;
+util.inherits(VimeoProvider, MediaPlatformProvider);
+
+/**
+ * Uploads a media to the Vimeo platform.
+ *
+ * @param {String} mediaFilePath The absolute system path of the media to upload
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~uploadCallback} callback
+ * The function to call when it's done
+ */
+VimeoProvider.prototype.upload = function(mediaFilePath, callback) {
+  var self = this;
+  var mediaId;
+
+  async.series([
+
+    // Checks user quota
+    function(callback) {
+
+      self.vimeo.request({
+        method: 'GET',
+        path: '/me'
+      },
+      function(error, body) {
+        if (error)
+          return callback(error);
+
+        // User does not have permission to upload
+        if (!body.upload_quota)
+          return callback(new Error('User does not have permission to upload on Vimeo'));
+
+        // Checks the size of the media to upload
+        fs.stat(mediaFilePath, function(error, stats) {
+          if (error)
+            callback(error);
+          else if (stats.size >= body.upload_quota.space.free)
+            callback(new Error('No more space left in Vimeo account'));
+          else
+            callback();
+        });
+
+      });
+
+    },
+
+    // Upload media
+    function(callback) {
+      self.vimeo.upload(
+        mediaFilePath,
+        function(uri) {
+          mediaId = uri.match(/\/videos\/(.*)$/)[1];
+          callback();
+        },
+        function(bytesUploaded, bytesTotal) {},
+        function(error) {
+          callback(error);
+        }
+      );
+    }
+
+  ], function(error) {
+    callback(error, mediaId);
+  });
+
+};
+
+/**
+ * Gets information about medias hosted by Vimeo.
+ *
+ * Media is considered available if the expected media height has been transcoded by the media platform.
+ *
+ * @param {Array} mediasIds The Vimeo ids of the medias
+ * @param {Array} expectedMediasHeights The expected medias heights in the same order as medias ids
+ * @param {module:publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider~getMediaInfoCallback}
+ * callback The function to call when it's done
+ */
+VimeoProvider.prototype.getMediasInfo = function(mediasIds, expectedMediasHeights, callback) {
+  var self = this;
+
+  var series = [];
+  var infos = {sources: [], available: true};
+  mediasIds.forEach(function(mediaId, index) {
+    series.push(function(cb) {
+
+      // Ask Vimeo for media information
+      self.vimeo.request({method: 'GET', path: '/videos/' + mediaId}, function(error, body) {
+        var available = false;
+        var expectedMediaHeight = expectedMediasHeights[index];
+
+        if (!error) {
+          var info = {};
+
+          // Got direct access to media files and formats
+          // Keep only files with supported quality (see qualitiesMap)
+          if (body.files) {
+            var files = [];
+            for (var j = 0; j &lt; body.files.length; j++) {
+              var file = body.files[j];
+
+              if (self.qualitiesMap[file.quality] != undefined) {
+                files.push({
+                  quality: self.qualitiesMap[file.quality],
+                  width: file.width,
+                  height: file.height,
+                  link: file.link
+                });
+
+                // Vimeo set the media as "available" as soon as any definition has been transcoded not when all
+                // definitions have been transcoded
+                // Set the media as "available" as soon as the expected definition has been transcoded
+                // If media height is not standard, Vimeo eventually change its definition to something close, thus
+                // we add a factor error of 22% of the expected definition to deal with those cases
+                if (Math.abs(file.height - expectedMediaHeight) &lt; (expectedMediaHeight * 0.22))
+                  available = true;
+              }
+            }
+            info.files = files;
+          }
+
+          info.available = (body.status === 'available') &amp;&amp; available;
+          infos.sources.push(info);
+        }
+
+        cb(error);
+      });
+    });
+  });
+
+  async.series(series, function(error) {
+    if (error)
+      callback(error);
+    else {
+      for (var i = 0; i &lt; infos.sources.length; i++) {
+        infos.available = infos.available &amp;&amp; infos.sources[i].available;
+      }
+      callback(null, infos);
+    }
+  });
+};
+
+/**
+ * Removes a media from the Vimeo platform.
+ *
+ * @param {Array} mediaIds Vimeo media ids to remove
+ * @param {callback} callback The function to call when it's done
+ */
+VimeoProvider.prototype.remove = function(mediaIds, callback) {
+  if (!mediaIds) {
+    callback(new Error('media id should be defined'), null);
+    return;
+  }
+  var self = this;
+  var parallel = [];
+
+  mediaIds.forEach(function(mediaId) {
+    parallel.push(function(callback) {
+      self.vimeo.request({method: 'DELETE', path: '/videos/' + mediaId}, function(error, body, statusCode, headers) {
+        if (error) {
+          callback(error);
+          return;
+        } else if (statusCode != 204) {
+          callback(new Error(statusCode));
+          return;
+        }
+        callback();
+      });
+    });
+  });
+
+  async.parallel(parallel, function(error) {
+    callback(error);
+  });
+};
+
+/**
+ * Updates a media resources on the platform.
+ *
+ * If media has several resources on the platform, the same update will be performed for all resources.
+ * Actually only the media title is synchronized with Vimeo.
+ *
+ * @param {Object} media The media
+ * @param {Array} media.mediaId The list of media resource ids
+ * @param {Object} data The datas to update
+ * @param {String} [data.title] The media title. Be careful only the first 128 characters will be used. Also HTML tags
+ * will be removed
+ * @param {Boolean} force true to force the update even if title hasn't changed, false otherwise
+ * @param {callback} callback The function to call when it's done
+ */
+VimeoProvider.prototype.update = function(media, data, force, callback) {
+  if (!data.title || (data.title === media.title &amp;&amp; !force)) return callback();
+
+  var self = this;
+  var parallel = [];
+
+  media.mediaId.forEach(function(mediaId) {
+    parallel.push(function(callback) {
+      self.vimeo.request(
+        {
+          method: 'PATCH',
+          path: '/videos/' + mediaId,
+          query: {
+            name: data.title.substring(0, 128)
+          }
+        },
+        callback
+      );
+    });
+  });
+
+  async.parallel(parallel, function(error) {
+    callback(error);
+  });
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Feb 27 2023 15:33:25 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

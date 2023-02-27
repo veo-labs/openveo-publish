@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PublishManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PublishManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @module module:publish/PublishManager
+ */
+
+var util = require('util');
+var events = require('events');
+var path = require('path');
+var nanoid = require('nanoid').nanoid;
+var openVeoApi = require('@openveo/api');
+var Package = process.requirePublish('app/server/packages/Package.js');
+var packageFactory = process.requirePublish('app/server/packages/packageFactory.js');
+var ERRORS = process.requirePublish('app/server/packages/errors.js');
+var STATES = process.requirePublish('app/server/packages/states.js');
+var PublishError = process.requirePublish('app/server/PublishError.js');
+var ResourceFilter = openVeoApi.storages.ResourceFilter;
+
+var publishManager;
+
+/**
+ * Fired when an error occurred while processing a package.
+ *
+ * @event module:publish/PublishManager~PublishManager#error
+ * @property {Error} error The error
+ */
+
+/**
+ * Fired when a package process has succeed.
+ *
+ * @event module:publish/PublishManager~PublishManager#complete
+ * @property {Object} package The processed package
+ */
+
+/**
+ * Fired when a media in error restarts.
+ *
+ * @event module:publish/PublishManager~PublishManager#retry
+ * @property {Object} media The media
+ */
+
+/**
+ * Fired when a media stuck in "waiting for upload" state starts uploading.
+ *
+ * @event module:publish/PublishManager~PublishManager#upload
+ * @property {Object} media The media
+ */
+
+/**
+ * Fired when media state has changed.
+ *
+ * @event module:publish/PublishManager~PublishManager#stateChanged
+ * @property {Object} media The media
+ */
+
+/**
+ * Defines the PublishManager which handles the media publication's process.
+ *
+ * Media publications are handled in parallel. Media publication's process can be
+ * different regarding the type of the media.
+ *
+ * @example
+ * var coreApi = process.api.getCoreApi();
+ * var database = coreApi.getDatabase();
+ * var PublishManager = process.requirePublish('app/server/PublishManager.js');
+ * var videoProvider = new VideoProvider(database);
+ * var publishManager = new PublishManager(videoProvider, 5);
+ *
+ * // Listen publish manager's errors
+ * publishManager.on('error', function(error) {
+ *   // Do something
+ * });
+ *
+ * // Listen to publish manager's end of processing for a media
+ * publishManager.on('complete', function(mediaPackage){
+ *   // Do something
+ * });
+ *
+ * // Listen to publish manager's event informing that a media processing is retrying
+ * publishManager.on('retry', function(mediaPackage) {
+ *   // Do something
+ * });
+ *
+ * // Listen to publish manager's event informing that a media, waiting for upload, starts uploading
+ * publishManager.on('upload', function(mediaPackage) {
+ *   // Do something
+ * });
+ *
+ * publishManager.publish({
+ *   type: 'youtube', // The media platform to use for this media
+ *   originalPackagePath: '/home/openveo/medias/media-package.tar', // Path of the media package
+ *   originalFileName: 'media-package' // File name without extension
+ * });
+ *
+ * @class PublishManager
+ * @constructor
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider The media provider
+ * @param {Number} [maxConcurrentPackage=3] The maximum number of medias to treat in parallel
+ */
+function PublishManager(videoProvider, maxConcurrentPackage) {
+  if (publishManager)
+    throw new Error('PublishManager already instanciated, use get method instead');
+
+  Object.defineProperties(this,
+
+    /** @lends module:publish/PublishManager~PublishManger */
+    {
+
+      /**
+       * Medias waiting to be processed.
+       *
+       * @type {Array}
+       * @instance
+       * @readonly
+       */
+      queue: {value: []},
+
+      /**
+       * Medias being processed.
+       *
+       * @type {Array}
+       * @instance
+       * @readonly
+       */
+      pendingPackages: {value: []},
+
+      /**
+       * Media provider.
+       *
+       * @type {module:publish/providers/VideoProvider~VideoProvider}
+       * @instance
+       * @readonly
+       */
+      videoProvider: {value: videoProvider},
+
+      /**
+       * Maximum number of medias to treat in parallel.
+       *
+       * @type {Number}
+       * @instance
+       * @readonly
+       */
+      maxConcurrentPackage: {value: maxConcurrentPackage || 3}
+
+    }
+
+  );
+}
+
+util.inherits(PublishManager, events.EventEmitter);
+module.exports = PublishManager;
+
+/**
+ * Removes a media from pending medias.
+ *
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
+ * @private
+ * @param {Object} mediaPackage The media package to remove
+ */
+function removeFromPending(mediaPackage) {
+  for (var i = 0; i &lt; this.pendingPackages.length; i++) {
+    if (this.pendingPackages[i]['id'] === mediaPackage.id) {
+      this.pendingPackages.splice(i, 1);
+      break;
+    }
+  }
+  for (var j = 0; j &lt; this.pendingPackages.length; j++) {
+    if (this.pendingPackages[j]['originalFileName'] === mediaPackage.originalFileName) {
+      this.pendingPackages.splice(j, 1);
+      break;
+    }
+  }
+  process.logger.debug('Package ' + mediaPackage.id + ' from ' +
+   mediaPackage.originalFileName + ' is removed from pendingPackages');
+}
+
+/**
+ * Handles media error event.
+ *
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
+ * @private
+ * @param {Error} error The error
+ * @param {Object} mediaPackage The media on error
+ */
+function onError(error, mediaPackage) {
+
+  // Remove media from pending medias
+  removeFromPending.call(this, mediaPackage);
+
+  // Publish pending media from FIFO queue
+  if (this.queue.length)
+    this.publish(this.queue.shift(0));
+
+  // Add media id to the error message
+  if (error)
+    error.message += ' (' + mediaPackage.id + ')';
+
+  this.emit('error', error, error.code);
+}
+
+/**
+ * Handles media complete event.
+ *
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
+ * @private
+ * @param {Object} mediaPackage The package on error
+ */
+function onComplete(mediaPackage) {
+
+  // Remove package from pending packages
+  removeFromPending.call(this, mediaPackage);
+
+  // Publish pending package from FIFO queue
+  if (this.queue.length)
+    this.publish(this.queue.shift(0));
+
+  this.emit('complete', mediaPackage);
+}
+
+/**
+ * Creates a media package manager corresponding to the media type.
+ *
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
+ * @private
+ * @param {Object} mediaPackage The media to manage
+ * @return {Package} A media package manager
+ */
+function createMediaPackageManager(mediaPackage) {
+  var self = this;
+  var mediaPackageManager = packageFactory.get(mediaPackage.packageType, mediaPackage);
+
+  // Handle errors from media package manager
+  mediaPackageManager.on('error', function(error) {
+    onError.call(self, error, mediaPackage);
+  });
+
+  // Handle complete events from media package manager
+  mediaPackageManager.on('complete', function(completePackage) {
+    onComplete.call(self, completePackage);
+  });
+
+  // Handle stateChanged events from media package manager
+  mediaPackageManager.on('stateChanged', function(mediaPackage) {
+    self.emit('stateChanged', mediaPackage);
+  });
+
+  return mediaPackageManager;
+}
+
+/**
+ * Adds media package to the list of pending packages.
+ *
+ * @memberof module:publish/PublishManager~PublishManager
+ * @this module:publish/PublishManager~PublishManager
+ * @private
+ * @param {Object} mediaPackage The media package to add to pending packages
+ * @return {Boolean} true if the media package is successfully added to pending packages
+ * false if it has been added to queue
+ */
+function addPackage(mediaPackage) {
+  process.logger.debug('Actually ' + this.pendingPackages.length + ' pending packages');
+
+  // Packages of the same name are authorized to be treated simultaneously
+  // From a list of packages with the same name we don't know which one is actually not waiting for another one
+  var pendingPackagesWithAnotherName = this.pendingPackages.filter(function(pendingPackage) {
+    return mediaPackage.originalFileName !== pendingPackage.originalFileName;
+  });
+
+  // Too much pending packages
+  if (pendingPackagesWithAnotherName.length >= this.maxConcurrentPackage) {
+
+    // Add package to queue
+    this.queue.push(mediaPackage);
+    process.logger.debug('Add package ' + mediaPackage.originalPackagePath + ' (' + mediaPackage.id + ') to queue');
+    return false;
+
+  } else {
+
+    // Process can deal with the package
+    process.logger.debug('Add package ' + mediaPackage.originalPackagePath +
+                      ' (' + mediaPackage.id + ') to pending packages');
+
+    // Add package to the list of pending packages
+    this.pendingPackages.push(mediaPackage);
+    return true;
+
+  }
+}
+
+/**
+ * Gets an instance of the PublishManager.
+ *
+ * @param {module:publish/providers/VideoProvider~VideoProvider} videoProvider The media provider
+ * @param {Number} [maxConcurrentPackage] The maximum number of medias to treat in parallel
+ * @return {module:publish/PublishManager~PublishManager} The PublishManager singleton instance
+ */
+PublishManager.get = function(videoProvider, maxConcurrentPackage) {
+  if (!publishManager)
+    publishManager = new PublishManager(videoProvider);
+
+  return publishManager;
+};
+
+/**
+ * Publishes the given media package.
+ *
+ * Media package must be of one of the supported type.
+ *
+ * @param {Object} mediaPackage Media to publish
+ * @param {String} mediaPackage.originalPackagePath Package absolute path
+ * @param {String} mediaPackage.packageType The package type
+ * @param {String} [mediaPackage.title] The title to use for this media, default to the file name without extension
+ */
+PublishManager.prototype.publish = function(mediaPackage) {
+  var self = this;
+
+  if (mediaPackage &amp;&amp; (typeof mediaPackage === 'object')) {
+
+    // Media package can be in queue and already have an id
+    if (!mediaPackage.id) {
+      var pathDescriptor = path.parse(mediaPackage.originalPackagePath);
+      mediaPackage.id = nanoid();
+      mediaPackage.title = mediaPackage.title || pathDescriptor.name;
+    }
+
+    self.videoProvider.getOne(
+      new ResourceFilter().equal('originalPackagePath', mediaPackage.originalPackagePath),
+      {
+        include: ['id']
+      },
+      function(error, media) {
+        if (error) {
+          self.emit('error', new PublishError('Getting media with original package path "' +
+                                              mediaPackage.originalPackagePath + '" failed with message : ' +
+                                              error.message, ERRORS.UNKNOWN));
+        } else if (!media) {
+
+          // Package can be added to pending packages as a new one
+          if (addPackage.call(self, mediaPackage)) {
+
+            // Media package does not exist
+            // Publish it
+            var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+            mediaPackageManager.init(Package.STATES.PACKAGE_SUBMITTED, Package.TRANSITIONS.INIT);
+            mediaPackageManager.executeTransition(Package.TRANSITIONS.INIT);
+
+          }
+
+        } else if (media.id === mediaPackage.id) {
+
+          // Media already exists
+          // Retry media
+          self.retry(media.id, true);
+
+        } else {
+          self.emit(
+            'error',
+            new PublishError('Duplicate file "' + mediaPackage.originalPackagePath, ERRORS.DUPLICATE_MEDIA)
+          );
+        }
+      }
+    );
+  } else
+    this.emit('error', new PublishError('mediaPackage argument must be an Object', ERRORS.UNKNOWN));
+};
+
+/**
+ * Retries publishing a media package which is on error.
+ *
+ * @param {String} packageId The id of the package on error
+ * @param {Boolean} forceRetry Force retrying a package no matter its state
+ */
+PublishManager.prototype.retry = function(packageId, forceRetry) {
+  if (packageId) {
+    var self = this;
+
+    // Retrieve package information
+    this.videoProvider.getOne(
+      new ResourceFilter().equal('id', packageId),
+      null,
+      function(error, mediaPackage) {
+        if (error) {
+          self.emit(
+            'error',
+            new PublishError(
+              'Getting package ' + packageId + ' failed with message : ' + error.message,
+              ERRORS.UNKNOWN
+            )
+          );
+        } else if (!mediaPackage) {
+
+          // Package does not exist
+          self.emit(
+            'error',
+            new PublishError('Cannot retry package ' + packageId + ' (not found)', ERRORS.PACKAGE_NOT_FOUND)
+          );
+
+        } else if (mediaPackage.state === STATES.ERROR || forceRetry) {
+
+          // Got package information
+          // Package is indeed in error
+          self.videoProvider.updateState(mediaPackage.id, STATES.PENDING, function() {
+
+            // Retry officially started
+            self.emit('retry', mediaPackage);
+            self.emit('stateChanged', mediaPackage);
+
+          });
+
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+          process.logger.info('Retry package ' + mediaPackage.id);
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
+
+          // Package can be added to pending packages
+          if (addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+        }
+
+      }
+    );
+  }
+};
+
+/**
+ * Retries publishing all packages in a non stable state.
+ *
+ * Stable states are:
+ * - STATES.ERROR
+ * - STATES.WAITING_FOR_MERGE
+ * - STATES.WAITING_FOR_UPLOAD
+ * - STATES.READY
+ * - STATES.PUBLISHED
+ */
+PublishManager.prototype.retryAll = function() {
+  var self = this;
+
+  // Retrieve all packages in a non stable state
+  this.videoProvider.getAll(
+    new ResourceFilter().notIn(
+      'state', [
+        STATES.ERROR,
+        STATES.WAITING_FOR_MERGE,
+        STATES.WAITING_FOR_UPLOAD,
+        STATES.READY,
+        STATES.PUBLISHED
+      ]
+    ),
+    null,
+    {
+      id: 'desc'
+    },
+    function(error, mediaPackages) {
+      if (error) {
+        return self.emit(
+          'error',
+          new PublishError(
+            'Getting packages in non stable state failed with message : ' + error.message,
+            ERRORS.UNKNOWN
+          )
+        );
+      }
+
+      mediaPackages.forEach(function(mediaPackage) {
+        self.retry(mediaPackage.id, true);
+      });
+
+    }
+  );
+
+};
+
+/**
+ * Uploads a media blocked in "waiting to upload" state.
+ *
+ * @param {String} packageId The id of the package waiting to be uploaded
+ * @param {String} platform The type of the video platform to upload to
+ */
+PublishManager.prototype.upload = function(packageId, platform) {
+  if (packageId &amp;&amp; platform) {
+    var self = this;
+
+    // Retrieve package information
+    this.videoProvider.getOne(
+      new ResourceFilter().equal('id', packageId),
+      null,
+      function(error, mediaPackage) {
+        if (error) {
+          self.emit(
+            'error',
+            new PublishError(
+              'Getting package ' + packageId + ' failed with message : ' + error.message,
+              ERRORS.UNKNOWN
+            )
+          );
+        } else if (!mediaPackage) {
+
+          // Package does not exist
+          self.emit(
+            'error',
+            new PublishError('Cannot upload package ' + packageId + ' (not found)', ERRORS.PACKAGE_NOT_FOUND)
+          );
+
+        } else if (mediaPackage.state === STATES.WAITING_FOR_UPLOAD) {
+
+          // Package is indeed waiting for upload
+          self.videoProvider.updateState(mediaPackage.id, STATES.PENDING, function() {
+
+            // Upload officially started
+            self.emit('upload', mediaPackage);
+            self.emit('stateChanged', mediaPackage);
+
+          });
+          self.videoProvider.updateType(mediaPackage.id, platform);
+
+          var mediaPackageManager = createMediaPackageManager.call(self, mediaPackage);
+          process.logger.info('Force upload package ' + mediaPackage.id);
+          mediaPackage.type = platform;
+          mediaPackageManager.init(mediaPackage.lastState, mediaPackage.lastTransition);
+
+          // Package can be added to pending packages
+          if (addPackage.call(self, mediaPackage))
+            mediaPackageManager.executeTransition(mediaPackage.lastTransition);
+
+        }
+
+      }
+    );
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publish_controllers_ConfigurationController.html">publish/controllers/ConfigurationController</a></li><li><a href="module-publish_controllers_httpErrors.html">publish/controllers/httpErrors</a></li><li><a href="module-publish_controllers_PropertyController.html">publish/controllers/PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController.html">publish/controllers/StatisticsController</a></li><li><a href="module-publish_controllers_VideoController.html">publish/controllers/VideoController</a></li><li><a href="module-publish_hooks.html">publish/hooks</a></li><li><a href="module-publish_listener.html">publish/listener</a></li><li><a href="module-publish_packages_ArchiveFormat.html">publish/packages/ArchiveFormat</a></li><li><a href="module-publish_packages_archiveFormatFactory.html">publish/packages/archiveFormatFactory</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchivePackage.html">publish/packages/ArchivePackage</a></li><li><a href="module-publish_packages_ArchivePackageError.html">publish/packages/ArchivePackageError</a></li><li><a href="module-publish_packages_errors.html">publish/packages/errors</a></li><li><a href="module-publish_packages_Package.html">publish/packages/Package</a></li><li><a href="module-publish_packages_PackageError.html">publish/packages/PackageError</a></li><li><a href="module-publish_packages_packageFactory.html">publish/packages/packageFactory</a></li><li><a href="module-publish_packages_states.html">publish/packages/states</a></li><li><a href="module-publish_packages_VideoPackageError.html">publish/packages/VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_factory.html">publish/providers/mediaPlatforms/factory</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_types.html">publish/providers/mediaPlatforms/types</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider.html">publish/providers/PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider.html">publish/providers/PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage.html">publish/providers/VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider.html">publish/providers/VideoProvider</a></li><li><a href="module-publish_PublishError.html">publish/PublishError</a></li><li><a href="module-publish_PublishManager.html">publish/PublishManager</a></li><li><a href="module-publish_PublishPlugin.html">publish/PublishPlugin</a></li><li><a href="module-publish_PublishPluginApi.html">publish/PublishPluginApi</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-publish_controllers_httpErrors-HTTP_ERRORS.html">publish/controllers/httpErrors~HTTP_ERRORS</a></li><li><a href="module-publish_hooks-PUBLISH_HOOKS.html">publish/hooks~PUBLISH_HOOKS</a></li><li><a href="module-publish_packages_errors-ERRORS.html">publish/packages/errors~ERRORS</a></li><li><a href="module-publish_packages_states-STATES.html">publish/packages/states~STATES</a></li><li><a href="module-publish_providers_mediaPlatforms_types-TYPES.html">publish/providers/mediaPlatforms/types~TYPES</a></li></ul><h3>Classes</h3><ul><li><a href="module-publish_controllers_ConfigurationController-ConfigurationController.html">publish/controllers/ConfigurationController~ConfigurationController</a></li><li><a href="module-publish_controllers_PropertyController-PropertyController.html">publish/controllers/PropertyController~PropertyController</a></li><li><a href="module-publish_controllers_StatisticsController-StatisticsController.html">publish/controllers/StatisticsController~StatisticsController</a></li><li><a href="module-publish_controllers_VideoController-VideoController.html">publish/controllers/VideoController~VideoController</a></li><li><a href="module-publish_packages_ArchiveFormatVersion1-ArchiveFormatVersion1.html">publish/packages/ArchiveFormatVersion1~ArchiveFormatVersion1</a></li><li><a href="module-publish_packages_ArchiveFormatVersion2-ArchiveFormatVersion2.html">publish/packages/ArchiveFormatVersion2~ArchiveFormatVersion2</a></li><li><a href="module-publish_packages_ArchiveFormat-ArchiveFormat.html">publish/packages/ArchiveFormat~ArchiveFormat</a></li><li><a href="module-publish_packages_ArchivePackageError-ArchivePackageError.html">publish/packages/ArchivePackageError~ArchivePackageError</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html">publish/packages/ArchivePackage~ArchivePackage</a></li><li><a href="module-publish_packages_PackageError-PackageError.html">publish/packages/PackageError~PackageError</a></li><li><a href="module-publish_packages_Package-Package.html">publish/packages/Package~Package</a></li><li><a href="module-publish_packages_VideoPackageError-VideoPackageError.html">publish/packages/VideoPackageError~VideoPackageError</a></li><li><a href="module-publish_providers_mediaPlatforms_LocalProvider-LocalProvider.html">publish/providers/mediaPlatforms/LocalProvider~LocalProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_MediaPlatformProvider-MediaPlatformProvider.html">publish/providers/mediaPlatforms/MediaPlatformProvider~MediaPlatformProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsClient-TlsClient.html">publish/providers/mediaPlatforms/tls/TlsClient~TlsClient</a></li><li><a href="module-publish_providers_mediaPlatforms_tls_TlsProvider-TlsProvider.html">publish/providers/mediaPlatforms/tls/TlsProvider~TlsProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_VimeoProvider-VimeoProvider.html">publish/providers/mediaPlatforms/VimeoProvider~VimeoProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_WowzaProvider-WowzaProvider.html">publish/providers/mediaPlatforms/WowzaProvider~WowzaProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_GoogleOAuthHelper-GoogleOAuthHelper.html">publish/providers/mediaPlatforms/youtube/GoogleOAuthHelper~GoogleOAuthHelper</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeProvider-YoutubeProvider.html">publish/providers/mediaPlatforms/youtube/YoutubeProvider~YoutubeProvider</a></li><li><a href="module-publish_providers_mediaPlatforms_youtube_YoutubeResumableUpload-ResumableUpload.html">publish/providers/mediaPlatforms/youtube/YoutubeResumableUpload~ResumableUpload</a></li><li><a href="module-publish_providers_PoiProvider-PoiProvider.html">publish/providers/PoiProvider~PoiProvider</a></li><li><a href="module-publish_providers_PropertyProvider-PropertyProvider.html">publish/providers/PropertyProvider~PropertyProvider</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html">publish/providers/VideoPackage~VideoPackage</a></li><li><a href="module-publish_providers_VideoProvider-VideoProvider.html">publish/providers/VideoProvider~VideoProvider</a></li><li><a href="module-publish_PublishError-PublishError.html">publish/PublishError~PublishError</a></li><li><a href="module-publish_PublishManager-PublishManager.html">publish/PublishManager~PublishManager</a></li><li><a href="module-publish_PublishPluginApi-PublishPluginApi.html">publish/PublishPluginApi~PublishPluginApi</a></li><li><a href="module-publish_PublishPlugin-PublishPlugin.html">publish/PublishPlugin~PublishPlugin</a></li></ul><h3>Events</h3><ul><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:complete">publish/packages/ArchivePackage~ArchivePackage#complete</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:error">publish/packages/ArchivePackage~ArchivePackage#error</a></li><li><a href="module-publish_packages_ArchivePackage-ArchivePackage.html#event:stateChanged">publish/packages/ArchivePackage~ArchivePackage#stateChanged</a></li><li><a href="module-publish_packages_Package-Package.html#event:complete">publish/packages/Package~Package#complete</a></li><li><a href="module-publish_packages_Package-Package.html#event:error">publish/packages/Package~Package#error</a></li><li><a href="module-publish_packages_Package-Package.html#event:stateChanged">publish/packages/Package~Package#stateChanged</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:complete">publish/providers/VideoPackage~VideoPackage#complete</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:error">publish/providers/VideoPackage~VideoPackage#error</a></li><li><a href="module-publish_providers_VideoPackage-VideoPackage.html#event:stateChanged">publish/providers/VideoPackage~VideoPackage#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:complete">publish/PublishManager~PublishManager#complete</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:error">publish/PublishManager~PublishManager#error</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:retry">publish/PublishManager~PublishManager#retry</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:stateChanged">publish/PublishManager~PublishManager#stateChanged</a></li><li><a href="module-publish_PublishManager-PublishManager.html#event:upload">publish/PublishManager~PublishManager#upload</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Feb 27 2023 15:33:25 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
