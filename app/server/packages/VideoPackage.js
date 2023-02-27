@@ -9,7 +9,9 @@ var path = require('path');
 var fs = require('fs');
 var async = require('async');
 var ffmpeg = require('fluent-ffmpeg');
+var mp4Box = require('mp4box');
 var openVeoApi = require('@openveo/api');
+
 var Package = process.requirePublish('app/server/packages/Package.js');
 var ERRORS = process.requirePublish('app/server/packages/errors.js');
 var STATES = process.requirePublish('app/server/packages/states.js');
@@ -136,7 +138,8 @@ Object.freeze(VideoPackage.stateMachine);
  * Defragments given MP4 file.
  *
  * If the input file is fragmented, FFMPEG will be used to defragment the MP4.
- * The fragmentation detection of the file is based on an unknown "nb_frames" property in FFPROBE output metadata.
+ * The fragmentation detection of the file is based on isFragmented property returned by MP4Box after analyzing the
+ * moov box.
  *
  * If file is not fragmented, it does nothing.
  *
@@ -154,23 +157,34 @@ VideoPackage.prototype.defragment = function(mp4FilePath, callback) {
 
   async.series([
 
-    // Detect if file need defragmentation (unknown "nb_frames")
+    // Detect if file needs defragmentation using MP4Box
     function(callback) {
-      ffmpeg.ffprobe(mp4FilePath, function(error, metadata) {
-        if (error) return callback(error);
+      var mp4FileBoxes = mp4Box.createFile();
+      var mp4FileReader = fs.createReadStream(mp4FilePath);
+      var mp4FilePosition = 0;
+      var stopParse = false;
 
-        if (metadata && Array.isArray(metadata.streams)) {
-          var fragmentedStreams = metadata.streams.filter(function(stream) {
-            if (stream.codec_type !== 'video')
-              return false;
-
-            return stream.nb_frames === 'N/A';
-          });
-
-          defragmentationRequired = fragmentedStreams.length !== 0;
-        }
-
+      mp4FileBoxes.onError = callback;
+      mp4FileBoxes.onReady = function(info) {
+        stopParse = true;
+        defragmentationRequired = info.isFragmented;
+        mp4FileReader.destroy();
         callback();
+      };
+
+      mp4FileReader.on('error', callback);
+      mp4FileReader.on('readable', function() {
+        if (!stopParse) {
+          var chunk = mp4FileReader.read();
+          if (chunk) {
+            var chunkBuffer = chunk.buffer;
+            chunkBuffer.fileStart = mp4FilePosition;
+            mp4FilePosition += chunkBuffer.byteLength;
+            mp4FileBoxes.appendBuffer(chunkBuffer);
+          } else {
+            mp4FileBoxes.flush();
+          }
+        }
       });
     },
 

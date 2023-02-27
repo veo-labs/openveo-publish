@@ -21,12 +21,17 @@ describe('VideoPackage', function() {
   var expectedError = new Error('Something went wrong');
   var expectedFfprobeResult;
   var expectedPackages;
+  var expectedMp4BoxFile;
+  var expectedReadStream;
   var ffmpeg;
   var ffmpegFunctions;
   var fs;
+  var mp4Box;
+  var Mp4BoxFile;
   var openVeoApi;
   var poiProvider;
   var publishConf;
+  var ReadStream;
   var videoPackage;
   var VideoPackage;
   var videoPlatformConf;
@@ -38,7 +43,6 @@ describe('VideoPackage', function() {
       streams: [
         {
           codec_type: 'video', // eslint-disable-line camelcase
-          nb_frames: 'N/A', // eslint-disable-line camelcase
           height: 720
         }
       ]
@@ -125,7 +129,39 @@ describe('VideoPackage', function() {
       callback(null, expectedFfprobeResult);
     });
 
+    Mp4BoxFile = function() {};
+    Mp4BoxFile.prototype.appendBuffer = chai.spy(function(arrayBuffer) {
+      this.onReady({isFragmented: true});
+    });
+    Mp4BoxFile.prototype.flush = chai.spy(function() {});
+
+    mp4Box = {
+      createFile: chai.spy(function() {
+        expectedMp4BoxFile = new Mp4BoxFile();
+        return expectedMp4BoxFile;
+      })
+    };
+
+    ReadStream = function() {
+      this.events = {};
+    };
+    ReadStream.prototype.destroy = chai.spy(function() {});
+    ReadStream.prototype.on = chai.spy(function(eventName, callback) {
+      this.events[eventName] = callback;
+      if (eventName === 'readable') {
+        callback();
+      }
+      return this;
+    });
+    ReadStream.prototype.read = chai.spy(function() {
+      return Buffer.from('something');
+    });
+
     fs = {
+      createReadStream: chai.spy(function(filePath) {
+        expectedReadStream = new ReadStream();
+        return expectedReadStream;
+      }),
       unlink: chai.spy(function(filePath, callback) {
         callback();
       }),
@@ -146,6 +182,7 @@ describe('VideoPackage', function() {
     mock('@openveo/api', openVeoApi);
     mock('fs', fs);
     mock('fluent-ffmpeg', ffmpeg);
+    mock('mp4box', mp4Box);
     mock(path.join(process.rootPublish, 'app/server/providers/VideoProvider.js'), videoProvider);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/publishConf.json'), publishConf);
     mock(path.join(openVeoApi.fileSystem.getConfDir(), 'publish/videoPlatformConf.json'), videoPlatformConf);
@@ -175,11 +212,23 @@ describe('VideoPackage', function() {
     var expectedDefragmentedFilePath = '/tmp/file-to-defragment-defrag.mp4';
 
     it('should defragment given video file if fragmented', function(done) {
+      const expectedBuffer = Buffer.from('something');
+
+      Mp4BoxFile.prototype.appendBuffer = chai.spy(function(arrayBuffer) {
+        assert.equal(arrayBuffer, expectedBuffer.buffer);
+        this.onReady({isFragmented: true});
+      });
+
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.isNull(error, 'Unexpected error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        ffmpeg.ffprobe.should.have.been.called.with(expectedFilePath);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(1);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.with(expectedBuffer.buffer);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.with(expectedFilePath);
         ffmpegFunctions.save.should.have.been.called.exactly(1);
@@ -193,13 +242,50 @@ describe('VideoPackage', function() {
     });
 
     it('should not defragment given video file if not fragmented', function(done) {
-      expectedFfprobeResult = {};
+      const expectedBuffer = Buffer.from('something');
+
+      Mp4BoxFile.prototype.appendBuffer = chai.spy(function(arrayBuffer) {
+        this.onReady({isFragmented: false});
+      });
 
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.isNull(error, 'Unexpected error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
-        ffmpeg.ffprobe.should.have.been.called.with(expectedFilePath);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(1);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.with(expectedBuffer.buffer);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
+        ffmpeg.should.have.been.called.exactly(0);
+        ffmpegFunctions.save.should.have.been.called.exactly(0);
+        fs.unlink.should.have.been.called.exactly(0);
+        fs.rename.should.have.been.called.exactly(0);
+        done();
+      });
+    });
+
+    it('should execute callback with an error if reading file failed', function(done) {
+      const expectedError = new Error('something went wrong');
+
+      ReadStream.prototype.on = chai.spy(function(eventName, callback) {
+        this.events[eventName] = callback;
+        if (eventName === 'readable') {
+          this.events.error(expectedError);
+        }
+        return this;
+      });
+
+      videoPackage.defragment(expectedFilePath, function(error) {
+        assert.strictEqual(error, expectedError, 'Wrong error');
+
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(0);
+        expectedReadStream.read.should.have.been.called.exactly(0);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(0);
         ffmpeg.should.have.been.called.exactly(0);
         ffmpegFunctions.save.should.have.been.called.exactly(0);
         fs.unlink.should.have.been.called.exactly(0);
@@ -209,13 +295,21 @@ describe('VideoPackage', function() {
     });
 
     it('should execute callback with an error if analyzing file failed', function(done) {
-      ffmpeg.ffprobe = chai.spy(function(filePath, callback) {
-        callback(expectedError);
+      const expectedError = new Error('something went wrong');
+
+      Mp4BoxFile.prototype.appendBuffer = chai.spy(function(arrayBuffer) {
+        this.onError(expectedError);
       });
+
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.strictEqual(error, expectedError, 'Wrong error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(0);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.exactly(0);
         ffmpegFunctions.save.should.have.been.called.exactly(0);
         fs.unlink.should.have.been.called.exactly(0);
@@ -232,7 +326,12 @@ describe('VideoPackage', function() {
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.strictEqual(error, expectedError, 'Wrong error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(1);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.exactly(1);
         ffmpegFunctions.save.should.have.been.called.exactly(1);
         fs.unlink.should.have.been.called.exactly(0);
@@ -249,7 +348,12 @@ describe('VideoPackage', function() {
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.strictEqual(error, expectedError, 'Wrong error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(1);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.exactly(1);
         ffmpegFunctions.save.should.have.been.called.exactly(1);
         fs.unlink.should.have.been.called.exactly(1);
@@ -266,7 +370,12 @@ describe('VideoPackage', function() {
       videoPackage.defragment(expectedFilePath, function(error) {
         assert.strictEqual(error, expectedError, 'Wrong error');
 
-        ffmpeg.ffprobe.should.have.been.called.exactly(1);
+        mp4Box.createFile.should.have.been.called.exactly(1);
+        fs.createReadStream.should.have.been.called.with(expectedFilePath);
+        fs.createReadStream.should.have.been.called.exactly(1);
+        expectedReadStream.destroy.should.have.been.called.exactly(1);
+        expectedReadStream.read.should.have.been.called.exactly(1);
+        expectedMp4BoxFile.appendBuffer.should.have.been.called.exactly(1);
         ffmpeg.should.have.been.called.exactly(1);
         ffmpegFunctions.save.should.have.been.called.exactly(1);
         fs.unlink.should.have.been.called.exactly(1);

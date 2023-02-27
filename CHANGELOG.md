@@ -1,3 +1,9 @@
+# 14.0.3 / YYYY-MM-DD
+
+## BUG FIXES
+
+- Fix fragmented MP4 detection when processing a video file. Some fragmented MP4 files were not detected as fragmented and thus weren't defragmented
+
 # 14.0.2 / 2022-05-27
 
 ## BUG FIXES
